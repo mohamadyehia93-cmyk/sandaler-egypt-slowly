@@ -2,8 +2,6 @@ export const regions = [
   { id: "nile-delta", nameKey: "region.nileDelta", emoji: "🌿", color: "#2BBFB3" },
   { id: "suez-canal", nameKey: "region.suezCanal", emoji: "⚓", color: "#1A7A74" },
   { id: "upper-egypt", nameKey: "region.upperEgypt", emoji: "🏛️", color: "#E8A838" },
-  { id: "mariout", nameKey: "region.mariout", emoji: "🌊", color: "#3B82F6" },
-  { id: "fayyum", nameKey: "region.fayyum", emoji: "🏜️", color: "#D97706" },
   { id: "frontiers", nameKey: "region.frontiers", emoji: "⛰️", color: "#8B5CF6" },
 ];
 
