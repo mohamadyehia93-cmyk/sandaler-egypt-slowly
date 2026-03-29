@@ -56,6 +56,37 @@ const ExperienceCards = () => {
         ))}
       </div>
 
+      {/* Region dropdown */}
+      <div className="relative px-4 mb-3">
+        <button
+          onClick={() => setRegionOpen(!regionOpen)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground shadow-card"
+        >
+          <MapPin className="w-3.5 h-3.5 text-primary" />
+          {activeRegionLabel}
+          <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${regionOpen ? "rotate-180" : ""}`} />
+        </button>
+        {regionOpen && (
+          <div className="absolute top-full left-4 mt-1 z-30 bg-card rounded-lg shadow-elevated border border-border py-1 min-w-[160px]">
+            <button
+              onClick={() => { setActiveRegion("all"); setRegionOpen(false); }}
+              className={`w-full text-start px-3 py-2 text-xs ${activeRegion === "all" ? "text-primary font-semibold bg-secondary" : "text-foreground"}`}
+            >
+              {lang === "ar" ? "كل المناطق" : "All Regions"}
+            </button>
+            {regions.map((r) => (
+              <button
+                key={r.id}
+                onClick={() => { setActiveRegion(r.id); setRegionOpen(false); }}
+                className={`w-full text-start px-3 py-2 text-xs ${activeRegion === r.id ? "text-primary font-semibold bg-secondary" : "text-foreground"}`}
+              >
+                {r.emoji} {t(r.nameKey)}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Cards */}
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {filtered.map((e) => (
