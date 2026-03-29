@@ -1,18 +1,31 @@
 import { useState } from "react";
-import { Heart } from "lucide-react";
+import { Heart, MapPin, ChevronDown } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { experiences, experienceThemes, ExperienceTheme } from "@/lib/sampleData";
+import { experiences, experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
 import { useNavigate } from "react-router-dom";
+
+const regionOptions = [
+  { id: "all", label: { en: "All Regions", ar: "كل المناطق" } },
+  ...regions.map((r) => ({ id: r.id, label: { en: r.nameKey, ar: r.nameKey } })),
+];
 
 const ExperienceCards = () => {
   const { lang, t } = useI18n();
   const navigate = useNavigate();
   const [activeTheme, setActiveTheme] = useState<ExperienceTheme | "all">("all");
+  const [activeRegion, setActiveRegion] = useState("all");
+  const [regionOpen, setRegionOpen] = useState(false);
 
-  const filtered = activeTheme === "all"
-    ? experiences
-    : experiences.filter((e) => e.theme === activeTheme);
+  const filtered = experiences.filter((e) => {
+    const themeMatch = activeTheme === "all" || e.theme === activeTheme;
+    const regionMatch = activeRegion === "all" || e.region.en.toLowerCase().replace(/\s/g, "-") === activeRegion;
+    return themeMatch && regionMatch;
+  });
+
+  const activeRegionLabel = activeRegion === "all"
+    ? (lang === "ar" ? "كل المناطق" : "All Regions")
+    : t(regions.find((r) => r.id === activeRegion)?.nameKey ?? "");
 
   return (
     <SectionHeader titleKey="section.experiences" onSeeAll={() => {}}>
