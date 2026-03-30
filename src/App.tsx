@@ -10,6 +10,7 @@ import ExperienceDetail from "./pages/ExperienceDetail.tsx";
 import Wishlists from "./pages/Wishlists.tsx";
 import Inbox from "./pages/Inbox.tsx";
 import Profile from "./pages/Profile.tsx";
+import RegionDetail from "./pages/RegionDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
