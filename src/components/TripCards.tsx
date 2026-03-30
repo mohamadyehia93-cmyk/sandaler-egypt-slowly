@@ -2,17 +2,20 @@ import { useState } from "react";
 import { MapPin, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { trips, regions } from "@/lib/sampleData";
+import { trips, experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
 
 const TripCards = () => {
   const { lang, t } = useI18n();
   const navigate = useNavigate();
+  const [activeTheme, setActiveTheme] = useState<ExperienceTheme | "all">("all");
   const [activeRegion, setActiveRegion] = useState("all");
   const [regionOpen, setRegionOpen] = useState(false);
 
   const filtered = trips.filter((tr) => {
-    return activeRegion === "all" || tr.regionId === activeRegion;
+    const themeMatch = activeTheme === "all" || tr.theme === activeTheme;
+    const regionMatch = activeRegion === "all" || tr.regionId === activeRegion;
+    return themeMatch && regionMatch;
   });
 
   const activeRegionLabel = activeRegion === "all"
