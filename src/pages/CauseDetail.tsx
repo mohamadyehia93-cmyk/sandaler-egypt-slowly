@@ -5,10 +5,10 @@ import { causes, regions } from "@/lib/sampleData";
 import DetailTestimonials from "@/components/DetailTestimonials";
 
 const supportOptions = [
-  { key: "gift", icon: Gift, label: { en: "Send a Gift", ar: "أرسل هدية" }, desc: { en: "Support through gift packages for the community", ar: "ادعم من خلال هدايا للمجتمع" }, color: "bg-amber-500/10 text-amber-600" },
-  { key: "donate", icon: HandHeart, label: { en: "Donate", ar: "تبرّع" }, desc: { en: "Direct financial contribution to the cause", ar: "مساهمة مالية مباشرة للقضية" }, color: "bg-emerald-500/10 text-emerald-600" },
-  { key: "volunteer", icon: UserCheck, label: { en: "Volunteer", ar: "تطوّع" }, desc: { en: "Give your time and skills on the ground", ar: "قدّم وقتك ومهاراتك على أرض الواقع" }, color: "bg-blue-500/10 text-blue-600" },
-  { key: "consult", icon: MessageCircle, label: { en: "Consult", ar: "استشارة" }, desc: { en: "Offer professional expertise and guidance", ar: "قدّم خبرتك المهنية وإرشاداتك" }, color: "bg-purple-500/10 text-purple-600" },
+  { key: "gift", icon: Gift, label: { en: "Send a Gift", ar: "أرسل هدية" }, desc: { en: "Support through gift packages for the community", ar: "ادعم من خلال هدايا للمجتمع" }, color: "bg-amber-500/10 text-amber-600", path: "gift" },
+  { key: "donate", icon: HandHeart, label: { en: "Donate", ar: "تبرّع" }, desc: { en: "Direct financial contribution to the cause", ar: "مساهمة مالية مباشرة للقضية" }, color: "bg-emerald-500/10 text-emerald-600", path: "donate" },
+  { key: "volunteer", icon: UserCheck, label: { en: "Volunteer", ar: "تطوّع" }, desc: { en: "Give your time and skills on the ground", ar: "قدّم وقتك ومهاراتك على أرض الواقع" }, color: "bg-blue-500/10 text-blue-600", path: "volunteer" },
+  { key: "consult", icon: MessageCircle, label: { en: "Consult", ar: "استشارة" }, desc: { en: "Offer professional expertise and guidance", ar: "قدّم خبرتك المهنية وإرشاداتك" }, color: "bg-purple-500/10 text-purple-600", path: "consult" },
 ];
 
 const CauseDetail = () => {
@@ -95,6 +95,7 @@ const CauseDetail = () => {
           {supportOptions.map((opt) => (
             <button
               key={opt.key}
+              onClick={() => navigate(`/cause/${id}/${opt.path}`)}
               className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border shadow-card hover:border-primary transition-colors"
             >
               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${opt.color}`}>

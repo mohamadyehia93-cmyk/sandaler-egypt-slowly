@@ -24,6 +24,10 @@ import ImpactDashboard from "./pages/ImpactDashboard.tsx";
 import BadgesQuests from "./pages/BadgesQuests.tsx";
 import Settings from "./pages/Settings.tsx";
 import HelpSupport from "./pages/HelpSupport.tsx";
+import CauseSupportGift from "./pages/CauseSupportGift.tsx";
+import CauseSupportDonate from "./pages/CauseSupportDonate.tsx";
+import CauseSupportVolunteer from "./pages/CauseSupportVolunteer.tsx";
+import CauseSupportConsult from "./pages/CauseSupportConsult.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -42,6 +46,10 @@ const App = () => (
             <Route path="/trip/:id" element={<TripDetail />} />
             <Route path="/audio-tour/:id" element={<AudioTourDetail />} />
             <Route path="/cause/:id" element={<CauseDetail />} />
+            <Route path="/cause/:id/gift" element={<CauseSupportGift />} />
+            <Route path="/cause/:id/donate" element={<CauseSupportDonate />} />
+            <Route path="/cause/:id/volunteer" element={<CauseSupportVolunteer />} />
+            <Route path="/cause/:id/consult" element={<CauseSupportConsult />} />
             <Route path="/region/:regionId" element={<RegionDetail />} />
             <Route path="/person/:id" element={<PersonDetail />} />
             <Route path="/city/:cityId" element={<CityDetail />} />
