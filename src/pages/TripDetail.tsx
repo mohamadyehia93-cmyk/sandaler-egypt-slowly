@@ -129,7 +129,7 @@ const TripDetail = () => {
           <span className="text-lg font-bold text-primary-dark">{trip.price} {t("common.egp")}</span>
           <span className="text-xs text-muted-foreground block">{lang === "ar" ? "للشخص" : "per person"}</span>
         </div>
-        <button className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated">
+        <button onClick={() => navigate(`/booking?type=trip&id=${trip.id}`)} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated">
           {t("common.book")}
         </button>
       </div>

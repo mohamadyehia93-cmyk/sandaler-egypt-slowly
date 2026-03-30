@@ -28,6 +28,7 @@ import CauseSupportGift from "./pages/CauseSupportGift.tsx";
 import CauseSupportDonate from "./pages/CauseSupportDonate.tsx";
 import CauseSupportVolunteer from "./pages/CauseSupportVolunteer.tsx";
 import CauseSupportConsult from "./pages/CauseSupportConsult.tsx";
+import Booking from "./pages/Booking.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();

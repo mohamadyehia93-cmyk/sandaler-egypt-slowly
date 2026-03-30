@@ -92,7 +92,7 @@ const ProductDetail = () => {
         <div>
           <span className="text-lg font-bold text-primary-dark">{product.price} {t("common.egp")}</span>
         </div>
-        <button className="flex items-center gap-2 px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated">
+        <button onClick={() => navigate(`/booking?type=product&id=${product.id}`)} className="flex items-center gap-2 px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated">
           <ShoppingCart className="w-4 h-4" />
           {lang === "ar" ? "أضف للسلة" : "Add to Cart"}
         </button>
