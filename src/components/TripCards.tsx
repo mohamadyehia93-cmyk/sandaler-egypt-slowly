@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { MapPin, ChevronDown } from "lucide-react";
+import { MapPin, ChevronDown, Users, Lock, Clock, CalendarDays } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { trips, experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
+import { trips, experienceThemes, ExperienceTheme, regions, TripAccessType, TripDuration } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
 
@@ -12,11 +12,15 @@ const TripCards = () => {
   const [activeTheme, setActiveTheme] = useState<ExperienceTheme | "all">("all");
   const [activeRegion, setActiveRegion] = useState("all");
   const [regionOpen, setRegionOpen] = useState(false);
+  const [activeAccess, setActiveAccess] = useState<TripAccessType | "all">("all");
+  const [activeDuration, setActiveDuration] = useState<TripDuration | "all">("all");
 
   const filtered = trips.filter((tr) => {
     const themeMatch = activeTheme === "all" || tr.theme === activeTheme;
     const regionMatch = activeRegion === "all" || tr.regionId === activeRegion;
-    return themeMatch && regionMatch;
+    const accessMatch = activeAccess === "all" || tr.accessType === activeAccess;
+    const durationMatch = activeDuration === "all" || tr.duration === activeDuration;
+    return themeMatch && regionMatch && accessMatch && durationMatch;
   });
 
   const activeRegionLabel = activeRegion === "all"
