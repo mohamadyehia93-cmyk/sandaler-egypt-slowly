@@ -664,6 +664,7 @@ export const latestPosts = [
     image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80",
     regionId: "nile-delta",
     author: { en: "Nour El-Din", ar: "نور الدين" },
+    authorId: "ca2",
     date: "2024-12-15",
     readTime: 5,
     body: {
