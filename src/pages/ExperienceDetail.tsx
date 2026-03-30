@@ -108,6 +108,9 @@ const ExperienceDetail = () => {
             </div>
           ))}
         </div>
+
+        {/* Testimonials */}
+        <DetailTestimonials />
       </div>
 
       {/* Sticky Bottom */}

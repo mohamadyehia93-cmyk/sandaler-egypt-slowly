@@ -101,6 +101,9 @@ const TripDetail = () => {
             </div>
           ))}
         </div>
+
+        {/* Testimonials */}
+        <DetailTestimonials />
       </div>
 
       {/* Sticky Bottom */}
