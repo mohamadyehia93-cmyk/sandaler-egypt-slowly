@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bell, Calendar } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import BottomNav from "@/components/BottomNav";
