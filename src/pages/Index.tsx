@@ -74,7 +74,7 @@ const Index = () => {
           <button className="relative p-1.5" onClick={() => { setSearchOpen(!searchOpen); setSearchQuery(""); }}>
             {searchOpen ? <X className="w-5 h-5 text-foreground" /> : <Search className="w-5 h-5 text-foreground" />}
           </button>
-          <button className="relative p-1.5">
+          <button className="relative p-1.5" onClick={() => navigate("/inbox")}>
             <Bell className="w-5 h-5 text-foreground" />
             <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-destructive rounded-full" />
           </button>
