@@ -642,13 +642,104 @@ export const products = [
 ];
 
 export const latestPosts = [
-  { id: "lp1", title: { en: "The Forgotten Forts of the Delta", ar: "القلاع المنسية في الدلتا" }, category: { en: "History", ar: "تاريخ" }, image: "https://images.unsplash.com/photo-1568322445389-f64c5bb0df1d?w=400&q=80", regionId: "nile-delta" },
-  { id: "lp2", title: { en: "Cooking with Grandma in Rosetta", ar: "الطبخ مع جدتي في رشيد" }, category: { en: "Food", ar: "طعام" }, image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80", regionId: "nile-delta" },
-  { id: "lp3", title: { en: "Life on Lake Manzala", ar: "الحياة على بحيرة المنزلة" }, category: { en: "Culture", ar: "ثقافة" }, image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=400&q=80", regionId: "nile-delta" },
-  { id: "lp4", title: { en: "Sunrise over the Suez Canal", ar: "شروق الشمس فوق قناة السويس" }, category: { en: "Nature", ar: "طبيعة" }, image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=400&q=80", regionId: "suez-canal" },
-  { id: "lp5", title: { en: "Nubian Colors of Aswan", ar: "ألوان النوبة في أسوان" }, category: { en: "Culture", ar: "ثقافة" }, image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=400&q=80", regionId: "upper-egypt" },
-  { id: "lp6", title: { en: "Siwa: The Last Oasis", ar: "سيوة: الواحة الأخيرة" }, category: { en: "Nature", ar: "طبيعة" }, image: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=400&q=80", regionId: "frontiers" },
-  { id: "lp7", title: { en: "Port Said's European Quarter", ar: "الحي الأوروبي في بورسعيد" }, category: { en: "History", ar: "تاريخ" }, image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=400&q=80", regionId: "suez-canal" },
+  {
+    id: "lp1",
+    title: { en: "The Forgotten Forts of the Delta", ar: "القلاع المنسية في الدلتا" },
+    category: { en: "History", ar: "تاريخ" },
+    image: "https://images.unsplash.com/photo-1568322445389-f64c5bb0df1d?w=400&q=80",
+    regionId: "nile-delta",
+    author: { en: "Ahmed Mansour", ar: "أحمد منصور" },
+    date: "2024-12-10",
+    readTime: 6,
+    body: {
+      en: "Scattered across the Nile Delta, a chain of forgotten fortifications tells the story of Egypt's strategic northern frontier. From the Mamluk-era watchtowers of Rosetta to the Ottoman garrison posts near Damietta, these structures once guarded against Crusader invasions and Mediterranean pirates.\n\nMany of these forts are now hidden among palm groves and farmland, slowly reclaimed by nature. The Fort of Qaitbay in Rosetta, built in the 15th century using stones from ancient temples, is one of the best preserved. Its thick walls and corner towers still command views over the Nile's western branch.\n\nLocal historians are working to document and preserve these sites before they disappear entirely. Community-led walking tours now connect several forts along the delta's coastline, offering visitors a glimpse into a chapter of Egyptian history rarely found in guidebooks.\n\nThe restoration effort has also uncovered fascinating artifacts — Ottoman-era cannons, medieval pottery fragments, and inscribed stone blocks that hint at even older structures beneath.",
+      ar: "منتشرة عبر دلتا النيل، سلسلة من التحصينات المنسية تروي قصة حدود مصر الشمالية الاستراتيجية. من أبراج المراقبة المملوكية في رشيد إلى مراكز الحراسة العثمانية قرب دمياط، كانت هذه الهياكل تحرس ضد الغزوات الصليبية وقراصنة البحر المتوسط.\n\nالعديد من هذه القلاع مخفية الآن بين بساتين النخيل والأراضي الزراعية. قلعة قايتباي في رشيد، التي بُنيت في القرن الخامس عشر باستخدام أحجار من المعابد القديمة، من أفضلها حفظاً.\n\nالمؤرخون المحليون يعملون على توثيق هذه المواقع والحفاظ عليها. جولات مشي مجتمعية تربط الآن عدة قلاع على طول ساحل الدلتا.\n\nكشفت جهود الترميم أيضاً عن قطع أثرية مذهلة — مدافع عثمانية وشظايا فخار من العصور الوسطى وكتل حجرية منقوشة."
+    },
+  },
+  {
+    id: "lp2",
+    title: { en: "Cooking with Grandma in Rosetta", ar: "الطبخ مع جدتي في رشيد" },
+    category: { en: "Food", ar: "طعام" },
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80",
+    regionId: "nile-delta",
+    author: { en: "Nour El-Din", ar: "نور الدين" },
+    date: "2024-12-15",
+    readTime: 5,
+    body: {
+      en: "In a small kitchen off a narrow alley in Rosetta's old quarter, Fatma Abdelrahman — known simply as 'Teta Fatma' — has been cooking traditional delta dishes for over 50 years. Her home has become an unofficial culinary school for travelers seeking authentic Egyptian flavors.\n\nThe morning starts at the local souk, where Teta Fatma selects the freshest ingredients: molokhia leaves, river fish, and bundles of fresh dill and coriander. She insists on hand-picking each herb, explaining that 'the nose knows before the tongue.'\n\nBack in her kitchen, the magic begins. She prepares 'sayadeya' — a Rosetta specialty of spiced rice layered with caramelized onions and fresh-caught Nile fish. The dish requires patience: the onions must reach a deep amber color, and the fish stock simmers for hours.\n\nAs the aromas fill the house, neighbors stop by, children peek through the doorway, and stories flow as freely as the tea. This isn't just cooking — it's a window into the soul of delta hospitality, where every meal is a celebration of community.",
+      ar: "في مطبخ صغير في زقاق ضيق في الحي القديم برشيد، تطبخ فاطمة عبدالرحمن — المعروفة بـ'تيتا فاطمة' — أطباق الدلتا التقليدية منذ أكثر من ٥٠ عاماً. أصبح منزلها مدرسة طهي غير رسمية للمسافرين.\n\nيبدأ الصباح في السوق المحلي حيث تختار تيتا فاطمة أطيب المكونات: ورق الملوخية وسمك النهر وحزم الشبت والكزبرة الطازجة.\n\nفي مطبخها يبدأ السحر. تحضّر 'الصيادية' — تخصص رشيد من الأرز المتبل مع البصل المكرمل وسمك النيل الطازج.\n\nمع انتشار الروائح يمر الجيران ويطل الأطفال من الباب وتتدفق القصص بحرية مع الشاي. هذا ليس مجرد طبخ — إنه نافذة على روح كرم ضيافة الدلتا."
+    },
+  },
+  {
+    id: "lp3",
+    title: { en: "Life on Lake Manzala", ar: "الحياة على بحيرة المنزلة" },
+    category: { en: "Culture", ar: "ثقافة" },
+    image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=400&q=80",
+    regionId: "nile-delta",
+    author: { en: "Sara Khalil", ar: "سارة خليل" },
+    date: "2024-12-20",
+    readTime: 7,
+    body: {
+      en: "Lake Manzala is a world apart. Egypt's largest northern lagoon stretches across 700 square kilometers between Damietta, Port Said, and the Mediterranean, dotted with dozens of inhabited islands where fishing families have lived for generations.\n\nAt dawn, the lake comes alive. Hundreds of colorful wooden boats push off from reed-lined shores, their fishermen casting nets in techniques unchanged for centuries. The catch — tilapia, mullet, and shrimp — feeds families and fills the markets of nearby towns.\n\nBut Manzala is more than a fishery. It's one of the most important wetlands in the Mediterranean basin, a critical stopover for millions of migratory birds traveling between Europe and Africa. Flamingos, herons, and pelicans paint the horizon pink and white during winter months.\n\nThe lake faces serious environmental threats from agricultural runoff and urban encroachment. Local conservation groups are fighting to protect this irreplaceable ecosystem, working with fishing communities to promote sustainable practices that can preserve both livelihoods and biodiversity.\n\nVisiting Manzala is an exercise in slowing down — riding a felucca through channels of lotus flowers, sharing tea with fishermen who know every island by name, and watching sunsets that seem to set the entire lake on fire.",
+      ar: "بحيرة المنزلة عالم قائم بذاته. أكبر بحيرات مصر الشمالية تمتد على ٧٠٠ كيلومتر مربع بين دمياط وبورسعيد والبحر المتوسط، تتناثر فيها عشرات الجزر المأهولة حيث عاشت عائلات الصيد لأجيال.\n\nعند الفجر تنبض البحيرة بالحياة. مئات القوارب الخشبية الملونة تنطلق من الشواطئ، صياديها يلقون الشباك بتقنيات لم تتغير لقرون.\n\nلكن المنزلة أكثر من مجرد مصيد. إنها واحدة من أهم الأراضي الرطبة في حوض المتوسط، محطة توقف حيوية لملايين الطيور المهاجرة. الفلامنجو والبلشون والبجع يرسمون الأفق بالوردي والأبيض في أشهر الشتاء.\n\nتواجه البحيرة تهديدات بيئية خطيرة. مجموعات الحفاظ المحلية تكافح لحماية هذا النظام البيئي.\n\nزيارة المنزلة تمرين في التباطؤ — ركوب فلوكة عبر قنوات زهور اللوتس ومشاركة الشاي مع الصيادين ومشاهدة غروب يشعل البحيرة بالنار."
+    },
+  },
+  {
+    id: "lp4",
+    title: { en: "Sunrise over the Suez Canal", ar: "شروق الشمس فوق قناة السويس" },
+    category: { en: "Nature", ar: "طبيعة" },
+    image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=400&q=80",
+    regionId: "suez-canal",
+    author: { en: "Mahmoud Rizk", ar: "محمود رزق" },
+    date: "2025-01-02",
+    readTime: 5,
+    body: {
+      en: "There are few places on Earth where you can stand on a bridge between two continents and watch the sun rise over Asia while Africa wakes behind you. The Suez Canal, that narrow ribbon of water connecting the Mediterranean to the Red Sea, offers exactly this experience.\n\nI arrived in Ismailia before dawn, walking along the canal's western bank as the first light painted the sky in bands of amber and rose. Container ships — some as tall as apartment buildings — glided silently through the still water, their navigation lights blinking like earthbound stars.\n\nThe canal is 193 kilometers of engineering marvel, completed in 1869 after a decade of construction. But beyond the statistics, it's the daily ritual of the waterway that captivates: the synchronized passage of convoys, the patient waiting of ships at anchor, and the fishermen who cast their lines from the canal banks as giants pass within arm's reach.\n\nAs the sun climbed higher, the desert on either side transformed from grey to gold. Lake Timsah shimmered to the south, and the gardens of Ismailia — the canal's garden city — filled with birdsong. It was a reminder that even the most industrial of landscapes can hold moments of profound beauty.",
+      ar: "قليلة هي الأماكن على الأرض حيث يمكنك الوقوف على جسر بين قارتين ومشاهدة الشمس تشرق فوق آسيا بينما أفريقيا تستيقظ خلفك. قناة السويس تقدم بالضبط هذه التجربة.\n\nوصلت الإسماعيلية قبل الفجر، أمشي على الضفة الغربية مع أول ضوء يرسم السماء بخطوط من العنبر والورد. سفن الحاويات — بعضها بارتفاع عمارات — تنزلق بصمت عبر المياه الساكنة.\n\nالقناة ١٩٣ كيلومتراً من الإعجاز الهندسي اكتمل عام ١٨٦٩. لكن وراء الأرقام، الطقوس اليومية للممر المائي هي ما يأسر: مرور القوافل المتزامن والصيادون الذين يلقون خيوطهم من ضفاف القناة.\n\nمع ارتفاع الشمس تحولت الصحراء من الرمادي إلى الذهبي. بحيرة التمساح تلمع جنوباً وحدائق الإسماعيلية تمتلئ بتغريد الطيور. تذكير بأن حتى أكثر المناظر صناعية يمكن أن تحمل لحظات جمال عميق."
+    },
+  },
+  {
+    id: "lp5",
+    title: { en: "Nubian Colors of Aswan", ar: "ألوان النوبة في أسوان" },
+    category: { en: "Culture", ar: "ثقافة" },
+    image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=400&q=80",
+    regionId: "upper-egypt",
+    author: { en: "Hana Sobhi", ar: "هنا صبحي" },
+    date: "2025-01-08",
+    readTime: 6,
+    body: {
+      en: "The Nubian villages of Aswan are among the most visually stunning communities in all of Africa. Nestled along the banks of the Nile south of the city, these villages explode with color — every house is painted in vivid blues, yellows, greens, and oranges, often decorated with hand-painted murals of Nile scenes, geometric patterns, and crocodile motifs.\n\nColor in Nubian culture isn't decorative — it's deeply symbolic. Blue wards off evil, green represents the Nile's fertility, and yellow celebrates the desert sun. Each family chooses their palette carefully, and repainting the house is a communal event accompanied by music and feasting.\n\nInside the homes, the warmth continues. Nubian hospitality is legendary — visitors are welcomed with hibiscus tea (karkadeh), freshly baked bread, and conversation that can stretch for hours. Many families have opened their homes as small guesthouses, offering travelers an intimate experience of a culture that predates the pharaohs.\n\nThe Nubian language, related to ancient Meroitic, is still spoken in these villages. Efforts to preserve it include community language classes, a growing body of Nubian-language literature, and digital archives of spoken traditions. Supporting these villages through responsible tourism helps keep one of Africa's oldest living cultures vibrant and thriving.",
+      ar: "القرى النوبية في أسوان من أكثر المجتمعات إبهاراً بصرياً في أفريقيا. على ضفاف النيل جنوب المدينة، تنفجر هذه القرى بالألوان — كل منزل مطلي بأزرق وأصفر وأخضر وبرتقالي زاهي مع جداريات يدوية.\n\nاللون في الثقافة النوبية ليس زخرفياً — إنه رمزي عميقاً. الأزرق يبعد الشر والأخضر يمثل خصوبة النيل والأصفر يحتفل بشمس الصحراء.\n\nداخل المنازل يستمر الدفء. كرم الضيافة النوبي أسطوري — يُرحب بالزوار بالكركديه والخبز الطازج ومحادثات تمتد لساعات. عائلات كثيرة فتحت بيوتها كبيوت ضيافة صغيرة.\n\nاللغة النوبية لا تزال محكية في هذه القرى. جهود الحفاظ عليها تشمل دروس لغة مجتمعية وأرشيفات رقمية للتقاليد المنطوقة. دعم هذه القرى بالسياحة المسؤولة يساعد في إبقاء واحدة من أقدم الثقافات الحية في أفريقيا نابضة ومزدهرة."
+    },
+  },
+  {
+    id: "lp6",
+    title: { en: "Siwa: The Last Oasis", ar: "سيوة: الواحة الأخيرة" },
+    category: { en: "Nature", ar: "طبيعة" },
+    image: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=400&q=80",
+    regionId: "frontiers",
+    author: { en: "Omar Siwan", ar: "عمر السيوي" },
+    date: "2025-01-15",
+    readTime: 8,
+    body: {
+      en: "Eight hours west of Cairo, past the military checkpoints and the endless desert highway, the landscape suddenly transforms. Date palms appear on the horizon, salt lakes glitter under the sun, and the ruins of Shali Fortress rise from the earth like a sandcastle abandoned by giants. Welcome to Siwa.\n\nSiwa Oasis is Egypt's most remote inhabited settlement, sitting just 50 kilometers from the Libyan border. Its 25,000 residents speak Siwi, a Berber language with no written form, and maintain traditions that have survived millennia of isolation.\n\nAlexander the Great came here in 331 BC to consult the Oracle of Amun — a journey so important that he crossed the Sahara to make it. The temple ruins still stand on a rocky outcrop overlooking the oasis, and the sense of ancient mystery remains palpable.\n\nModern Siwa is a study in contrasts. Donkey carts share unpaved roads with the occasional pickup truck. Women weave intricate silver jewelry using techniques passed down for generations. And at night, with no light pollution for hundreds of kilometers, the Milky Way arches overhead with breathtaking clarity.\n\nThe Great Sand Sea begins just beyond the oasis — an ocean of dunes stretching to the Libyan border. Sandboarding down these slopes at sunset, with the oasis glowing golden below, is one of Egypt's most unforgettable experiences.\n\nBut Siwa's greatest treasure is its people. Their warmth, their unhurried pace of life, and their deep connection to the land offer a powerful antidote to the speed of modern life.",
+      ar: "على بعد ثماني ساعات غرب القاهرة، بعد نقاط التفتيش العسكرية والطريق الصحراوي اللانهائي، يتحول المشهد فجأة. نخيل التمر يظهر في الأفق وبحيرات الملح تلمع تحت الشمس وأطلال قلعة شالي ترتفع من الأرض. أهلاً بكم في سيوة.\n\nسيوة أبعد مستوطنة مأهولة في مصر، على بعد ٥٠ كم من الحدود الليبية. سكانها الـ٢٥ ألف يتحدثون السيوية، لغة أمازيغية بدون شكل مكتوب.\n\nجاء الإسكندر الأكبر هنا عام ٣٣١ ق.م لاستشارة وحي آمون. أطلال المعبد لا تزال قائمة على نتوء صخري يطل على الواحة.\n\nسيوة الحديثة دراسة في التناقضات. عربات الحمير تشارك الطرق غير المعبدة مع شاحنات صغيرة. النساء ينسجن مجوهرات فضية معقدة بتقنيات متوارثة. وفي الليل، بدون تلوث ضوئي لمئات الكيلومترات، درب التبانة يقوس فوقك بوضوح مذهل.\n\nبحر الرمال العظيم يبدأ خلف الواحة مباشرة. التزلج على الكثبان عند الغروب، مع الواحة المتوهجة بالذهب أسفلك، من أكثر تجارب مصر التي لا تُنسى.\n\nلكن أعظم كنوز سيوة هو شعبها. دفئهم وإيقاع حياتهم غير المتسرع وارتباطهم العميق بالأرض."
+    },
+  },
+  {
+    id: "lp7",
+    title: { en: "Port Said's European Quarter", ar: "الحي الأوروبي في بورسعيد" },
+    category: { en: "History", ar: "تاريخ" },
+    image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=400&q=80",
+    regionId: "suez-canal",
+    author: { en: "Captain Mahmoud", ar: "الكابتن محمود" },
+    date: "2025-01-20",
+    readTime: 6,
+    body: {
+      en: "Walking through Port Said's European Quarter is like stepping into a forgotten film set. Ornate balconied buildings line the streets in a riot of French, Italian, and Greek architectural styles — their facades adorned with carved cherubs, floral motifs, and wrought-iron balustrades that wouldn't look out of place in Nice or Naples.\n\nThis extraordinary neighborhood was built during the construction of the Suez Canal (1859–1869) when Port Said was a boomtown attracting workers, merchants, and adventurers from across the Mediterranean. At its peak, the city had consulates from dozens of nations and more spoken languages than any other Egyptian city.\n\nToday, many of these buildings are in various states of decay, their grandeur fading behind peeling paint and crumbling plaster. But a growing preservation movement is breathing new life into the quarter. Local architects are documenting every building, creating detailed records of their history and architectural features.\n\nThe Simon Arzt department store building, once the 'Harrods of the East,' still stands as a monument to the city's cosmopolitan past. The old Greek church, the Italian consulate, and the Eastern Exchange Hotel all tell stories of a city that was, for a brief moment, one of the most international in the world.\n\nGuided heritage walks, led by retired sailors and lifelong residents, connect these landmarks with personal stories — making the architecture come alive with the voices of those who remember the quarter in its glory days.",
+      ar: "المشي في الحي الأوروبي في بورسعيد كالدخول في مشهد فيلم منسي. مبانٍ مزخرفة بشرفات تصطف في الشوارع بأساليب معمارية فرنسية وإيطالية ويونانية — واجهاتها مزينة بملائكة منحوتة وزخارف نباتية ودرابزين حديد مطاوع.\n\nبُني هذا الحي الاستثنائي خلال بناء قناة السويس (١٨٥٩–١٨٦٩) عندما كانت بورسعيد مدينة مزدهرة تجذب العمال والتجار والمغامرين من عبر المتوسط.\n\nاليوم كثير من هذه المباني في حالات تدهور مختلفة. لكن حركة حفاظ متنامية تبث حياة جديدة. معماريون محليون يوثقون كل مبنى بسجلات تفصيلية.\n\nمبنى متجر سيمون أرتز، 'هارودز الشرق' سابقاً، لا يزال شاهداً على ماضي المدينة العالمي. الكنيسة اليونانية القديمة والقنصلية الإيطالية وفندق التبادل الشرقي كلها تروي قصص مدينة كانت لفترة قصيرة من أكثر المدن عالمية.\n\nجولات تراثية بقيادة بحارة متقاعدين وسكان عمرهم تربط هذه المعالم بقصص شخصية — تجعل العمارة تنبض بأصوات من يتذكرون الحي في أيام مجده."
+    },
+  },
 ];
 
 export const whosWho = [

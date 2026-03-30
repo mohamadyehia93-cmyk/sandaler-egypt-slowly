@@ -16,6 +16,7 @@ import Profile from "./pages/Profile.tsx";
 import RegionDetail from "./pages/RegionDetail.tsx";
 import CityDetail from "./pages/CityDetail.tsx";
 import PersonDetail from "./pages/PersonDetail.tsx";
+import PostDetail from "./pages/PostDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/region/:regionId" element={<RegionDetail />} />
             <Route path="/person/:id" element={<PersonDetail />} />
             <Route path="/city/:cityId" element={<CityDetail />} />
+            <Route path="/post/:id" element={<PostDetail />} />
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile" element={<Profile />} />
