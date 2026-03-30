@@ -9,6 +9,7 @@ import Splash from "./pages/Splash.tsx";
 import ExperienceDetail from "./pages/ExperienceDetail.tsx";
 import TripDetail from "./pages/TripDetail.tsx";
 import AudioTourDetail from "./pages/AudioTourDetail.tsx";
+import CauseDetail from "./pages/CauseDetail.tsx";
 import Wishlists from "./pages/Wishlists.tsx";
 import Inbox from "./pages/Inbox.tsx";
 import Profile from "./pages/Profile.tsx";
