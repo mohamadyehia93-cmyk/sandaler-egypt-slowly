@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star } from "lucide-react";
+import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cityData, experiences, audioTours, accommodation, products, whosWho, causes, latestPosts, transport } from "@/lib/sampleData";
 import SectionHeader from "@/components/SectionHeader";
@@ -51,14 +51,50 @@ const CityDetail = () => {
 
       <div className="space-y-5 pt-4">
         {/* About Section */}
-        <div className="px-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Compass className="w-4 h-4 text-primary" />
-            <h3 className="text-base font-bold text-foreground">
-              {lang === "ar" ? "عن المدينة" : "About"}
-            </h3>
+        <div className="px-4 space-y-4">
+          {/* Overview */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Compass className="w-4 h-4 text-primary" />
+              <h3 className="text-base font-bold text-foreground">
+                {lang === "ar" ? "نظرة عامة" : "Overview"}
+              </h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.overview[lang]}</p>
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">{city.about[lang]}</p>
+
+          {/* History */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <BookOpen className="w-4 h-4 text-primary" />
+              <h3 className="text-base font-bold text-foreground">
+                {lang === "ar" ? "التاريخ" : "History"}
+              </h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.history[lang]}</p>
+          </div>
+
+          {/* Culture */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Palette className="w-4 h-4 text-primary" />
+              <h3 className="text-base font-bold text-foreground">
+                {lang === "ar" ? "الثقافة" : "Culture"}
+              </h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.culture[lang]}</p>
+          </div>
+
+          {/* Geography */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Mountain className="w-4 h-4 text-primary" />
+              <h3 className="text-base font-bold text-foreground">
+                {lang === "ar" ? "الجغرافيا" : "Geography"}
+              </h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.geography[lang]}</p>
+          </div>
         </div>
 
         {/* Latest Posts */}

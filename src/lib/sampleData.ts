@@ -45,13 +45,20 @@ export const regionCities: Record<string, { id: string; name: { en: string; ar: 
   ],
 };
 
+export type CityAbout = {
+  overview: { en: string; ar: string };
+  history: { en: string; ar: string };
+  culture: { en: string; ar: string };
+  geography: { en: string; ar: string };
+};
+
 export type CityInfo = {
   id: string;
   regionId: string;
   name: { en: string; ar: string };
   governorate: { en: string; ar: string };
   population: string;
-  about: { en: string; ar: string };
+  about: CityAbout;
   highlights: { en: string[]; ar: string[] };
   knownFor: { en: string[]; ar: string[] };
   bestTime: { en: string; ar: string };
