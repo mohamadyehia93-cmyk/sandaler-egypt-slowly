@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { MapPin, ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { trips, experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
+import { trips, regions } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
 
 const TripCards = () => {
   const { lang, t } = useI18n();
+  const navigate = useNavigate();
   const [activeRegion, setActiveRegion] = useState("all");
   const [regionOpen, setRegionOpen] = useState(false);
 
@@ -53,7 +55,7 @@ const TripCards = () => {
       {/* Cards */}
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {filtered.map((tr) => (
-          <div key={tr.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card">
+          <div key={tr.id} onClick={() => navigate(`/trip/${tr.id}`)} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer">
             <div className="relative h-32">
               <img src={tr.image} alt={tr.title[lang]} className="w-full h-full object-cover" />
             </div>

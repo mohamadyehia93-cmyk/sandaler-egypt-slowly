@@ -7,6 +7,7 @@ import { I18nProvider } from "@/lib/i18n";
 import Index from "./pages/Index.tsx";
 import Splash from "./pages/Splash.tsx";
 import ExperienceDetail from "./pages/ExperienceDetail.tsx";
+import TripDetail from "./pages/TripDetail.tsx";
 import Wishlists from "./pages/Wishlists.tsx";
 import Inbox from "./pages/Inbox.tsx";
 import Profile from "./pages/Profile.tsx";
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/welcome" element={<Splash />} />
             <Route path="/" element={<Index />} />
             <Route path="/experience/:id" element={<ExperienceDetail />} />
+            <Route path="/trip/:id" element={<TripDetail />} />
             <Route path="/region/:regionId" element={<RegionDetail />} />
             <Route path="/person/:id" element={<PersonDetail />} />
             <Route path="/wishlists" element={<Wishlists />} />
