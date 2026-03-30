@@ -111,6 +111,17 @@ const RegionDetail = () => {
         </div>
       ) : null}
 
+      {/* Interactive Map */}
+      <div className="px-4 mb-4">
+        <div className="flex items-center gap-2 mb-2">
+          <MapPin className="w-4 h-4 text-primary" />
+          <h3 className="text-base font-bold text-foreground">
+            {lang === "ar" ? "خريطة المنطقة" : "Region Map"}
+          </h3>
+        </div>
+        <RegionMap regionId={regionId || ""} color={region.color} />
+      </div>
+
       <div className="space-y-6 pt-1">
         {/* Latest Posts */}
         {regionPosts.length > 0 && (
