@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { audioTours, regions } from "@/lib/sampleData";
 import DetailTestimonials from "@/components/DetailTestimonials";
+import TourStopsMap from "@/components/TourStopsMap";
 
 const AudioTourDetail = () => {
   const { id } = useParams();
@@ -14,16 +15,62 @@ const AudioTourDetail = () => {
   const tour = audioTours.find((a) => a.id === id) || audioTours[0];
   const region = regions.find((r) => r.id === tour.regionId);
 
-  const stops = [
-    { en: "Starting point — Welcome & introduction", ar: "نقطة البداية — ترحيب ومقدمة" },
-    { en: "Historical landmark — Stories from the past", ar: "معلم تاريخي — قصص من الماضي" },
-    { en: "Local market — Sounds and flavors", ar: "السوق المحلي — أصوات ونكهات" },
-    { en: "Hidden alley — Architecture spotlight", ar: "زقاق مخفي — تسليط الضوء على العمارة" },
-    { en: "Waterfront — Nature and reflections", ar: "الواجهة البحرية — طبيعة وتأملات" },
-    { en: "Cultural center — Art & community", ar: "مركز ثقافي — فن ومجتمع" },
-    { en: "Scenic viewpoint — Panoramic view", ar: "نقطة مشاهدة — منظر بانورامي" },
-    { en: "Final stop — Summary & farewell", ar: "المحطة الأخيرة — ملخص ووداع" },
-  ].slice(0, tour.stops);
+  // Tour-specific stop coordinates
+  const tourStopsData: Record<string, { label: { en: string; ar: string }; lat: number; lng: number }[]> = {
+    a1: [
+      { label: { en: "Rosetta Citadel — Welcome", ar: "قلعة رشيد — ترحيب" }, lat: 31.404, lng: 30.417 },
+      { label: { en: "Rashid National Museum", ar: "متحف رشيد القومي" }, lat: 31.406, lng: 30.419 },
+      { label: { en: "Palm Tree Boulevard", ar: "شارع النخيل" }, lat: 31.408, lng: 30.421 },
+      { label: { en: "Old Souk Market", ar: "السوق القديم" }, lat: 31.410, lng: 30.418 },
+      { label: { en: "Abu Mandour Mosque", ar: "مسجد أبو مندور" }, lat: 31.412, lng: 30.415 },
+      { label: { en: "Nile Corniche Viewpoint", ar: "كورنيش النيل" }, lat: 31.414, lng: 30.413 },
+      { label: { en: "Traditional Café", ar: "المقهى التقليدي" }, lat: 31.411, lng: 30.420 },
+      { label: { en: "Rosetta Stone Site — Farewell", ar: "موقع حجر رشيد — وداع" }, lat: 31.407, lng: 30.422 },
+    ],
+    a2: [
+      { label: { en: "Ismailia Station — Start", ar: "محطة الإسماعيلية — البداية" }, lat: 30.596, lng: 32.271 },
+      { label: { en: "Lake Timsah Shore", ar: "شاطئ بحيرة التمساح" }, lat: 30.593, lng: 32.278 },
+      { label: { en: "De Lesseps House", ar: "بيت دي لسبس" }, lat: 30.590, lng: 32.274 },
+      { label: { en: "Ismailia Museum", ar: "متحف الإسماعيلية" }, lat: 30.588, lng: 32.269 },
+      { label: { en: "Forsan Island", ar: "جزيرة الفرسان" }, lat: 30.585, lng: 32.276 },
+      { label: { en: "Canal Waterfront — End", ar: "واجهة القناة — النهاية" }, lat: 30.598, lng: 32.283 },
+    ],
+    a3: [
+      { label: { en: "Manzala Lake Entrance", ar: "مدخل بحيرة المنزلة" }, lat: 31.167, lng: 32.033 },
+      { label: { en: "Bird Watching Tower", ar: "برج مراقبة الطيور" }, lat: 31.172, lng: 32.038 },
+      { label: { en: "Fishing Village", ar: "قرية الصيادين" }, lat: 31.178, lng: 32.042 },
+      { label: { en: "Reed Islands", ar: "جزر القصب" }, lat: 31.183, lng: 32.036 },
+      { label: { en: "Pelican Colony", ar: "مستعمرة البجع" }, lat: 31.188, lng: 32.041 },
+      { label: { en: "Flamingo Bay", ar: "خليج الفلامنجو" }, lat: 31.192, lng: 32.045 },
+      { label: { en: "Sunset Point", ar: "نقطة الغروب" }, lat: 31.186, lng: 32.050 },
+      { label: { en: "Manzala Heritage Dock", ar: "رصيف المنزلة التراثي" }, lat: 31.180, lng: 32.048 },
+      { label: { en: "Fish Market", ar: "سوق السمك" }, lat: 31.175, lng: 32.044 },
+      { label: { en: "Farewell Café", ar: "مقهى الوداع" }, lat: 31.170, lng: 32.037 },
+    ],
+    a4: [
+      { label: { en: "Luxor Temple Entrance", ar: "مدخل معبد الأقصر" }, lat: 25.700, lng: 32.639 },
+      { label: { en: "Avenue of Sphinxes", ar: "طريق الكباش" }, lat: 25.704, lng: 32.641 },
+      { label: { en: "Karnak Temple Complex", ar: "مجمع معابد الكرنك" }, lat: 25.719, lng: 32.657 },
+      { label: { en: "Sacred Lake", ar: "البحيرة المقدسة" }, lat: 25.718, lng: 32.660 },
+      { label: { en: "Obelisk of Hatshepsut", ar: "مسلة حتشبسوت" }, lat: 25.720, lng: 32.655 },
+      { label: { en: "Nile Felucca Point", ar: "نقطة الفلوكة" }, lat: 25.698, lng: 32.636 },
+      { label: { en: "Valley View — Farewell", ar: "إطلالة الوادي — وداع" }, lat: 25.695, lng: 32.633 },
+    ],
+    a5: [
+      { label: { en: "Shali Fortress — Start", ar: "قلعة شالي — البداية" }, lat: 29.203, lng: 25.519 },
+      { label: { en: "Cleopatra's Spring", ar: "عين كليوباترا" }, lat: 29.207, lng: 25.522 },
+      { label: { en: "Temple of the Oracle", ar: "معبد الوحي" }, lat: 29.198, lng: 25.515 },
+      { label: { en: "Siwa Salt Lakes", ar: "بحيرات سيوة الملحية" }, lat: 29.195, lng: 25.525 },
+      { label: { en: "Great Sand Sea Viewpoint", ar: "إطلالة بحر الرمال العظيم" }, lat: 29.190, lng: 25.530 },
+    ],
+  };
+
+  const mapStops = (tourStopsData[tour.id] || tourStopsData.a1).slice(0, tour.stops);
+
+  const stops = mapStops.map((s) => ({
+    en: s.label.en,
+    ar: s.label.ar,
+  }));
 
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -118,6 +165,7 @@ const AudioTourDetail = () => {
 
         {/* Tour Stops */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "محطات الجولة" : "Tour Stops"}</h2>
+        <TourStopsMap stops={mapStops} />
         <div className="relative mb-6">
           {stops.map((stop, i) => (
             <div key={i} className="flex gap-3 pb-4">
