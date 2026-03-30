@@ -2,6 +2,7 @@ import { ArrowLeft, Heart, Star, MapPin, Share2, Clock, Users, MessageCircle } f
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { experiences } from "@/lib/sampleData";
+import DetailTestimonials from "@/components/DetailTestimonials";
 
 const ExperienceDetail = () => {
   const { id } = useParams();
