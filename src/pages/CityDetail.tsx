@@ -1,0 +1,223 @@
+import { useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import { cityData, experiences, audioTours, accommodation, products, whosWho, causes } from "@/lib/sampleData";
+import SectionHeader from "@/components/SectionHeader";
+import CausesSection from "@/components/CausesSection";
+import BottomNav from "@/components/BottomNav";
+
+const CityDetail = () => {
+  const { cityId } = useParams();
+  const navigate = useNavigate();
+  const { lang, t } = useI18n();
+
+  const city = cityData[cityId || ""];
+  if (!city) return <div className="p-8 text-center text-muted-foreground">City not found</div>;
+
+  const cityExperiences = experiences.filter((e) => e.cityId === cityId);
+  const cityAudioTours = audioTours.filter((a) => a.cityId === cityId);
+  const cityAccommodation = accommodation.filter((a) => a.cityId === cityId);
+  const cityProducts = products.filter((p) => p.cityId === cityId);
+  const cityPeople = whosWho.filter((w) => w.cityId === cityId);
+  const cityCauses = causes.filter((c) => c.cityId === cityId);
+
+  return (
+    <div className="min-h-screen bg-surface pb-20">
+      {/* Header */}
+      <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40">
+        <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary">
+          <ArrowLeft className="w-5 h-5 text-foreground" />
+        </button>
+        <h1 className="text-lg font-bold text-foreground">{city.name[lang]}</h1>
+      </header>
+
+      {/* Hero Image */}
+      <div className="relative h-48 mx-4 mt-2 rounded-xl overflow-hidden">
+        <img src={city.image} alt={city.name[lang]} className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-3 left-4 right-4">
+          <h2 className="text-xl font-bold text-white mb-1">{city.name[lang]}</h2>
+          <div className="flex items-center gap-2 text-white/80 text-xs">
+            <MapPin className="w-3 h-3" />
+            <span>{city.governorate[lang]}</span>
+            <span>•</span>
+            <Users className="w-3 h-3" />
+            <span>{city.population}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-5 pt-4">
+        {/* About Section */}
+        <div className="px-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Compass className="w-4 h-4 text-primary" />
+            <h3 className="text-base font-bold text-foreground">
+              {lang === "ar" ? "عن المدينة" : "About"}
+            </h3>
+          </div>
+          <p className="text-sm text-muted-foreground leading-relaxed">{city.about[lang]}</p>
+        </div>
+
+        {/* Highlights */}
+        <div className="px-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <h3 className="text-base font-bold text-foreground">
+              {lang === "ar" ? "أبرز المعالم" : "Highlights"}
+            </h3>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {city.highlights[lang].map((h, i) => (
+              <div key={i} className="bg-card rounded-lg p-3 shadow-card border border-border">
+                <span className="text-xs font-medium text-foreground">{h}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Known For */}
+        <div className="px-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Heart className="w-4 h-4 text-primary" />
+            <h3 className="text-base font-bold text-foreground">
+              {lang === "ar" ? "تشتهر بـ" : "Known For"}
+            </h3>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {city.knownFor[lang].map((k, i) => (
+              <span key={i} className="text-xs font-medium text-primary bg-primary/10 px-3 py-1.5 rounded-full">
+                {k}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Best Time to Visit */}
+        <div className="px-4">
+          <div className="flex items-center gap-2 bg-card rounded-lg p-3 shadow-card border border-border">
+            <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
+            <div>
+              <span className="text-xs text-muted-foreground">{lang === "ar" ? "أفضل وقت للزيارة" : "Best Time to Visit"}</span>
+              <p className="text-sm font-medium text-foreground">{city.bestTime[lang]}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Who's Who */}
+        {cityPeople.length > 0 && (
+          <SectionHeader titleKey="section.whosWho" onSeeAll={() => {}}>
+            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+              {cityPeople.map((p) => (
+                <div key={p.id} onClick={() => navigate(`/person/${p.id}`)} className="min-w-[160px] max-w-[160px] rounded-lg shadow-card bg-card overflow-hidden cursor-pointer">
+                  <div className="relative h-28">
+                    <img src={p.image} alt={p.name[lang]} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-2 left-2 right-2">
+                      <h3 className="text-xs font-bold text-white line-clamp-1">{p.name[lang]}</h3>
+                    </div>
+                  </div>
+                  <div className="p-2.5">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full mb-1.5">
+                      <Users className="w-2.5 h-2.5" /> {p.role[lang]}
+                    </span>
+                    <p className="text-[10px] text-muted-foreground line-clamp-3 leading-relaxed">{p.bio[lang]}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionHeader>
+        )}
+
+        {/* Experiences */}
+        {cityExperiences.length > 0 && (
+          <SectionHeader titleKey="section.experiences" onSeeAll={() => {}}>
+            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+              {cityExperiences.map((e) => (
+                <div key={e.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/experience/${e.id}`)}>
+                  <div className="relative h-32">
+                    <img src={e.image} alt={e.title[lang]} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-1">{e.title[lang]}</h3>
+                    <span className="text-sm font-bold text-primary-dark">
+                      {e.price === 0 ? t("common.free") : `${e.price} ${t("common.egp")}`}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionHeader>
+        )}
+
+        {/* Audio Tours */}
+        {cityAudioTours.length > 0 && (
+          <SectionHeader titleKey="section.audioTours" onSeeAll={() => {}}>
+            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+              {cityAudioTours.map((tour) => (
+                <div key={tour.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/audio-tour/${tour.id}`)}>
+                  <div className="relative h-32">
+                    <img src={tour.image} alt={tour.title[lang]} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-1">{tour.title[lang]}</h3>
+                    <span className="text-sm font-bold text-primary-dark">
+                      {tour.price === 0 ? t("common.free") : `${tour.price} ${t("common.egp")}`}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionHeader>
+        )}
+
+        {/* Places to Stay */}
+        {cityAccommodation.length > 0 && (
+          <SectionHeader titleKey="section.placesToStay" onSeeAll={() => {}}>
+            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+              {cityAccommodation.map((a) => (
+                <div key={a.id} className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card">
+                  <div className="relative h-32">
+                    <img src={a.image} alt={a.title[lang]} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-0.5">{a.title[lang]}</h3>
+                    <span className="text-sm font-bold text-primary-dark">{a.price} {t("common.egp")}<span className="text-xs font-normal text-muted-foreground">{t("common.perNight")}</span></span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionHeader>
+        )}
+
+        {/* Local Products */}
+        {cityProducts.length > 0 && (
+          <SectionHeader titleKey="section.products" onSeeAll={() => {}}>
+            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+              {cityProducts.map((p) => (
+                <div key={p.id} className="min-w-[160px] rounded-lg overflow-hidden shadow-card bg-card">
+                  <div className="relative h-28">
+                    <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-2.5">
+                    <h3 className="text-xs font-semibold text-foreground line-clamp-2 mb-1">{p.title[lang]}</h3>
+                    <span className="text-sm font-bold text-primary-dark">{p.price} {t("common.egp")}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionHeader>
+        )}
+
+        {/* Causes */}
+        {cityCauses.length > 0 && (
+          <CausesSection regionId={city.regionId} cityFilter={cityId || ""} />
+        )}
+      </div>
+
+      <BottomNav />
+    </div>
+  );
+};
+
+export default CityDetail;

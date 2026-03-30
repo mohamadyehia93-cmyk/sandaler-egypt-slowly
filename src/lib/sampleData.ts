@@ -11,6 +11,12 @@ export const regionCities: Record<string, { id: string; name: { en: string; ar: 
     { id: "damietta", name: { en: "Damietta", ar: "دمياط" } },
     { id: "edku", name: { en: "Edku", ar: "إدكو" } },
     { id: "manzala", name: { en: "Manzala", ar: "المنزلة" } },
+    { id: "mansoura", name: { en: "Mansoura", ar: "المنصورة" } },
+    { id: "tanta", name: { en: "Tanta", ar: "طنطا" } },
+    { id: "bilbeis", name: { en: "Bilbeis", ar: "بلبيس" } },
+    { id: "el-mahalla", name: { en: "El Mahalla El Kubra", ar: "المحلة الكبرى" } },
+    { id: "fuwwah", name: { en: "Fuwwah", ar: "فوة" } },
+    { id: "desouk", name: { en: "Desouk", ar: "دسوق" } },
   ],
   "suez-canal": [
     { id: "ismailia", name: { en: "Ismailia", ar: "الإسماعيلية" } },
@@ -21,12 +27,448 @@ export const regionCities: Record<string, { id: string; name: { en: string; ar: 
     { id: "aswan", name: { en: "Aswan", ar: "أسوان" } },
     { id: "luxor", name: { en: "Luxor", ar: "الأقصر" } },
     { id: "edfu", name: { en: "Edfu", ar: "إدفو" } },
+    { id: "esna", name: { en: "Esna", ar: "إسنا" } },
+    { id: "sohag", name: { en: "Sohag", ar: "سوهاج" } },
+    { id: "qena", name: { en: "Qena", ar: "قنا" } },
+    { id: "assiut", name: { en: "Assiut", ar: "أسيوط" } },
+    { id: "minya", name: { en: "Minya", ar: "المنيا" } },
+    { id: "fayoum", name: { en: "Fayoum", ar: "الفيوم" } },
   ],
   "frontiers": [
     { id: "siwa", name: { en: "Siwa", ar: "سيوة" } },
     { id: "dahab", name: { en: "Dahab", ar: "دهب" } },
     { id: "marsa-alam", name: { en: "Marsa Alam", ar: "مرسى علم" } },
+    { id: "quseir", name: { en: "Quseir", ar: "القصير" } },
+    { id: "hurghada", name: { en: "Hurghada", ar: "الغردقة" } },
+    { id: "marsa-matrouh", name: { en: "Marsa Matrouh", ar: "مرسى مطروح" } },
+    { id: "el-arish", name: { en: "El Arish", ar: "العريش" } },
   ],
+};
+
+export type CityInfo = {
+  id: string;
+  regionId: string;
+  name: { en: string; ar: string };
+  governorate: { en: string; ar: string };
+  population: string;
+  about: { en: string; ar: string };
+  highlights: { en: string[]; ar: string[] };
+  knownFor: { en: string[]; ar: string[] };
+  bestTime: { en: string; ar: string };
+  image: string;
+};
+
+export const cityData: Record<string, CityInfo> = {
+  // === NILE DELTA ===
+  rosetta: {
+    id: "rosetta", regionId: "nile-delta",
+    name: { en: "Rosetta", ar: "رشيد" },
+    governorate: { en: "Beheira", ar: "البحيرة" },
+    population: "~75,000",
+    about: {
+      en: "Rosetta (Rashid) is a historic port city at the mouth of the Nile's western branch on the Mediterranean. It is world-famous as the site where the Rosetta Stone was discovered in 1799 by French soldiers during Napoleon's campaign. The city boasts one of the finest collections of Ottoman-era architecture in Egypt, with over 20 restored merchant houses featuring intricate red-and-black brickwork. Surrounded by palm groves, Rosetta is also known as the 'City of a Million Palm Trees.'",
+      ar: "رشيد مدينة ميناء تاريخية عند مصب فرع النيل الغربي على البحر المتوسط. اشتهرت عالمياً بأنها المكان الذي اكتُشف فيه حجر رشيد عام ١٧٩٩. تضم المدينة واحدة من أروع مجموعات العمارة العثمانية في مصر مع أكثر من ٢٠ منزلاً تجارياً مرمماً. تُعرف أيضاً بمدينة المليون نخلة."
+    },
+    highlights: { en: ["Rosetta Stone discovery site", "Ottoman merchant houses", "Abu Mandour Mosque", "Nile estuary & Mediterranean views"], ar: ["موقع اكتشاف حجر رشيد", "البيوت العثمانية", "مسجد أبو مندور", "مصب النيل والبحر المتوسط"] },
+    knownFor: { en: ["Ottoman architecture", "Palm weaving crafts", "Traditional delta cuisine", "Historical significance"], ar: ["العمارة العثمانية", "حرف نسج النخيل", "المطبخ التقليدي", "الأهمية التاريخية"] },
+    bestTime: { en: "October – April (mild weather)", ar: "أكتوبر – أبريل (طقس معتدل)" },
+    image: "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=800&q=80",
+  },
+  damietta: {
+    id: "damietta", regionId: "nile-delta",
+    name: { en: "Damietta", ar: "دمياط" },
+    governorate: { en: "Damietta", ar: "دمياط" },
+    population: "~400,000",
+    about: {
+      en: "Damietta is a major port city on the Mediterranean coast at the eastern branch of the Nile Delta. It has been a significant trading hub since ancient times, famously withstanding Crusader sieges in the 13th century. Today it is Egypt's furniture-making capital, with thousands of workshops producing handcrafted wooden furniture. The city is also renowned for its sweets, especially the iconic 'Damietta Meshaltit' cheese and its artisanal confections.",
+      ar: "دمياط مدينة ميناء رئيسية على ساحل البحر المتوسط عند الفرع الشرقي لدلتا النيل. كانت مركزاً تجارياً مهماً منذ العصور القديمة واشتهرت بصمودها أمام الحملات الصليبية. اليوم هي عاصمة صناعة الأثاث في مصر وتشتهر بالجبن الدمياطي والحلويات."
+    },
+    highlights: { en: ["Furniture workshops & souks", "Damietta Port", "Ras El Bar beach resort", "Historic old quarter"], ar: ["ورش ومحلات الأثاث", "ميناء دمياط", "منتجع رأس البر", "الحي القديم"] },
+    knownFor: { en: ["Furniture craftsmanship", "Damietta cheese", "Palm weaving", "Seafood"], ar: ["صناعة الأثاث", "الجبن الدمياطي", "نسج النخيل", "المأكولات البحرية"] },
+    bestTime: { en: "May – September (beach season)", ar: "مايو – سبتمبر (موسم الشاطئ)" },
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
+  },
+  edku: {
+    id: "edku", regionId: "nile-delta",
+    name: { en: "Edku", ar: "إدكو" },
+    governorate: { en: "Beheira", ar: "البحيرة" },
+    population: "~70,000",
+    about: {
+      en: "Edku is a small town on the Mediterranean coast near Lake Edku, one of the northern delta lagoons. The lake is a vital ecosystem for migratory birds and sustains local fishing communities. The town is known for its organic honey production and quiet, rural charm. Lake Edku connects to the sea through a narrow channel, creating a unique brackish habitat.",
+      ar: "إدكو بلدة صغيرة على ساحل البحر المتوسط قرب بحيرة إدكو، إحدى بحيرات الدلتا الشمالية. البحيرة نظام بيئي حيوي للطيور المهاجرة وتدعم مجتمعات الصيد المحلية. تشتهر بإنتاج العسل العضوي وهدوء الريف."
+    },
+    highlights: { en: ["Lake Edku", "Organic honey farms", "Fishing villages", "Bird watching"], ar: ["بحيرة إدكو", "مزارع العسل العضوي", "قرى الصيد", "مراقبة الطيور"] },
+    knownFor: { en: ["Organic honey", "Lake fishing", "Migratory birds", "Rural tranquility"], ar: ["العسل العضوي", "صيد البحيرة", "الطيور المهاجرة", "هدوء الريف"] },
+    bestTime: { en: "November – March (bird migration)", ar: "نوفمبر – مارس (هجرة الطيور)" },
+    image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=800&q=80",
+  },
+  manzala: {
+    id: "manzala", regionId: "nile-delta",
+    name: { en: "Manzala", ar: "المنزلة" },
+    governorate: { en: "Dakahlia", ar: "الدقهلية" },
+    population: "~80,000",
+    about: {
+      en: "Manzala sits on the shores of Lake Manzala, the largest of Egypt's northern delta lakes and one of the most important wetlands in the Mediterranean basin. The lake is home to thousands of migratory birds and supports fishing families who have lived on its waters for generations. Despite environmental challenges, Manzala remains a vital ecological area and a window into the traditional delta way of life.",
+      ar: "المنزلة تقع على شواطئ بحيرة المنزلة، أكبر بحيرات الدلتا الشمالية وواحدة من أهم الأراضي الرطبة في حوض البحر المتوسط. البحيرة موطن لآلاف الطيور المهاجرة وتدعم عائلات الصيد التي عاشت على مياهها لأجيال."
+    },
+    highlights: { en: ["Lake Manzala wetlands", "Bird Island", "Traditional fishing boats", "Sunrise fishing trips"], ar: ["أراضي بحيرة المنزلة الرطبة", "جزيرة الطيور", "قوارب الصيد التقليدية", "رحلات صيد عند الشروق"] },
+    knownFor: { en: ["Bird watching", "Traditional fishing", "Wetland ecology", "Lake cuisine"], ar: ["مراقبة الطيور", "الصيد التقليدي", "بيئة الأراضي الرطبة", "مأكولات البحيرة"] },
+    bestTime: { en: "October – March (migration season)", ar: "أكتوبر – مارس (موسم الهجرة)" },
+    image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=800&q=80",
+  },
+  mansoura: {
+    id: "mansoura", regionId: "nile-delta",
+    name: { en: "Mansoura", ar: "المنصورة" },
+    governorate: { en: "Dakahlia", ar: "الدقهلية" },
+    population: "~632,000",
+    about: {
+      en: "Mansoura ('The Victorious') is one of Egypt's largest delta cities, located on the eastern bank of the Damietta branch of the Nile. The city earned its name after the Egyptian victory over the Seventh Crusade led by King Louis IX of France in 1250, where the French king was captured. Today Mansoura is a vibrant university city, home to Mansoura University, and serves as a major commercial and cultural hub for the eastern delta. The Nile corniche offers beautiful riverside walks and the old quarter retains much of its historic charm.",
+      ar: "المنصورة ('المنتصرة') واحدة من أكبر مدن الدلتا، تقع على الضفة الشرقية لفرع دمياط. سُميت بهذا الاسم بعد انتصار المصريين على الحملة الصليبية السابعة بقيادة الملك لويس التاسع عام ١٢٥٠. اليوم مدينة جامعية نابضة بالحياة ومركز تجاري وثقافي رئيسي."
+    },
+    highlights: { en: ["Dar Ibn Luqman Museum (Crusader prison)", "Nile Corniche", "Mansoura University campus", "Historic old quarter"], ar: ["متحف دار ابن لقمان", "كورنيش النيل", "حرم جامعة المنصورة", "الحي القديم"] },
+    knownFor: { en: ["Battle of Mansoura 1250", "University city", "Nile riverside culture", "Delta gastronomy"], ar: ["معركة المنصورة ١٢٥٠", "مدينة جامعية", "ثقافة ضفاف النيل", "مطبخ الدلتا"] },
+    bestTime: { en: "October – April (pleasant weather)", ar: "أكتوبر – أبريل (طقس لطيف)" },
+    image: "https://images.unsplash.com/photo-1568322445389-f64c5bb0df1d?w=800&q=80",
+  },
+  tanta: {
+    id: "tanta", regionId: "nile-delta",
+    name: { en: "Tanta", ar: "طنطا" },
+    governorate: { en: "Gharbia", ar: "الغربية" },
+    population: "~530,000",
+    about: {
+      en: "Tanta is the largest city in the Nile Delta and capital of the Gharbia Governorate. It is best known for the annual Moulid of Sayyed Ahmed el-Badawi, one of Egypt's largest religious festivals attracting millions of visitors each October. The city is a major agricultural trading center, historically famous for its cotton markets. Tanta is also celebrated for its roasted chickpeas and sweets, especially 'halawet el-moulid' candy during the festival season.",
+      ar: "طنطا أكبر مدينة في دلتا النيل وعاصمة محافظة الغربية. تشتهر بمولد السيد أحمد البدوي، أحد أكبر المهرجانات الدينية في مصر الذي يجذب الملايين كل أكتوبر. مركز تجاري زراعي رئيسي اشتهر تاريخياً بأسواق القطن وتشتهر بالحمص المحمص وحلاوة المولد."
+    },
+    highlights: { en: ["El-Sayyed El-Badawi Mosque", "Annual Moulid festival", "Historic cotton markets", "Tanta University"], ar: ["مسجد السيد البدوي", "مولد السيد البدوي السنوي", "أسواق القطن التاريخية", "جامعة طنطا"] },
+    knownFor: { en: ["Moulid festival", "Roasted chickpeas & sweets", "Cotton trading heritage", "Sufi culture"], ar: ["مولد السيد البدوي", "الحمص والحلويات", "تراث تجارة القطن", "الثقافة الصوفية"] },
+    bestTime: { en: "October (Moulid festival)", ar: "أكتوبر (موسم المولد)" },
+    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=800&q=80",
+  },
+  bilbeis: {
+    id: "bilbeis", regionId: "nile-delta",
+    name: { en: "Bilbeis", ar: "بلبيس" },
+    governorate: { en: "Sharqia", ar: "الشرقية" },
+    population: "~250,000",
+    about: {
+      en: "Bilbeis is one of Egypt's oldest cities, located at the eastern edge of the Nile Delta in the Sharqia Governorate. It served as a fortress city guarding the eastern approach to Cairo since Pharaonic times. The city was a key battleground during the Crusader invasions and retains remnants of its medieval fortifications. Today Bilbeis is known for its agricultural surroundings, traditional markets, and its position on the ancient trade route to the Sinai.",
+      ar: "بلبيس من أقدم مدن مصر، تقع على الحافة الشرقية لدلتا النيل. كانت مدينة حصن تحرس المدخل الشرقي للقاهرة منذ العصر الفرعوني. كانت ساحة معركة رئيسية خلال الغزوات الصليبية ولا تزال تحتفظ ببقايا تحصيناتها. اليوم تشتهر بأسواقها التقليدية وموقعها على طريق التجارة القديم."
+    },
+    highlights: { en: ["Ancient fortress ruins", "Traditional souks", "Agricultural heartland", "Gateway to Sinai trade route"], ar: ["أطلال القلعة القديمة", "الأسواق التقليدية", "قلب الأراضي الزراعية", "بوابة طريق تجارة سيناء"] },
+    knownFor: { en: ["Ancient fortress city", "Crusader-era history", "Agricultural markets", "Traditional crafts"], ar: ["مدينة القلعة القديمة", "تاريخ عصر الحروب الصليبية", "الأسواق الزراعية", "الحرف التقليدية"] },
+    bestTime: { en: "November – March (cool weather)", ar: "نوفمبر – مارس (طقس بارد)" },
+    image: "https://images.unsplash.com/photo-1568322445389-f64c5bb0df1d?w=800&q=80",
+  },
+  "el-mahalla": {
+    id: "el-mahalla", regionId: "nile-delta",
+    name: { en: "El Mahalla El Kubra", ar: "المحلة الكبرى" },
+    governorate: { en: "Gharbia", ar: "الغربية" },
+    population: "~535,000",
+    about: {
+      en: "El Mahalla El Kubra is one of the largest industrial cities in the Nile Delta and home to the Misr Spinning and Weaving Company, the largest textile factory in the Middle East, founded in 1927. The city has a proud labor history and played a pivotal role in Egypt's modern social movements. Beyond industry, El Mahalla is known for its rich textile heritage, vibrant markets, and traditional delta culture. The city's weavers produce some of Egypt's finest cotton and linen fabrics.",
+      ar: "المحلة الكبرى واحدة من أكبر المدن الصناعية في الدلتا وموطن شركة مصر للغزل والنسيج، أكبر مصنع نسيج في الشرق الأوسط تأسس عام ١٩٢٧. تتميز بتاريخ عمالي عريق وتراث نسيج غني وأسواق نابضة بالحياة."
+    },
+    highlights: { en: ["Misr Spinning & Weaving Company", "Textile heritage museum", "Traditional cotton markets", "Historic workers' quarter"], ar: ["شركة مصر للغزل والنسيج", "متحف تراث النسيج", "أسواق القطن التقليدية", "حي العمال التاريخي"] },
+    knownFor: { en: ["Textile industry", "Cotton & linen fabrics", "Labor movement history", "Traditional weaving"], ar: ["صناعة النسيج", "أقمشة القطن والكتان", "تاريخ الحركة العمالية", "النسيج التقليدي"] },
+    bestTime: { en: "October – April", ar: "أكتوبر – أبريل" },
+    image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=800&q=80",
+  },
+  fuwwah: {
+    id: "fuwwah", regionId: "nile-delta",
+    name: { en: "Fuwwah", ar: "فوة" },
+    governorate: { en: "Kafr El Sheikh", ar: "كفر الشيخ" },
+    population: "~80,000",
+    about: {
+      en: "Fuwwah is a small delta town on the Rosetta branch of the Nile, historically renowned as Egypt's carpet-weaving capital. The town has produced hand-loomed kilims and carpets for centuries, a craft tradition that earned it recognition from UNESCO. Fuwwah's weavers use traditional techniques passed down through generations, creating distinctive geometric patterns with natural dyes. The town also features several Ottoman-era mosques and a charming riverside setting.",
+      ar: "فوة بلدة صغيرة على فرع رشيد من النيل، اشتهرت تاريخياً كعاصمة نسج السجاد في مصر. أنتجت البلدة السجاد والكليم اليدوي لقرون، وهي حرفة معترف بها من اليونسكو. يستخدم النساجون تقنيات تقليدية متوارثة وأصباغ طبيعية. تضم أيضاً عدة مساجد عثمانية."
+    },
+    highlights: { en: ["Hand-loomed carpet workshops", "Ottoman mosques", "Nile riverside walks", "UNESCO-recognized craft heritage"], ar: ["ورش السجاد اليدوي", "المساجد العثمانية", "ممشى النيل", "تراث حرفي معترف به من اليونسكو"] },
+    knownFor: { en: ["Carpet & kilim weaving", "UNESCO craft heritage", "Ottoman architecture", "Nile riverside charm"], ar: ["نسج السجاد والكليم", "تراث حرفي يونسكو", "العمارة العثمانية", "سحر ضفاف النيل"] },
+    bestTime: { en: "October – April", ar: "أكتوبر – أبريل" },
+    image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=800&q=80",
+  },
+  desouk: {
+    id: "desouk", regionId: "nile-delta",
+    name: { en: "Desouk", ar: "دسوق" },
+    governorate: { en: "Kafr El Sheikh", ar: "كفر الشيخ" },
+    population: "~150,000",
+    about: {
+      en: "Desouk is a delta town on the Rosetta branch of the Nile in Kafr El Sheikh Governorate. It is best known as the home of the shrine of Ibrahim El-Desouki, one of the four poles of Sunni Sufism and founder of the Desouqi Sufi order. The annual moulid (festival) of El-Desouki draws hundreds of thousands of pilgrims and features Sufi chanting, dhikr circles, and colorful processions. The town offers an authentic glimpse into Egyptian Sufi spiritual traditions.",
+      ar: "دسوق بلدة على فرع رشيد من النيل. تشتهر بضريح إبراهيم الدسوقي، أحد الأقطاب الأربعة في التصوف السني ومؤسس الطريقة الدسوقية. المولد السنوي يجذب مئات الآلاف من الحجاج ويضم الإنشاد الصوفي وحلقات الذكر والمواكب."
+    },
+    highlights: { en: ["Ibrahim El-Desouki Mosque & Shrine", "Annual Sufi moulid festival", "Dhikr circles & Sufi chanting", "Nile riverside"], ar: ["مسجد وضريح إبراهيم الدسوقي", "مولد الدسوقي السنوي", "حلقات الذكر والإنشاد", "ضفاف النيل"] },
+    knownFor: { en: ["Sufi heritage", "El-Desouki moulid", "Spiritual pilgrimage", "Delta hospitality"], ar: ["التراث الصوفي", "مولد الدسوقي", "الحج الروحي", "كرم ضيافة الدلتا"] },
+    bestTime: { en: "October (moulid season)", ar: "أكتوبر (موسم المولد)" },
+    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=800&q=80",
+  },
+  // === SUEZ CANAL ===
+  ismailia: {
+    id: "ismailia", regionId: "suez-canal",
+    name: { en: "Ismailia", ar: "الإسماعيلية" },
+    governorate: { en: "Ismailia", ar: "الإسماعيلية" },
+    population: "~400,000",
+    about: {
+      en: "Ismailia is a garden city on the western bank of the Suez Canal, situated on the shores of Lake Timsah. Founded in 1863 during the construction of the Suez Canal, it was named after Khedive Ismail. The city is known for its tree-lined boulevards, colonial-era architecture, and relaxed atmosphere. Lake Timsah offers kayaking, fishing, and waterfront dining, while the Ismailia Museum houses Pharaonic and Greco-Roman artifacts from the canal zone.",
+      ar: "الإسماعيلية مدينة حدائق على الضفة الغربية لقناة السويس على شاطئ بحيرة التمساح. تأسست عام ١٨٦٣ أثناء بناء القناة وسُميت باسم الخديوي إسماعيل. تشتهر بشوارعها المشجرة وعمارتها الاستعمارية وأجوائها الهادئة."
+    },
+    highlights: { en: ["Lake Timsah", "Ismailia Museum", "De Lesseps' House", "Garden city boulevards"], ar: ["بحيرة التمساح", "متحف الإسماعيلية", "منزل دي لسبس", "شوارع المدينة المشجرة"] },
+    knownFor: { en: ["Suez Canal history", "Garden city atmosphere", "Lake Timsah water sports", "Colonial architecture"], ar: ["تاريخ قناة السويس", "أجواء المدينة الحدائقية", "رياضات بحيرة التمساح", "العمارة الاستعمارية"] },
+    bestTime: { en: "October – April", ar: "أكتوبر – أبريل" },
+    image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=800&q=80",
+  },
+  "port-said": {
+    id: "port-said", regionId: "suez-canal",
+    name: { en: "Port Said", ar: "بورسعيد" },
+    governorate: { en: "Port Said", ar: "بورسعيد" },
+    population: "~750,000",
+    about: {
+      en: "Port Said is a vibrant coastal city at the northern entrance of the Suez Canal where it meets the Mediterranean Sea. Founded in 1859, the city features a distinctive European Quarter with ornate balconied buildings reflecting French, Italian, and Greek architectural influences. It was a free trade zone for decades and remains a duty-free shopping destination. Port Said played a heroic role during the 1956 Suez Crisis and the city celebrates its resistance every December 23.",
+      ar: "بورسعيد مدينة ساحلية نابضة بالحياة عند المدخل الشمالي لقناة السويس. تأسست عام ١٨٥٩ وتتميز بحي أوروبي مميز بمبانٍ ذات شرفات تعكس تأثيرات معمارية فرنسية وإيطالية ويونانية. لعبت دوراً بطولياً خلال أزمة السويس ١٩٥٦."
+    },
+    highlights: { en: ["European Quarter", "Suez Canal waterfront", "Port Said Lighthouse", "Military Museum"], ar: ["الحي الأوروبي", "واجهة قناة السويس", "منارة بورسعيد", "المتحف الحربي"] },
+    knownFor: { en: ["Colonial architecture", "Duty-free shopping", "1956 resistance history", "Seafood cuisine"], ar: ["العمارة الاستعمارية", "التسوق المعفي", "تاريخ مقاومة ١٩٥٦", "المأكولات البحرية"] },
+    bestTime: { en: "March – May, October – November", ar: "مارس – مايو، أكتوبر – نوفمبر" },
+    image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=800&q=80",
+  },
+  suez: {
+    id: "suez", regionId: "suez-canal",
+    name: { en: "Suez", ar: "السويس" },
+    governorate: { en: "Suez", ar: "السويس" },
+    population: "~730,000",
+    about: {
+      en: "Suez sits at the southern end of the Suez Canal where it meets the Red Sea's Gulf of Suez. The city has been a strategic gateway between Africa and Asia for millennia. It played a crucial role during the 1973 October War and still carries the spirit of resilience. Today the city is an industrial and petroleum hub, but also offers access to Ain Sokhna's beaches and the Ataka Mountains, providing a mix of urban energy and nearby natural escapes.",
+      ar: "السويس تقع في الطرف الجنوبي لقناة السويس حيث تلتقي بخليج السويس من البحر الأحمر. كانت بوابة استراتيجية بين أفريقيا وآسيا لآلاف السنين. لعبت دوراً حاسماً في حرب أكتوبر ١٩٧٣. اليوم مركز صناعي وبترولي مع قرب من شواطئ العين السخنة."
+    },
+    highlights: { en: ["Southern canal entrance", "Ataka Mountains", "Ain Sokhna nearby", "October War memorials"], ar: ["مدخل القناة الجنوبي", "جبال عتاقة", "العين السخنة القريبة", "نصب حرب أكتوبر"] },
+    knownFor: { en: ["Strategic canal position", "1973 War history", "Industrial heritage", "Gateway to Red Sea"], ar: ["الموقع الاستراتيجي", "تاريخ حرب ٧٣", "التراث الصناعي", "بوابة البحر الأحمر"] },
+    bestTime: { en: "October – April", ar: "أكتوبر – أبريل" },
+    image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=800&q=80",
+  },
+  // === UPPER EGYPT ===
+  aswan: {
+    id: "aswan", regionId: "upper-egypt",
+    name: { en: "Aswan", ar: "أسوان" },
+    governorate: { en: "Aswan", ar: "أسوان" },
+    population: "~350,000",
+    about: {
+      en: "Aswan is Egypt's southernmost major city, sitting on the east bank of the Nile at the first cataract. It has been Egypt's gateway to Africa since ancient times and is renowned for its Nubian culture, vibrant painted villages, and stunning river scenery. Key attractions include the Philae Temple dedicated to Isis, the Unfinished Obelisk, the Aswan High Dam, and the peaceful Elephantine Island. Aswan's warm winters and golden sunsets make it one of Egypt's most beloved destinations.",
+      ar: "أسوان أقصى مدينة رئيسية جنوب مصر، على الضفة الشرقية للنيل عند الشلال الأول. بوابة مصر إلى أفريقيا منذ القدم وتشتهر بثقافتها النوبية وقراها الملونة ومناظر النيل الخلابة. معبد فيلة والمسلة الناقصة والسد العالي من أبرز معالمها."
+    },
+    highlights: { en: ["Philae Temple", "Nubian villages", "Aswan High Dam", "Elephantine Island"], ar: ["معبد فيلة", "القرى النوبية", "السد العالي", "جزيرة الفنتين"] },
+    knownFor: { en: ["Nubian culture", "Ancient temples", "Winter sun destination", "Felucca sailing"], ar: ["الثقافة النوبية", "المعابد القديمة", "وجهة شتوية", "ركوب الفلوكة"] },
+    bestTime: { en: "October – March (warm & dry)", ar: "أكتوبر – مارس (دافئ وجاف)" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=800&q=80",
+  },
+  luxor: {
+    id: "luxor", regionId: "upper-egypt",
+    name: { en: "Luxor", ar: "الأقصر" },
+    governorate: { en: "Luxor", ar: "الأقصر" },
+    population: "~500,000",
+    about: {
+      en: "Luxor, ancient Thebes, is often called the 'World's Greatest Open-Air Museum.' The city is divided by the Nile into the East Bank (city of the living) with Karnak and Luxor Temples, and the West Bank (city of the dead) with the Valley of the Kings, Hatshepsut's Temple, and the Colossi of Memnon. Luxor contains roughly one-third of the world's antiquities and is one of the most visited archaeological sites on Earth.",
+      ar: "الأقصر، طيبة القديمة، تُلقب بأعظم متحف مفتوح في العالم. تنقسم بالنيل إلى البر الشرقي (مدينة الأحياء) بمعبدي الكرنك والأقصر، والبر الغربي (مدينة الأموات) بوادي الملوك ومعبد حتشبسوت وتمثالي ممنون. تضم نحو ثلث آثار العالم."
+    },
+    highlights: { en: ["Valley of the Kings", "Karnak Temple", "Hatshepsut Temple", "Hot air balloon rides"], ar: ["وادي الملوك", "معبد الكرنك", "معبد حتشبسوت", "رحلات المنطاد"] },
+    knownFor: { en: ["Ancient Thebes", "World's greatest open-air museum", "Pharaonic tombs", "Nile cruises"], ar: ["طيبة القديمة", "أعظم متحف مفتوح", "المقابر الفرعونية", "رحلات النيل"] },
+    bestTime: { en: "October – March", ar: "أكتوبر – مارس" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=800&q=80",
+  },
+  edfu: {
+    id: "edfu", regionId: "upper-egypt",
+    name: { en: "Edfu", ar: "إدفو" },
+    governorate: { en: "Aswan", ar: "أسوان" },
+    population: "~140,000",
+    about: {
+      en: "Edfu is a small city on the west bank of the Nile between Luxor and Aswan, home to the Temple of Horus — the best-preserved ancient temple in all of Egypt. Built during the Ptolemaic period between 237–57 BC, the temple's massive pylon entrance and detailed hieroglyphic inscriptions offer an unparalleled glimpse into ancient Egyptian religious life. Edfu is a key stop on Nile cruise itineraries.",
+      ar: "إدفو مدينة صغيرة على الضفة الغربية للنيل بين الأقصر وأسوان، تضم معبد حورس — أفضل معبد قديم محفوظ في مصر. بُني خلال العصر البطلمي بين ٢٣٧–٥٧ ق.م ويقدم لمحة فريدة عن الحياة الدينية المصرية القديمة."
+    },
+    highlights: { en: ["Temple of Horus", "Ancient hieroglyphic inscriptions", "Nile cruise stop", "Traditional sugar cane fields"], ar: ["معبد حورس", "نقوش هيروغليفية قديمة", "محطة رحلات النيل", "حقول قصب السكر"] },
+    knownFor: { en: ["Temple of Horus", "Ptolemaic architecture", "Nile cruise destination", "Sugar cane agriculture"], ar: ["معبد حورس", "العمارة البطلمية", "وجهة رحلات النيل", "زراعة القصب"] },
+    bestTime: { en: "October – March", ar: "أكتوبر – مارس" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=800&q=80",
+  },
+  esna: {
+    id: "esna", regionId: "upper-egypt",
+    name: { en: "Esna", ar: "إسنا" },
+    governorate: { en: "Luxor", ar: "الأقصر" },
+    population: "~80,000",
+    about: {
+      en: "Esna is a small Upper Egyptian town about 55 km south of Luxor on the west bank of the Nile. It is known for the Temple of Khnum, the ram-headed god of creation, which features a beautifully preserved hypostyle hall with 24 columns decorated with astronomical ceiling paintings. The Esna Lock, where Nile cruise ships pass through, is one of the most photographed moments of any Nile cruise. The town's souks and traditional architecture offer an authentic Upper Egyptian experience.",
+      ar: "إسنا بلدة صغيرة في صعيد مصر على بعد ٥٥ كم جنوب الأقصر. تشتهر بمعبد خنوم، إله الخلق برأس الكبش، الذي يضم قاعة أعمدة محفوظة بشكل جميل. قفل إسنا حيث تمر سفن النيل السياحية من أشهر لحظات رحلات النيل."
+    },
+    highlights: { en: ["Temple of Khnum", "Esna Lock (Nile barrage)", "Traditional souks", "Astronomical ceiling paintings"], ar: ["معبد خنوم", "قفل إسنا", "الأسواق التقليدية", "رسومات السقف الفلكية"] },
+    knownFor: { en: ["Temple of Khnum", "Nile Lock passage", "Traditional weaving", "Authentic Upper Egyptian life"], ar: ["معبد خنوم", "ممر قفل النيل", "النسيج التقليدي", "حياة الصعيد الأصيلة"] },
+    bestTime: { en: "October – March", ar: "أكتوبر – مارس" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=800&q=80",
+  },
+  sohag: {
+    id: "sohag", regionId: "upper-egypt",
+    name: { en: "Sohag", ar: "سوهاج" },
+    governorate: { en: "Sohag", ar: "سوهاج" },
+    population: "~210,000",
+    about: {
+      en: "Sohag is a major Upper Egyptian city on the west bank of the Nile, serving as the capital of Sohag Governorate. The region is a cradle of early Christianity in Egypt, home to the White Monastery (Deir el-Abyad) and Red Monastery (Deir el-Ahmar), two of the oldest Coptic monasteries dating to the 4th–5th centuries. The nearby ancient city of Abydos, sacred to Osiris, contains the magnificent Temple of Seti I with its famous King List. Sohag is also known for its traditional textile industry.",
+      ar: "سوهاج مدينة رئيسية في صعيد مصر، عاصمة محافظة سوهاج. المنطقة مهد المسيحية المبكرة في مصر بالدير الأبيض والدير الأحمر من أقدم الأديرة القبطية. مدينة أبيدوس القريبة المقدسة عند أوزيريس تضم معبد سيتي الأول بقائمة الملوك الشهيرة."
+    },
+    highlights: { en: ["White Monastery", "Red Monastery", "Abydos Temple of Seti I", "Sohag National Museum"], ar: ["الدير الأبيض", "الدير الأحمر", "معبد سيتي الأول بأبيدوس", "متحف سوهاج القومي"] },
+    knownFor: { en: ["Coptic monasteries", "Abydos archaeological site", "Traditional textiles", "Early Christian heritage"], ar: ["الأديرة القبطية", "موقع أبيدوس الأثري", "المنسوجات التقليدية", "التراث المسيحي المبكر"] },
+    bestTime: { en: "October – March", ar: "أكتوبر – مارس" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=800&q=80",
+  },
+  qena: {
+    id: "qena", regionId: "upper-egypt",
+    name: { en: "Qena", ar: "قنا" },
+    governorate: { en: "Qena", ar: "قنا" },
+    population: "~230,000",
+    about: {
+      en: "Qena is the capital of Qena Governorate, located on a bend of the Nile in Upper Egypt. The city serves as the gateway to the spectacular Temple of Dendera, one of the best-preserved temple complexes in Egypt, dedicated to Hathor, the goddess of love and joy. The temple's famous zodiac ceiling is a masterpiece of ancient astronomical art. Qena is also known as the pottery capital of Upper Egypt, producing distinctive red and black earthenware using techniques unchanged for thousands of years.",
+      ar: "قنا عاصمة محافظة قنا، تقع على منحنى النيل في صعيد مصر. البوابة إلى معبد دندرة المذهل، من أفضل المعابد المحفوظة في مصر، المكرس لحتحور إلهة الحب والفرح. سقف البروج الشهير تحفة فنية فلكية قديمة. تشتهر أيضاً بصناعة الفخار."
+    },
+    highlights: { en: ["Dendera Temple Complex", "Zodiac ceiling", "Traditional pottery workshops", "Nile bend scenery"], ar: ["مجمع معابد دندرة", "سقف البروج", "ورش الفخار التقليدية", "مناظر منحنى النيل"] },
+    knownFor: { en: ["Dendera Temple", "Pottery & earthenware", "Hathor worship site", "Sugar cane production"], ar: ["معبد دندرة", "الفخار والأواني", "موقع عبادة حتحور", "إنتاج قصب السكر"] },
+    bestTime: { en: "October – March", ar: "أكتوبر – مارس" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=800&q=80",
+  },
+  assiut: {
+    id: "assiut", regionId: "upper-egypt",
+    name: { en: "Assiut", ar: "أسيوط" },
+    governorate: { en: "Assiut", ar: "أسيوط" },
+    population: "~500,000",
+    about: {
+      en: "Assiut is the largest city in Upper Egypt and a major university center, home to Assiut University founded in 1957. Strategically positioned at the point where the Nile Valley is narrowest, it has been a vital crossroads since Pharaonic times, controlling trade routes to the Western Desert oases. The city is home to the Assiut Barrage, one of the oldest barrages on the Nile, and the nearby Meir tombs feature some of the finest Middle Kingdom rock-cut paintings. It is also an important center for Egypt's Coptic Christian community, with the Monastery of the Virgin Mary at Drunka drawing millions of pilgrims annually.",
+      ar: "أسيوط أكبر مدينة في صعيد مصر ومركز جامعي رئيسي. تقع في أضيق نقطة في وادي النيل وكانت ملتقى طرق تجارية منذ العصر الفرعوني. تضم قناطر أسيوط ومقابر مير بلوحاتها المنحوتة الرائعة ودير العذراء بدرنكة الذي يجذب ملايين الحجاج سنوياً."
+    },
+    highlights: { en: ["Assiut Barrage", "Meir Tombs", "Monastery of the Virgin Mary at Drunka", "Assiut University"], ar: ["قناطر أسيوط", "مقابر مير", "دير العذراء بدرنكة", "جامعة أسيوط"] },
+    knownFor: { en: ["University city", "Coptic pilgrimage center", "Ancient trade crossroads", "Nile barrage"], ar: ["مدينة جامعية", "مركز حج قبطي", "ملتقى تجارة قديم", "قناطر النيل"] },
+    bestTime: { en: "October – March", ar: "أكتوبر – مارس" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=800&q=80",
+  },
+  minya: {
+    id: "minya", regionId: "upper-egypt",
+    name: { en: "Minya", ar: "المنيا" },
+    governorate: { en: "Minya", ar: "المنيا" },
+    population: "~365,000",
+    about: {
+      en: "Minya, known as the 'Bride of Upper Egypt,' is a city on the west bank of the Nile about 245 km south of Cairo. The region is rich in archaeological sites including Tell el-Amarna, the short-lived capital of the heretic pharaoh Akhenaten, and the Beni Hasan tombs with their remarkable Middle Kingdom wall paintings depicting daily life. Minya also has a significant Coptic heritage, with the Al-Kosheh monastery and Tuna el-Gebel necropolis. The city features elegant 19th-century architecture along its corniche.",
+      ar: "المنيا، 'عروس الصعيد'، مدينة على الضفة الغربية للنيل على بعد ٢٤٥ كم جنوب القاهرة. المنطقة غنية بالمواقع الأثرية مثل تل العمارنة عاصمة إخناتون ومقابر بني حسن بلوحاتها الجدارية الرائعة. تتميز بعمارة أنيقة من القرن التاسع عشر على الكورنيش."
+    },
+    highlights: { en: ["Tell el-Amarna", "Beni Hasan tombs", "Tuna el-Gebel necropolis", "19th-century corniche architecture"], ar: ["تل العمارنة", "مقابر بني حسن", "مقبرة تونة الجبل", "عمارة الكورنيش"] },
+    knownFor: { en: ["Akhenaten's capital", "Middle Kingdom tombs", "Bride of Upper Egypt", "Coptic heritage"], ar: ["عاصمة إخناتون", "مقابر الدولة الوسطى", "عروس الصعيد", "التراث القبطي"] },
+    bestTime: { en: "October – March", ar: "أكتوبر – مارس" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=800&q=80",
+  },
+  fayoum: {
+    id: "fayoum", regionId: "upper-egypt",
+    name: { en: "Fayoum", ar: "الفيوم" },
+    governorate: { en: "Fayoum", ar: "الفيوم" },
+    population: "~400,000",
+    about: {
+      en: "Fayoum is Egypt's largest oasis, located about 100 km southwest of Cairo. Fed by the Bahr Yussef canal from the Nile, it has been continuously inhabited for over 8,000 years. The region is home to Lake Qarun, one of the oldest natural lakes in the world, and the Wadi El-Rayan protected area with its stunning waterfalls. Fayoum is famous for the 'Fayoum Portraits' — remarkably lifelike Greco-Roman funerary paintings found in the area. The Valley of the Whales (Wadi Al-Hitan), a UNESCO World Heritage Site, contains fossilized whale skeletons millions of years old.",
+      ar: "الفيوم أكبر واحة في مصر على بعد ١٠٠ كم جنوب غرب القاهرة. يغذيها بحر يوسف من النيل وسكنت بشكل مستمر لأكثر من ٨٠٠٠ سنة. تضم بحيرة قارون ووادي الريان بشلالاته. تشتهر بصور الفيوم اليونانية الرومانية ووادي الحيتان موقع التراث العالمي."
+    },
+    highlights: { en: ["Wadi Al-Hitan (Valley of the Whales)", "Lake Qarun", "Wadi El-Rayan waterfalls", "Fayoum Portraits"], ar: ["وادي الحيتان", "بحيرة قارون", "شلالات وادي الريان", "صور الفيوم"] },
+    knownFor: { en: ["UNESCO Valley of the Whales", "Ancient oasis life", "Fayoum Portraits", "Desert & lake landscapes"], ar: ["وادي الحيتان يونسكو", "حياة الواحة القديمة", "صور الفيوم", "مناظر الصحراء والبحيرة"] },
+    bestTime: { en: "October – April", ar: "أكتوبر – أبريل" },
+    image: "https://images.unsplash.com/photo-1553913861-c0fddf2619ee?w=800&q=80",
+  },
+  // === FRONTIERS ===
+  siwa: {
+    id: "siwa", regionId: "frontiers",
+    name: { en: "Siwa", ar: "سيوة" },
+    governorate: { en: "Matrouh", ar: "مطروح" },
+    population: "~25,000",
+    about: {
+      en: "Siwa Oasis is one of Egypt's most remote and enchanting destinations, located near the Libyan border in the Western Desert. The oasis has its own distinct Berber (Amazigh) culture and language. Alexander the Great famously visited the Oracle of Amun here in 331 BC. Key attractions include the ruins of Shali Fortress, Cleopatra's Spring, the Temple of the Oracle, and the Great Sand Sea for sandboarding and stargazing. Siwa is also known for its organic dates, olives, and salt lakes.",
+      ar: "واحة سيوة من أكثر وجهات مصر عزلة وسحراً، بالقرب من الحدود الليبية. لها ثقافة ولغة أمازيغية مميزة. زارها الإسكندر الأكبر لمعبد وحي آمون عام ٣٣١ ق.م. تشمل المعالم قلعة شالي وعين كليوباترا وبحر الرمال العظيم."
+    },
+    highlights: { en: ["Oracle Temple of Amun", "Shali Fortress", "Cleopatra's Spring", "Great Sand Sea"], ar: ["معبد وحي آمون", "قلعة شالي", "عين كليوباترا", "بحر الرمال العظيم"] },
+    knownFor: { en: ["Berber culture", "Alexander the Great's oracle visit", "Sandboarding", "Organic dates & olives"], ar: ["الثقافة الأمازيغية", "زيارة الإسكندر للوحي", "التزلج على الرمال", "التمور والزيتون العضوي"] },
+    bestTime: { en: "October – April (avoid summer heat)", ar: "أكتوبر – أبريل (تجنب حرارة الصيف)" },
+    image: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=800&q=80",
+  },
+  dahab: {
+    id: "dahab", regionId: "frontiers",
+    name: { en: "Dahab", ar: "دهب" },
+    governorate: { en: "South Sinai", ar: "جنوب سيناء" },
+    population: "~15,000",
+    about: {
+      en: "Dahab ('Gold' in Arabic) is a laid-back Red Sea coastal town in South Sinai, beloved by divers, windsurfers, and backpackers. Once a Bedouin fishing village, it has evolved into one of the world's top diving destinations, home to the famous Blue Hole — a deep underwater sinkhole. Dahab offers world-class windsurfing and kitesurfing at Laguna Beach, desert safaris to the Coloured Canyon, and easy access to Mount Sinai. Its Bedouin-run seafront cafes and relaxed atmosphere set it apart from larger Red Sea resorts.",
+      ar: "دهب ('الذهب' بالعربية) مدينة ساحلية هادئة على البحر الأحمر في جنوب سيناء، محبوبة من الغواصين وراكبي الأمواج. كانت قرية صيد بدوية وأصبحت من أفضل وجهات الغوص في العالم بالحفرة الزرقاء الشهيرة."
+    },
+    highlights: { en: ["Blue Hole diving", "Laguna Beach windsurfing", "Coloured Canyon", "Bedouin seafront cafes"], ar: ["غوص الحفرة الزرقاء", "ركوب الأمواج بلاجونا", "الوادي الملون", "مقاهي البدو البحرية"] },
+    knownFor: { en: ["World-class diving", "Windsurfing & kitesurfing", "Backpacker culture", "Bedouin hospitality"], ar: ["غوص عالمي", "ركوب الأمواج", "ثقافة الرحالة", "كرم البدو"] },
+    bestTime: { en: "Year-round (best: March – May, Sep – Nov)", ar: "على مدار السنة (أفضل: مارس–مايو، سبتمبر–نوفمبر)" },
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+  },
+  "marsa-alam": {
+    id: "marsa-alam", regionId: "frontiers",
+    name: { en: "Marsa Alam", ar: "مرسى علم" },
+    governorate: { en: "Red Sea", ar: "البحر الأحمر" },
+    population: "~15,000",
+    about: {
+      en: "Marsa Alam is a quiet Red Sea resort town in southeastern Egypt, known for its pristine coral reefs and encounters with dolphins, sea turtles, and dugongs. Unlike the busier resorts of Hurghada and Sharm El Sheikh, Marsa Alam offers a more secluded, eco-oriented experience. The nearby Abu Dabbab bay is one of the few places where you can swim with dugongs. Wadi El Gemal National Park to the south protects a vast area of desert and coastline.",
+      ar: "مرسى علم مدينة منتجعات هادئة على البحر الأحمر، تشتهر بشعابها المرجانية البكر ولقاءات الدلافين والسلاحف البحرية وعرائس البحر. أبو دباب من الأماكن القليلة للسباحة مع عرائس البحر. محمية وادي الجمال تحمي منطقة شاسعة."
+    },
+    highlights: { en: ["Abu Dabbab dugong bay", "Pristine coral reefs", "Wadi El Gemal National Park", "Dolphin encounters"], ar: ["خليج أبو دباب", "شعاب مرجانية بكر", "محمية وادي الجمال", "لقاءات الدلافين"] },
+    knownFor: { en: ["Dugong encounters", "Eco-diving", "Secluded beaches", "Marine biodiversity"], ar: ["لقاءات عرائس البحر", "الغوص البيئي", "شواطئ منعزلة", "التنوع البحري"] },
+    bestTime: { en: "Year-round (best: March – May, Sep – Nov)", ar: "على مدار السنة" },
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+  },
+  quseir: {
+    id: "quseir", regionId: "frontiers",
+    name: { en: "Quseir", ar: "القصير" },
+    governorate: { en: "Red Sea", ar: "البحر الأحمر" },
+    population: "~50,000",
+    about: {
+      en: "Quseir (also spelled El Quseir) is one of Egypt's oldest ports on the Red Sea coast, with a history stretching back to Pharaonic times when it served as a departure point for expeditions to the Land of Punt. The Ottoman-era fortress overlooking the harbor, built in the 16th century, is the town's centerpiece. Quseir's old quarter features traditional Red Sea architecture with coral-block buildings and carved wooden balconies. The town offers excellent diving on less-crowded reefs and a genuine small-town Red Sea atmosphere untouched by mass tourism.",
+      ar: "القصير من أقدم موانئ مصر على البحر الأحمر، يعود تاريخها للعصر الفرعوني كنقطة انطلاق لرحلات أرض بونت. القلعة العثمانية من القرن السادس عشر هي قلب المدينة. الحي القديم يضم عمارة البحر الأحمر التقليدية بمبانٍ من كتل المرجان وشرفات خشبية منحوتة."
+    },
+    highlights: { en: ["Ottoman fortress", "Old quarter coral-block houses", "Unspoiled diving reefs", "Ancient port of Punt trade"], ar: ["القلعة العثمانية", "بيوت المرجان القديمة", "شعاب غوص بكر", "ميناء تجارة بونت القديم"] },
+    knownFor: { en: ["Ancient Red Sea port", "Ottoman heritage", "Quiet diving paradise", "Coral-block architecture"], ar: ["ميناء البحر الأحمر القديم", "التراث العثماني", "جنة غوص هادئة", "عمارة المرجان"] },
+    bestTime: { en: "October – April", ar: "أكتوبر – أبريل" },
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+  },
+  hurghada: {
+    id: "hurghada", regionId: "frontiers",
+    name: { en: "Hurghada", ar: "الغردقة" },
+    governorate: { en: "Red Sea", ar: "البحر الأحمر" },
+    population: "~300,000",
+    about: {
+      en: "Hurghada is Egypt's premier Red Sea resort city, stretching along 40 km of coastline. What was once a small fishing village has transformed into an international beach destination with world-class diving and snorkeling. The Giftun Islands offshore are a protected marine area with stunning coral gardens. Hurghada's marina district (New Marina) features upscale restaurants and yacht clubs, while El Dahar (the old town) preserves the traditional bazaar atmosphere. The city is also a gateway for desert excursions to the Eastern Desert.",
+      ar: "الغردقة مدينة المنتجعات الأولى على البحر الأحمر في مصر، تمتد على ٤٠ كم من الساحل. تحولت من قرية صيد صغيرة إلى وجهة شاطئية دولية بغوص عالمي. جزر الجفتون محمية بحرية بحدائق مرجانية مذهلة. المارينا الجديدة بمطاعمها والدهار القديم بأسواقه."
+    },
+    highlights: { en: ["Giftun Islands marine park", "New Marina waterfront", "El Dahar old town bazaar", "Desert safari excursions"], ar: ["محمية جزر الجفتون", "واجهة المارينا الجديدة", "سوق الدهار القديم", "رحلات سفاري الصحراء"] },
+    knownFor: { en: ["Red Sea diving & snorkeling", "Beach resorts", "Marine biodiversity", "Year-round sunshine"], ar: ["غوص وسنوركل البحر الأحمر", "منتجعات شاطئية", "التنوع البحري", "شمس على مدار السنة"] },
+    bestTime: { en: "Year-round (best: March – May, Sep – Nov)", ar: "على مدار السنة" },
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+  },
+  "marsa-matrouh": {
+    id: "marsa-matrouh", regionId: "frontiers",
+    name: { en: "Marsa Matrouh", ar: "مرسى مطروح" },
+    governorate: { en: "Matrouh", ar: "مطروح" },
+    population: "~150,000",
+    about: {
+      en: "Marsa Matrouh is Egypt's classic Mediterranean summer getaway, known for its gentle turquoise bays and white sandy beaches along the North Coast. Cleopatra's Beach, set in a natural rock pool, is one of Egypt's most beautiful swimming spots. The city has drawn visitors since ancient times — Cleopatra and Mark Antony are said to have bathed here. Rommel's Museum, housed in the caves where Field Marshal Rommel planned his WWII campaigns, adds historical depth. Ageeba Beach, with its dramatic cliff-framed cove, is considered one of the most beautiful beaches in the Mediterranean.",
+      ar: "مرسى مطروح منتجع مصر الكلاسيكي على البحر المتوسط، تشتهر بخلجانها الفيروزية وشواطئها البيضاء. شاطئ كليوباترا في حوض صخري طبيعي من أجمل أماكن السباحة في مصر. متحف روميل في الكهوف التي خطط منها حملاته. شاطئ عجيبة بمنحدراته الدرامية من أجمل شواطئ المتوسط."
+    },
+    highlights: { en: ["Cleopatra's Beach", "Ageeba Beach", "Rommel's Cave Museum", "Turquoise Mediterranean bays"], ar: ["شاطئ كليوباترا", "شاطئ عجيبة", "متحف كهف روميل", "خلجان المتوسط الفيروزية"] },
+    knownFor: { en: ["Mediterranean beaches", "Cleopatra's Bath", "WWII history", "Egyptian summer culture"], ar: ["شواطئ المتوسط", "حمام كليوباترا", "تاريخ الحرب العالمية الثانية", "ثقافة الصيف المصرية"] },
+    bestTime: { en: "June – September (beach season)", ar: "يونيو – سبتمبر (موسم الشاطئ)" },
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
+  },
+  "el-arish": {
+    id: "el-arish", regionId: "frontiers",
+    name: { en: "El Arish", ar: "العريش" },
+    governorate: { en: "North Sinai", ar: "شمال سيناء" },
+    population: "~165,000",
+    about: {
+      en: "El Arish is the capital of North Sinai Governorate, sitting on the Mediterranean coast at the northern edge of the Sinai Peninsula. The city has a long Bedouin heritage and features palm-lined beaches, a historic souk known for its Bedouin crafts, and the remains of a Mamluk-era fortress. The Zaranik Protectorate nearby is an important wetland for migratory birds on the Africa-Eurasia flyway. El Arish is known for its distinctive palm-frond handicrafts and Bedouin textile traditions.",
+      ar: "العريش عاصمة محافظة شمال سيناء، على ساحل البحر المتوسط عند الحافة الشمالية لشبه جزيرة سيناء. تتميز بتراث بدوي عريق وشواطئ مظللة بالنخيل وسوق تاريخي بحرف بدوية. محمية الزرانيق أرض رطبة مهمة للطيور المهاجرة."
+    },
+    highlights: { en: ["Palm-lined Mediterranean beaches", "Bedouin craft souk", "Zaranik Protectorate", "Mamluk fortress remains"], ar: ["شواطئ المتوسط المظللة بالنخيل", "سوق الحرف البدوية", "محمية الزرانيق", "بقايا القلعة المملوكية"] },
+    knownFor: { en: ["Bedouin culture & crafts", "Palm-frond handicrafts", "Migratory bird wetlands", "Sinai gateway"], ar: ["الثقافة والحرف البدوية", "حرف سعف النخيل", "أراضي الطيور المهاجرة", "بوابة سيناء"] },
+    bestTime: { en: "March – May, October – November", ar: "مارس – مايو، أكتوبر – نوفمبر" },
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
+  },
 };
 
 export const heroSlides = [
