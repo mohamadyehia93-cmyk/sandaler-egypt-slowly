@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Calendar } from "lucide-react";
+import { Bell, Calendar, Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n";
 import BottomNav from "@/components/BottomNav";
 import TopTabs from "@/components/TopTabs";
