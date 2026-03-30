@@ -125,7 +125,10 @@ const PersonDetail = () => {
             <MessageCircle className="w-4 h-4 text-primary" />
             <h3 className="text-sm font-semibold text-foreground">{lang === "ar" ? "تواصل" : "Contact"}</h3>
           </div>
-          <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors">
+          <button
+            onClick={() => navigate(`/inbox?personId=${person.id}&name=${encodeURIComponent(person.name.en)}&nameAr=${encodeURIComponent(person.name.ar)}&image=${encodeURIComponent(person.image)}`)}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
+          >
             <MessageCircle className="w-5 h-5" />
             {lang === "ar" ? "أرسل رسالة" : "Send Message"}
           </button>
