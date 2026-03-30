@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Quote, Feather, BookOpen, Share2, Instagram, Twitter } from "lucide-react";
+import { ArrowLeft, MapPin, Quote, Feather, BookOpen, Share2, Instagram, Twitter, UserPlus, UserCheck } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cultureActors, latestPosts, regions } from "@/lib/sampleData";
 
