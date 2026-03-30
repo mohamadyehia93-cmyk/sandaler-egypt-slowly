@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users } from "lucide-react";
+import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { regions, regionCities, accommodation, transport, products, experiences, latestPosts, whosWho } from "@/lib/sampleData";
+import { regions, regionCities, accommodation, transport, products, experiences, latestPosts, whosWho, audioTours } from "@/lib/sampleData";
 import SectionHeader from "@/components/SectionHeader";
 import BottomNav from "@/components/BottomNav";
 
@@ -27,6 +27,7 @@ const RegionDetail = () => {
   const regionTransport = cityFilter(transport.filter((tr) => tr.regionId === regionId));
   const regionProducts = cityFilter(products.filter((p) => p.regionId === regionId));
   const regionPeople = cityFilter(whosWho.filter((w) => w.regionId === regionId));
+  const regionAudioTours = cityFilter(audioTours.filter((a) => a.regionId === regionId));
 
   const selectedCityLabel = selectedCity === "all"
     ? t("filter.allCities")
@@ -134,6 +135,34 @@ const RegionDetail = () => {
                         <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {e.rating}
                       </span>
                     </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionHeader>
+        )}
+
+        {/* Audio Tours */}
+        {regionAudioTours.length > 0 && (
+          <SectionHeader titleKey="section.audioTours" onSeeAll={() => {}}>
+            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+              {regionAudioTours.map((tour) => (
+                <div key={tour.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card">
+                  <div className="relative h-32">
+                    <img src={tour.image} alt={tour.title[lang]} className="w-full h-full object-cover" />
+                    <div className="absolute top-2 left-2 bg-background/80 backdrop-blur-sm text-foreground text-[10px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <Headphones className="w-3 h-3" /> {t("common.audioTour")}
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-1.5">{tour.title[lang]}</h3>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground mb-1.5">
+                      <span className="flex items-center gap-0.5"><Clock className="w-3 h-3" /> {tour.duration} {t("common.min")}</span>
+                      <span className="flex items-center gap-0.5"><MapPinned className="w-3 h-3" /> {tour.stops} {t("common.stops")}</span>
+                    </div>
+                    <span className="text-sm font-bold text-primary-dark">
+                      {tour.price === 0 ? t("common.free") : `${tour.price} ${t("common.egp")}`}
+                    </span>
                   </div>
                 </div>
               ))}
