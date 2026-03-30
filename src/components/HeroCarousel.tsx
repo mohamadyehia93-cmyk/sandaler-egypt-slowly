@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const HeroCarousel = () => {
   const { lang } = useI18n();
+  const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
