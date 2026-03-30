@@ -38,7 +38,7 @@ const Index = () => {
     });
     accommodation.forEach((ac) => {
       const title = ac.title[lang];
-      if (title.toLowerCase().includes(q)) results.push({ id: ac.id, title, type: lang === "ar" ? "إقامة" : "Stay", route: `/accommodation/${ac.id}` });
+      if (title.toLowerCase().includes(q)) results.push({ id: ac.id, title, type: lang === "ar" ? "إقامة" : "Stay", route: `/stay/${ac.id}` });
     });
     whosWho.forEach((w) => {
       const name = w.name[lang];
