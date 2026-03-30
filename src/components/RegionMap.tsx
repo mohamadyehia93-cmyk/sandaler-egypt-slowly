@@ -123,7 +123,7 @@ const RegionMap = ({ regionId, color }: RegionMapProps) => {
         center={config.center}
         zoom={config.zoom}
         style={{ height: "100%", width: "100%" }}
-        zoomControl={false}
+        zoomControl={true}
         attributionControl={false}
       >
         <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
