@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { causes } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
+import CityBadge from "./CityBadge";
 
 type Props = {
   regionId: string;
@@ -41,6 +42,7 @@ const CausesSection = ({ regionId, cityFilter = "all" }: Props) => {
               </div>
               <div className="p-3">
                 <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">{cause.title[lang]}</h3>
+                <div className="mb-1"><CityBadge cityId={cause.cityId} /></div>
                 <p className="text-[11px] text-muted-foreground line-clamp-2 mb-2">{cause.summary[lang]}</p>
                 <div className="flex items-center gap-1 text-[10px] text-muted-foreground mb-2">
                   <span>{cause.org.logo}</span>

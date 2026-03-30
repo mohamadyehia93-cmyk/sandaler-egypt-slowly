@@ -2,6 +2,7 @@ import { Heart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { products } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
+import CityBadge from "./CityBadge";
 
 const ProductGrid = () => {
   const { lang, t } = useI18n();
@@ -22,7 +23,7 @@ const ProductGrid = () => {
             </div>
             <div className="p-2.5">
               <h3 className="text-xs font-semibold text-foreground line-clamp-2 mb-1">{p.title[lang]}</h3>
-              <p className="text-[10px] text-muted-foreground mb-1">{p.village[lang]}</p>
+              <div className="mb-1"><CityBadge cityId={p.cityId} /></div>
               <span className="text-sm font-bold text-primary-dark">{p.price} {t("common.egp")}</span>
             </div>
           </div>

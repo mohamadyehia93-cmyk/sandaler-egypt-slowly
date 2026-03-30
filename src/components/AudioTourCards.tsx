@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { audioTours } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
+import CityBadge from "./CityBadge";
 
 const AudioTourCards = () => {
   const { lang, t } = useI18n();
@@ -30,9 +31,12 @@ const AudioTourCards = () => {
               </div>
             </div>
             <div className="p-3 flex items-center justify-between">
-              <span className="text-sm font-bold text-primary-dark">
-                {a.price === 0 ? t("common.free") : `${a.price} ${t("common.egp")}`}
-              </span>
+              <div className="flex flex-col gap-1">
+                <CityBadge cityId={a.cityId} />
+                <span className="text-sm font-bold text-primary-dark">
+                  {a.price === 0 ? t("common.free") : `${a.price} ${t("common.egp")}`}
+                </span>
+              </div>
               <div className="flex gap-2">
                 <button className="p-1.5 rounded-full bg-secondary text-secondary-foreground">
                   <Download className="w-4 h-4" />
