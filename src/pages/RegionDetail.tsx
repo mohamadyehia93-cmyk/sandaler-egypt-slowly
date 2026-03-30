@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned } from "lucide-react";
+import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned, Compass } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { regions, regionCities, accommodation, transport, products, experiences, latestPosts, whosWho, audioTours, causes } from "@/lib/sampleData";
 import SectionHeader from "@/components/SectionHeader";
@@ -92,6 +92,19 @@ const RegionDetail = () => {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* About */}
+      {region.about && (
+        <div className="px-4 mb-2">
+          <div className="flex items-center gap-2 mb-2">
+            <Compass className="w-4 h-4 text-primary" />
+            <h3 className="text-base font-bold text-foreground">
+              {lang === "ar" ? "عن المنطقة" : "About"}
+            </h3>
+          </div>
+          <p className="text-sm text-muted-foreground leading-relaxed">{region.about[lang]}</p>
         </div>
       )}
 
