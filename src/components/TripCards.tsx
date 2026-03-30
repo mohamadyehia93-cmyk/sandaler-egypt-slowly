@@ -55,7 +55,7 @@ const TripCards = () => {
       {/* Cards */}
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {filtered.map((tr) => (
-          <div key={tr.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card">
+          <div key={tr.id} onClick={() => navigate(`/trip/${tr.id}`)} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer">
             <div className="relative h-32">
               <img src={tr.image} alt={tr.title[lang]} className="w-full h-full object-cover" />
             </div>
