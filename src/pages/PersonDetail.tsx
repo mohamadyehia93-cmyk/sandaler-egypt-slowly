@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Clock, Globe, Award, Heart, Sparkles } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Globe, Award, Heart, Sparkles, MessageCircle, Phone, Mail } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { whosWho, regions, experiences } from "@/lib/sampleData";
 import BottomNav from "@/components/BottomNav";
@@ -116,6 +116,28 @@ const PersonDetail = () => {
                 {language}
               </span>
             ))}
+          </div>
+        </div>
+
+        {/* Contact */}
+        <div className="bg-card rounded-xl p-4 shadow-card border border-border">
+          <div className="flex items-center gap-2 mb-3">
+            <MessageCircle className="w-4 h-4 text-primary" />
+            <h3 className="text-sm font-semibold text-foreground">{lang === "ar" ? "تواصل" : "Contact"}</h3>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <button className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors">
+              <MessageCircle className="w-5 h-5 text-primary" />
+              <span className="text-[10px] font-medium text-primary">{lang === "ar" ? "رسالة" : "Message"}</span>
+            </button>
+            <button className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors">
+              <Phone className="w-5 h-5 text-primary" />
+              <span className="text-[10px] font-medium text-primary">{lang === "ar" ? "اتصال" : "Call"}</span>
+            </button>
+            <button className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors">
+              <Mail className="w-5 h-5 text-primary" />
+              <span className="text-[10px] font-medium text-primary">{lang === "ar" ? "بريد" : "Email"}</span>
+            </button>
           </div>
         </div>
       </div>
