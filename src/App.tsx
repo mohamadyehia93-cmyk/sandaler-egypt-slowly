@@ -11,6 +11,7 @@ import Wishlists from "./pages/Wishlists.tsx";
 import Inbox from "./pages/Inbox.tsx";
 import Profile from "./pages/Profile.tsx";
 import RegionDetail from "./pages/RegionDetail.tsx";
+import PersonDetail from "./pages/PersonDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
