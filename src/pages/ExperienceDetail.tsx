@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, Star, MapPin, Share2, Clock, Users, MessageCircle } from "lucide-react";
+import { ArrowLeft, Heart, Star, MapPin, Share2, Clock, Users, MessageCircle, ShieldCheck, Leaf, HandHeart, Headphones } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { experiences } from "@/lib/sampleData";
