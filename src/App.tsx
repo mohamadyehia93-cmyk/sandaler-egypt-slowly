@@ -44,6 +44,7 @@ const App = () => (
           <Routes>
             <Route path="/welcome" element={<Splash />} />
             <Route path="/" element={<Index />} />
+            <Route path="/calendar" element={<EventCalendar />} />
             <Route path="/experience/:id" element={<ExperienceDetail />} />
             <Route path="/trip/:id" element={<TripDetail />} />
             <Route path="/audio-tour/:id" element={<AudioTourDetail />} />

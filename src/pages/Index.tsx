@@ -42,7 +42,10 @@ const Index = () => {
       </header>
 
       {/* Date Banner */}
-      <div className="mx-4 mb-3 px-3 py-2 rounded-lg bg-secondary flex items-center gap-2">
+      <div
+        onClick={() => navigate("/calendar")}
+        className="mx-4 mb-3 px-3 py-2 rounded-lg bg-secondary flex items-center gap-2 cursor-pointer hover:bg-secondary/80 transition-colors"
+      >
         <Calendar className="w-4 h-4 text-primary" />
         <span className="text-xs font-medium text-secondary-foreground">{t("date.chooseDate")}</span>
       </div>
