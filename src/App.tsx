@@ -24,6 +24,10 @@ import ImpactDashboard from "./pages/ImpactDashboard.tsx";
 import BadgesQuests from "./pages/BadgesQuests.tsx";
 import Settings from "./pages/Settings.tsx";
 import HelpSupport from "./pages/HelpSupport.tsx";
+import CauseSupportGift from "./pages/CauseSupportGift.tsx";
+import CauseSupportDonate from "./pages/CauseSupportDonate.tsx";
+import CauseSupportVolunteer from "./pages/CauseSupportVolunteer.tsx";
+import CauseSupportConsult from "./pages/CauseSupportConsult.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
