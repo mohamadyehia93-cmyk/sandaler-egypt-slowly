@@ -829,13 +829,14 @@ export const latestPosts = [
     category: { en: "History", ar: "تاريخ" },
     image: "https://images.unsplash.com/photo-1568322445389-f64c5bb0df1d?w=400&q=80",
     regionId: "nile-delta",
+    cityId: "rosetta",
     author: { en: "Ahmed Mansour", ar: "أحمد منصور" },
     authorId: "ca1",
     date: "2024-12-10",
     readTime: 6,
     body: {
-      en: "Scattered across the Nile Delta, a chain of forgotten fortifications tells the story of Egypt's strategic northern frontier. From the Mamluk-era watchtowers of Rosetta to the Ottoman garrison posts near Damietta, these structures once guarded against Crusader invasions and Mediterranean pirates.\n\nMany of these forts are now hidden among palm groves and farmland, slowly reclaimed by nature. The Fort of Qaitbay in Rosetta, built in the 15th century using stones from ancient temples, is one of the best preserved. Its thick walls and corner towers still command views over the Nile's western branch.\n\nLocal historians are working to document and preserve these sites before they disappear entirely. Community-led walking tours now connect several forts along the delta's coastline, offering visitors a glimpse into a chapter of Egyptian history rarely found in guidebooks.\n\nThe restoration effort has also uncovered fascinating artifacts — Ottoman-era cannons, medieval pottery fragments, and inscribed stone blocks that hint at even older structures beneath.",
-      ar: "منتشرة عبر دلتا النيل، سلسلة من التحصينات المنسية تروي قصة حدود مصر الشمالية الاستراتيجية. من أبراج المراقبة المملوكية في رشيد إلى مراكز الحراسة العثمانية قرب دمياط، كانت هذه الهياكل تحرس ضد الغزوات الصليبية وقراصنة البحر المتوسط.\n\nالعديد من هذه القلاع مخفية الآن بين بساتين النخيل والأراضي الزراعية. قلعة قايتباي في رشيد، التي بُنيت في القرن الخامس عشر باستخدام أحجار من المعابد القديمة، من أفضلها حفظاً.\n\nالمؤرخون المحليون يعملون على توثيق هذه المواقع والحفاظ عليها. جولات مشي مجتمعية تربط الآن عدة قلاع على طول ساحل الدلتا.\n\nكشفت جهود الترميم أيضاً عن قطع أثرية مذهلة — مدافع عثمانية وشظايا فخار من العصور الوسطى وكتل حجرية منقوشة."
+      en: "Scattered across the Nile Delta, a chain of forgotten fortifications tells the story of Egypt's strategic northern frontier. From the Mamluk-era watchtowers of Rosetta to the Ottoman garrison posts near Damietta, these structures once guarded against Crusader invasions and Mediterranean pirates.\n\nMany of these forts are now hidden among palm groves and farmland, slowly reclaimed by nature. The Fort of Qaitbay in Rosetta, built in the 15th century using stones from ancient temples, is one of the best preserved.\n\nLocal historians are working to document and preserve these sites before they disappear entirely. Community-led walking tours now connect several forts along the delta's coastline.",
+      ar: "منتشرة عبر دلتا النيل، سلسلة من التحصينات المنسية تروي قصة حدود مصر الشمالية الاستراتيجية. من أبراج المراقبة المملوكية في رشيد إلى مراكز الحراسة العثمانية قرب دمياط.\n\nالعديد من هذه القلاع مخفية الآن بين بساتين النخيل والأراضي الزراعية. قلعة قايتباي في رشيد من أفضلها حفظاً.\n\nالمؤرخون المحليون يعملون على توثيق هذه المواقع والحفاظ عليها."
     },
   },
   {
@@ -844,13 +845,14 @@ export const latestPosts = [
     category: { en: "Food", ar: "طعام" },
     image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80",
     regionId: "nile-delta",
+    cityId: "rosetta",
     author: { en: "Nour El-Din", ar: "نور الدين" },
     authorId: "ca2",
     date: "2024-12-15",
     readTime: 5,
     body: {
-      en: "In a small kitchen off a narrow alley in Rosetta's old quarter, Fatma Abdelrahman — known simply as 'Teta Fatma' — has been cooking traditional delta dishes for over 50 years. Her home has become an unofficial culinary school for travelers seeking authentic Egyptian flavors.\n\nThe morning starts at the local souk, where Teta Fatma selects the freshest ingredients: molokhia leaves, river fish, and bundles of fresh dill and coriander. She insists on hand-picking each herb, explaining that 'the nose knows before the tongue.'\n\nBack in her kitchen, the magic begins. She prepares 'sayadeya' — a Rosetta specialty of spiced rice layered with caramelized onions and fresh-caught Nile fish. The dish requires patience: the onions must reach a deep amber color, and the fish stock simmers for hours.\n\nAs the aromas fill the house, neighbors stop by, children peek through the doorway, and stories flow as freely as the tea. This isn't just cooking — it's a window into the soul of delta hospitality, where every meal is a celebration of community.",
-      ar: "في مطبخ صغير في زقاق ضيق في الحي القديم برشيد، تطبخ فاطمة عبدالرحمن — المعروفة بـ'تيتا فاطمة' — أطباق الدلتا التقليدية منذ أكثر من ٥٠ عاماً. أصبح منزلها مدرسة طهي غير رسمية للمسافرين.\n\nيبدأ الصباح في السوق المحلي حيث تختار تيتا فاطمة أطيب المكونات: ورق الملوخية وسمك النهر وحزم الشبت والكزبرة الطازجة.\n\nفي مطبخها يبدأ السحر. تحضّر 'الصيادية' — تخصص رشيد من الأرز المتبل مع البصل المكرمل وسمك النيل الطازج.\n\nمع انتشار الروائح يمر الجيران ويطل الأطفال من الباب وتتدفق القصص بحرية مع الشاي. هذا ليس مجرد طبخ — إنه نافذة على روح كرم ضيافة الدلتا."
+      en: "In a small kitchen off a narrow alley in Rosetta's old quarter, Fatma Abdelrahman — known simply as 'Teta Fatma' — has been cooking traditional delta dishes for over 50 years. Her home has become an unofficial culinary school for travelers seeking authentic Egyptian flavors.\n\nShe prepares 'sayadeya' — a Rosetta specialty of spiced rice layered with caramelized onions and fresh-caught Nile fish.",
+      ar: "في مطبخ صغير في زقاق ضيق في الحي القديم برشيد، تطبخ فاطمة عبدالرحمن أطباق الدلتا التقليدية منذ أكثر من ٥٠ عاماً.\n\nتحضّر 'الصيادية' — تخصص رشيد من الأرز المتبل مع البصل المكرمل وسمك النيل الطازج."
     },
   },
   {
@@ -859,13 +861,14 @@ export const latestPosts = [
     category: { en: "Culture", ar: "ثقافة" },
     image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=400&q=80",
     regionId: "nile-delta",
+    cityId: "manzala",
     author: { en: "Sara Khalil", ar: "سارة خليل" },
     authorId: "ca3",
     date: "2024-12-20",
     readTime: 7,
     body: {
-      en: "Lake Manzala is a world apart. Egypt's largest northern lagoon stretches across 700 square kilometers between Damietta, Port Said, and the Mediterranean, dotted with dozens of inhabited islands where fishing families have lived for generations.\n\nAt dawn, the lake comes alive. Hundreds of colorful wooden boats push off from reed-lined shores, their fishermen casting nets in techniques unchanged for centuries. The catch — tilapia, mullet, and shrimp — feeds families and fills the markets of nearby towns.\n\nBut Manzala is more than a fishery. It's one of the most important wetlands in the Mediterranean basin, a critical stopover for millions of migratory birds traveling between Europe and Africa. Flamingos, herons, and pelicans paint the horizon pink and white during winter months.\n\nThe lake faces serious environmental threats from agricultural runoff and urban encroachment. Local conservation groups are fighting to protect this irreplaceable ecosystem, working with fishing communities to promote sustainable practices that can preserve both livelihoods and biodiversity.\n\nVisiting Manzala is an exercise in slowing down — riding a felucca through channels of lotus flowers, sharing tea with fishermen who know every island by name, and watching sunsets that seem to set the entire lake on fire.",
-      ar: "بحيرة المنزلة عالم قائم بذاته. أكبر بحيرات مصر الشمالية تمتد على ٧٠٠ كيلومتر مربع بين دمياط وبورسعيد والبحر المتوسط، تتناثر فيها عشرات الجزر المأهولة حيث عاشت عائلات الصيد لأجيال.\n\nعند الفجر تنبض البحيرة بالحياة. مئات القوارب الخشبية الملونة تنطلق من الشواطئ، صياديها يلقون الشباك بتقنيات لم تتغير لقرون.\n\nلكن المنزلة أكثر من مجرد مصيد. إنها واحدة من أهم الأراضي الرطبة في حوض المتوسط، محطة توقف حيوية لملايين الطيور المهاجرة. الفلامنجو والبلشون والبجع يرسمون الأفق بالوردي والأبيض في أشهر الشتاء.\n\nتواجه البحيرة تهديدات بيئية خطيرة. مجموعات الحفاظ المحلية تكافح لحماية هذا النظام البيئي.\n\nزيارة المنزلة تمرين في التباطؤ — ركوب فلوكة عبر قنوات زهور اللوتس ومشاركة الشاي مع الصيادين ومشاهدة غروب يشعل البحيرة بالنار."
+      en: "Lake Manzala is a world apart. Egypt's largest northern lagoon stretches across 700 square kilometers, dotted with dozens of inhabited islands where fishing families have lived for generations.\n\nAt dawn, hundreds of colorful wooden boats push off from reed-lined shores. The catch — tilapia, mullet, and shrimp — feeds families and fills the markets of nearby towns.\n\nManzala is one of the most important wetlands in the Mediterranean basin, a critical stopover for millions of migratory birds.",
+      ar: "بحيرة المنزلة عالم قائم بذاته. أكبر بحيرات مصر الشمالية تمتد على ٧٠٠ كيلومتر مربع.\n\nعند الفجر تنبض البحيرة بالحياة. مئات القوارب الخشبية الملونة تنطلق من الشواطئ.\n\nالمنزلة واحدة من أهم الأراضي الرطبة في حوض المتوسط، محطة توقف حيوية لملايين الطيور المهاجرة."
     },
   },
   {
@@ -874,13 +877,14 @@ export const latestPosts = [
     category: { en: "Nature", ar: "طبيعة" },
     image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=400&q=80",
     regionId: "suez-canal",
+    cityId: "ismailia",
     author: { en: "Mahmoud Rizk", ar: "محمود رزق" },
     authorId: "ca4",
     date: "2025-01-02",
     readTime: 5,
     body: {
-      en: "There are few places on Earth where you can stand on a bridge between two continents and watch the sun rise over Asia while Africa wakes behind you. The Suez Canal, that narrow ribbon of water connecting the Mediterranean to the Red Sea, offers exactly this experience.\n\nI arrived in Ismailia before dawn, walking along the canal's western bank as the first light painted the sky in bands of amber and rose. Container ships — some as tall as apartment buildings — glided silently through the still water, their navigation lights blinking like earthbound stars.\n\nThe canal is 193 kilometers of engineering marvel, completed in 1869 after a decade of construction. But beyond the statistics, it's the daily ritual of the waterway that captivates: the synchronized passage of convoys, the patient waiting of ships at anchor, and the fishermen who cast their lines from the canal banks as giants pass within arm's reach.\n\nAs the sun climbed higher, the desert on either side transformed from grey to gold. Lake Timsah shimmered to the south, and the gardens of Ismailia — the canal's garden city — filled with birdsong. It was a reminder that even the most industrial of landscapes can hold moments of profound beauty.",
-      ar: "قليلة هي الأماكن على الأرض حيث يمكنك الوقوف على جسر بين قارتين ومشاهدة الشمس تشرق فوق آسيا بينما أفريقيا تستيقظ خلفك. قناة السويس تقدم بالضبط هذه التجربة.\n\nوصلت الإسماعيلية قبل الفجر، أمشي على الضفة الغربية مع أول ضوء يرسم السماء بخطوط من العنبر والورد. سفن الحاويات — بعضها بارتفاع عمارات — تنزلق بصمت عبر المياه الساكنة.\n\nالقناة ١٩٣ كيلومتراً من الإعجاز الهندسي اكتمل عام ١٨٦٩. لكن وراء الأرقام، الطقوس اليومية للممر المائي هي ما يأسر: مرور القوافل المتزامن والصيادون الذين يلقون خيوطهم من ضفاف القناة.\n\nمع ارتفاع الشمس تحولت الصحراء من الرمادي إلى الذهبي. بحيرة التمساح تلمع جنوباً وحدائق الإسماعيلية تمتلئ بتغريد الطيور. تذكير بأن حتى أكثر المناظر صناعية يمكن أن تحمل لحظات جمال عميق."
+      en: "I arrived in Ismailia before dawn, walking along the canal's western bank as the first light painted the sky in bands of amber and rose. Container ships glided silently through the still water.\n\nThe canal is 193 kilometers of engineering marvel, completed in 1869. But beyond the statistics, it's the daily ritual that captivates: the synchronized passage of convoys and fishermen casting lines as giants pass within arm's reach.",
+      ar: "وصلت الإسماعيلية قبل الفجر، أمشي على الضفة الغربية مع أول ضوء يرسم السماء بخطوط من العنبر والورد.\n\nالقناة ١٩٣ كيلومتراً من الإعجاز الهندسي اكتمل عام ١٨٦٩. لكن وراء الأرقام، الطقوس اليومية للممر المائي هي ما يأسر."
     },
   },
   {
@@ -889,13 +893,14 @@ export const latestPosts = [
     category: { en: "Culture", ar: "ثقافة" },
     image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=400&q=80",
     regionId: "upper-egypt",
+    cityId: "aswan",
     author: { en: "Hana Sobhi", ar: "هنا صبحي" },
     authorId: "ca5",
     date: "2025-01-08",
     readTime: 6,
     body: {
-      en: "The Nubian villages of Aswan are among the most visually stunning communities in all of Africa. Nestled along the banks of the Nile south of the city, these villages explode with color — every house is painted in vivid blues, yellows, greens, and oranges, often decorated with hand-painted murals of Nile scenes, geometric patterns, and crocodile motifs.\n\nColor in Nubian culture isn't decorative — it's deeply symbolic. Blue wards off evil, green represents the Nile's fertility, and yellow celebrates the desert sun. Each family chooses their palette carefully, and repainting the house is a communal event accompanied by music and feasting.\n\nInside the homes, the warmth continues. Nubian hospitality is legendary — visitors are welcomed with hibiscus tea (karkadeh), freshly baked bread, and conversation that can stretch for hours. Many families have opened their homes as small guesthouses, offering travelers an intimate experience of a culture that predates the pharaohs.\n\nThe Nubian language, related to ancient Meroitic, is still spoken in these villages. Efforts to preserve it include community language classes, a growing body of Nubian-language literature, and digital archives of spoken traditions. Supporting these villages through responsible tourism helps keep one of Africa's oldest living cultures vibrant and thriving.",
-      ar: "القرى النوبية في أسوان من أكثر المجتمعات إبهاراً بصرياً في أفريقيا. على ضفاف النيل جنوب المدينة، تنفجر هذه القرى بالألوان — كل منزل مطلي بأزرق وأصفر وأخضر وبرتقالي زاهي مع جداريات يدوية.\n\nاللون في الثقافة النوبية ليس زخرفياً — إنه رمزي عميقاً. الأزرق يبعد الشر والأخضر يمثل خصوبة النيل والأصفر يحتفل بشمس الصحراء.\n\nداخل المنازل يستمر الدفء. كرم الضيافة النوبي أسطوري — يُرحب بالزوار بالكركديه والخبز الطازج ومحادثات تمتد لساعات. عائلات كثيرة فتحت بيوتها كبيوت ضيافة صغيرة.\n\nاللغة النوبية لا تزال محكية في هذه القرى. جهود الحفاظ عليها تشمل دروس لغة مجتمعية وأرشيفات رقمية للتقاليد المنطوقة. دعم هذه القرى بالسياحة المسؤولة يساعد في إبقاء واحدة من أقدم الثقافات الحية في أفريقيا نابضة ومزدهرة."
+      en: "The Nubian villages of Aswan are among the most visually stunning communities in all of Africa. Every house is painted in vivid blues, yellows, greens, and oranges, decorated with hand-painted murals.\n\nColor in Nubian culture isn't decorative — it's deeply symbolic. Blue wards off evil, green represents the Nile's fertility, and yellow celebrates the desert sun.",
+      ar: "القرى النوبية في أسوان من أكثر المجتمعات إبهاراً بصرياً في أفريقيا. كل منزل مطلي بألوان زاهية مع جداريات يدوية.\n\nاللون في الثقافة النوبية ليس زخرفياً — إنه رمزي عميقاً. الأزرق يبعد الشر والأخضر يمثل خصوبة النيل."
     },
   },
   {
@@ -904,13 +909,14 @@ export const latestPosts = [
     category: { en: "Nature", ar: "طبيعة" },
     image: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=400&q=80",
     regionId: "frontiers",
+    cityId: "siwa",
     author: { en: "Omar Siwan", ar: "عمر السيوي" },
     authorId: "ca6",
     date: "2025-01-15",
     readTime: 8,
     body: {
-      en: "Eight hours west of Cairo, past the military checkpoints and the endless desert highway, the landscape suddenly transforms. Date palms appear on the horizon, salt lakes glitter under the sun, and the ruins of Shali Fortress rise from the earth like a sandcastle abandoned by giants. Welcome to Siwa.\n\nSiwa Oasis is Egypt's most remote inhabited settlement, sitting just 50 kilometers from the Libyan border. Its 25,000 residents speak Siwi, a Berber language with no written form, and maintain traditions that have survived millennia of isolation.\n\nAlexander the Great came here in 331 BC to consult the Oracle of Amun — a journey so important that he crossed the Sahara to make it. The temple ruins still stand on a rocky outcrop overlooking the oasis, and the sense of ancient mystery remains palpable.\n\nModern Siwa is a study in contrasts. Donkey carts share unpaved roads with the occasional pickup truck. Women weave intricate silver jewelry using techniques passed down for generations. And at night, with no light pollution for hundreds of kilometers, the Milky Way arches overhead with breathtaking clarity.\n\nThe Great Sand Sea begins just beyond the oasis — an ocean of dunes stretching to the Libyan border. Sandboarding down these slopes at sunset, with the oasis glowing golden below, is one of Egypt's most unforgettable experiences.\n\nBut Siwa's greatest treasure is its people. Their warmth, their unhurried pace of life, and their deep connection to the land offer a powerful antidote to the speed of modern life.",
-      ar: "على بعد ثماني ساعات غرب القاهرة، بعد نقاط التفتيش العسكرية والطريق الصحراوي اللانهائي، يتحول المشهد فجأة. نخيل التمر يظهر في الأفق وبحيرات الملح تلمع تحت الشمس وأطلال قلعة شالي ترتفع من الأرض. أهلاً بكم في سيوة.\n\nسيوة أبعد مستوطنة مأهولة في مصر، على بعد ٥٠ كم من الحدود الليبية. سكانها الـ٢٥ ألف يتحدثون السيوية، لغة أمازيغية بدون شكل مكتوب.\n\nجاء الإسكندر الأكبر هنا عام ٣٣١ ق.م لاستشارة وحي آمون. أطلال المعبد لا تزال قائمة على نتوء صخري يطل على الواحة.\n\nسيوة الحديثة دراسة في التناقضات. عربات الحمير تشارك الطرق غير المعبدة مع شاحنات صغيرة. النساء ينسجن مجوهرات فضية معقدة بتقنيات متوارثة. وفي الليل، بدون تلوث ضوئي لمئات الكيلومترات، درب التبانة يقوس فوقك بوضوح مذهل.\n\nبحر الرمال العظيم يبدأ خلف الواحة مباشرة. التزلج على الكثبان عند الغروب، مع الواحة المتوهجة بالذهب أسفلك، من أكثر تجارب مصر التي لا تُنسى.\n\nلكن أعظم كنوز سيوة هو شعبها. دفئهم وإيقاع حياتهم غير المتسرع وارتباطهم العميق بالأرض."
+      en: "Eight hours west of Cairo, the landscape suddenly transforms. Date palms appear, salt lakes glitter, and the ruins of Shali Fortress rise from the earth. Welcome to Siwa.\n\nAlexander the Great came here in 331 BC to consult the Oracle of Amun. The temple ruins still stand, and the sense of ancient mystery remains palpable.",
+      ar: "على بعد ثماني ساعات غرب القاهرة يتحول المشهد فجأة. نخيل التمر يظهر في الأفق وبحيرات الملح تلمع وأطلال قلعة شالي ترتفع من الأرض.\n\nجاء الإسكندر الأكبر هنا عام ٣٣١ ق.م لاستشارة وحي آمون. أطلال المعبد لا تزال قائمة."
     },
   },
   {
@@ -919,13 +925,420 @@ export const latestPosts = [
     category: { en: "History", ar: "تاريخ" },
     image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=400&q=80",
     regionId: "suez-canal",
+    cityId: "port-said",
     author: { en: "Captain Mahmoud", ar: "الكابتن محمود" },
     authorId: "ca7",
     date: "2025-01-20",
     readTime: 6,
     body: {
-      en: "Walking through Port Said's European Quarter is like stepping into a forgotten film set. Ornate balconied buildings line the streets in a riot of French, Italian, and Greek architectural styles — their facades adorned with carved cherubs, floral motifs, and wrought-iron balustrades that wouldn't look out of place in Nice or Naples.\n\nThis extraordinary neighborhood was built during the construction of the Suez Canal (1859–1869) when Port Said was a boomtown attracting workers, merchants, and adventurers from across the Mediterranean. At its peak, the city had consulates from dozens of nations and more spoken languages than any other Egyptian city.\n\nToday, many of these buildings are in various states of decay, their grandeur fading behind peeling paint and crumbling plaster. But a growing preservation movement is breathing new life into the quarter. Local architects are documenting every building, creating detailed records of their history and architectural features.\n\nThe Simon Arzt department store building, once the 'Harrods of the East,' still stands as a monument to the city's cosmopolitan past. The old Greek church, the Italian consulate, and the Eastern Exchange Hotel all tell stories of a city that was, for a brief moment, one of the most international in the world.\n\nGuided heritage walks, led by retired sailors and lifelong residents, connect these landmarks with personal stories — making the architecture come alive with the voices of those who remember the quarter in its glory days.",
-      ar: "المشي في الحي الأوروبي في بورسعيد كالدخول في مشهد فيلم منسي. مبانٍ مزخرفة بشرفات تصطف في الشوارع بأساليب معمارية فرنسية وإيطالية ويونانية — واجهاتها مزينة بملائكة منحوتة وزخارف نباتية ودرابزين حديد مطاوع.\n\nبُني هذا الحي الاستثنائي خلال بناء قناة السويس (١٨٥٩–١٨٦٩) عندما كانت بورسعيد مدينة مزدهرة تجذب العمال والتجار والمغامرين من عبر المتوسط.\n\nاليوم كثير من هذه المباني في حالات تدهور مختلفة. لكن حركة حفاظ متنامية تبث حياة جديدة. معماريون محليون يوثقون كل مبنى بسجلات تفصيلية.\n\nمبنى متجر سيمون أرتز، 'هارودز الشرق' سابقاً، لا يزال شاهداً على ماضي المدينة العالمي. الكنيسة اليونانية القديمة والقنصلية الإيطالية وفندق التبادل الشرقي كلها تروي قصص مدينة كانت لفترة قصيرة من أكثر المدن عالمية.\n\nجولات تراثية بقيادة بحارة متقاعدين وسكان عمرهم تربط هذه المعالم بقصص شخصية — تجعل العمارة تنبض بأصوات من يتذكرون الحي في أيام مجده."
+      en: "Walking through Port Said's European Quarter is like stepping into a forgotten film set. Ornate balconied buildings line the streets in French, Italian, and Greek architectural styles.\n\nThis neighborhood was built during the construction of the Suez Canal (1859–1869) when Port Said was a boomtown attracting workers and merchants from across the Mediterranean.",
+      ar: "المشي في الحي الأوروبي في بورسعيد كالدخول في مشهد فيلم منسي. مبانٍ مزخرفة بشرفات تصطف في الشوارع بأساليب معمارية فرنسية وإيطالية ويونانية.\n\nبُني هذا الحي خلال بناء قناة السويس عندما كانت بورسعيد مدينة مزدهرة."
+    },
+  },
+  // Damietta
+  {
+    id: "lp8",
+    title: { en: "Damietta's Furniture Kingdom", ar: "مملكة الأثاث في دمياط" },
+    category: { en: "Culture", ar: "ثقافة" },
+    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "damietta",
+    author: { en: "Amira El-Sayed", ar: "أميرة السيد" },
+    authorId: "ca1",
+    date: "2025-01-25",
+    readTime: 5,
+    body: {
+      en: "Damietta is Egypt's undisputed furniture capital. Thousands of workshops line the city's streets, producing everything from ornate Arabic-style sitting rooms to sleek modern designs exported across the Middle East.\n\nThe craft dates back centuries — Damietta's woodworkers were renowned even during the Crusader era for their skill with local sycamore and imported teak.",
+      ar: "دمياط عاصمة الأثاث بلا منازع في مصر. آلاف الورش تصطف في شوارع المدينة، تنتج كل شيء من غرف الجلوس العربية المزخرفة إلى التصاميم العصرية.\n\nالحرفة تعود لقرون — نجارو دمياط كانوا مشهورين حتى في عصر الحروب الصليبية."
+    },
+  },
+  {
+    id: "lp9",
+    title: { en: "The Secret Cheese of Damietta", ar: "جبنة دمياط السرية" },
+    category: { en: "Food", ar: "طعام" },
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "damietta",
+    author: { en: "Nour El-Din", ar: "نور الدين" },
+    authorId: "ca2",
+    date: "2025-02-01",
+    readTime: 4,
+    body: {
+      en: "Damietta cheese — the soft, briny white cheese that appears on every Egyptian breakfast table — has been made here for over a thousand years. Local families guard their fermentation techniques as closely as any French fromager.\n\nThe best cheese comes from water buffalo milk, sourced from farms in the surrounding delta villages.",
+      ar: "جبنة دمياط — الجبنة البيضاء الطرية المالحة التي تظهر على كل مائدة إفطار مصرية — تُصنع هنا منذ أكثر من ألف عام.\n\nأفضل الجبنة تأتي من حليب الجاموس من مزارع القرى المحيطة."
+    },
+  },
+  // Mansoura
+  {
+    id: "lp10",
+    title: { en: "Where Egypt Defeated the Crusaders", ar: "حيث هزمت مصر الصليبيين" },
+    category: { en: "History", ar: "تاريخ" },
+    image: "https://images.unsplash.com/photo-1568322445389-f64c5bb0df1d?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "mansoura",
+    author: { en: "Khaled El-Mansoury", ar: "خالد المنصوري" },
+    authorId: "ww10",
+    date: "2025-02-05",
+    readTime: 7,
+    body: {
+      en: "Mansoura — meaning 'The Victorious' — earned its name in 1250 when Egyptian forces defeated King Louis IX's Seventh Crusade. Dar Ibn Luqman, where the French king was imprisoned, still stands as a museum.\n\nToday, Mansoura is a vibrant university city on the Damietta branch of the Nile, where students fill the cafés along the corniche.",
+      ar: "المنصورة — بمعنى 'المنتصرة' — اكتسبت اسمها عام ١٢٥٠ عندما هزمت القوات المصرية الحملة الصليبية السابعة للملك لويس التاسع. دار ابن لقمان لا تزال قائمة كمتحف.\n\nاليوم المنصورة مدينة جامعية نابضة بالحياة على فرع دمياط من النيل."
+    },
+  },
+  // Tanta
+  {
+    id: "lp11",
+    title: { en: "The Great Moulid of Tanta", ar: "مولد طنطا الكبير" },
+    category: { en: "Culture", ar: "ثقافة" },
+    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "tanta",
+    author: { en: "Sheikh Taha", ar: "الشيخ طه" },
+    authorId: "ww11",
+    date: "2025-02-10",
+    readTime: 6,
+    body: {
+      en: "Every October, Tanta transforms. Over two million people descend on the city for the Moulid of Sayed El-Badawi, Egypt's largest religious festival. The streets fill with Sufi dhikr circles, sweet vendors, and pilgrims from across the country.\n\nAhmed El-Badawi, the 13th-century Sufi saint, remains one of Egypt's most beloved spiritual figures.",
+      ar: "كل أكتوبر تتحول طنطا. أكثر من مليوني شخص يتدفقون للمدينة لمولد السيد البدوي، أكبر مهرجان ديني في مصر.\n\nأحمد البدوي، القديس الصوفي من القرن الثالث عشر، يبقى من أحب الشخصيات الروحية في مصر."
+    },
+  },
+  // El Mahalla
+  {
+    id: "lp12",
+    title: { en: "Cotton, Revolution, and the Workers of El Mahalla", ar: "القطن والثورة وعمال المحلة" },
+    category: { en: "History", ar: "تاريخ" },
+    image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "el-mahalla",
+    author: { en: "Samira El-Mahallawya", ar: "سميرة المحلاوية" },
+    authorId: "ww12",
+    date: "2025-02-15",
+    readTime: 6,
+    body: {
+      en: "El Mahalla El Kubra is the heartbeat of Egypt's textile industry. The Misr Spinning and Weaving Company, founded in 1927 by Talaat Harb, became the largest industrial complex in the Middle East and the birthplace of Egypt's labor movement.\n\nThe 2008 workers' strike here is widely considered a precursor to the 2011 revolution.",
+      ar: "المحلة الكبرى نبض صناعة النسيج في مصر. شركة مصر للغزل والنسيج، التي أسسها طلعت حرب عام ١٩٢٧، أصبحت أكبر مجمع صناعي في الشرق الأوسط.\n\nإضراب العمال عام ٢٠٠٨ يُعتبر على نطاق واسع مقدمة لثورة ٢٠١١."
+    },
+  },
+  // Fuwwah
+  {
+    id: "lp13",
+    title: { en: "The Kilim Weavers of Fuwwah", ar: "نساجو الكليم في فوة" },
+    category: { en: "Culture", ar: "ثقافة" },
+    image: "https://images.unsplash.com/photo-1515562141589-67f0d569b6c4?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "fuwwah",
+    author: { en: "Hajja Karima", ar: "الحاجة كريمة" },
+    authorId: "ww13",
+    date: "2025-02-18",
+    readTime: 5,
+    body: {
+      en: "Fuwwah is Egypt's carpet capital — a small Nile-side town where the rhythmic clatter of hand looms has echoed through narrow streets for centuries. The kilims produced here feature bold geometric patterns using natural dyes.\n\nHajja Karima, at 70, is the town's most celebrated weaver. She learned at her mother's loom at age five and has trained over 200 young women.",
+      ar: "فوة عاصمة السجاد في مصر — بلدة صغيرة على النيل حيث طقطقة الأنوال اليدوية ترددت في الأزقة لقرون. الكليم المنتج هنا يتميز بأنماط هندسية جريئة بأصباغ طبيعية.\n\nالحاجة كريمة، في السبعين من عمرها، أشهر نساجة في البلدة."
+    },
+  },
+  // Bilbeis
+  {
+    id: "lp14",
+    title: { en: "Bilbeis: The Delta's Eastern Gate", ar: "بلبيس: بوابة الدلتا الشرقية" },
+    category: { en: "History", ar: "تاريخ" },
+    image: "https://images.unsplash.com/photo-1568322445389-f64c5bb0df1d?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "bilbeis",
+    author: { en: "Ahmed Bilbeisi", ar: "أحمد البلبيسي" },
+    authorId: "ww14",
+    date: "2025-02-20",
+    readTime: 5,
+    body: {
+      en: "Bilbeis has guarded the eastern approach to Cairo for over a thousand years. Its fortress, first built during the Fatimid era, was the first line of defense against Crusader armies marching from Palestine.\n\nToday the ruins sit quietly among date palms, a forgotten guardian of the delta's edge.",
+      ar: "حرست بلبيس المدخل الشرقي للقاهرة لأكثر من ألف عام. قلعتها، التي بُنيت أولاً في العصر الفاطمي، كانت خط الدفاع الأول ضد جيوش الصليبيين.\n\nاليوم الأطلال تجلس بهدوء بين نخيل التمر، حارس منسي لحافة الدلتا."
+    },
+  },
+  // Desouk
+  {
+    id: "lp15",
+    title: { en: "Desouk: Home of the Fourth Pole", ar: "دسوق: موطن القطب الرابع" },
+    category: { en: "Culture", ar: "ثقافة" },
+    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "desouk",
+    author: { en: "Sheikh Ibrahim", ar: "الشيخ إبراهيم" },
+    authorId: "ww15",
+    date: "2025-02-22",
+    readTime: 5,
+    body: {
+      en: "Ibrahim El-Desouki, the 13th-century Sufi master, is revered as one of Islam's four spiritual poles. His mosque in Desouk draws pilgrims year-round, and the annual moulid celebration transforms this quiet delta town.\n\nThe Sufi tradition here runs deep — families trace their spiritual lineage back through centuries of practice.",
+      ar: "إبراهيم الدسوقي، الأستاذ الصوفي من القرن الثالث عشر، يُبجل كأحد الأقطاب الروحية الأربعة في الإسلام. مسجده في دسوق يستقطب الحجاج طوال العام.\n\nالتقليد الصوفي هنا عميق — العائلات تتبع سلسلة نسبها الروحي عبر قرون."
+    },
+  },
+  // Suez
+  {
+    id: "lp16",
+    title: { en: "Suez: City of Resistance", ar: "السويس: مدينة المقاومة" },
+    category: { en: "History", ar: "تاريخ" },
+    image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=400&q=80",
+    regionId: "suez-canal",
+    cityId: "suez",
+    author: { en: "Captain Samir", ar: "الكابتن سمير" },
+    authorId: "ww16",
+    date: "2025-02-25",
+    readTime: 6,
+    body: {
+      en: "Suez earned its reputation as a city of resistance during the 1973 October War, when its citizens fought alongside the military to defend against Israeli forces. The city's war memorials and monuments tell a story of extraordinary civilian courage.\n\nToday, Suez sits at the southern mouth of the canal, where ships emerge into the Red Sea with the Ataka Mountains as their backdrop.",
+      ar: "اكتسبت السويس سمعتها كمدينة مقاومة خلال حرب أكتوبر ١٩٧٣، عندما حارب مواطنوها جنباً إلى جنب مع الجيش.\n\nاليوم تقع السويس عند الفم الجنوبي للقناة، حيث تخرج السفن إلى البحر الأحمر بجبال عتاقة خلفها."
+    },
+  },
+  // Luxor
+  {
+    id: "lp17",
+    title: { en: "Dawn over the Valley of the Kings", ar: "الفجر فوق وادي الملوك" },
+    category: { en: "History", ar: "تاريخ" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "luxor",
+    author: { en: "Ahmed Luxor", ar: "أحمد الأقصري" },
+    authorId: "ww17",
+    date: "2025-03-01",
+    readTime: 7,
+    body: {
+      en: "From 300 meters above the West Bank, a hot air balloon offers a perspective that no guidebook can capture. The Valley of the Kings unfolds below — 63 royal tombs carved into limestone over 500 years.\n\nAs the sun rises, the Colossi of Memnon cast long shadows across sugar cane fields, and the Temple of Hatshepsut glows amber against the cliffs.",
+      ar: "من ٣٠٠ متر فوق البر الغربي، يقدم المنطاد منظوراً لا يمكن لأي دليل سياحي أن يلتقطه. وادي الملوك ينكشف أسفلك — ٦٣ مقبرة ملكية منحوتة في الحجر الجيري.\n\nمع شروق الشمس، تمثالا ممنون يلقيان ظلالاً طويلة عبر حقول القصب."
+    },
+  },
+  {
+    id: "lp18",
+    title: { en: "Karnak at Night: A Sound and Light Journey", ar: "الكرنك ليلاً: رحلة صوت وضوء" },
+    category: { en: "Culture", ar: "ثقافة" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "luxor",
+    author: { en: "Hana Sobhi", ar: "هنا صبحي" },
+    authorId: "ca5",
+    date: "2025-03-05",
+    readTime: 5,
+    body: {
+      en: "Walking through Karnak Temple at night is an experience unlike any other in Egypt. The colossal columns of the Hypostyle Hall are illuminated in shifting colors while narration brings 3,000 years of history to life.\n\nThe sacred lake reflects the lit temple, creating a mirror image that feels more dream than reality.",
+      ar: "المشي في معبد الكرنك ليلاً تجربة لا مثيل لها في مصر. أعمدة قاعة الأعمدة الضخمة مضاءة بألوان متغيرة مع سرد يحيي ٣٠٠٠ عام من التاريخ.\n\nالبحيرة المقدسة تعكس المعبد المضاء، صورة مرآة تبدو كحلم أكثر من واقع."
+    },
+  },
+  // Edfu
+  {
+    id: "lp19",
+    title: { en: "The Falcon God's Perfect Temple", ar: "معبد إله الصقر الكامل" },
+    category: { en: "History", ar: "تاريخ" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "edfu",
+    author: { en: "Mustafa Horus", ar: "مصطفى حورس" },
+    authorId: "host17",
+    date: "2025-03-08",
+    readTime: 5,
+    body: {
+      en: "The Temple of Horus at Edfu is the best-preserved ancient temple in all of Egypt. Buried under sand for centuries, it emerged almost intact — its walls covered in hieroglyphic texts that are an encyclopedia of Ptolemaic-era religion.\n\nThe massive pylon entrance, 36 meters high, still bears carvings of the pharaoh smiting his enemies before Horus.",
+      ar: "معبد حورس في إدفو أفضل المعابد القديمة حفظاً في مصر. دُفن تحت الرمال لقرون وظهر سليماً تقريباً — جدرانه مغطاة بنصوص هيروغليفية.\n\nمدخل الصرح الضخم، بارتفاع ٣٦ متراً، لا يزال يحمل نقوشاً للفرعون وهو يضرب أعداءه أمام حورس."
+    },
+  },
+  // Esna
+  {
+    id: "lp20",
+    title: { en: "Esna's Lock: Where Time Stands Still", ar: "قفل إسنا: حيث يتوقف الزمن" },
+    category: { en: "Culture", ar: "ثقافة" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "esna",
+    author: { en: "Hamdi Esnawy", ar: "حمدي الإسناوي" },
+    authorId: "ww18",
+    date: "2025-03-10",
+    readTime: 5,
+    body: {
+      en: "The Esna Lock is one of the Nile's most dramatic spectacles. Cruise ships queue to pass through while local vendors paddle alongside in small boats, tossing goods up to passengers in a centuries-old floating market tradition.\n\nNearby, the Temple of Khnum features a recently cleaned astronomical ceiling that has revealed astonishing zodiac paintings hidden under centuries of soot.",
+      ar: "قفل إسنا من أكثر مشاهد النيل درامية. سفن الكروز تصطف للعبور بينما باعة محليون يجدفون بجوارها في تقليد سوق عائم عمره قرون.\n\nقريباً، معبد خنوم يضم سقفاً فلكياً مُنظفاً حديثاً كشف عن رسومات برج فلكية مذهلة."
+    },
+  },
+  // Sohag
+  {
+    id: "lp21",
+    title: { en: "The White Monastery: Egypt's Coptic Heart", ar: "الدير الأبيض: قلب مصر القبطية" },
+    category: { en: "Culture", ar: "ثقافة" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "sohag",
+    author: { en: "Father Boulos", ar: "الأب بولس" },
+    authorId: "ww19",
+    date: "2025-03-12",
+    readTime: 6,
+    body: {
+      en: "The White Monastery near Sohag, built in the 4th century by Saint Shenouda, is one of the oldest Christian structures still in use. Its massive limestone walls, resembling a pharaonic temple, shelter centuries of Coptic art, manuscripts, and living monastic tradition.\n\nThe annual festival of Saint Shenouda draws tens of thousands of Coptic pilgrims from across Egypt.",
+      ar: "الدير الأبيض قرب سوهاج، الذي بناه القديس شنودة في القرن الرابع، من أقدم المباني المسيحية المستخدمة. جدرانه الحجرية الضخمة تأوي قروناً من الفن القبطي والمخطوطات.\n\nالمهرجان السنوي للقديس شنودة يستقطب عشرات الآلاف من الحجاج الأقباط."
+    },
+  },
+  // Qena
+  {
+    id: "lp22",
+    title: { en: "Dendera's Zodiac: The Sky Carved in Stone", ar: "زودياك دندرة: السماء منحوتة في الحجر" },
+    category: { en: "History", ar: "تاريخ" },
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "qena",
+    author: { en: "Youssef El-Qenawi", ar: "يوسف القناوي" },
+    authorId: "ww20",
+    date: "2025-03-15",
+    readTime: 6,
+    body: {
+      en: "The Temple of Hathor at Dendera, near Qena, contains one of the ancient world's most remarkable astronomical documents — a circular zodiac carved into the ceiling that maps the night sky as the Egyptians saw it over 2,000 years ago.\n\nQena's pottery quarter continues an equally ancient tradition, with potters shaping Nile clay into the famous 'qulla' water jug.",
+      ar: "معبد حتحور في دندرة قرب قنا يحتوي على واحدة من أبرز الوثائق الفلكية في العالم القديم — زودياك دائري منحوت في السقف يرسم خريطة السماء.\n\nحي الفخار في قنا يواصل تقليداً قديماً بنفس القدر، مع الفخاريين يشكلون طين النيل في قلة المياه الشهيرة."
+    },
+  },
+  // Dahab
+  {
+    id: "lp23",
+    title: { en: "The Blue Hole: Diving into Legend", ar: "الحفرة الزرقاء: الغوص في الأسطورة" },
+    category: { en: "Nature", ar: "طبيعة" },
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&q=80",
+    regionId: "frontiers",
+    cityId: "dahab",
+    author: { en: "Sara Khalil", ar: "سارة خليل" },
+    authorId: "ca3",
+    date: "2025-03-18",
+    readTime: 5,
+    body: {
+      en: "Dahab's Blue Hole is one of the world's most famous dive sites — a 130-meter deep sinkhole in the coral reef just meters from shore. Its crystal-clear waters attract divers and snorkelers from around the globe.\n\nBeyond the diving, Dahab retains its Bedouin village charm, with beachfront cafés where cats outnumber tourists and the pace of life is measured in sunsets.",
+      ar: "الحفرة الزرقاء في دهب من أشهر مواقع الغوص في العالم — حفرة غاطسة بعمق ١٣٠ متراً في الشعاب المرجانية على بعد أمتار من الشاطئ.\n\nخارج الغوص، تحتفظ دهب بسحر القرية البدوية، مع مقاهٍ شاطئية يفوق عدد القطط فيها عدد السياح."
+    },
+  },
+  // Hurghada
+  {
+    id: "lp24",
+    title: { en: "Hurghada: From Fishing Village to Red Sea Capital", ar: "الغردقة: من قرية صيد إلى عاصمة البحر الأحمر" },
+    category: { en: "History", ar: "تاريخ" },
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&q=80",
+    regionId: "frontiers",
+    cityId: "hurghada",
+    author: { en: "Captain Reef", ar: "كابتن ريف" },
+    authorId: "ww24",
+    date: "2025-03-20",
+    readTime: 5,
+    body: {
+      en: "Just forty years ago, Hurghada was a sleepy fishing village. Today it's one of the Red Sea's premier diving destinations, yet the old town (El Dahar) still retains its authentic souk and traditional character.\n\nThe coral reefs offshore — particularly around Giftun Island — are among the healthiest in the Red Sea, home to over 1,000 species of fish.",
+      ar: "قبل أربعين عاماً فقط كانت الغردقة قرية صيد هادئة. اليوم من أبرز وجهات الغوص في البحر الأحمر، لكن المدينة القديمة (الدهار) لا تزال تحتفظ بسوقها الأصيل.\n\nالشعاب المرجانية — خاصة حول جزيرة الجفتون — من أصح الشعاب في البحر الأحمر."
+    },
+  },
+  // Marsa Alam
+  {
+    id: "lp25",
+    title: { en: "Swimming with Dugongs in Marsa Alam", ar: "السباحة مع عروس البحر في مرسى علم" },
+    category: { en: "Nature", ar: "طبيعة" },
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&q=80",
+    regionId: "frontiers",
+    cityId: "marsa-alam",
+    author: { en: "Sameh Alam", ar: "سامح علم" },
+    authorId: "ww25",
+    date: "2025-03-22",
+    readTime: 5,
+    body: {
+      en: "Abu Dabbab Bay in Marsa Alam is one of the few places on Earth where you can reliably encounter dugongs — the gentle sea cows that inspired mermaid legends. Green sea turtles also graze on the seagrass beds here.\n\nEthical wildlife tourism is crucial — local researchers monitor the animals and educate visitors on maintaining respectful distances.",
+      ar: "خليج أبو دباب في مرسى علم من الأماكن القليلة على الأرض حيث يمكنك مقابلة عروس البحر — أبقار البحر اللطيفة التي ألهمت أساطير حوريات البحر.\n\nالسياحة البرية الأخلاقية ضرورية — الباحثون المحليون يراقبون الحيوانات ويثقفون الزوار."
+    },
+  },
+  // Minya
+  {
+    id: "lp26",
+    title: { en: "In Akhenaten's Footsteps at Tell el-Amarna", ar: "على خطى أخناتون في تل العمارنة" },
+    category: { en: "History", ar: "تاريخ" },
+    image: "https://images.unsplash.com/photo-1568322445389-f64c5bb0df1d?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "minya",
+    author: { en: "Hoda El-Minyawya", ar: "هدى المنياوية" },
+    authorId: "ww22",
+    date: "2025-03-25",
+    readTime: 6,
+    body: {
+      en: "Tell el-Amarna near Minya was the short-lived capital of the 'heretic pharaoh' Akhenaten, who abandoned Thebes to build a new city devoted to the sun god Aten. The ruins stretch for 10 kilometers along the Nile's east bank.\n\nNearby Beni Hassan contains some of Egypt's finest Middle Kingdom tomb paintings, showing scenes of daily life 4,000 years ago.",
+      ar: "تل العمارنة قرب المنيا كانت العاصمة قصيرة العمر للفرعون 'المهرطق' أخناتون. الأطلال تمتد لعشرة كيلومترات على الضفة الشرقية للنيل.\n\nبني حسن القريبة تحتوي على أفضل لوحات مقابر الدولة الوسطى، تُظهر مشاهد الحياة اليومية قبل ٤٠٠٠ عام."
+    },
+  },
+  // Fayoum
+  {
+    id: "lp27",
+    title: { en: "Valley of the Whales: Egypt's Desert Ocean", ar: "وادي الحيتان: محيط مصر الصحراوي" },
+    category: { en: "Nature", ar: "طبيعة" },
+    image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "fayoum",
+    author: { en: "Gamal Fayoumi", ar: "جمال الفيومي" },
+    authorId: "ww23",
+    date: "2025-03-28",
+    readTime: 6,
+    body: {
+      en: "Wadi Al-Hitan — the Valley of the Whales — is a UNESCO World Heritage Site in Fayoum's Western Desert where the fossilized skeletons of ancient whales lie scattered across the sand. These 40-million-year-old remains tell the story of whale evolution from land to sea.\n\nNearby, the waterfalls of Wadi El-Rayan cascade into a desert oasis that feels like a mirage made real.",
+      ar: "وادي الحيتان موقع تراث عالمي لليونسكو في الصحراء الغربية بالفيوم حيث هياكل الحيتان القديمة المتحجرة منتشرة على الرمال.\n\nقريباً، شلالات وادي الريان تتدفق في واحة صحراوية تبدو كسراب تحقق."
+    },
+  },
+  // Assiut
+  {
+    id: "lp28",
+    title: { en: "The Hidden Tombs of Meir", ar: "مقابر مير المخفية" },
+    category: { en: "History", ar: "تاريخ" },
+    image: "https://images.unsplash.com/photo-1568322445389-f64c5bb0df1d?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "assiut",
+    author: { en: "Dr. Maged Assiuti", ar: "د. ماجد الأسيوطي" },
+    authorId: "ww21",
+    date: "2025-03-30",
+    readTime: 5,
+    body: {
+      en: "The Meir Tombs near Assiut are among Egypt's least-visited ancient treasures. These Middle Kingdom rock-cut tombs contain some of the finest paintings of daily life in ancient Egypt — farmers harvesting, fishermen on the Nile, and dancing scenes of extraordinary vitality.\n\nAssiut University's community tourism program is working to make these tombs accessible while protecting them.",
+      ar: "مقابر مير قرب أسيوط من أقل الكنوز القديمة زيارة في مصر. هذه المقابر المنحوتة في الصخر تحتوي على بعض أفضل لوحات الحياة اليومية في مصر القديمة.\n\nبرنامج جامعة أسيوط للسياحة المجتمعية يعمل على إتاحة هذه المقابر مع حمايتها."
+    },
+  },
+  // Quseir
+  {
+    id: "lp29",
+    title: { en: "Quseir: The Spice Port That Time Forgot", ar: "القصير: ميناء البهارات الذي نسيه الزمن" },
+    category: { en: "History", ar: "تاريخ" },
+    image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=400&q=80",
+    regionId: "frontiers",
+    cityId: "quseir",
+    author: { en: "Mahmoud Quseiri", ar: "محمود القصيري" },
+    authorId: "ww26",
+    date: "2025-04-01",
+    readTime: 5,
+    body: {
+      en: "Quseir was a major Red Sea port since Pharaonic times — ships laden with spices, incense, and gold from Punt docked here 4,000 years ago. The Ottoman fortress still guards the harbor, and the old town's coral-block buildings are slowly being restored.\n\nOffshore, the reefs are among the Red Sea's most pristine, untouched by the mass tourism that has transformed Hurghada.",
+      ar: "كانت القصير ميناء رئيسياً على البحر الأحمر منذ العصر الفرعوني — سفن محملة بالبهارات والبخور والذهب رست هنا قبل ٤٠٠٠ عام.\n\nتحت الماء، الشعاب من أكثر شعاب البحر الأحمر بكارة، لم تمسها السياحة الجماعية."
+    },
+  },
+  // Marsa Matrouh
+  {
+    id: "lp30",
+    title: { en: "Turquoise Dreams on Matrouh's Hidden Beaches", ar: "أحلام فيروزية على شواطئ مطروح المخفية" },
+    category: { en: "Nature", ar: "طبيعة" },
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&q=80",
+    regionId: "frontiers",
+    cityId: "marsa-matrouh",
+    author: { en: "Laila Matrouh", ar: "ليلى مطروح" },
+    authorId: "ww27",
+    date: "2025-04-05",
+    readTime: 5,
+    body: {
+      en: "Agiba Beach near Marsa Matrouh has been called the most beautiful beach in Africa. Its turquoise waters, sheltered by dramatic limestone cliffs, rival any Caribbean cove.\n\nCleopatra Beach, where legend says the queen herself bathed, features a natural rock pool with impossibly clear water. The Berber communities nearby add a rich cultural dimension to the coast.",
+      ar: "شاطئ عجيبة قرب مرسى مطروح وُصف بأجمل شاطئ في أفريقيا. مياهه الفيروزية المحمية بمنحدرات حجرية تنافس أي خليج كاريبي.\n\nشاطئ كليوباترا، حيث تقول الأسطورة أن الملكة نفسها استحمت، يضم بركة صخرية طبيعية بمياه صافية بشكل لا يُصدق."
+    },
+  },
+  // El Arish
+  {
+    id: "lp31",
+    title: { en: "El Arish: Where the Desert Meets the Sea", ar: "العريش: حيث تلتقي الصحراء بالبحر" },
+    category: { en: "Nature", ar: "طبيعة" },
+    image: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=400&q=80",
+    regionId: "frontiers",
+    cityId: "el-arish",
+    author: { en: "Abu Salem", ar: "أبو سالم" },
+    authorId: "ww28",
+    date: "2025-04-08",
+    readTime: 5,
+    body: {
+      en: "El Arish's palm-fringed Mediterranean beach is one of North Sinai's hidden gems. The Bedouin traditions here run deep — from camel racing on the sand to evening tea ceremonies under date palms.\n\nThe town's Thursday market is a lively gathering where Bedouin tribes trade produce, livestock, and handicrafts in a tradition that predates modern borders.",
+      ar: "شاطئ العريش المحاط بالنخيل على المتوسط من جواهر شمال سيناء المخفية. التقاليد البدوية هنا عميقة — من سباق الجمال على الرمال إلى طقوس الشاي المسائية.\n\nسوق الخميس في البلدة تجمع حيوي حيث القبائل البدوية تتاجر بالمنتجات والماشية والحرف اليدوية."
     },
   },
 ];
