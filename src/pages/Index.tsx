@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bell, Calendar } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import BottomNav from "@/components/BottomNav";
@@ -16,6 +17,7 @@ import Certifications from "@/components/Certifications";
 const Index = () => {
   const { t, lang, setLang } = useI18n();
   const [activeTab, setActiveTab] = useState("explore");
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-surface pb-20">
@@ -40,7 +42,10 @@ const Index = () => {
       </header>
 
       {/* Date Banner */}
-      <div className="mx-4 mb-3 px-3 py-2 rounded-lg bg-secondary flex items-center gap-2">
+      <div
+        onClick={() => navigate("/calendar")}
+        className="mx-4 mb-3 px-3 py-2 rounded-lg bg-secondary flex items-center gap-2 cursor-pointer hover:bg-secondary/80 transition-colors"
+      >
         <Calendar className="w-4 h-4 text-primary" />
         <span className="text-xs font-medium text-secondary-foreground">{t("date.chooseDate")}</span>
       </div>

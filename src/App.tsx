@@ -29,6 +29,7 @@ import CauseSupportDonate from "./pages/CauseSupportDonate.tsx";
 import CauseSupportVolunteer from "./pages/CauseSupportVolunteer.tsx";
 import CauseSupportConsult from "./pages/CauseSupportConsult.tsx";
 import Booking from "./pages/Booking.tsx";
+import EventCalendar from "./pages/EventCalendar.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const App = () => (
           <Routes>
             <Route path="/welcome" element={<Splash />} />
             <Route path="/" element={<Index />} />
+            <Route path="/calendar" element={<EventCalendar />} />
             <Route path="/experience/:id" element={<ExperienceDetail />} />
             <Route path="/trip/:id" element={<TripDetail />} />
             <Route path="/audio-tour/:id" element={<AudioTourDetail />} />
