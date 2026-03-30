@@ -9,6 +9,7 @@ import Splash from "./pages/Splash.tsx";
 import ExperienceDetail from "./pages/ExperienceDetail.tsx";
 import TripDetail from "./pages/TripDetail.tsx";
 import AudioTourDetail from "./pages/AudioTourDetail.tsx";
+import CauseDetail from "./pages/CauseDetail.tsx";
 import Wishlists from "./pages/Wishlists.tsx";
 import Inbox from "./pages/Inbox.tsx";
 import Profile from "./pages/Profile.tsx";
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/experience/:id" element={<ExperienceDetail />} />
             <Route path="/trip/:id" element={<TripDetail />} />
             <Route path="/audio-tour/:id" element={<AudioTourDetail />} />
+            <Route path="/cause/:id" element={<CauseDetail />} />
             <Route path="/region/:regionId" element={<RegionDetail />} />
             <Route path="/person/:id" element={<PersonDetail />} />
             <Route path="/wishlists" element={<Wishlists />} />

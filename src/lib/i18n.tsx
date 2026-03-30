@@ -44,6 +44,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "section.partners": { en: "Our Partners", ar: "شركاؤنا" },
   "section.certifications": { en: "Verification & Certificates", ar: "التوثيق والشهادات" },
   "common.audioTour": { en: "Audio Tour", ar: "جولة صوتية" },
+  "section.causes": { en: "Local Causes", ar: "قضايا محلية" },
 };
 
 type I18nContextType = {

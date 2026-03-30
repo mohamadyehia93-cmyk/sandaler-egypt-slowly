@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { regions, regionCities, accommodation, transport, products, experiences, latestPosts, whosWho, audioTours } from "@/lib/sampleData";
+import { regions, regionCities, accommodation, transport, products, experiences, latestPosts, whosWho, audioTours, causes } from "@/lib/sampleData";
 import SectionHeader from "@/components/SectionHeader";
+import CausesSection from "@/components/CausesSection";
 import BottomNav from "@/components/BottomNav";
 
 const RegionDetail = () => {
@@ -264,6 +265,8 @@ const RegionDetail = () => {
             </div>
           </SectionHeader>
         )}
+        {/* Causes */}
+        <CausesSection regionId={regionId || ""} cityFilter={selectedCity} />
       </div>
 
       <BottomNav />
