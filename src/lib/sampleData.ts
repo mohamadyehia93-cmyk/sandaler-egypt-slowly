@@ -70,9 +70,12 @@ export const trips = [
 ];
 
 export const accommodation = [
-  { id: "ac1", title: { en: "Delta Family Homestay", ar: "إقامة عائلية في الدلتا" }, type: { en: "Homestay", ar: "إقامة عائلية" }, location: { en: "Damietta", ar: "دمياط" }, price: 300, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80", rating: 4.5 },
-  { id: "ac2", title: { en: "Lake Mariout Eco-Lodge", ar: "نزل بيئي على بحيرة مريوط" }, type: { en: "Eco-lodge", ar: "نزل بيئي" }, location: { en: "Mariout", ar: "مريوط" }, price: 500, image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80", rating: 4.8 },
-  { id: "ac3", title: { en: "Ismailia Canal House", ar: "بيت القناة بالإسماعيلية" }, type: { en: "Guesthouse", ar: "بيت ضيافة" }, location: { en: "Ismailia", ar: "الإسماعيلية" }, price: 400, image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&q=80", rating: 4.6 },
+  { id: "ac1", title: { en: "Delta Family Homestay", ar: "إقامة عائلية في الدلتا" }, type: { en: "Homestay", ar: "إقامة عائلية" }, location: { en: "Damietta", ar: "دمياط" }, price: 300, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80", rating: 4.5, regionId: "nile-delta" },
+  { id: "ac2", title: { en: "Rosetta Riverside Inn", ar: "نزل رشيد على النهر" }, type: { en: "Guesthouse", ar: "بيت ضيافة" }, location: { en: "Rosetta", ar: "رشيد" }, price: 350, image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80", rating: 4.8, regionId: "nile-delta" },
+  { id: "ac3", title: { en: "Ismailia Canal House", ar: "بيت القناة بالإسماعيلية" }, type: { en: "Guesthouse", ar: "بيت ضيافة" }, location: { en: "Ismailia", ar: "الإسماعيلية" }, price: 400, image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&q=80", rating: 4.6, regionId: "suez-canal" },
+  { id: "ac4", title: { en: "Port Said Heritage Hotel", ar: "فندق تراث بورسعيد" }, type: { en: "Hotel", ar: "فندق" }, location: { en: "Port Said", ar: "بورسعيد" }, price: 600, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80", rating: 4.4, regionId: "suez-canal" },
+  { id: "ac5", title: { en: "Nubian Village Stay", ar: "إقامة في القرية النوبية" }, type: { en: "Homestay", ar: "إقامة عائلية" }, location: { en: "Aswan", ar: "أسوان" }, price: 280, image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80", rating: 4.9, regionId: "upper-egypt" },
+  { id: "ac6", title: { en: "Siwa Oasis Eco-Lodge", ar: "نزل سيوة البيئي" }, type: { en: "Eco-lodge", ar: "نزل بيئي" }, location: { en: "Siwa", ar: "سيوة" }, price: 500, image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&q=80", rating: 4.7, regionId: "frontiers" },
 ];
 
 export const transport = [
