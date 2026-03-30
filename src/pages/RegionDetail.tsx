@@ -204,7 +204,7 @@ const RegionDetail = () => {
           <SectionHeader titleKey="section.placesToStay" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {regionAccommodation.map((a) => (
-                <div key={a.id} className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card">
+                <div key={a.id} className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${a.id}`)}>
                   <div className="relative h-32">
                     <img src={a.image} alt={a.title[lang]} className="w-full h-full object-cover" />
                     <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
