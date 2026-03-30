@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { regions, regionCities, experiences, latestPosts, whosWho, audioTours, causes, cityData } from "@/lib/sampleData";
 import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
+import RegionMap from "@/components/RegionMap";
 import BottomNav from "@/components/BottomNav";
 
 const RegionDetail = () => {
