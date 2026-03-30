@@ -27,6 +27,7 @@ const RegionDetail = () => {
   const regionTransport = cityFilter(transport.filter((tr) => tr.regionId === regionId));
   const regionProducts = cityFilter(products.filter((p) => p.regionId === regionId));
   const regionPeople = cityFilter(whosWho.filter((w) => w.regionId === regionId));
+  const regionAudioTours = cityFilter(audioTours.filter((a) => a.regionId === regionId));
 
   const selectedCityLabel = selectedCity === "all"
     ? t("filter.allCities")
