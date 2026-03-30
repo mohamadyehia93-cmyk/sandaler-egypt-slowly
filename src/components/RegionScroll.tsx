@@ -9,7 +9,7 @@ const RegionScroll = () => {
 
   return (
     <SectionHeader titleKey="section.regions" onSeeAll={() => {}}>
-      <div className="flex gap-4 px-4 overflow-x-auto hide-scrollbar">
+      <div className="grid grid-cols-4 gap-2 px-4">
         {regions.map((r) => (
           <button key={r.id} onClick={() => navigate(`/region/${r.id}`)} className="flex flex-col items-center gap-2 min-w-[72px]">
             <div
