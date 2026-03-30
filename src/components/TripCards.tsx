@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { MapPin, ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { trips, experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
+import { trips, regions } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
 
 const TripCards = () => {
