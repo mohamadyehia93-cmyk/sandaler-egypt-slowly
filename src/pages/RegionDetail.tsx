@@ -252,7 +252,7 @@ const RegionDetail = () => {
           <SectionHeader titleKey="section.products" onSeeAll={() => {}}>
             <div className="grid grid-cols-2 gap-3 px-4">
               {regionProducts.map((p) => (
-                <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card">
+                <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/product/${p.id}`)}>
                   <div className="relative h-32">
                     <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
                     <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
