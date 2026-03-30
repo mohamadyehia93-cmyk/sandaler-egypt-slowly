@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, Share2, MapPin, Clock, Users, Calendar } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Clock, Users, Calendar, MessageCircle } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { trips, regions } from "@/lib/sampleData";
