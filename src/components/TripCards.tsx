@@ -13,7 +13,9 @@ const TripCards = () => {
   const [activeRegion, setActiveRegion] = useState("all");
   const [regionOpen, setRegionOpen] = useState(false);
   const [activeAccess, setActiveAccess] = useState<TripAccessType | "all">("all");
+  const [accessOpen, setAccessOpen] = useState(false);
   const [activeDuration, setActiveDuration] = useState<TripDuration | "all">("all");
+  const [durationOpen, setDurationOpen] = useState(false);
 
   const filtered = trips.filter((tr) => {
     const themeMatch = activeTheme === "all" || tr.theme === activeTheme;
