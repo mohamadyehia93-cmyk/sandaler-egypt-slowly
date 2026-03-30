@@ -198,7 +198,7 @@ const CityDetail = () => {
           <SectionHeader titleKey="section.placesToStay" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityAccommodation.map((a) => (
-                <div key={a.id} className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card">
+                <div key={a.id} className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${a.id}`)}>
                   <div className="relative h-32">
                     <img src={a.image} alt={a.title[lang]} className="w-full h-full object-cover" />
                   </div>
