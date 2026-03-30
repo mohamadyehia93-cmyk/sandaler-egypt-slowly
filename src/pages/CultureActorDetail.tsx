@@ -1,12 +1,28 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Quote, Feather, BookOpen, Share2, Instagram, Twitter } from "lucide-react";
+import { ArrowLeft, MapPin, Quote, Feather, BookOpen, Share2, Instagram, Twitter, UserPlus, UserCheck } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cultureActors, latestPosts, regions } from "@/lib/sampleData";
+
+const FollowButton = ({ lang, following, onToggle }: { lang: string; following: boolean; onToggle: () => void }) => (
+  <button
+    onClick={onToggle}
+    className={`mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+      following
+        ? "bg-secondary text-foreground border border-border"
+        : "bg-primary text-primary-foreground"
+    }`}
+  >
+    {following ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+    {following ? (lang === "ar" ? "متابَع" : "Following") : (lang === "ar" ? "متابعة" : "Follow")}
+  </button>
+);
 
 const CultureActorDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang } = useI18n();
+  const [following, setFollowing] = useState(false);
 
   const actor = cultureActors.find((a) => a.id === id);
   if (!actor) return <div className="p-8 text-center text-muted-foreground">Culture Actor not found</div>;
@@ -57,6 +73,9 @@ const CultureActorDetail = () => {
             </div>
           )}
         </div>
+
+        {/* Follow Button */}
+        <FollowButton lang={lang} following={following} onToggle={() => setFollowing(!following)} />
       </div>
 
       {/* Quote */}
