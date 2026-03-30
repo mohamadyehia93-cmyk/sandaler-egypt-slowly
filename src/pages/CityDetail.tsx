@@ -22,6 +22,7 @@ const CityDetail = () => {
   const cityCauses = causes.filter((c) => c.cityId === cityId);
   const cityPosts = latestPosts.filter((p) => (p as any).cityId === cityId);
   const cityTransport = transport.filter((tr) => tr.cityId === cityId);
+  const cityTrips = trips.filter((tr) => tr.cityId === cityId);
 
   return (
     <div className="min-h-screen bg-surface pb-20">
