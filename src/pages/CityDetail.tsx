@@ -20,7 +20,7 @@ const CityDetail = () => {
   const cityProducts = products.filter((p) => p.cityId === cityId);
   const cityPeople = whosWho.filter((w) => w.cityId === cityId);
   const cityCauses = causes.filter((c) => c.cityId === cityId);
-  const cityPosts = latestPosts.filter((p) => p.regionId === city.regionId);
+  const cityPosts = latestPosts.filter((p) => (p as any).cityId === cityId);
   const cityTransport = transport.filter((tr) => tr.cityId === cityId);
 
   return (
