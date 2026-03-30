@@ -7,6 +7,7 @@ import SectionHeader from "./SectionHeader";
 
 const TripCards = () => {
   const { lang, t } = useI18n();
+  const navigate = useNavigate();
   const [activeRegion, setActiveRegion] = useState("all");
   const [regionOpen, setRegionOpen] = useState(false);
 
