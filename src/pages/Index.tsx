@@ -17,6 +17,7 @@ import Certifications from "@/components/Certifications";
 const Index = () => {
   const { t, lang, setLang } = useI18n();
   const [activeTab, setActiveTab] = useState("explore");
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-surface pb-20">
