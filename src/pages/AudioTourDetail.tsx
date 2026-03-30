@@ -165,6 +165,7 @@ const AudioTourDetail = () => {
 
         {/* Tour Stops */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "محطات الجولة" : "Tour Stops"}</h2>
+        <TourStopsMap stops={mapStops} />
         <div className="relative mb-6">
           {stops.map((stop, i) => (
             <div key={i} className="flex gap-3 pb-4">
