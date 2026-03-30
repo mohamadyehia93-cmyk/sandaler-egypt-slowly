@@ -3,6 +3,7 @@ import { Heart, MapPin, ChevronDown } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { experiences, experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
+import CityBadge from "./CityBadge";
 import { useNavigate } from "react-router-dom";
 
 const regionOptions = [
