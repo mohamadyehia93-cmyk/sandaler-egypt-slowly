@@ -95,6 +95,7 @@ const CauseDetail = () => {
           {supportOptions.map((opt) => (
             <button
               key={opt.key}
+              onClick={() => navigate(`/cause/${id}/${opt.path}`)}
               className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border shadow-card hover:border-primary transition-colors"
             >
               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${opt.color}`}>
