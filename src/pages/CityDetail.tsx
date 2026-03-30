@@ -82,6 +82,7 @@ const CityDetail = () => {
           </SectionHeader>
         )}
 
+
         {/* Highlights */}
         <div className="px-4">
           <div className="flex items-center gap-2 mb-2">
