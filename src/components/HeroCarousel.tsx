@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { heroSlides } from "@/lib/sampleData";
 import { useI18n } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 
 const HeroCarousel = () => {
   const { lang } = useI18n();
+  const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
@@ -17,7 +19,11 @@ const HeroCarousel = () => {
   const slide = heroSlides[current];
 
   return (
-    <div className="relative w-full h-52 overflow-hidden rounded-xl mx-4 mb-6" style={{ width: "calc(100% - 2rem)" }}>
+    <div
+      className="relative w-full h-52 overflow-hidden rounded-xl mx-4 mb-6 cursor-pointer"
+      style={{ width: "calc(100% - 2rem)" }}
+      onClick={() => navigate(slide.link)}
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={slide.id}
