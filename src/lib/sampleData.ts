@@ -9,7 +9,7 @@ export const regionCities: Record<string, { id: string; name: { en: string; ar: 
   "nile-delta": [
     { id: "rosetta", name: { en: "Rosetta", ar: "رشيد" } },
     { id: "damietta", name: { en: "Damietta", ar: "دمياط" } },
-    { id: "edku", name: { en: "Edku", ar: "إدكو" } },
+    
     { id: "manzala", name: { en: "Manzala", ar: "المنزلة" } },
     { id: "mansoura", name: { en: "Mansoura", ar: "المنصورة" } },
     { id: "tanta", name: { en: "Tanta", ar: "طنطا" } },
@@ -98,22 +98,6 @@ export const cityData: Record<string, CityInfo> = {
     knownFor: { en: ["Furniture craftsmanship", "Damietta cheese", "Palm weaving", "Seafood"], ar: ["صناعة الأثاث", "الجبن الدمياطي", "نسج النخيل", "المأكولات البحرية"] },
     bestTime: { en: "May – September (beach season)", ar: "مايو – سبتمبر (موسم الشاطئ)" },
     image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
-  },
-  "edku": {
-    id: "edku", regionId: "nile-delta",
-    name: { en: "Edku", ar: "إدكو" },
-    governorate: { en: "Beheira", ar: "البحيرة" },
-    population: "~70,000",
-    about: {
-      overview: { en: "Edku is a tranquil coastal town on the Mediterranean, nestled beside Lake Edku — one of the Nile Delta\'s precious northern lagoons and a biodiversity hotspot.", ar: "إدكو بلدة ساحلية هادئة على البحر المتوسط، تجاور بحيرة إدكو — إحدى بحيرات دلتا النيل الشمالية الثمينة." },
-      history: { en: "Edku\'s lagoon has supported fishing communities for millennia, developing a self-sustaining economy based on fishing, beekeeping, and seasonal agriculture.", ar: "دعمت بحيرة إدكو مجتمعات الصيد لآلاف السنين، مطورة اقتصاداً مستداماً قائماً على الصيد وتربية النحل والزراعة الموسمية." },
-      culture: { en: "Known for its organic honey production and artisanal fishing traditions. The community maintains close-knit social bonds centered around the lake.", ar: "تشتهر بإنتاج العسل العضوي وتقاليد الصيد الحرفية. يحافظ المجتمع على روابط اجتماعية متينة تتمحور حول البحيرة." },
-      geography: { en: "Lake Edku connects to the Mediterranean through a narrow channel, creating a unique brackish ecosystem vital for thousands of migratory birds.", ar: "تتصل بحيرة إدكو بالبحر المتوسط عبر قناة ضيقة، مما يخلق نظاماً بيئياً فريداً للطيور المهاجرة." },
-    },
-    highlights: { en: ["Lake Edku", "Organic honey farms", "Fishing villages", "Bird watching"], ar: ["بحيرة إدكو", "مزارع العسل العضوي", "قرى الصيد", "مراقبة الطيور"] },
-    knownFor: { en: ["Organic honey", "Lake fishing", "Migratory birds", "Rural tranquility"], ar: ["العسل العضوي", "صيد البحيرة", "الطيور المهاجرة", "هدوء الريف"] },
-    bestTime: { en: "November – March (bird migration)", ar: "نوفمبر – مارس (هجرة الطيور)" },
-    image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=800&q=80",
   },
   "manzala": {
     id: "manzala", regionId: "nile-delta",
