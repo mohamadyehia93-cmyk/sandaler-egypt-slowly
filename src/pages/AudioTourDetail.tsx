@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { audioTours, regions } from "@/lib/sampleData";
 import DetailTestimonials from "@/components/DetailTestimonials";
+import TourStopsMap from "@/components/TourStopsMap";
 
 const AudioTourDetail = () => {
   const { id } = useParams();
