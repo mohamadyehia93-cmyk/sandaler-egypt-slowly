@@ -91,9 +91,9 @@ const TripCards = () => {
               <img src={tr.image} alt={tr.title[lang]} className="w-full h-full object-cover" />
             </div>
             <div className="p-3">
-              <div className="flex items-center gap-1 text-xs text-accent mb-1">
-                <MapPin className="w-3 h-3" />
-                <span>{tr.route[lang]}</span>
+              <div className="flex items-center gap-2 mb-1">
+                <CityBadge cityId={tr.cityId} />
+                <span className="text-[10px] text-muted-foreground">{tr.route[lang]}</span>
               </div>
               <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-2">{tr.title[lang]}</h3>
               <div className="flex items-center justify-between">

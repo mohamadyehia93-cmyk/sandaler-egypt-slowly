@@ -107,7 +107,10 @@ const ExperienceCards = () => {
             </div>
             <div className="p-3">
               <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">{e.title[lang]}</h3>
-              <p className="text-xs text-muted-foreground mb-2">{e.region[lang]} · {e.date}</p>
+              <div className="flex items-center gap-2 mb-2">
+                <CityBadge cityId={e.cityId} />
+                <span className="text-[10px] text-muted-foreground">{e.date}</span>
+              </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-primary-dark">
                   {e.price === 0 ? t("common.free") : `${e.price} ${t("common.egp")}`}

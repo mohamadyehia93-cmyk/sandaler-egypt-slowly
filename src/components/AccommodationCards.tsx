@@ -25,7 +25,7 @@ const AccommodationCards = () => {
             </div>
             <div className="p-3">
               <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-0.5">{a.title[lang]}</h3>
-              <p className="text-xs text-muted-foreground mb-2">{a.location[lang]}</p>
+              <div className="mb-2"><CityBadge cityId={a.cityId} /></div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-primary-dark">
                   {a.price} {t("common.egp")}<span className="text-xs font-normal text-muted-foreground">{t("common.perNight")}</span>

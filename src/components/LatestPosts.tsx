@@ -24,6 +24,9 @@ const LatestPosts = () => {
                 <span className="inline-block bg-primary text-primary-foreground text-[9px] font-semibold px-1.5 py-0.5 rounded mb-1">
                   {p.category[lang]}
                 </span>
+                {p.cityId && (
+                  <CityBadge cityId={p.cityId} variant="overlay" />
+                )}
                 <h3 className="text-xs font-bold text-primary-foreground line-clamp-2 leading-tight">
                   {p.title[lang]}
                 </h3>
