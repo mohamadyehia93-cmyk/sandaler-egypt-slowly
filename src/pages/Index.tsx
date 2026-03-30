@@ -55,9 +55,9 @@ const Index = () => {
             <RegionScroll />
             <LatestPosts />
             <AudioTourCards />
-            <ExperienceCards />
-            <TripCards />
             <Testimonials />
+            <Partners />
+            <Certifications />
             <Partners />
             <Certifications />
           </>
