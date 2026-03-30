@@ -58,6 +58,9 @@ const CultureActorDetail = () => {
             </div>
           )}
         </div>
+
+        {/* Follow Button */}
+        <FollowButton lang={lang} />
       </div>
 
       {/* Quote */}
