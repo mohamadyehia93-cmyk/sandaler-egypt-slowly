@@ -9,7 +9,7 @@ export const regionCities: Record<string, { id: string; name: { en: string; ar: 
   "nile-delta": [
     { id: "rosetta", name: { en: "Rosetta", ar: "رشيد" } },
     { id: "damietta", name: { en: "Damietta", ar: "دمياط" } },
-    { id: "edku", name: { en: "Edku", ar: "إدكو" } },
+    
     { id: "manzala", name: { en: "Manzala", ar: "المنزلة" } },
     { id: "mansoura", name: { en: "Mansoura", ar: "المنصورة" } },
     { id: "tanta", name: { en: "Tanta", ar: "طنطا" } },
