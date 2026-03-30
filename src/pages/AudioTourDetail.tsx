@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, Share2, Headphones, Play, Pause, Download, MapPin, Clock, Navigation, Wifi, WifiOff } from "lucide-react";
+import { ArrowLeft, Heart, Share2, Headphones, Play, Pause, Download, MapPin, Clock, Navigation, Wifi, WifiOff, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
