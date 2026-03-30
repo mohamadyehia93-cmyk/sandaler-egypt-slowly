@@ -560,7 +560,7 @@ export const experiences = [
   // Adventure — Frontiers
   { id: "e3", title: { en: "Desert Sandboarding in Siwa", ar: "التزلج على الرمال في سيوة" }, region: { en: "Frontiers", ar: "الحدود" }, regionId: "frontiers", cityId: "siwa", theme: "adventure" as ExperienceTheme, price: 250, date: "Dec 26, 2024", image: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=400&q=80", rating: 4.9, reviews: 42 },
   // Adventure — Nile Delta
-  { id: "e13", title: { en: "Night Fishing on Lake Burullus", ar: "الصيد الليلي في بحيرة البرلس" }, region: { en: "Nile Delta", ar: "دلتا النيل" }, regionId: "nile-delta", cityId: "manzala", theme: "adventure" as ExperienceTheme, price: 170, date: "Jan 22, 2025", image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=400&q=80", rating: 4.6, reviews: 19 },
+  { id: "e13", title: { en: "Night Fishing on Lake Manzala", ar: "الصيد الليلي في بحيرة المنزلة" }, region: { en: "Nile Delta", ar: "دلتا النيل" }, regionId: "nile-delta", cityId: "manzala", theme: "adventure" as ExperienceTheme, price: 170, date: "Jan 22, 2025", image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=400&q=80", rating: 4.6, reviews: 19 },
   // Adventure — Frontiers
   { id: "e16", title: { en: "Snorkeling in Dahab Blue Hole", ar: "غوص في الحفرة الزرقاء بدهب" }, region: { en: "Frontiers", ar: "الحدود" }, regionId: "frontiers", cityId: "dahab", theme: "adventure" as ExperienceTheme, price: 300, date: "Mar 1, 2025", image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&q=80", rating: 4.8, reviews: 55 },
 
