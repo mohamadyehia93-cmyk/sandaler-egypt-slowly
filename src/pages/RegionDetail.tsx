@@ -24,9 +24,6 @@ const RegionDetail = () => {
 
   const regionExperiences = cityFilter(experiences.filter((e) => e.regionId === regionId));
   const regionPosts = latestPosts.filter((p) => p.regionId === regionId);
-  const regionAccommodation = cityFilter(accommodation.filter((a) => a.regionId === regionId));
-  const regionTransport = cityFilter(transport.filter((tr) => tr.regionId === regionId));
-  const regionProducts = cityFilter(products.filter((p) => p.regionId === regionId));
   const regionPeople = cityFilter(whosWho.filter((w) => w.regionId === regionId));
   const regionAudioTours = cityFilter(audioTours.filter((a) => a.regionId === regionId));
 
