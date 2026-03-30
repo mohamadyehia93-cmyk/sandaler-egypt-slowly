@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned, Compass } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { regions, regionCities, accommodation, transport, products, experiences, latestPosts, whosWho, audioTours, causes } from "@/lib/sampleData";
+import { regions, regionCities, experiences, latestPosts, whosWho, audioTours, causes } from "@/lib/sampleData";
 import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
 import BottomNav from "@/components/BottomNav";
@@ -24,9 +24,6 @@ const RegionDetail = () => {
 
   const regionExperiences = cityFilter(experiences.filter((e) => e.regionId === regionId));
   const regionPosts = latestPosts.filter((p) => p.regionId === regionId);
-  const regionAccommodation = cityFilter(accommodation.filter((a) => a.regionId === regionId));
-  const regionTransport = cityFilter(transport.filter((tr) => tr.regionId === regionId));
-  const regionProducts = cityFilter(products.filter((p) => p.regionId === regionId));
   const regionPeople = cityFilter(whosWho.filter((w) => w.regionId === regionId));
   const regionAudioTours = cityFilter(audioTours.filter((a) => a.regionId === regionId));
 
@@ -212,79 +209,6 @@ const RegionDetail = () => {
           </SectionHeader>
         )}
 
-        {/* Places to Stay */}
-        {regionAccommodation.length > 0 && (
-          <SectionHeader titleKey="section.placesToStay" onSeeAll={() => {}}>
-            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-              {regionAccommodation.map((a) => (
-                <div key={a.id} className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${a.id}`)}>
-                  <div className="relative h-32">
-                    <img src={a.image} alt={a.title[lang]} className="w-full h-full object-cover" />
-                    <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
-                      <Heart className="w-4 h-4 text-foreground" />
-                    </button>
-                    <span className="absolute bottom-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
-                      {a.type[lang]}
-                    </span>
-                  </div>
-                  <div className="p-3">
-                    <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-0.5">{a.title[lang]}</h3>
-                    <p className="text-xs text-muted-foreground mb-2">{a.location[lang]}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold text-primary-dark">
-                        {a.price} {t("common.egp")}<span className="text-xs font-normal text-muted-foreground">{t("common.perNight")}</span>
-                      </span>
-                      <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
-                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {a.rating}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </SectionHeader>
-        )}
-
-        {/* Getting Around */}
-        {regionTransport.length > 0 && (
-          <SectionHeader titleKey="section.gettingAround" onSeeAll={() => {}}>
-            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-              {regionTransport.map((tr) => (
-                <div key={tr.id} className="min-w-[140px] rounded-lg shadow-card bg-card p-4 flex flex-col items-center gap-2 cursor-pointer" onClick={() => navigate(`/transport/${tr.id}`)}>
-                  <span className="text-3xl">{tr.icon}</span>
-                  <h3 className="text-xs font-semibold text-foreground text-center line-clamp-2">{tr.title[lang]}</h3>
-                  <span className="text-sm font-bold text-primary-dark">{tr.price} {t("common.egp")}</span>
-                </div>
-              ))}
-            </div>
-          </SectionHeader>
-        )}
-
-        {/* Local Products */}
-        {regionProducts.length > 0 && (
-          <SectionHeader titleKey="section.products" onSeeAll={() => {}}>
-            <div className="grid grid-cols-2 gap-3 px-4">
-              {regionProducts.map((p) => (
-                <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/product/${p.id}`)}>
-                  <div className="relative h-32">
-                    <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
-                    <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
-                      <Heart className="w-3.5 h-3.5 text-foreground" />
-                    </button>
-                    <span className="absolute bottom-2 left-2 bg-accent text-accent-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
-                      {p.badge[lang]}
-                    </span>
-                  </div>
-                  <div className="p-2.5">
-                    <h3 className="text-xs font-semibold text-foreground line-clamp-2 mb-1">{p.title[lang]}</h3>
-                    <p className="text-[10px] text-muted-foreground mb-1">{p.village[lang]}</p>
-                    <span className="text-sm font-bold text-primary-dark">{p.price} {t("common.egp")}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </SectionHeader>
-        )}
         {/* Causes */}
         <CausesSection regionId={regionId || ""} cityFilter={selectedCity} />
       </div>
