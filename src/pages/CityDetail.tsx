@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain } from "lucide-react";
+import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { cityData, experiences, audioTours, accommodation, products, whosWho, causes, latestPosts, transport } from "@/lib/sampleData";
+import { cityData, experiences, audioTours, accommodation, products, whosWho, causes, latestPosts, transport, trips } from "@/lib/sampleData";
 import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
 import BottomNav from "@/components/BottomNav";
@@ -22,6 +22,7 @@ const CityDetail = () => {
   const cityCauses = causes.filter((c) => c.cityId === cityId);
   const cityPosts = latestPosts.filter((p) => (p as any).cityId === cityId);
   const cityTransport = transport.filter((tr) => tr.cityId === cityId);
+  const cityTrips = trips.filter((tr) => tr.cityId === cityId);
 
   return (
     <div className="min-h-screen bg-surface pb-20">
@@ -210,7 +211,31 @@ const CityDetail = () => {
           </SectionHeader>
         )}
 
-        {/* Audio Tours */}
+        {/* Trips */}
+        {cityTrips.length > 0 && (
+          <SectionHeader titleKey="section.trips" onSeeAll={() => {}}>
+            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+              {cityTrips.map((trip) => (
+                <div key={trip.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/trip/${trip.id}`)}>
+                  <div className="relative h-32">
+                    <img src={trip.image} alt={trip.title[lang]} className="w-full h-full object-cover" />
+                    <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <Route className="w-3 h-3" /> {trip.route[lang]}
+                    </span>
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-1">{trip.title[lang]}</h3>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold text-primary">{trip.price} {t("common.egp")}</span>
+                      <span className="text-[10px] text-muted-foreground">{trip.date}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionHeader>
+        )}
+
         {cityAudioTours.length > 0 && (
           <SectionHeader titleKey="section.audioTours" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
