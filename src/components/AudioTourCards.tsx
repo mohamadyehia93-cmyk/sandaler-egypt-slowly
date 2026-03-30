@@ -1,10 +1,12 @@
 import { Headphones, Play, Download } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { audioTours } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
 
 const AudioTourCards = () => {
   const { lang, t } = useI18n();
+  const navigate = useNavigate();
 
   return (
     <SectionHeader titleKey="section.audioTours" onSeeAll={() => {}}>
