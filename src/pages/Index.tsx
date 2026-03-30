@@ -9,6 +9,9 @@ import LatestPosts from "@/components/LatestPosts";
 import AudioTourCards from "@/components/AudioTourCards";
 import ExperienceCards from "@/components/ExperienceCards";
 import TripCards from "@/components/TripCards";
+import Testimonials from "@/components/Testimonials";
+import Partners from "@/components/Partners";
+import Certifications from "@/components/Certifications";
 
 const Index = () => {
   const { t, lang, setLang } = useI18n();
