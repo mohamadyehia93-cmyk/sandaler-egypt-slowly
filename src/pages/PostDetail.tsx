@@ -35,8 +35,16 @@ const PostDetail = () => {
           <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
             <Share2 className="w-5 h-5 text-foreground" />
           </button>
-          <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
-            <Bookmark className="w-5 h-5 text-foreground" />
+          <button
+            onClick={() => {
+              setSaved(!saved);
+              toast(saved
+                ? (lang === "ar" ? "تمت الإزالة من المفضلة" : "Removed from wishlist")
+                : (lang === "ar" ? "تمت الإضافة للمفضلة" : "Added to wishlist"));
+            }}
+            className="p-2 rounded-full bg-background/80 backdrop-blur-sm"
+          >
+            <Bookmark className={`w-5 h-5 ${saved ? "fill-primary text-primary" : "text-foreground"}`} />
           </button>
         </div>
         <div className="absolute bottom-4 left-4 right-4">
