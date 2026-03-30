@@ -57,6 +57,9 @@ const Index = () => {
             <AudioTourCards />
             <ExperienceCards />
             <TripCards />
+            <Testimonials />
+            <Partners />
+            <Certifications />
           </>
         )}
         {activeTab === "experiences" && <ExperienceCards />}

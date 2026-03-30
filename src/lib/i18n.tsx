@@ -40,6 +40,10 @@ const translations: Record<string, Record<Lang, string>> = {
   "region.mariout": { en: "Mariout", ar: "مريوط" },
   "region.fayyum": { en: "Fayyum", ar: "الفيوم" },
   "region.frontiers": { en: "Frontiers", ar: "الحدود" },
+  "section.testimonials": { en: "Testimonials", ar: "آراء المسافرين" },
+  "section.partners": { en: "Our Partners", ar: "شركاؤنا" },
+  "section.certifications": { en: "Verification & Certificates", ar: "التوثيق والشهادات" },
+  "common.audioTour": { en: "Audio Tour", ar: "جولة صوتية" },
 };
 
 type I18nContextType = {
