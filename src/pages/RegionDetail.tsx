@@ -93,7 +93,7 @@ const RegionDetail = () => {
           <SectionHeader titleKey="section.whosWho" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {regionPeople.map((p) => (
-                <div key={p.id} className="min-w-[160px] max-w-[160px] rounded-lg shadow-card bg-card overflow-hidden">
+                <div key={p.id} onClick={() => navigate(`/person/${p.id}`)} className="min-w-[160px] max-w-[160px] rounded-lg shadow-card bg-card overflow-hidden cursor-pointer">
                   <div className="relative h-28">
                     <img src={p.image} alt={p.name[lang]} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
