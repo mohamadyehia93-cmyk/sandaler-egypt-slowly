@@ -56,8 +56,8 @@ const Profile = () => {
         {/* Menu */}
         <div className="bg-card rounded-xl shadow-card overflow-hidden">
           {menuItems.map((item, i) => (
-            <button key={i} className={`w-full flex items-center justify-between px-4 py-3.5 text-sm text-foreground ${i < menuItems.length - 1 ? "border-b border-border" : ""}`}>
-              {item}
+            <button key={i} onClick={() => navigate(item.path)} className={`w-full flex items-center justify-between px-4 py-3.5 text-sm text-foreground ${i < menuItems.length - 1 ? "border-b border-border" : ""}`}>
+              {item.label}
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
           ))}

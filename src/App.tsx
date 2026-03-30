@@ -52,6 +52,10 @@ const App = () => (
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/impact" element={<ImpactDashboard />} />
+            <Route path="/profile/badges" element={<BadgesQuests />} />
+            <Route path="/profile/settings" element={<Settings />} />
+            <Route path="/profile/help" element={<HelpSupport />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
