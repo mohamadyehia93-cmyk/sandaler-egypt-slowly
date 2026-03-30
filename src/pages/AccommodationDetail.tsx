@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Star, MapPin, Users, Clock, DoorOpen, Heart, Check, ShoppingCart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { accommodation } from "@/lib/sampleData";
+import { accommodation, hosts } from "@/lib/sampleData";
 
 const AccommodationDetail = () => {
   const { id } = useParams();
