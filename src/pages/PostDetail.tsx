@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock, Bookmark, Share2, User, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { latestPosts, cultureActors, cityData } from "@/lib/sampleData";
+import { toast } from "sonner";
 
 const PostDetail = () => {
   const { id } = useParams();
