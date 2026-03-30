@@ -45,6 +45,10 @@ const translations: Record<string, Record<Lang, string>> = {
   "section.certifications": { en: "Verification & Certificates", ar: "التوثيق والشهادات" },
   "common.audioTour": { en: "Audio Tour", ar: "جولة صوتية" },
   "section.causes": { en: "Local Causes", ar: "قضايا محلية" },
+  "city.about": { en: "About", ar: "عن المدينة" },
+  "city.highlights": { en: "Highlights", ar: "أبرز المعالم" },
+  "city.knownFor": { en: "Known For", ar: "تشتهر بـ" },
+  "city.bestTime": { en: "Best Time to Visit", ar: "أفضل وقت للزيارة" },
 };
 
 type I18nContextType = {

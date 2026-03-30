@@ -75,13 +75,20 @@ const RegionDetail = () => {
                 {t("filter.allCities")}
               </button>
               {cities.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => { setSelectedCity(c.id); setCityDropOpen(false); }}
-                  className={`w-full px-3 py-2.5 text-start text-sm border-t border-border ${selectedCity === c.id ? "bg-primary/10 text-primary font-semibold" : "text-foreground hover:bg-secondary"}`}
-                >
-                  {c.name[lang]}
-                </button>
+                <div key={c.id} className="flex items-center border-t border-border">
+                  <button
+                    onClick={() => { setSelectedCity(c.id); setCityDropOpen(false); }}
+                    className={`flex-1 px-3 py-2.5 text-start text-sm ${selectedCity === c.id ? "bg-primary/10 text-primary font-semibold" : "text-foreground hover:bg-secondary"}`}
+                  >
+                    {c.name[lang]}
+                  </button>
+                  <button
+                    onClick={() => { setCityDropOpen(false); navigate(`/city/${c.id}`); }}
+                    className="px-3 py-2.5 text-xs text-primary hover:bg-primary/10 font-medium"
+                  >
+                    →
+                  </button>
+                </div>
               ))}
             </div>
           )}
