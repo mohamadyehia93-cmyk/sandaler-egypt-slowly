@@ -58,8 +58,6 @@ const Index = () => {
             <Testimonials />
             <Partners />
             <Certifications />
-            <Partners />
-            <Certifications />
           </>
         )}
         {activeTab === "experiences" && <ExperienceCards />}
