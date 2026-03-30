@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned, Compass } from "lucide-react";
+import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned, Compass, BookOpen, Palette, Mountain } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { regions, regionCities, experiences, latestPosts, whosWho, audioTours, causes } from "@/lib/sampleData";
+import { regions, regionCities, experiences, latestPosts, whosWho, audioTours, causes, cityData } from "@/lib/sampleData";
 import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
 import BottomNav from "@/components/BottomNav";
@@ -92,8 +92,27 @@ const RegionDetail = () => {
         </div>
       )}
 
-      {/* About */}
-      {region.about && (
+      {/* About — show city-specific description when a city is selected, otherwise region description */}
+      {selectedCity !== "all" && cityData[selectedCity] ? (
+        <div className="px-4 mb-2 space-y-4">
+          {[
+            { key: "overview" as const, icon: <Compass className="w-4 h-4 text-primary" />, label: { en: "Overview", ar: "نظرة عامة" } },
+            { key: "history" as const, icon: <BookOpen className="w-4 h-4 text-primary" />, label: { en: "History", ar: "التاريخ" } },
+            { key: "culture" as const, icon: <Palette className="w-4 h-4 text-primary" />, label: { en: "Culture", ar: "الثقافة" } },
+            { key: "geography" as const, icon: <Mountain className="w-4 h-4 text-primary" />, label: { en: "Geography", ar: "الجغرافيا" } },
+          ].map((section) => (
+            <div key={section.key}>
+              <div className="flex items-center gap-2 mb-2">
+                {section.icon}
+                <h3 className="text-base font-bold text-foreground">{section.label[lang]}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {cityData[selectedCity].about[section.key][lang]}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : region.about ? (
         <div className="px-4 mb-2">
           <div className="flex items-center gap-2 mb-2">
             <Compass className="w-4 h-4 text-primary" />
@@ -103,7 +122,7 @@ const RegionDetail = () => {
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed">{region.about[lang]}</p>
         </div>
-      )}
+      ) : null}
 
       <div className="space-y-6 pt-1">
         {/* Latest Posts */}
