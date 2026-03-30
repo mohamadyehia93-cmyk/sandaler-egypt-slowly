@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapPin, ChevronDown, Users, Lock, Clock, CalendarDays } from "lucide-react";
+import { MapPin, ChevronDown, Users, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { trips, experienceThemes, ExperienceTheme, regions, TripAccessType, TripDuration } from "@/lib/sampleData";
