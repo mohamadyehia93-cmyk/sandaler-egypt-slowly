@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Star, MapPin, Users, Clock, DoorOpen, Heart, Check, ShoppingCart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { accommodation } from "@/lib/sampleData";
+import { accommodation, hosts } from "@/lib/sampleData";
 
 const AccommodationDetail = () => {
   const { id } = useParams();
@@ -50,10 +50,23 @@ const AccommodationDetail = () => {
         </div>
 
         {/* Host */}
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-surface mb-5">
-          <div className="w-11 h-11 rounded-full bg-primary/20 flex items-center justify-center text-lg">🏠</div>
+        <div
+          className="flex items-center gap-3 p-3 rounded-xl bg-surface mb-5 cursor-pointer"
+          onClick={() => {
+            const host = hosts.find((h) => h.id === place.hostId);
+            if (host) navigate(`/host/${host.id}`);
+          }}
+        >
+          {(() => {
+            const host = hosts.find((h) => h.id === place.hostId);
+            return host ? (
+              <img src={host.image} alt={host.name[lang]} className="w-11 h-11 rounded-full object-cover" />
+            ) : (
+              <div className="w-11 h-11 rounded-full bg-primary/20 flex items-center justify-center text-lg">🏠</div>
+            );
+          })()}
           <div>
-            <p className="text-sm font-semibold text-foreground">{lang === "ar" ? "المضيف" : "Hosted by"} {place.host[lang]}</p>
+            <p className="text-sm font-semibold text-primary">{lang === "ar" ? "المضيف" : "Hosted by"} {place.host[lang]}</p>
             <p className="text-xs text-muted-foreground">{place.type[lang]} · {place.location[lang]}</p>
           </div>
         </div>

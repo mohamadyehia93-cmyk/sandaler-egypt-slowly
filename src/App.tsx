@@ -19,6 +19,7 @@ import PersonDetail from "./pages/PersonDetail.tsx";
 import PostDetail from "./pages/PostDetail.tsx";
 import CultureActorDetail from "./pages/CultureActorDetail.tsx";
 import AccommodationDetail from "./pages/AccommodationDetail.tsx";
+import HostDetail from "./pages/HostDetail.tsx";
 import TransportDetail from "./pages/TransportDetail.tsx";
 import ProductDetail from "./pages/ProductDetail.tsx";
 import ImpactDashboard from "./pages/ImpactDashboard.tsx";
@@ -60,6 +61,7 @@ const App = () => (
             <Route path="/post/:id" element={<PostDetail />} />
             <Route path="/culture-actor/:id" element={<CultureActorDetail />} />
             <Route path="/stay/:id" element={<AccommodationDetail />} />
+            <Route path="/host/:id" element={<HostDetail />} />
             <Route path="/transport/:id" element={<TransportDetail />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/booking" element={<Booking />} />
