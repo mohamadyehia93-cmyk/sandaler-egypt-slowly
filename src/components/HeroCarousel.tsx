@@ -19,7 +19,11 @@ const HeroCarousel = () => {
   const slide = heroSlides[current];
 
   return (
-    <div className="relative w-full h-52 overflow-hidden rounded-xl mx-4 mb-6" style={{ width: "calc(100% - 2rem)" }}>
+    <div
+      className="relative w-full h-52 overflow-hidden rounded-xl mx-4 mb-6 cursor-pointer"
+      style={{ width: "calc(100% - 2rem)" }}
+      onClick={() => navigate(slide.link)}
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={slide.id}
