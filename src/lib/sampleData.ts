@@ -724,6 +724,7 @@ export const latestPosts = [
     image: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=400&q=80",
     regionId: "frontiers",
     author: { en: "Omar Siwan", ar: "عمر السيوي" },
+    authorId: "ca6",
     date: "2025-01-15",
     readTime: 8,
     body: {
