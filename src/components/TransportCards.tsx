@@ -1,6 +1,7 @@
 import { useI18n } from "@/lib/i18n";
 import { transport } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
+import CityBadge from "./CityBadge";
 
 const TransportCards = () => {
   const { lang, t } = useI18n();
