@@ -14,7 +14,8 @@ const AudioTourCards = () => {
         {audioTours.map((a) => (
           <div
             key={a.id}
-            className="min-w-[260px] rounded-lg overflow-hidden shadow-card bg-card"
+            onClick={() => navigate(`/audio-tour/${a.id}`)}
+            className="min-w-[260px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
           >
             <div className="relative h-36">
               <img src={a.image} alt={a.title[lang]} className="w-full h-full object-cover" />
