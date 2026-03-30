@@ -360,13 +360,32 @@ const AudioTourDetail = () => {
 
         {/* Narrator */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "الراوي" : "Narrator"}</h2>
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-surface mb-6">
-          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-lg">🎙️</div>
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-foreground">{lang === "ar" ? "ياسمين حسين" : "Yasmine Hussein"}</p>
-            <p className="text-xs text-muted-foreground">{lang === "ar" ? "راوية محلية · مؤرخة" : "Local narrator · Historian"}</p>
-          </div>
-        </div>
+        {(() => {
+          const narrator = tourNarrators[tour.id];
+          if (!narrator) return (
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-surface mb-6">
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-lg">🎙️</div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">{lang === "ar" ? "راوي محلي" : "Local Narrator"}</p>
+                <p className="text-xs text-muted-foreground">{lang === "ar" ? "مرشد معتمد" : "Verified guide"}</p>
+              </div>
+            </div>
+          );
+          return (
+            <div className="rounded-xl bg-surface mb-6 overflow-hidden">
+              <div className="flex items-center gap-3 p-3">
+                <img src={narrator.image} alt={narrator.name[lang]} className="w-14 h-14 rounded-full object-cover border-2 border-primary/20" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-foreground">{narrator.name[lang]}</p>
+                  <p className="text-xs text-muted-foreground">{narrator.title[lang]}</p>
+                </div>
+              </div>
+              <div className="px-3 pb-3 border-t border-border">
+                <p className="text-xs text-muted-foreground leading-relaxed pt-2.5">{narrator.bio[lang]}</p>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Tour Stops */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "محطات الجولة" : "Tour Stops"}</h2>
