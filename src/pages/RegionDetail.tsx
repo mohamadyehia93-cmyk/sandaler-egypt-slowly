@@ -95,6 +95,19 @@ const RegionDetail = () => {
         </div>
       )}
 
+      {/* About */}
+      {region.about && (
+        <div className="px-4 mb-2">
+          <div className="flex items-center gap-2 mb-2">
+            <Compass className="w-4 h-4 text-primary" />
+            <h3 className="text-base font-bold text-foreground">
+              {lang === "ar" ? "عن المنطقة" : "About"}
+            </h3>
+          </div>
+          <p className="text-sm text-muted-foreground leading-relaxed">{region.about[lang]}</p>
+        </div>
+      )}
+
       <div className="space-y-6 pt-1">
         {/* Who's Who */}
         {regionPeople.length > 0 && (
