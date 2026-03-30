@@ -22,6 +22,7 @@ import AccommodationDetail from "./pages/AccommodationDetail.tsx";
 import HostDetail from "./pages/HostDetail.tsx";
 import TransportDetail from "./pages/TransportDetail.tsx";
 import ProductDetail from "./pages/ProductDetail.tsx";
+import PartnerDetail from "./pages/PartnerDetail.tsx";
 import ImpactDashboard from "./pages/ImpactDashboard.tsx";
 import BadgesQuests from "./pages/BadgesQuests.tsx";
 import Settings from "./pages/Settings.tsx";
