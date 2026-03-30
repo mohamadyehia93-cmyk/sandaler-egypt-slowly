@@ -75,7 +75,7 @@ const CultureActorDetail = () => {
         </div>
 
         {/* Follow Button */}
-        <FollowButton lang={lang} />
+        <FollowButton lang={lang} following={following} onToggle={() => setFollowing(!following)} />
       </div>
 
       {/* Quote */}
