@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { cityData, experiences, audioTours, accommodation, products, whosWho, causes } from "@/lib/sampleData";
+import { cityData, experiences, audioTours, accommodation, products, whosWho, causes, latestPosts } from "@/lib/sampleData";
 import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
 import BottomNav from "@/components/BottomNav";
