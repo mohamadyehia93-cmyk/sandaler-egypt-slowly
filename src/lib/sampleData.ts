@@ -764,3 +764,104 @@ export const whosWho = [
   { id: "ww8", name: { en: "Omar Siwan", ar: "عمر السيوي" }, role: { en: "Desert Guide", ar: "مرشد صحراوي" }, bio: { en: "Born in Siwa, Omar leads sandboarding and stargazing expeditions. He knows every dune and salt lake in the oasis and shares Berber traditions with visitors.", ar: "وُلد في سيوة، عمر يقود رحلات التزلج على الرمال ومراقبة النجوم. يعرف كل كثبان وبحيرة ملح في الواحة ويشارك تقاليد الأمازيغ مع الزوار." }, image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80", regionId: "frontiers", cityId: "siwa", interests: { en: ["Sandboarding", "Stargazing", "Berber culture", "Desert survival"], ar: ["التزلج على الرمال", "مراقبة النجوم", "ثقافة الأمازيغ", "البقاء في الصحراء"] }, favoritePlaces: { en: ["Great Sand Sea", "Cleopatra's Spring", "Shali Fortress"], ar: ["بحر الرمال العظيم", "عين كليوباترا", "قلعة شالي"] }, meetingTimes: { en: "Daily, 6 AM – 10 AM & 4 PM – sunset", ar: "يومياً، ٦ ص – ١٠ ص و ٤ م – الغروب" }, languages: { en: ["Arabic", "Siwi Berber", "English"], ar: ["العربية", "السيوية الأمازيغية", "الإنجليزية"] }, yearsActive: 15 },
   { id: "ww9", name: { en: "Yasmine Bedouin", ar: "ياسمين البدوية" }, role: { en: "Dive Instructor", ar: "مدربة غوص" }, bio: { en: "Dahab's first local female dive instructor at the Blue Hole. She's passionate about marine conservation and teaches freediving and scuba courses year-round.", ar: "أول مدربة غوص محلية في دهب عند الحفرة الزرقاء. شغوفة بحماية البيئة البحرية وتعلّم دورات الغوص الحر والسكوبا على مدار العام." }, image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80", regionId: "frontiers", cityId: "dahab", interests: { en: ["Freediving", "Marine conservation", "Underwater photography", "Yoga"], ar: ["الغوص الحر", "حماية البيئة البحرية", "التصوير تحت الماء", "اليوغا"] }, favoritePlaces: { en: ["Blue Hole", "Lighthouse Reef", "Dahab Boardwalk"], ar: ["الحفرة الزرقاء", "شعاب المنارة", "ممشى دهب"] }, meetingTimes: { en: "Daily, 7 AM – 5 PM", ar: "يومياً، ٧ ص – ٥ م" }, languages: { en: ["Arabic", "English", "Italian"], ar: ["العربية", "الإنجليزية", "الإيطالية"] }, yearsActive: 10 },
 ];
+
+export const cultureActors = [
+  {
+    id: "ca1",
+    name: { en: "Ahmed Mansour", ar: "أحمد منصور" },
+    title: { en: "Heritage Journalist", ar: "صحفي تراثي" },
+    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80",
+    regionId: "nile-delta",
+    bio: {
+      en: "Ahmed Mansour is a heritage journalist who has spent over 15 years documenting Egypt's forgotten historical sites. His work focuses on the Nile Delta's overlooked fortifications and medieval architecture, bringing attention to structures that risk disappearing without preservation efforts.",
+      ar: "أحمد منصور صحفي تراثي أمضى أكثر من ١٥ عاماً في توثيق المواقع التاريخية المنسية في مصر. يركز عمله على تحصينات دلتا النيل المتجاهلة والعمارة الوسطى، لفت الانتباه إلى هياكل معرضة للاختفاء بدون جهود حفظ."
+    },
+    expertise: { en: ["Historical Research", "Investigative Journalism", "Heritage Documentation", "Community Storytelling"], ar: ["البحث التاريخي", "الصحافة الاستقصائية", "توثيق التراث", "سرد القصص المجتمعية"] },
+    quote: { en: "Every crumbling wall has a story waiting to be told.", ar: "كل جدار متهالك يحمل قصة تنتظر أن تُروى." },
+    socialLinks: { instagram: "#", twitter: "#" },
+  },
+  {
+    id: "ca2",
+    name: { en: "Nour El-Din", ar: "نور الدين" },
+    title: { en: "Food Culture Writer", ar: "كاتب ثقافة الطعام" },
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80",
+    regionId: "nile-delta",
+    bio: {
+      en: "Nour El-Din is a food culture writer who travels across Egypt documenting traditional recipes and the stories behind them. His immersive approach — cooking alongside grandmothers and market vendors — has made him a beloved voice in Egyptian culinary journalism.",
+      ar: "نور الدين كاتب ثقافة طعام يسافر عبر مصر لتوثيق الوصفات التقليدية والقصص وراءها. أسلوبه الغامر — الطبخ مع الجدات وباعة السوق — جعله صوتاً محبوباً في الصحافة المصرية الطهوية."
+    },
+    expertise: { en: ["Food Anthropology", "Recipe Documentation", "Cultural Writing", "Travel Journalism"], ar: ["أنثروبولوجيا الطعام", "توثيق الوصفات", "الكتابة الثقافية", "صحافة السفر"] },
+    quote: { en: "A recipe is a love letter from one generation to the next.", ar: "الوصفة رسالة حب من جيل إلى آخر." },
+    socialLinks: { instagram: "#", twitter: "#" },
+  },
+  {
+    id: "ca3",
+    name: { en: "Sara Khalil", ar: "سارة خليل" },
+    title: { en: "Environmental Journalist", ar: "صحفية بيئية" },
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
+    regionId: "nile-delta",
+    bio: {
+      en: "Sara Khalil is an environmental journalist whose work highlights the intersection of ecology and community life in Egypt's wetlands. Her award-winning reporting on Lake Manzala has brought international attention to the delta's fragile ecosystems.",
+      ar: "سارة خليل صحفية بيئية يسلط عملها الضوء على تقاطع البيئة والحياة المجتمعية في أراضي مصر الرطبة. تقاريرها الحائزة على جوائز عن بحيرة المنزلة جلبت اهتماماً دولياً بالنظم البيئية الهشة في الدلتا."
+    },
+    expertise: { en: ["Environmental Reporting", "Wetland Ecology", "Documentary Film", "Conservation Advocacy"], ar: ["التقارير البيئية", "بيئة الأراضي الرطبة", "الأفلام الوثائقية", "الدعوة للحفاظ"] },
+    quote: { en: "Nature doesn't need our saving — it needs our respect.", ar: "الطبيعة لا تحتاج إنقاذنا — تحتاج احترامنا." },
+    socialLinks: { instagram: "#", twitter: "#" },
+  },
+  {
+    id: "ca4",
+    name: { en: "Mahmoud Rizk", ar: "محمود رزق" },
+    title: { en: "Travel Photographer", ar: "مصور سفر" },
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
+    regionId: "suez-canal",
+    bio: {
+      en: "Mahmoud Rizk is a travel photographer and writer whose lens captures the quiet poetry of Egypt's canal cities. His dawn-to-dusk photo essays reveal the human stories woven into the infrastructure of the Suez Canal.",
+      ar: "محمود رزق مصور سفر وكاتب تلتقط عدسته الشعر الهادئ لمدن مصر على القناة. مقالاته المصورة من الفجر إلى الغسق تكشف القصص الإنسانية المنسوجة في بنية قناة السويس."
+    },
+    expertise: { en: ["Travel Photography", "Photo Essays", "Maritime Culture", "Visual Storytelling"], ar: ["تصوير السفر", "المقالات المصورة", "الثقافة البحرية", "السرد البصري"] },
+    quote: { en: "The best light is the one that tells a story.", ar: "أفضل ضوء هو الذي يروي قصة." },
+    socialLinks: { instagram: "#", twitter: "#" },
+  },
+  {
+    id: "ca5",
+    name: { en: "Hana Sobhi", ar: "هنا صبحي" },
+    title: { en: "Cultural Anthropologist", ar: "عالمة أنثروبولوجيا ثقافية" },
+    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80",
+    regionId: "upper-egypt",
+    bio: {
+      en: "Hana Sobhi is a cultural anthropologist specializing in Nubian heritage and identity. Her fieldwork in Aswan's Nubian villages combines academic rigor with deeply personal storytelling, giving voice to communities whose traditions span millennia.",
+      ar: "هنا صبحي عالمة أنثروبولوجيا ثقافية متخصصة في التراث والهوية النوبية. عملها الميداني في قرى أسوان النوبية يجمع بين الدقة الأكاديمية والسرد الشخصي العميق، يمنح صوتاً لمجتمعات تمتد تقاليدها لآلاف السنين."
+    },
+    expertise: { en: ["Nubian Studies", "Cultural Anthropology", "Oral History", "Heritage Preservation"], ar: ["الدراسات النوبية", "الأنثروبولوجيا الثقافية", "التاريخ الشفهي", "الحفاظ على التراث"] },
+    quote: { en: "Culture lives in the details — a color, a song, a recipe.", ar: "الثقافة تعيش في التفاصيل — لون، أغنية، وصفة." },
+    socialLinks: { instagram: "#", twitter: "#" },
+  },
+  {
+    id: "ca6",
+    name: { en: "Omar Siwan", ar: "عمر السيوي" },
+    title: { en: "Desert Guide & Writer", ar: "مرشد صحراوي وكاتب" },
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
+    regionId: "frontiers",
+    bio: {
+      en: "Born and raised in Siwa Oasis, Omar Siwan bridges the ancient Berber world with modern storytelling. As both a desert guide and writer, he brings the silence of the Sahara and the warmth of Siwi hospitality to readers worldwide.",
+      ar: "وُلد ونشأ في واحة سيوة، عمر السيوي يربط بين عالم الأمازيغ القديم والسرد الحديث. كمرشد صحراوي وكاتب، ينقل صمت الصحراء ودفء كرم الضيافة السيوي إلى القراء حول العالم."
+    },
+    expertise: { en: ["Desert Navigation", "Berber Culture", "Nature Writing", "Eco-Tourism"], ar: ["الملاحة الصحراوية", "ثقافة الأمازيغ", "كتابة الطبيعة", "السياحة البيئية"] },
+    quote: { en: "The desert doesn't speak — it listens.", ar: "الصحراء لا تتكلم — إنها تستمع." },
+    socialLinks: { instagram: "#", twitter: "#" },
+  },
+  {
+    id: "ca7",
+    name: { en: "Captain Mahmoud", ar: "الكابتن محمود" },
+    title: { en: "Maritime Historian", ar: "مؤرخ بحري" },
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
+    regionId: "suez-canal",
+    bio: {
+      en: "Captain Mahmoud is a retired sailor turned historian and writer. His decades navigating the Suez Canal gave him an unrivaled understanding of Port Said's cosmopolitan past, which he now shares through heritage walks and vivid literary essays.",
+      ar: "الكابتن محمود بحار متقاعد تحول إلى مؤرخ وكاتب. عقود من الإبحار في قناة السويس منحته فهماً لا مثيل له لماضي بورسعيد العالمي، يشاركه الآن عبر جولات تراثية ومقالات أدبية حية."
+    },
+    expertise: { en: ["Maritime History", "Heritage Conservation", "Walking Tours", "Historical Writing"], ar: ["التاريخ البحري", "الحفاظ على التراث", "الجولات المشائية", "الكتابة التاريخية"] },
+    quote: { en: "Every port tells the story of the world.", ar: "كل ميناء يروي قصة العالم." },
+    socialLinks: { instagram: "#", twitter: "#" },
+  },
+];
