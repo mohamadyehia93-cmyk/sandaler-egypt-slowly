@@ -78,17 +78,36 @@ const ExperienceDetail = () => {
           ))}
         </div>
 
-        {/* Host */}
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-surface mb-6">
-          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-lg">👤</div>
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-foreground">{lang === "ar" ? "بإرشاد أحمد" : "Hosted by Ahmed"}</p>
-            <p className="text-xs text-muted-foreground">{lang === "ar" ? "مرشد محلي · ٥ سنوات خبرة" : "Local guide · 5 years experience"}</p>
-          </div>
-          <button className="p-2 rounded-full bg-secondary">
-            <MessageCircle className="w-4 h-4 text-secondary-foreground" />
-          </button>
-        </div>
+        {/* Host Bio */}
+        {(() => {
+          const host = experienceHosts[exp.id];
+          if (!host) return (
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-surface mb-6">
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-lg">👤</div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">{lang === "ar" ? "بإرشاد مرشد محلي" : "Hosted by a local guide"}</p>
+                <p className="text-xs text-muted-foreground">{lang === "ar" ? "مرشد محلي معتمد" : "Verified local guide"}</p>
+              </div>
+            </div>
+          );
+          return (
+            <div className="rounded-xl bg-surface mb-6 overflow-hidden">
+              <div className="flex items-center gap-3 p-3">
+                <img src={host.image} alt={host.name[lang]} className="w-14 h-14 rounded-full object-cover border-2 border-primary/20" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-foreground">{lang === "ar" ? "بإرشاد" : "Hosted by"} {host.name[lang]}</p>
+                  <p className="text-xs text-muted-foreground">{lang === "ar" ? `${host.years} سنوات خبرة` : `${host.years} years experience`} · {host.languages[lang]}</p>
+                </div>
+                <button className="p-2 rounded-full bg-secondary">
+                  <MessageCircle className="w-4 h-4 text-secondary-foreground" />
+                </button>
+              </div>
+              <div className="px-3 pb-3 border-t border-border">
+                <p className="text-xs text-muted-foreground leading-relaxed pt-2.5">{host.bio[lang]}</p>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* What You'll Do */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "ماذا ستفعل" : "What You'll Do"}</h2>
