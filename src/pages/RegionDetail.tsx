@@ -265,6 +265,8 @@ const RegionDetail = () => {
             </div>
           </SectionHeader>
         )}
+        {/* Causes */}
+        <CausesSection regionId={regionId || ""} cityFilter={selectedCity} />
       </div>
 
       <BottomNav />
