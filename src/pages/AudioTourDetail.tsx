@@ -372,13 +372,17 @@ const AudioTourDetail = () => {
             </div>
           );
           return (
-            <div className="rounded-xl bg-surface mb-6 overflow-hidden">
+            <div
+              className={`rounded-xl bg-surface mb-6 overflow-hidden ${narrator.profileId ? "cursor-pointer" : ""}`}
+              onClick={() => { if (narrator.profileId) navigate(`/culture-actor/${narrator.profileId}`); }}
+            >
               <div className="flex items-center gap-3 p-3">
                 <img src={narrator.image} alt={narrator.name[lang]} className="w-14 h-14 rounded-full object-cover border-2 border-primary/20" />
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-foreground">{narrator.name[lang]}</p>
+                  <p className={`text-sm font-semibold ${narrator.profileId ? "text-primary" : "text-foreground"}`}>{narrator.name[lang]}</p>
                   <p className="text-xs text-muted-foreground">{narrator.title[lang]}</p>
                 </div>
+                {narrator.profileId && <ChevronRight className="w-4 h-4 text-muted-foreground" />}
               </div>
               <div className="px-3 pb-3 border-t border-border">
                 <p className="text-xs text-muted-foreground leading-relaxed pt-2.5">{narrator.bio[lang]}</p>
