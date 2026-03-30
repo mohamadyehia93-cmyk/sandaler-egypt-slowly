@@ -209,8 +209,6 @@ const RegionDetail = () => {
           </SectionHeader>
         )}
 
-        {/* Places to Stay */}
-        {regionAccommodation.length > 0 && (
           <SectionHeader titleKey="section.placesToStay" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {regionAccommodation.map((a) => (
