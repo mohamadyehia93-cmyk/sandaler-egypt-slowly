@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock, Bookmark, Share2, User } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { latestPosts } from "@/lib/sampleData";
+import { latestPosts, cultureActors } from "@/lib/sampleData";
 
 const PostDetail = () => {
   const { id } = useParams();
