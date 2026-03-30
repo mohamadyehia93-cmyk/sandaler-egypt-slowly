@@ -125,20 +125,10 @@ const PersonDetail = () => {
             <MessageCircle className="w-4 h-4 text-primary" />
             <h3 className="text-sm font-semibold text-foreground">{lang === "ar" ? "تواصل" : "Contact"}</h3>
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            <button className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors">
-              <MessageCircle className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-medium text-primary">{lang === "ar" ? "رسالة" : "Message"}</span>
-            </button>
-            <button className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors">
-              <Phone className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-medium text-primary">{lang === "ar" ? "اتصال" : "Call"}</span>
-            </button>
-            <button className="flex flex-col items-center gap-1.5 p-3 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors">
-              <Mail className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-medium text-primary">{lang === "ar" ? "بريد" : "Email"}</span>
-            </button>
-          </div>
+          <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors">
+            <MessageCircle className="w-5 h-5" />
+            {lang === "ar" ? "أرسل رسالة" : "Send Message"}
+          </button>
         </div>
       </div>
 
