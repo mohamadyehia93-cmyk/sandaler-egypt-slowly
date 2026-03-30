@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, Star, MapPin, Share2, Clock, Users, MessageCircle } from "lucide-react";
+import { ArrowLeft, Heart, Star, MapPin, Share2, Clock, Users, MessageCircle, ShieldCheck, Leaf, HandHeart, Headphones } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { experiences } from "@/lib/sampleData";
@@ -105,6 +105,27 @@ const ExperienceDetail = () => {
             <div key={i} className="flex items-center gap-2 p-2.5 rounded-lg bg-surface">
               <span className="text-base">{item.icon}</span>
               <span className="text-xs text-foreground">{item.text}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Why Book with Sandal */}
+        <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "لماذا تحجز مع صندل؟" : "Why Book with Sandal?"}</h2>
+        <div className="space-y-3 mb-6">
+          {[
+            { icon: ShieldCheck, title: { en: "Verified Local Hosts", ar: "مضيفون محليون موثقون" }, desc: { en: "Every host is personally vetted and trained to ensure authentic, safe experiences.", ar: "كل مضيف يتم فحصه وتدريبه شخصياً لضمان تجارب أصيلة وآمنة." } },
+            { icon: HandHeart, title: { en: "Community-First Impact", ar: "أثر مجتمعي أولاً" }, desc: { en: "80% of your booking goes directly to local communities and artisans.", ar: "٨٠٪ من حجزك يذهب مباشرة للمجتمعات المحلية والحرفيين." } },
+            { icon: Leaf, title: { en: "Sustainable & Responsible", ar: "مستدام ومسؤول" }, desc: { en: "Low-footprint experiences designed to protect Egypt's heritage and nature.", ar: "تجارب منخفضة الأثر مصممة لحماية تراث مصر وطبيعتها." } },
+            { icon: Headphones, title: { en: "24/7 Local Support", ar: "دعم محلي على مدار الساعة" }, desc: { en: "Our team is always available before, during, and after your experience.", ar: "فريقنا متاح دائماً قبل وأثناء وبعد تجربتك." } },
+          ].map((item, i) => (
+            <div key={i} className="flex gap-3 p-3 rounded-xl bg-surface">
+              <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <item.icon className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">{item.title[lang]}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{item.desc[lang]}</p>
+              </div>
             </div>
           ))}
         </div>
