@@ -2,6 +2,7 @@ import { Heart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { products } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
+import CityBadge from "./CityBadge";
 
 const ProductGrid = () => {
   const { lang, t } = useI18n();
