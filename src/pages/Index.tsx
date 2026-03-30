@@ -9,9 +9,6 @@ import LatestPosts from "@/components/LatestPosts";
 import AudioTourCards from "@/components/AudioTourCards";
 import ExperienceCards from "@/components/ExperienceCards";
 import TripCards from "@/components/TripCards";
-import AccommodationCards from "@/components/AccommodationCards";
-import TransportCards from "@/components/TransportCards";
-import ProductGrid from "@/components/ProductGrid";
 
 const Index = () => {
   const { t, lang, setLang } = useI18n();
@@ -57,9 +54,6 @@ const Index = () => {
             <AudioTourCards />
             <ExperienceCards />
             <TripCards />
-            <AccommodationCards />
-            <TransportCards />
-            <ProductGrid />
           </>
         )}
         {activeTab === "experiences" && <ExperienceCards />}
