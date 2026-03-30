@@ -16,6 +16,7 @@ import Profile from "./pages/Profile.tsx";
 import RegionDetail from "./pages/RegionDetail.tsx";
 import CityDetail from "./pages/CityDetail.tsx";
 import PersonDetail from "./pages/PersonDetail.tsx";
+import PostDetail from "./pages/PostDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
