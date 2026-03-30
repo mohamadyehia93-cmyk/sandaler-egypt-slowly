@@ -87,6 +87,51 @@ const TripCards = () => {
         )}
       </div>
 
+      {/* Access & Duration filters */}
+      <div className="flex gap-2 px-4 mb-3">
+        {/* Public / Private */}
+        {([
+          { key: "all" as const, label: { en: "All", ar: "الكل" }, icon: null },
+          { key: "public" as const, label: { en: "Public", ar: "عامة" }, icon: Users },
+          { key: "private" as const, label: { en: "On Request", ar: "عند الطلب" }, icon: Lock },
+        ] as const).map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setActiveAccess(key)}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+              activeAccess === key
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground"
+            }`}
+          >
+            {Icon && <Icon className="w-3 h-3" />}
+            {label[lang]}
+          </button>
+        ))}
+
+        <span className="w-px bg-border mx-1 self-stretch" />
+
+        {/* One day / Multi day */}
+        {([
+          { key: "all" as const, label: { en: "All", ar: "الكل" }, icon: null },
+          { key: "one-day" as const, label: { en: "Day Trip", ar: "يوم واحد" }, icon: Clock },
+          { key: "multi-day" as const, label: { en: "Multi-Day", ar: "متعدد الأيام" }, icon: CalendarDays },
+        ] as const).map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setActiveDuration(key)}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+              activeDuration === key
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground"
+            }`}
+          >
+            {Icon && <Icon className="w-3 h-3" />}
+            {label[lang]}
+          </button>
+        ))}
+      </div>
+
       {/* Cards */}
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {filtered.map((tr) => (
