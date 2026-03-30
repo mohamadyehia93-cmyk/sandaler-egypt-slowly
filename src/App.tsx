@@ -20,6 +20,10 @@ import PostDetail from "./pages/PostDetail.tsx";
 import AccommodationDetail from "./pages/AccommodationDetail.tsx";
 import TransportDetail from "./pages/TransportDetail.tsx";
 import ProductDetail from "./pages/ProductDetail.tsx";
+import ImpactDashboard from "./pages/ImpactDashboard.tsx";
+import BadgesQuests from "./pages/BadgesQuests.tsx";
+import Settings from "./pages/Settings.tsx";
+import HelpSupport from "./pages/HelpSupport.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
