@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock, Bookmark, Share2, User } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { latestPosts } from "@/lib/sampleData";
+import { latestPosts, cultureActors } from "@/lib/sampleData";
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -45,12 +45,25 @@ const PostDetail = () => {
 
       {/* Meta */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-4 border-b border-border">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-            <User className="w-4 h-4 text-primary" />
-          </div>
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => {
+            const actor = cultureActors.find((a) => a.id === post.authorId);
+            if (actor) navigate(`/culture-actor/${actor.id}`);
+          }}
+        >
+          {(() => {
+            const actor = cultureActors.find((a) => a.id === post.authorId);
+            return actor ? (
+              <img src={actor.image} alt={actor.name[lang]} className="w-8 h-8 rounded-full object-cover" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <User className="w-4 h-4 text-primary" />
+              </div>
+            );
+          })()}
           <div>
-            <p className="text-xs font-semibold text-foreground">{post.author[lang]}</p>
+            <p className="text-xs font-semibold text-primary">{post.author[lang]}</p>
             <p className="text-[10px] text-muted-foreground">{formattedDate}</p>
           </div>
         </div>
