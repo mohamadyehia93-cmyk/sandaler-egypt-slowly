@@ -84,6 +84,23 @@ const TripDetail = () => {
           ))}
         </div>
 
+        {/* Organizer */}
+        <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "منظم الرحلة" : "Trip Organizer"}</h2>
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-surface mb-6">
+          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-lg">🧑‍💼</div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-foreground">{lang === "ar" ? "صندل للسياحة المستدامة" : "Sandal Sustainable Tourism"}</p>
+            <p className="text-xs text-muted-foreground">{lang === "ar" ? "منظم رحلات معتمد · +٥٠٠ رحلة" : "Licensed operator · 500+ trips"}</p>
+            <div className="flex items-center gap-1 mt-1">
+              <span className="text-[10px] bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded-full font-medium">{lang === "ar" ? "✅ موثّق" : "✅ Verified"}</span>
+              <span className="text-[10px] bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded-full font-medium">{lang === "ar" ? "🌿 صديق للبيئة" : "🌿 Eco-friendly"}</span>
+            </div>
+          </div>
+          <button className="p-2 rounded-full bg-secondary">
+            <MessageCircle className="w-4 h-4 text-secondary-foreground" />
+          </button>
+        </div>
+
         {/* What's Included */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "ما يشمله السعر" : "What's Included"}</h2>
         <div className="grid grid-cols-2 gap-2 mb-6">
