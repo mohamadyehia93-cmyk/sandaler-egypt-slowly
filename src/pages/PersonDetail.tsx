@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Clock, Globe, Award, Heart, Sparkles } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Globe, Award, Heart, Sparkles, MessageCircle, Phone, Mail } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { whosWho, regions, experiences } from "@/lib/sampleData";
 import BottomNav from "@/components/BottomNav";
