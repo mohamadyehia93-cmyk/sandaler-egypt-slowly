@@ -36,6 +36,7 @@ const App = () => (
             <Route path="/cause/:id" element={<CauseDetail />} />
             <Route path="/region/:regionId" element={<RegionDetail />} />
             <Route path="/person/:id" element={<PersonDetail />} />
+            <Route path="/city/:cityId" element={<CityDetail />} />
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile" element={<Profile />} />
