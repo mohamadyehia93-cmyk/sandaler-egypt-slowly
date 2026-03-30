@@ -875,3 +875,234 @@ export const cultureActors = [
     socialLinks: { instagram: "#", twitter: "#" },
   },
 ];
+
+export const partnersData = [
+  {
+    id: "pa1",
+    name: { en: "UNDP Egypt", ar: "برنامج الأمم المتحدة الإنمائي مصر" },
+    type: { en: "Development Partner", ar: "شريك تنمية" },
+    logo: "🇺🇳",
+    color: "#0077B6",
+    location: { en: "Cairo, Egypt", ar: "القاهرة، مصر" },
+    since: 2019,
+    impactNumber: "50K+",
+    impactLabel: { en: "People reached", ar: "شخص مستفيد" },
+    projects: 12,
+    about: {
+      en: "UNDP Egypt has been a foundational partner in Sandal's mission to develop sustainable, community-driven tourism across Egypt's underserved regions. Through their Inclusive Growth initiative, UNDP provides technical assistance, capacity building for local communities, and funding for heritage preservation projects. Their support has been instrumental in launching eco-tourism cooperatives in the Nile Delta and Upper Egypt.",
+      ar: "كان برنامج الأمم المتحدة الإنمائي في مصر شريكاً أساسياً في مهمة صندل لتطوير السياحة المستدامة والمجتمعية عبر مناطق مصر المحرومة. من خلال مبادرة النمو الشامل، يقدم البرنامج المساعدة الفنية وبناء القدرات للمجتمعات المحلية وتمويل مشاريع الحفاظ على التراث."
+    },
+    mission: {
+      en: "Empowering communities through sustainable development and inclusive economic growth, ensuring no one is left behind.",
+      ar: "تمكين المجتمعات من خلال التنمية المستدامة والنمو الاقتصادي الشامل، لضمان عدم تخلف أحد عن الركب."
+    },
+    focusAreas: {
+      en: ["Sustainable Development", "Community Empowerment", "Heritage Preservation", "Economic Inclusion", "Climate Resilience"],
+      ar: ["التنمية المستدامة", "تمكين المجتمعات", "الحفاظ على التراث", "الشمول الاقتصادي", "المرونة المناخية"]
+    },
+    contributions: {
+      en: [
+        "Funded the restoration of 8 Ottoman merchant houses in Rosetta's historic quarter",
+        "Trained 200+ local women in sustainable craft techniques across the Nile Delta",
+        "Established eco-tourism cooperatives in 5 underserved delta communities",
+        "Provided technical expertise for Lake Manzala wetland conservation programs"
+      ],
+      ar: [
+        "مول ترميم ٨ بيوت تجارية عثمانية في حي رشيد التاريخي",
+        "درب أكثر من ٢٠٠ سيدة محلية على تقنيات الحرف المستدامة في دلتا النيل",
+        "أسس تعاونيات سياحة بيئية في ٥ مجتمعات دلتاوية محرومة",
+        "قدم الخبرة الفنية لبرامج الحفاظ على أراضي بحيرة المنزلة الرطبة"
+      ]
+    },
+  },
+  {
+    id: "pa2",
+    name: { en: "Ministry of Tourism", ar: "وزارة السياحة" },
+    type: { en: "Government", ar: "حكومي" },
+    logo: "🏛️",
+    color: "#C9A227",
+    location: { en: "Cairo, Egypt", ar: "القاهرة، مصر" },
+    since: 2020,
+    impactNumber: "4",
+    impactLabel: { en: "Regions activated", ar: "مناطق مفعّلة" },
+    projects: 8,
+    about: {
+      en: "Egypt's Ministry of Tourism and Antiquities is a strategic government partner that provides regulatory support, destination marketing, and official accreditation for Sandal's community-based tourism initiatives. Their endorsement has been critical in opening up regions beyond traditional tourist circuits and ensuring quality standards across all listed experiences and accommodations.",
+      ar: "وزارة السياحة والآثار المصرية شريك حكومي استراتيجي يقدم الدعم التنظيمي والتسويق للوجهات والاعتماد الرسمي لمبادرات صندل السياحية المجتمعية. كان تأييدها حاسماً في فتح مناطق خارج الدوائر السياحية التقليدية."
+    },
+    mission: {
+      en: "Diversifying Egypt's tourism offering beyond monuments to include authentic cultural experiences that benefit local communities.",
+      ar: "تنويع العرض السياحي المصري ليتجاوز الآثار ويشمل تجارب ثقافية أصيلة تفيد المجتمعات المحلية."
+    },
+    focusAreas: {
+      en: ["Destination Development", "Quality Accreditation", "Heritage Tourism", "Regional Marketing", "Safety Standards"],
+      ar: ["تطوير الوجهات", "اعتماد الجودة", "سياحة التراث", "التسويق الإقليمي", "معايير السلامة"]
+    },
+    contributions: {
+      en: [
+        "Official accreditation of 30+ community-based tourism experiences on the platform",
+        "Joint marketing campaigns promoting the Nile Delta and Suez Canal regions",
+        "Regulatory support for homestay licensing in rural communities",
+        "Integration of Sandal destinations into Egypt's national tourism strategy"
+      ],
+      ar: [
+        "اعتماد رسمي لأكثر من ٣٠ تجربة سياحية مجتمعية على المنصة",
+        "حملات تسويق مشتركة للترويج لمنطقتي دلتا النيل وقناة السويس",
+        "دعم تنظيمي لترخيص الإقامة العائلية في المجتمعات الريفية",
+        "دمج وجهات صندل في استراتيجية السياحة الوطنية المصرية"
+      ]
+    },
+  },
+  {
+    id: "pa3",
+    name: { en: "EcoTravel Egypt", ar: "إيكو ترافيل مصر" },
+    type: { en: "Tour Operator", ar: "منظم رحلات" },
+    logo: "🌿",
+    color: "#2D9B47",
+    location: { en: "Ismailia, Egypt", ar: "الإسماعيلية، مصر" },
+    since: 2021,
+    impactNumber: "3K+",
+    impactLabel: { en: "Tours organized", ar: "جولة منظمة" },
+    projects: 15,
+    about: {
+      en: "EcoTravel Egypt is a pioneering eco-tourism operator based in Ismailia that designs and runs sustainable travel experiences across the Suez Canal region and beyond. They specialize in small-group tours that prioritize environmental responsibility, local employment, and cultural authenticity. As Sandal's primary operational partner for guided experiences, they ensure every trip meets the highest standards of sustainability and community benefit.",
+      ar: "إيكو ترافيل مصر منظم رحلات سياحية بيئية رائد مقره الإسماعيلية يصمم وينظم تجارب سفر مستدامة عبر منطقة قناة السويس وما بعدها. يتخصصون في الجولات الصغيرة التي تعطي الأولوية للمسؤولية البيئية والتوظيف المحلي والأصالة الثقافية."
+    },
+    mission: {
+      en: "Proving that tourism can be a force for good — protecting ecosystems while creating meaningful livelihoods for local communities.",
+      ar: "إثبات أن السياحة يمكن أن تكون قوة للخير — حماية النظم البيئية مع خلق سبل عيش ذات معنى للمجتمعات المحلية."
+    },
+    focusAreas: {
+      en: ["Eco-Tourism", "Sustainable Travel", "Birdwatching Tours", "Kayaking Excursions", "Community Employment"],
+      ar: ["السياحة البيئية", "السفر المستدام", "جولات مراقبة الطيور", "رحلات الكاياك", "التوظيف المجتمعي"]
+    },
+    contributions: {
+      en: [
+        "Designed and operates 15 unique eco-tourism experiences listed on Sandal",
+        "Trained 50 local guides in responsible tourism practices across 3 regions",
+        "Launched the Lake Timsah kayaking and birdwatching program",
+        "Created a zero-waste tourism protocol adopted by partner accommodations"
+      ],
+      ar: [
+        "صمم ويشغل ١٥ تجربة سياحة بيئية فريدة مدرجة على صندل",
+        "درب ٥٠ مرشداً محلياً على ممارسات السياحة المسؤولة في ٣ مناطق",
+        "أطلق برنامج الكاياك ومراقبة الطيور في بحيرة التمساح",
+        "أنشأ بروتوكول سياحة خالية من النفايات تبنته أماكن الإقامة الشريكة"
+      ]
+    },
+  },
+  {
+    id: "pa4",
+    name: { en: "Artisan Collective", ar: "تجمع الحرفيين" },
+    type: { en: "Community Partner", ar: "شريك مجتمعي" },
+    logo: "🤝",
+    color: "#D97706",
+    location: { en: "Damietta & Rosetta, Egypt", ar: "دمياط ورشيد، مصر" },
+    since: 2020,
+    impactNumber: "120+",
+    impactLabel: { en: "Artisan families", ar: "عائلة حرفية" },
+    projects: 6,
+    about: {
+      en: "The Artisan Collective is a grassroots network of craft cooperatives spanning the Nile Delta, connecting traditional artisans with sustainable markets. Founded by a group of women weavers in Damietta, it now encompasses palm weavers, furniture makers, silverworkers, and textile artists across multiple delta cities. Through Sandal, their products reach travelers who value authenticity and fair trade.",
+      ar: "تجمع الحرفيين شبكة شعبية من التعاونيات الحرفية الممتدة عبر دلتا النيل، تربط الحرفيين التقليديين بأسواق مستدامة. أسسته مجموعة من نساجات النخيل في دمياط، ويضم الآن نساجي النخيل وصناع الأثاث وصاغة الفضة وفنانات النسيج عبر عدة مدن دلتاوية."
+    },
+    mission: {
+      en: "Preserving Egypt's living craft heritage by connecting artisans with fair markets and ensuring traditional skills pass to the next generation.",
+      ar: "الحفاظ على تراث مصر الحرفي الحي بربط الحرفيين بأسواق عادلة وضمان انتقال المهارات التقليدية للجيل القادم."
+    },
+    focusAreas: {
+      en: ["Fair Trade", "Traditional Crafts", "Women's Empowerment", "Skills Training", "Market Access"],
+      ar: ["التجارة العادلة", "الحرف التقليدية", "تمكين المرأة", "تدريب المهارات", "الوصول للأسواق"]
+    },
+    contributions: {
+      en: [
+        "Supplies all handcrafted products listed on Sandal's marketplace",
+        "Runs apprenticeship programs training 30 young artisans annually",
+        "Organized craft demonstration workshops included in tourism experiences",
+        "Achieved fair-trade certification for all cooperative members"
+      ],
+      ar: [
+        "يزود جميع المنتجات اليدوية المدرجة في سوق صندل",
+        "يدير برامج تدريب مهني تدرب ٣٠ حرفياً شاباً سنوياً",
+        "نظم ورش عمل عرض حرفية مدمجة في التجارب السياحية",
+        "حصل على شهادة التجارة العادلة لجميع أعضاء التعاونية"
+      ]
+    },
+  },
+  {
+    id: "pa5",
+    name: { en: "National Geographic Arabia", ar: "ناشيونال جيوغرافيك العربية" },
+    type: { en: "Media Partner", ar: "شريك إعلامي" },
+    logo: "📸",
+    color: "#FFB800",
+    location: { en: "Abu Dhabi, UAE", ar: "أبوظبي، الإمارات" },
+    since: 2022,
+    impactNumber: "2M+",
+    impactLabel: { en: "Readers reached", ar: "قارئ مستهدف" },
+    projects: 4,
+    about: {
+      en: "National Geographic Arabia is Sandal's media partner, amplifying the stories of Egypt's hidden communities and sustainable tourism initiatives to a global Arabic-speaking audience. Their editorial team has produced in-depth features on the Nile Delta's wetlands, Nubian cultural revival, and Siwa's Berber heritage — bringing unprecedented attention to regions typically overlooked by mainstream travel media.",
+      ar: "ناشيونال جيوغرافيك العربية شريك صندل الإعلامي، تضخم قصص مجتمعات مصر المخفية ومبادرات السياحة المستدامة لجمهور عربي عالمي. أنتج فريقها التحريري تقارير معمقة عن أراضي دلتا النيل الرطبة والإحياء الثقافي النوبي وتراث سيوة الأمازيغي."
+    },
+    mission: {
+      en: "Telling the untold stories of Egypt's communities and landscapes, inspiring responsible travel through world-class journalism and photography.",
+      ar: "رواية القصص غير المروية لمجتمعات مصر ومناظرها، وإلهام السفر المسؤول من خلال صحافة وتصوير عالمي المستوى."
+    },
+    focusAreas: {
+      en: ["Documentary Storytelling", "Travel Journalism", "Photography", "Cultural Preservation", "Environmental Awareness"],
+      ar: ["السرد الوثائقي", "صحافة السفر", "التصوير", "الحفاظ على الثقافة", "التوعية البيئية"]
+    },
+    contributions: {
+      en: [
+        "Published 8 feature stories on Sandal destinations reaching 2M+ readers",
+        "Co-produced a documentary series on Egypt's disappearing delta ecosystems",
+        "Provided professional photography for community profiles on the platform",
+        "Nominated Sandal for their annual 'Traveler of the Year' responsible tourism award"
+      ],
+      ar: [
+        "نشر ٨ قصص مميزة عن وجهات صندل وصلت لأكثر من ٢ مليون قارئ",
+        "شارك في إنتاج سلسلة وثائقية عن النظم البيئية المختفية في الدلتا",
+        "قدم تصويراً احترافياً لملفات المجتمعات على المنصة",
+        "رشح صندل لجائزة 'مسافر العام' السنوية للسياحة المسؤولة"
+      ]
+    },
+  },
+  {
+    id: "pa6",
+    name: { en: "Cairo University", ar: "جامعة القاهرة" },
+    type: { en: "Academic Partner", ar: "شريك أكاديمي" },
+    logo: "🎓",
+    color: "#7C3AED",
+    location: { en: "Giza, Egypt", ar: "الجيزة، مصر" },
+    since: 2021,
+    impactNumber: "300+",
+    impactLabel: { en: "Students involved", ar: "طالب مشارك" },
+    projects: 7,
+    about: {
+      en: "Cairo University's Faculty of Tourism and Hotels and Department of Anthropology are key academic partners providing research, training, and curriculum development for Sandal's tourism programs. Their students conduct fieldwork in partner communities, documenting oral histories, mapping heritage sites, and developing sustainable tourism management plans. The partnership ensures Sandal's approach is grounded in academic rigor and best practices.",
+      ar: "كلية السياحة والفنادق وقسم الأنثروبولوجيا في جامعة القاهرة شركاء أكاديميون رئيسيون يقدمون البحث والتدريب وتطوير المناهج لبرامج صندل السياحية. يجري طلابهم عملاً ميدانياً في المجتمعات الشريكة، يوثقون التاريخ الشفهي ويرسمون خرائط المواقع التراثية ويطورون خطط إدارة السياحة المستدامة."
+    },
+    mission: {
+      en: "Bridging academia and community through applied research that strengthens sustainable tourism and preserves Egypt's intangible cultural heritage.",
+      ar: "ربط الأكاديمية بالمجتمع من خلال البحث التطبيقي الذي يعزز السياحة المستدامة ويحافظ على التراث الثقافي غير المادي لمصر."
+    },
+    focusAreas: {
+      en: ["Tourism Research", "Cultural Documentation", "Student Fieldwork", "Oral History", "Heritage Mapping"],
+      ar: ["بحوث السياحة", "التوثيق الثقافي", "العمل الميداني للطلاب", "التاريخ الشفهي", "رسم خرائط التراث"]
+    },
+    contributions: {
+      en: [
+        "Documented oral histories of 100+ community elders across 4 regions",
+        "Mapped 45 previously undocumented heritage sites in the Nile Delta",
+        "Developed sustainable tourism management curriculum adopted by 3 universities",
+        "Published peer-reviewed research validating Sandal's community impact model"
+      ],
+      ar: [
+        "وثق التاريخ الشفهي لأكثر من ١٠٠ من كبار المجتمع عبر ٤ مناطق",
+        "رسم خرائط ٤٥ موقعاً تراثياً غير موثق سابقاً في دلتا النيل",
+        "طور منهج إدارة السياحة المستدامة تبنته ٣ جامعات",
+        "نشر بحوثاً محكمة تثبت نموذج تأثير صندل المجتمعي"
+      ]
+    },
+  },
+];
