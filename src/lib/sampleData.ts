@@ -694,6 +694,7 @@ export const latestPosts = [
     image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=400&q=80",
     regionId: "suez-canal",
     author: { en: "Mahmoud Rizk", ar: "محمود رزق" },
+    authorId: "ca4",
     date: "2025-01-02",
     readTime: 5,
     body: {
