@@ -70,7 +70,6 @@ const AccommodationDetail = () => {
             <p className="text-xs text-muted-foreground">{place.type[lang]} · {place.location[lang]}</p>
           </div>
         </div>
-        </div>
 
         {/* Description */}
         <h2 className="text-base font-bold text-primary-dark mb-2">{lang === "ar" ? "عن المكان" : "About This Place"}</h2>
