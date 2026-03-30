@@ -2,17 +2,20 @@ import { useState } from "react";
 import { MapPin, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { trips, regions } from "@/lib/sampleData";
+import { trips, experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
 
 const TripCards = () => {
   const { lang, t } = useI18n();
   const navigate = useNavigate();
+  const [activeTheme, setActiveTheme] = useState<ExperienceTheme | "all">("all");
   const [activeRegion, setActiveRegion] = useState("all");
   const [regionOpen, setRegionOpen] = useState(false);
 
   const filtered = trips.filter((tr) => {
-    return activeRegion === "all" || tr.regionId === activeRegion;
+    const themeMatch = activeTheme === "all" || tr.theme === activeTheme;
+    const regionMatch = activeRegion === "all" || tr.regionId === activeRegion;
+    return themeMatch && regionMatch;
   });
 
   const activeRegionLabel = activeRegion === "all"
@@ -21,6 +24,33 @@ const TripCards = () => {
 
   return (
     <SectionHeader titleKey="section.trips" onSeeAll={() => {}}>
+      {/* Theme filter pills */}
+      <div className="flex gap-2 px-4 mb-3 overflow-x-auto hide-scrollbar">
+        <button
+          onClick={() => setActiveTheme("all")}
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+            activeTheme === "all"
+              ? "bg-primary text-primary-foreground"
+              : "bg-secondary text-secondary-foreground"
+          }`}
+        >
+          {lang === "ar" ? "الكل" : "All"}
+        </button>
+        {experienceThemes.map((th) => (
+          <button
+            key={th.key}
+            onClick={() => setActiveTheme(th.key)}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
+              activeTheme === th.key
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground"
+            }`}
+          >
+            {th.emoji} {th.label[lang]}
+          </button>
+        ))}
+      </div>
+
       {/* Region dropdown */}
       <div className="relative px-4 mb-3">
         <button
