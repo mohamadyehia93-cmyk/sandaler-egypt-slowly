@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { trips, experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
 import SectionHeader from "./SectionHeader";
+import CityBadge from "./CityBadge";
 
 const TripCards = () => {
   const { lang, t } = useI18n();
