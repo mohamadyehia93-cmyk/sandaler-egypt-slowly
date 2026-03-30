@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Clock, Bookmark, Share2, User } from "lucide-react";
+import { ArrowLeft, Clock, Bookmark, Share2, User, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { latestPosts, cultureActors } from "@/lib/sampleData";
+import { latestPosts, cultureActors, cityData } from "@/lib/sampleData";
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -36,9 +36,20 @@ const PostDetail = () => {
           </button>
         </div>
         <div className="absolute bottom-4 left-4 right-4">
-          <span className="inline-block bg-primary text-primary-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full mb-2">
-            {post.category[lang]}
-          </span>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="inline-block bg-primary text-primary-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full">
+              {post.category[lang]}
+            </span>
+            {(post as any).cityId && cityData[(post as any).cityId] && (
+              <span
+                onClick={(e) => { e.stopPropagation(); navigate(`/city/${(post as any).cityId}`); }}
+                className="inline-flex items-center gap-1 bg-background/80 backdrop-blur-sm text-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full cursor-pointer hover:bg-background/90 transition-colors"
+              >
+                <MapPin className="w-3 h-3" />
+                {cityData[(post as any).cityId].name[lang]}
+              </span>
+            )}
+          </div>
           <h1 className="text-xl font-bold text-white leading-tight">{post.title[lang]}</h1>
         </div>
       </div>
