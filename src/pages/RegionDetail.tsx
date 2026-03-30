@@ -208,26 +208,6 @@ const RegionDetail = () => {
           </SectionHeader>
         )}
 
-        {/* Latest Posts */}
-        {regionPosts.length > 0 && (
-          <SectionHeader titleKey="section.latestPosts" onSeeAll={() => {}}>
-            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-              {regionPosts.map((post) => (
-                <div key={post.id} className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/post/${post.id}`)}>
-                  <div className="relative h-28">
-                    <img src={post.image} alt={post.title[lang]} className="w-full h-full object-cover" />
-                    <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
-                      {post.category[lang]}
-                    </span>
-                  </div>
-                  <div className="p-3">
-                    <h3 className="text-sm font-semibold text-foreground line-clamp-2">{post.title[lang]}</h3>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </SectionHeader>
-        )}
 
         {/* Causes */}
         <CausesSection regionId={regionId || ""} cityFilter={selectedCity} />
