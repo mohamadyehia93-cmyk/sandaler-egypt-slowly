@@ -28,6 +28,7 @@ import CauseSupportGift from "./pages/CauseSupportGift.tsx";
 import CauseSupportDonate from "./pages/CauseSupportDonate.tsx";
 import CauseSupportVolunteer from "./pages/CauseSupportVolunteer.tsx";
 import CauseSupportConsult from "./pages/CauseSupportConsult.tsx";
+import Booking from "./pages/Booking.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="/stay/:id" element={<AccommodationDetail />} />
             <Route path="/transport/:id" element={<TransportDetail />} />
             <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/booking" element={<Booking />} />
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile" element={<Profile />} />

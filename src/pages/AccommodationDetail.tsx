@@ -96,7 +96,7 @@ const AccommodationDetail = () => {
           <span className="text-lg font-bold text-primary-dark">{place.price} {t("common.egp")}</span>
           <span className="text-xs text-muted-foreground block">{t("common.perNight")}</span>
         </div>
-        <button className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated">
+        <button onClick={() => navigate(`/booking?type=stay&id=${place.id}`)} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated">
           {t("common.book")}
         </button>
       </div>
