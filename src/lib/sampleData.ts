@@ -679,6 +679,7 @@ export const latestPosts = [
     image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=400&q=80",
     regionId: "nile-delta",
     author: { en: "Sara Khalil", ar: "سارة خليل" },
+    authorId: "ca3",
     date: "2024-12-20",
     readTime: 7,
     body: {
