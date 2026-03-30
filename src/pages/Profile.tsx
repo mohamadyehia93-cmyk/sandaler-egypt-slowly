@@ -1,9 +1,11 @@
 import { User, MapPin, Star, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import { useI18n } from "@/lib/i18n";
 
 const Profile = () => {
   const { t, lang } = useI18n();
+  const navigate = useNavigate();
 
   const stats = [
     { value: "3", label: lang === "ar" ? "رحلات" : "Trips" },
@@ -12,10 +14,10 @@ const Profile = () => {
   ];
 
   const menuItems = [
-    lang === "ar" ? "لوحة التأثير" : "Impact Dashboard",
-    lang === "ar" ? "الشارات والمهام" : "Badges & Quests",
-    lang === "ar" ? "الإعدادات" : "Settings",
-    lang === "ar" ? "المساعدة والدعم" : "Help & Support",
+    { label: lang === "ar" ? "لوحة التأثير" : "Impact Dashboard", path: "/profile/impact" },
+    { label: lang === "ar" ? "الشارات والمهام" : "Badges & Quests", path: "/profile/badges" },
+    { label: lang === "ar" ? "الإعدادات" : "Settings", path: "/profile/settings" },
+    { label: lang === "ar" ? "المساعدة والدعم" : "Help & Support", path: "/profile/help" },
   ];
 
   return (
@@ -54,8 +56,8 @@ const Profile = () => {
         {/* Menu */}
         <div className="bg-card rounded-xl shadow-card overflow-hidden">
           {menuItems.map((item, i) => (
-            <button key={i} className={`w-full flex items-center justify-between px-4 py-3.5 text-sm text-foreground ${i < menuItems.length - 1 ? "border-b border-border" : ""}`}>
-              {item}
+            <button key={i} onClick={() => navigate(item.path)} className={`w-full flex items-center justify-between px-4 py-3.5 text-sm text-foreground ${i < menuItems.length - 1 ? "border-b border-border" : ""}`}>
+              {item.label}
               <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </button>
           ))}
