@@ -709,6 +709,7 @@ export const latestPosts = [
     image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=400&q=80",
     regionId: "upper-egypt",
     author: { en: "Hana Sobhi", ar: "هنا صبحي" },
+    authorId: "ca5",
     date: "2025-01-08",
     readTime: 6,
     body: {
