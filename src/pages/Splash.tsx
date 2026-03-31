@@ -440,41 +440,27 @@ const SplashPage = () => {
                 {localRoles.map(({ key, icon: Icon, label, desc }) => (
                   <button
                     key={key}
-                    onClick={() => setSelectedRole(key)}
-                    className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-start ${
-                      selectedRole === key
-                        ? "border-primary bg-primary/5 shadow-card"
-                        : "border-border bg-card hover:border-primary/30"
-                    }`}
+                    onClick={() => {
+                      setSelectedRole(key);
+                      setRoleQuestionIdx(0);
+                      setSelectedRoleAnswers({});
+                      goTo("roleDetails");
+                    }}
+                    className="flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-start border-border bg-card hover:border-primary/30"
                   >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                      selectedRole === key ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
-                    }`}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-secondary text-secondary-foreground">
                       <Icon className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-foreground">{label[lang]}</p>
                       <p className="text-xs text-muted-foreground">{desc[lang]}</p>
                     </div>
-                    {selectedRole === key && (
-                      <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center shrink-0">
-                        <span className="text-primary-foreground text-xs">✓</span>
-                      </div>
-                    )}
+                    <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 ms-auto" />
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="px-4 py-4 border-t border-border bg-background">
-              <button
-                onClick={() => { if (selectedRole) { setRoleQuestionIdx(0); setSelectedRoleAnswers({}); goTo("roleDetails"); } }}
-                disabled={!selectedRole}
-                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {lang === "ar" ? "التالي" : "Continue"}
-              </button>
-            </div>
           </motion.div>
         )}
 
