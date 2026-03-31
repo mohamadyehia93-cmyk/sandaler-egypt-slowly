@@ -64,6 +64,25 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        role: {
+          visitor: "hsl(var(--role-visitor))",
+          "culture-actor": "hsl(var(--role-culture-actor))",
+          "service-provider": "hsl(var(--role-service-provider))",
+          "whos-who": "hsl(var(--role-whos-who))",
+          organization: "hsl(var(--role-organization))",
+          ambassador: "hsl(var(--role-ambassador))",
+          "product-seller": "hsl(var(--role-product-seller))",
+          "trip-organizer": "hsl(var(--role-trip-organizer))",
+          "subject-expert": "hsl(var(--role-subject-expert))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
