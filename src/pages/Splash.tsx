@@ -237,7 +237,25 @@ const SplashPage = () => {
     setStep(next);
   };
 
-  const handleFinish = () => navigate("/");
+  const roleRoutMap: Record<string, string> = {
+    "visitor": "/",
+    "culture-actor": "/dashboard/culture-actor",
+    "service-provider": "/dashboard/service-provider",
+    "whos-who": "/dashboard/whos-who",
+    "organization": "/dashboard/organization",
+    "ambassador": "/dashboard/ambassador",
+    "product-seller": "/dashboard/product-seller",
+    "trip-organizer": "/dashboard/trip-organizer",
+    "subject-expert": "/dashboard/subject-expert",
+  };
+
+  const handleFinish = () => {
+    const route = selectedRole && selectedRole !== "visitor" && selectedRole !== "local" 
+      ? roleRoutMap[selectedRole] || "/" 
+      : "/";
+    localStorage.setItem("sandal-role", selectedRole || "visitor");
+    navigate(route);
+  };
   const handleGuestMode = () => navigate("/");
 
   const toggleCity = (cityId: string) => {

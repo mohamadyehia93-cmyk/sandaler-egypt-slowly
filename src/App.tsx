@@ -34,6 +34,15 @@ import CauseSupportConsult from "./pages/CauseSupportConsult.tsx";
 import Booking from "./pages/Booking.tsx";
 import EventCalendar from "./pages/EventCalendar.tsx";
 import NotFound from "./pages/NotFound.tsx";
+// Provider Dashboards
+import CultureActorDashboard from "./pages/dashboards/CultureActorDashboard.tsx";
+import ServiceProviderDashboard from "./pages/dashboards/ServiceProviderDashboard.tsx";
+import WhosWhoDashboard from "./pages/dashboards/WhosWhoDashboard.tsx";
+import OrganizationDashboard from "./pages/dashboards/OrganizationDashboard.tsx";
+import AmbassadorDashboard from "./pages/dashboards/AmbassadorDashboard.tsx";
+import ProductSellerDashboard from "./pages/dashboards/ProductSellerDashboard.tsx";
+import TripOrganizerDashboard from "./pages/dashboards/TripOrganizerDashboard.tsx";
+import SubjectExpertDashboard from "./pages/dashboards/SubjectExpertDashboard.tsx";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +83,15 @@ const App = () => (
             <Route path="/profile/badges" element={<BadgesQuests />} />
             <Route path="/profile/settings" element={<Settings />} />
             <Route path="/profile/help" element={<HelpSupport />} />
+            {/* Provider Dashboards */}
+            <Route path="/dashboard/culture-actor" element={<CultureActorDashboard />} />
+            <Route path="/dashboard/service-provider" element={<ServiceProviderDashboard />} />
+            <Route path="/dashboard/whos-who" element={<WhosWhoDashboard />} />
+            <Route path="/dashboard/organization" element={<OrganizationDashboard />} />
+            <Route path="/dashboard/ambassador" element={<AmbassadorDashboard />} />
+            <Route path="/dashboard/product-seller" element={<ProductSellerDashboard />} />
+            <Route path="/dashboard/trip-organizer" element={<TripOrganizerDashboard />} />
+            <Route path="/dashboard/subject-expert" element={<SubjectExpertDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
