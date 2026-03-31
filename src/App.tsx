@@ -34,6 +34,7 @@ import CauseSupportConsult from "./pages/CauseSupportConsult.tsx";
 import Booking from "./pages/Booking.tsx";
 import EventCalendar from "./pages/EventCalendar.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import ProviderProfile from "./pages/ProviderProfile.tsx";
 // Provider Dashboards
 import CultureActorDashboard from "./pages/dashboards/CultureActorDashboard.tsx";
 import ServiceProviderDashboard from "./pages/dashboards/ServiceProviderDashboard.tsx";
@@ -83,6 +84,7 @@ const App = () => (
             <Route path="/transport/:id" element={<TransportDetail />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/partner/:id" element={<PartnerDetail />} />
+            <Route path="/provider/:id" element={<ProviderProfile />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
