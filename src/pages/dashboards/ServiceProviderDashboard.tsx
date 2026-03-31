@@ -19,18 +19,18 @@ const ServiceProviderDashboard = () => {
   ];
 
   const bottomNav = [
-    { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true },
-    { label: lang === "ar" ? "قوائمي" : "My Listings", icon: "📋", active: false },
-    { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false },
-    { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false },
+    { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true, path: "/dashboard/service-provider" },
+    { label: lang === "ar" ? "قوائمي" : "My Listings", icon: "📋", active: false, path: "/" },
+    { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false, path: "/inbox" },
+    { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false, path: "/profile" },
   ];
 
   return (
     <div className="min-h-screen bg-surface pb-20">
       <header className="bg-role-service-provider text-white px-4 py-4">
         <div className="flex items-center justify-between mb-3">
-          <button onClick={() => navigate("/")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-          <button className="relative p-1"><Bell className="w-5 h-5" /><span className="absolute top-0 right-0 w-2 h-2 bg-destructive rounded-full" /></button>
+          <button onClick={() => navigate("/profile")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+          <button onClick={() => navigate("/inbox")} className="relative p-1"><Bell className="w-5 h-5" /><span className="absolute top-0 right-0 w-2 h-2 bg-destructive rounded-full" /></button>
         </div>
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl">⚓</div>
@@ -89,14 +89,14 @@ const ServiceProviderDashboard = () => {
         </div>
 
         {/* Quick Action */}
-        <button className="w-full bg-role-service-provider text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
+        <button onClick={() => navigate("/experience/1")} className="w-full bg-role-service-provider text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
           <Plus className="w-4 h-4" /> {lang === "ar" ? "تجربة جديدة" : "New Experience"}
         </button>
       </div>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-role-service-provider flex justify-around py-2 z-50">
         {bottomNav.map((item, i) => (
-          <button key={i} className={`flex flex-col items-center gap-0.5 px-3 py-1 ${item.active ? "opacity-100" : "opacity-60"}`}>
+          <button key={i} onClick={() => navigate(item.path)} className={`flex flex-col items-center gap-0.5 px-3 py-1 ${item.active ? "opacity-100" : "opacity-60"}`}>
             <span className="text-lg">{item.icon}</span>
             <span className="text-[10px] text-white font-medium">{item.label}</span>
           </button>
