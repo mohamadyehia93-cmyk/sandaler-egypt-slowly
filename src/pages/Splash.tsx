@@ -599,10 +599,14 @@ const SplashPage = () => {
               </button>
               <div>
                 <h1 className="text-lg font-bold text-foreground">
-                  {lang === "ar" ? "اختر مدنك" : "Pick Your Cities"}
+                  {selectedRole === "visitor"
+                    ? (lang === "ar" ? "أي مدن تريد استكشافها؟" : "Cities to Explore")
+                    : (lang === "ar" ? "أين تعمل؟" : "Where Are You Based?")}
                 </h1>
                 <p className="text-xs text-muted-foreground">
-                  {lang === "ar" ? "أي مدن تريد استكشافها؟" : "Which cities interest you?"}
+                  {selectedRole === "visitor"
+                    ? (lang === "ar" ? "اختر المدن التي تهمك" : "Pick cities you'd like to visit")
+                    : (lang === "ar" ? "اختر المدن التي تقدم خدماتك فيها" : "Select cities where you operate")}
                 </p>
               </div>
             </header>
