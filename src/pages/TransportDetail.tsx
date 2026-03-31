@@ -21,6 +21,7 @@ const TransportDetail = () => {
         </button>
         <h1 className="text-lg font-bold text-foreground flex-1">{item.title[lang]}</h1>
         <WishlistButton className="p-1.5 rounded-full hover:bg-secondary" />
+      </header>
 
       {/* Icon Hero */}
       <div className="flex flex-col items-center py-8 bg-surface">
