@@ -92,11 +92,15 @@ const ExperienceDetail = () => {
           );
           return (
             <div className="rounded-xl bg-surface mb-6 overflow-hidden">
-              <div className="flex items-center gap-3 p-3">
+              <button
+                onClick={() => { const pid = experienceToProvider[exp.id]; if (pid) navigate(`/provider/${pid}`); }}
+                className="flex items-center gap-3 p-3 w-full text-start"
+              >
                 <img src={host.image} alt={host.name[lang]} className="w-14 h-14 rounded-full object-cover border-2 border-primary/20" />
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-foreground">{lang === "ar" ? "بإرشاد" : "Hosted by"} {host.name[lang]}</p>
                   <p className="text-xs text-muted-foreground">{lang === "ar" ? `${host.years} سنوات خبرة` : `${host.years} years experience`} · {host.languages[lang]}</p>
+                  <span className="text-[10px] text-primary font-medium">{lang === "ar" ? "عرض الملف ←" : "View profile →"}</span>
                 </div>
                 <button className="p-2 rounded-full bg-secondary">
                   <MessageCircle className="w-4 h-4 text-secondary-foreground" />
