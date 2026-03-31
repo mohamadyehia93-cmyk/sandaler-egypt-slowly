@@ -92,7 +92,7 @@ const SubjectExpertDashboard = () => {
 
       <nav className="fixed bottom-0 left-0 right-0 bg-role-subject-expert flex justify-around py-2 z-50">
         {bottomNav.map((item, i) => (
-          <button key={i} className={`flex flex-col items-center gap-0.5 px-3 py-1 ${item.active ? "opacity-100" : "opacity-60"}`}>
+          <button key={i} onClick={() => navigate(item.path)} className={`flex flex-col items-center gap-0.5 px-3 py-1 ${item.active ? "opacity-100" : "opacity-60"}`}>
             <span className="text-lg">{item.icon}</span>
             <span className="text-[10px] text-white font-medium">{item.label}</span>
           </button>
