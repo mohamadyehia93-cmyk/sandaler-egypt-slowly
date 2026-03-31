@@ -26,6 +26,19 @@ const AccommodationCards = () => {
             </div>
             <div className="p-3">
               <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-0.5">{a.title[lang]}</h3>
+              {(() => {
+                const pid = accommodationToProvider[a.id];
+                const provider = pid ? providerShortInfo[pid] : null;
+                return provider ? (
+                  <button
+                    onClick={(ev) => { ev.stopPropagation(); navigate(`/provider/${pid}`); }}
+                    className="flex items-center gap-1.5 mb-1"
+                  >
+                    <img src={provider.avatar} alt="" className="w-4 h-4 rounded-full object-cover" />
+                    <span className="text-[10px] text-primary font-medium truncate">{provider.name[lang]}</span>
+                  </button>
+                ) : null;
+              })()}
               <div className="mb-2"><CityBadge cityId={a.cityId} /></div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-primary-dark">
