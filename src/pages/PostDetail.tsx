@@ -9,7 +9,7 @@ const PostDetail = () => {
   const navigate = useNavigate();
   const { lang } = useI18n();
 
-  const [saved, setSaved] = useState(false);
+  
 
   const post = latestPosts.find((p) => p.id === id);
   if (!post) return <div className="p-8 text-center text-muted-foreground">Post not found</div>;
