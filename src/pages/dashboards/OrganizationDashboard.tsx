@@ -68,10 +68,10 @@ const OrganizationDashboard = () => {
 
         {/* Quick Actions */}
         <div className="space-y-2">
-          <button className="w-full bg-role-organization text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
+          <button onClick={() => navigate("/dashboard/organization/new-program")} className="w-full bg-role-organization text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
             <Plus className="w-4 h-4" /> {lang === "ar" ? "إضافة برنامج" : "Add Program"}
           </button>
-          <button className="w-full border-2 border-role-organization text-role-organization rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
+          <button onClick={() => navigate("/calendar")} className="w-full border-2 border-role-organization text-role-organization rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
             <Calendar className="w-4 h-4" /> {lang === "ar" ? "إنشاء فعالية" : "Create Event"}
           </button>
         </div>
