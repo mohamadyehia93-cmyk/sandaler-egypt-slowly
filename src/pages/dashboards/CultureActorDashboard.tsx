@@ -18,10 +18,10 @@ const CultureActorDashboard = () => {
   ];
 
   const bottomNav = [
-    { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "📊", active: true },
-    { label: lang === "ar" ? "محتواي" : "My Content", icon: "✍️", active: false },
-    { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false },
-    { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false },
+    { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "📊", active: true, path: "/dashboard/culture-actor" },
+    { label: lang === "ar" ? "محتواي" : "My Content", icon: "✍️", active: false, path: "/" },
+    { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false, path: "/inbox" },
+    { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false, path: "/profile" },
   ];
 
   return (
@@ -29,8 +29,8 @@ const CultureActorDashboard = () => {
       {/* Header */}
       <header className="bg-role-culture-actor text-white px-4 py-4">
         <div className="flex items-center justify-between mb-3">
-          <button onClick={() => navigate("/")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-          <button className="relative p-1">
+          <button onClick={() => navigate("/profile")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+          <button onClick={() => navigate("/inbox")} className="relative p-1">
             <Bell className="w-5 h-5" />
             <span className="absolute top-0 right-0 w-2 h-2 bg-destructive rounded-full" />
           </button>
@@ -93,10 +93,10 @@ const CultureActorDashboard = () => {
 
         {/* Quick Actions */}
         <div className="space-y-2">
-          <button className="w-full bg-role-culture-actor text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
+          <button onClick={() => navigate("/dashboard/culture-actor/new-article")} className="w-full bg-role-culture-actor text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
             <Plus className="w-4 h-4" /> {lang === "ar" ? "مقال جديد" : "New Article"}
           </button>
-          <button className="w-full border-2 border-role-culture-actor text-role-culture-actor rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
+          <button onClick={() => navigate("/dashboard/culture-actor/new-article")} className="w-full border-2 border-role-culture-actor text-role-culture-actor rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
             <Mic className="w-4 h-4" /> {lang === "ar" ? "سرد صوتي جديد" : "New Audio Narrative"}
           </button>
         </div>
@@ -105,7 +105,7 @@ const CultureActorDashboard = () => {
       {/* Bottom Nav */}
       <nav className="fixed bottom-0 left-0 right-0 bg-role-culture-actor flex justify-around py-2 z-50">
         {bottomNav.map((item, i) => (
-          <button key={i} className={`flex flex-col items-center gap-0.5 px-3 py-1 ${item.active ? "opacity-100" : "opacity-60"}`}>
+          <button key={i} onClick={() => navigate(item.path)} className={`flex flex-col items-center gap-0.5 px-3 py-1 ${item.active ? "opacity-100" : "opacity-60"}`}>
             <span className="text-lg">{item.icon}</span>
             <span className="text-[10px] text-white font-medium">{item.label}</span>
           </button>

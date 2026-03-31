@@ -44,6 +44,13 @@ import ProductSellerDashboard from "./pages/dashboards/ProductSellerDashboard.ts
 import TripOrganizerDashboard from "./pages/dashboards/TripOrganizerDashboard.tsx";
 import SubjectExpertDashboard from "./pages/dashboards/SubjectExpertDashboard.tsx";
 import NewExperience from "./pages/dashboards/NewExperience.tsx";
+import NewArticle from "./pages/dashboards/NewArticle.tsx";
+import NewProduct from "./pages/dashboards/NewProduct.tsx";
+import NewTrip from "./pages/dashboards/NewTrip.tsx";
+import NewSession from "./pages/dashboards/NewSession.tsx";
+import NewProgram from "./pages/dashboards/NewProgram.tsx";
+import NewFlagReport from "./pages/dashboards/NewFlagReport.tsx";
+import NewCollection from "./pages/dashboards/NewCollection.tsx";
 
 const queryClient = new QueryClient();
 
@@ -85,14 +92,21 @@ const App = () => (
             <Route path="/profile/settings" element={<Settings />} />
             <Route path="/profile/help" element={<HelpSupport />} />
             {/* Provider Dashboards */}
+            <Route path="/dashboard/culture-actor/new-article" element={<NewArticle />} />
             <Route path="/dashboard/culture-actor" element={<CultureActorDashboard />} />
             <Route path="/dashboard/service-provider/new-experience" element={<NewExperience />} />
             <Route path="/dashboard/service-provider" element={<ServiceProviderDashboard />} />
+            <Route path="/dashboard/whos-who/new-session" element={<NewSession />} />
             <Route path="/dashboard/whos-who" element={<WhosWhoDashboard />} />
+            <Route path="/dashboard/organization/new-program" element={<NewProgram />} />
             <Route path="/dashboard/organization" element={<OrganizationDashboard />} />
+            <Route path="/dashboard/ambassador/flag-issue" element={<NewFlagReport />} />
             <Route path="/dashboard/ambassador" element={<AmbassadorDashboard />} />
+            <Route path="/dashboard/product-seller/new-product" element={<NewProduct />} />
             <Route path="/dashboard/product-seller" element={<ProductSellerDashboard />} />
+            <Route path="/dashboard/trip-organizer/new-trip" element={<NewTrip />} />
             <Route path="/dashboard/trip-organizer" element={<TripOrganizerDashboard />} />
+            <Route path="/dashboard/subject-expert/new-collection" element={<NewCollection />} />
             <Route path="/dashboard/subject-expert" element={<SubjectExpertDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
