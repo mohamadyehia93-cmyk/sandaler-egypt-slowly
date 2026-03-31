@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock, MapPin, Route, Lightbulb, ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { transport } from "@/lib/sampleData";
+import WishlistButton from "@/components/WishlistButton";
 
 const TransportDetail = () => {
   const { id } = useParams();
@@ -18,7 +19,8 @@ const TransportDetail = () => {
         <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
-        <h1 className="text-lg font-bold text-foreground">{item.title[lang]}</h1>
+        <h1 className="text-lg font-bold text-foreground flex-1">{item.title[lang]}</h1>
+        <WishlistButton className="p-1.5 rounded-full hover:bg-secondary" />
       </header>
 
       {/* Icon Hero */}

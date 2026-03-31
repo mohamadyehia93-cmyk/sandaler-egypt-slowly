@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Star, MapPin, Users, Clock, DoorOpen, Heart, Check, ShoppingCart } from "lucide-react";
+import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
 import { accommodation, hosts } from "@/lib/sampleData";
 
@@ -19,9 +20,7 @@ const AccommodationDetail = () => {
         <button onClick={() => navigate(-1)} className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-sm">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
-        <button className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm">
-          <Heart className="w-5 h-5 text-foreground" />
-        </button>
+        <WishlistButton />
         <div className="absolute bottom-3 left-4">
           <span className="bg-primary/90 text-primary-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full">
             {place.type[lang]}

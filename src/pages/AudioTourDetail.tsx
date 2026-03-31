@@ -1,5 +1,6 @@
 import { ArrowLeft, Heart, Share2, Headphones, Play, Pause, Download, MapPin, Clock, Navigation, Wifi, WifiOff, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { audioTours, regions } from "@/lib/sampleData";
@@ -290,9 +291,7 @@ const AudioTourDetail = () => {
           <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
             <Share2 className="w-5 h-5 text-foreground" />
           </button>
-          <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
-            <Heart className="w-5 h-5 text-foreground" />
-          </button>
+          <WishlistButton />
         </div>
         <div className="absolute bottom-4 left-4 right-4">
           <div className="flex items-center gap-1.5 mb-2">

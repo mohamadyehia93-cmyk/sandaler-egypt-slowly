@@ -1,16 +1,15 @@
-import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock, Bookmark, Share2, User, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { latestPosts, cultureActors, cityData } from "@/lib/sampleData";
-import { toast } from "sonner";
+import WishlistButton from "@/components/WishlistButton";
 
 const PostDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang } = useI18n();
 
-  const [saved, setSaved] = useState(false);
+  
 
   const post = latestPosts.find((p) => p.id === id);
   if (!post) return <div className="p-8 text-center text-muted-foreground">Post not found</div>;
@@ -35,17 +34,7 @@ const PostDetail = () => {
           <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
             <Share2 className="w-5 h-5 text-foreground" />
           </button>
-          <button
-            onClick={() => {
-              setSaved(!saved);
-              toast(saved
-                ? (lang === "ar" ? "تمت الإزالة من المفضلة" : "Removed from wishlist")
-                : (lang === "ar" ? "تمت الإضافة للمفضلة" : "Added to wishlist"));
-            }}
-            className="p-2 rounded-full bg-background/80 backdrop-blur-sm"
-          >
-            <Bookmark className={`w-5 h-5 ${saved ? "fill-primary text-primary" : "text-foreground"}`} />
-          </button>
+          <WishlistButton variant="bookmark" />
         </div>
         <div className="absolute bottom-4 left-4 right-4">
           <div className="flex items-center gap-2 mb-2">

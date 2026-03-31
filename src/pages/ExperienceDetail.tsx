@@ -1,4 +1,5 @@
 import { ArrowLeft, Heart, Star, MapPin, Share2, Clock, Users, MessageCircle, ShieldCheck, Leaf, HandHeart, Headphones, ChevronRight } from "lucide-react";
+import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { experiences } from "@/lib/sampleData";
@@ -55,9 +56,7 @@ const ExperienceDetail = () => {
           <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
             <Share2 className="w-5 h-5 text-foreground" />
           </button>
-          <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
-            <Heart className="w-5 h-5 text-foreground" />
-          </button>
+          <WishlistButton />
         </div>
       </div>
 

@@ -1,4 +1,5 @@
 import { ArrowLeft, Heart, Share2, MapPin, Clock, Users, Calendar, MessageCircle } from "lucide-react";
+import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { trips, regions } from "@/lib/sampleData";
@@ -33,9 +34,7 @@ const TripDetail = () => {
           <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
             <Share2 className="w-5 h-5 text-foreground" />
           </button>
-          <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
-            <Heart className="w-5 h-5 text-foreground" />
-          </button>
+          <WishlistButton />
         </div>
       </div>
 
