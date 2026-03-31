@@ -250,8 +250,10 @@ const SplashPage = () => {
   };
 
   const handleFinish = () => {
-    const route = (selectedLocalRole && selectedRole === "local") ? roleRoutMap[selectedLocalRole] || "/" : "/";
-    localStorage.setItem("sandal-role", selectedRole === "local" && selectedLocalRole ? selectedLocalRole : "visitor");
+    const route = selectedRole && selectedRole !== "visitor" && selectedRole !== "local" 
+      ? roleRoutMap[selectedRole] || "/" 
+      : "/";
+    localStorage.setItem("sandal-role", selectedRole || "visitor");
     navigate(route);
   };
   const handleGuestMode = () => navigate("/");
