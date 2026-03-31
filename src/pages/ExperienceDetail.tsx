@@ -105,7 +105,7 @@ const ExperienceDetail = () => {
                 <button className="p-2 rounded-full bg-secondary">
                   <MessageCircle className="w-4 h-4 text-secondary-foreground" />
                 </button>
-              </div>
+              </button>
               <div className="px-3 pb-3 border-t border-border">
                 <p className="text-xs text-muted-foreground leading-relaxed pt-2.5">{host.bio[lang]}</p>
               </div>
