@@ -336,7 +336,7 @@ const SplashPage = () => {
               <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20">
                 <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                   {(() => {
-                    const role = roles.find(r => r.key === selectedRole);
+                    const role = allRoles.find(r => r.key === selectedRole);
                     if (!role) return null;
                     const RoleIcon = role.icon;
                     return <RoleIcon className="w-4 h-4" />;
