@@ -29,8 +29,8 @@ const CultureActorDashboard = () => {
       {/* Header */}
       <header className="bg-role-culture-actor text-white px-4 py-4">
         <div className="flex items-center justify-between mb-3">
-          <button onClick={() => navigate("/")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-          <button className="relative p-1">
+          <button onClick={() => navigate("/profile")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+          <button onClick={() => navigate("/inbox")} className="relative p-1">
             <Bell className="w-5 h-5" />
             <span className="absolute top-0 right-0 w-2 h-2 bg-destructive rounded-full" />
           </button>
