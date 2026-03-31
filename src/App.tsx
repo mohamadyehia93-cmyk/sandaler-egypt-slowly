@@ -43,6 +43,7 @@ import AmbassadorDashboard from "./pages/dashboards/AmbassadorDashboard.tsx";
 import ProductSellerDashboard from "./pages/dashboards/ProductSellerDashboard.tsx";
 import TripOrganizerDashboard from "./pages/dashboards/TripOrganizerDashboard.tsx";
 import SubjectExpertDashboard from "./pages/dashboards/SubjectExpertDashboard.tsx";
+import NewExperience from "./pages/dashboards/NewExperience.tsx";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,7 @@ const App = () => (
             <Route path="/profile/help" element={<HelpSupport />} />
             {/* Provider Dashboards */}
             <Route path="/dashboard/culture-actor" element={<CultureActorDashboard />} />
+            <Route path="/dashboard/service-provider/new-experience" element={<NewExperience />} />
             <Route path="/dashboard/service-provider" element={<ServiceProviderDashboard />} />
             <Route path="/dashboard/whos-who" element={<WhosWhoDashboard />} />
             <Route path="/dashboard/organization" element={<OrganizationDashboard />} />
