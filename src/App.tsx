@@ -34,6 +34,15 @@ import CauseSupportConsult from "./pages/CauseSupportConsult.tsx";
 import Booking from "./pages/Booking.tsx";
 import EventCalendar from "./pages/EventCalendar.tsx";
 import NotFound from "./pages/NotFound.tsx";
+// Provider Dashboards
+import CultureActorDashboard from "./pages/dashboards/CultureActorDashboard.tsx";
+import ServiceProviderDashboard from "./pages/dashboards/ServiceProviderDashboard.tsx";
+import WhosWhoDashboard from "./pages/dashboards/WhosWhoDashboard.tsx";
+import OrganizationDashboard from "./pages/dashboards/OrganizationDashboard.tsx";
+import AmbassadorDashboard from "./pages/dashboards/AmbassadorDashboard.tsx";
+import ProductSellerDashboard from "./pages/dashboards/ProductSellerDashboard.tsx";
+import TripOrganizerDashboard from "./pages/dashboards/TripOrganizerDashboard.tsx";
+import SubjectExpertDashboard from "./pages/dashboards/SubjectExpertDashboard.tsx";
 
 const queryClient = new QueryClient();
 
