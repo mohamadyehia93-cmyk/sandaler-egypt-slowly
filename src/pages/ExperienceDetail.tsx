@@ -56,9 +56,7 @@ const ExperienceDetail = () => {
           <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
             <Share2 className="w-5 h-5 text-foreground" />
           </button>
-          <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
-            <Heart className="w-5 h-5 text-foreground" />
-          </button>
+          <WishlistButton />
         </div>
       </div>
 

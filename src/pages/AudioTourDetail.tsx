@@ -1,5 +1,6 @@
 import { ArrowLeft, Heart, Share2, Headphones, Play, Pause, Download, MapPin, Clock, Navigation, Wifi, WifiOff, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { audioTours, regions } from "@/lib/sampleData";
