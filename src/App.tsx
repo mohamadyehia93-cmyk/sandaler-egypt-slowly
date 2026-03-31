@@ -34,6 +34,7 @@ import CauseSupportConsult from "./pages/CauseSupportConsult.tsx";
 import Booking from "./pages/Booking.tsx";
 import EventCalendar from "./pages/EventCalendar.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import ProviderProfile from "./pages/ProviderProfile.tsx";
 // Provider Dashboards
 import CultureActorDashboard from "./pages/dashboards/CultureActorDashboard.tsx";
 import ServiceProviderDashboard from "./pages/dashboards/ServiceProviderDashboard.tsx";
