@@ -19,10 +19,10 @@ const ProductSellerDashboard = () => {
   ];
 
   const bottomNav = [
-    { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true },
-    { label: lang === "ar" ? "منتجاتي" : "My Products", icon: "🛍️", active: false },
-    { label: lang === "ar" ? "الطلبات" : "Orders", icon: "📦", active: false },
-    { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false },
+    { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true, path: "/dashboard/product-seller" },
+    { label: lang === "ar" ? "منتجاتي" : "My Products", icon: "🛍️", active: false, path: "/" },
+    { label: lang === "ar" ? "الطلبات" : "Orders", icon: "📦", active: false, path: "/inbox" },
+    { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false, path: "/profile" },
   ];
 
   return (
