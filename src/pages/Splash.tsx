@@ -4,10 +4,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { User, Pen, Briefcase, Home, Truck, Map, ShoppingBag, Building2, Shield, GraduationCap, ArrowLeft, ArrowRight } from "lucide-react";
 
-type OnboardingStep = "splash" | "language" | "role" | "profile";
+type OnboardingStep = "splash" | "language" | "role" | "localRole" | "profile";
 
-const roles = [
-  { key: "visitor", icon: User, label: { en: "Visitor", ar: "زائر" }, desc: { en: "Discover rural Egypt", ar: "اكتشف ريف مصر" } },
+const topRoles = [
+  { key: "visitor", icon: User, label: { en: "Visitor", ar: "زائر" }, desc: { en: "Discover rural Egypt as a traveler", ar: "اكتشف ريف مصر كمسافر" } },
+  { key: "local", icon: Home, label: { en: "Local", ar: "محلي" }, desc: { en: "I live here and want to contribute", ar: "أعيش هنا وأريد المساهمة" } },
+];
+
+const localRoles = [
   { key: "culture-actor", icon: Pen, label: { en: "Culture Actor", ar: "فاعل ثقافي" }, desc: { en: "Share your community's story", ar: "شارك قصة مجتمعك" } },
   { key: "service-provider", icon: Briefcase, label: { en: "Service Provider", ar: "مقدم خدمة" }, desc: { en: "List experiences & activities", ar: "اعرض تجارب وأنشطة" } },
   { key: "accommodation-host", icon: Home, label: { en: "Accommodation Host", ar: "مضيف إقامة" }, desc: { en: "Host travelers in your home", ar: "استضف مسافرين في بيتك" } },
@@ -17,6 +21,8 @@ const roles = [
   { key: "organization", icon: Building2, label: { en: "Organization", ar: "منظمة" }, desc: { en: "Recruit volunteers & donors", ar: "اجذب متطوعين ومتبرعين" } },
   { key: "ambassador", icon: Shield, label: { en: "Ambassador", ar: "سفير" }, desc: { en: "Verify & support providers", ar: "تحقق وادعم المقدمين" } },
 ];
+
+const allRoles = [topRoles[0], ...localRoles];
 
 const slideVariants = {
   enter: (dir: number) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
@@ -125,7 +131,7 @@ const SplashPage = () => {
           </motion.div>
         )}
 
-        {/* STEP 3: Role Selection */}
+        {/* STEP 3: Role Selection (Visitor vs Local) */}
         {step === "role" && (
           <motion.div
             key="role"
@@ -143,7 +149,7 @@ const SplashPage = () => {
               </button>
               <div>
                 <h1 className="text-lg font-bold text-foreground">
-                  {lang === "ar" ? "اختر دورك" : "Choose Your Role"}
+                  {lang === "ar" ? "من أنت؟" : "Who are you?"}
                 </h1>
                 <p className="text-xs text-muted-foreground">
                   {lang === "ar" ? "يمكنك تغييره لاحقاً" : "You can change this later"}
@@ -151,9 +157,63 @@ const SplashPage = () => {
               </div>
             </header>
 
+            <div className="flex-1 flex flex-col items-center justify-center px-6 gap-4">
+              {topRoles.map(({ key, icon: Icon, label, desc }) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    if (key === "visitor") {
+                      setSelectedRole("visitor");
+                      goTo("profile");
+                    } else {
+                      goTo("localRole");
+                    }
+                  }}
+                  className="w-full max-w-xs flex items-center gap-4 p-5 rounded-2xl border-2 border-border bg-card hover:border-primary/40 transition-all text-start shadow-card"
+                >
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <Icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-base font-bold text-foreground">{label[lang]}</p>
+                    <p className="text-xs text-muted-foreground">{desc[lang]}</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 ms-auto" />
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* STEP 3b: Local Role Selection */}
+        {step === "localRole" && (
+          <motion.div
+            key="localRole"
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.3 }}
+            className="min-h-screen bg-background flex flex-col"
+          >
+            <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
+              <button onClick={() => goTo("role", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+                <ArrowLeft className="w-5 h-5 text-foreground" />
+              </button>
+              <div>
+                <h1 className="text-lg font-bold text-foreground">
+                  {lang === "ar" ? "اختر دورك" : "Choose Your Role"}
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  {lang === "ar" ? "كيف تريد المساهمة؟" : "How do you want to contribute?"}
+                </p>
+              </div>
+            </header>
+
             <div className="flex-1 overflow-y-auto px-4 py-4">
               <div className="grid grid-cols-1 gap-2.5">
-                {roles.map(({ key, icon: Icon, label, desc }) => (
+                {localRoles.map(({ key, icon: Icon, label, desc }) => (
                   <button
                     key={key}
                     onClick={() => setSelectedRole(key)}
@@ -207,7 +267,7 @@ const SplashPage = () => {
             className="min-h-screen bg-background flex flex-col"
           >
             <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
-              <button onClick={() => goTo("role", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+              <button onClick={() => goTo(selectedRole === "visitor" ? "role" : "localRole", -1)} className="p-1.5 rounded-full hover:bg-secondary">
                 <ArrowLeft className="w-5 h-5 text-foreground" />
               </button>
               <div>
@@ -276,7 +336,7 @@ const SplashPage = () => {
               <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20">
                 <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                   {(() => {
-                    const role = roles.find(r => r.key === selectedRole);
+                    const role = allRoles.find(r => r.key === selectedRole);
                     if (!role) return null;
                     const RoleIcon = role.icon;
                     return <RoleIcon className="w-4 h-4" />;
@@ -285,7 +345,7 @@ const SplashPage = () => {
                 <div>
                   <p className="text-xs text-muted-foreground">{lang === "ar" ? "دورك" : "Your role"}</p>
                   <p className="text-sm font-semibold text-foreground">
-                    {roles.find(r => r.key === selectedRole)?.label[lang]}
+                    {allRoles.find(r => r.key === selectedRole)?.label[lang]}
                   </p>
                 </div>
               </div>
