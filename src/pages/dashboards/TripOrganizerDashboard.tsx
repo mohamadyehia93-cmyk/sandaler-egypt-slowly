@@ -19,10 +19,10 @@ const TripOrganizerDashboard = () => {
   ];
 
   const bottomNav = [
-    { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true },
-    { label: lang === "ar" ? "رحلاتي" : "My Trips", icon: "🗺️", active: false },
-    { label: lang === "ar" ? "العملاء" : "Leads", icon: "📥", active: false },
-    { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false },
+    { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true, path: "/dashboard/trip-organizer" },
+    { label: lang === "ar" ? "رحلاتي" : "My Trips", icon: "🗺️", active: false, path: "/" },
+    { label: lang === "ar" ? "العملاء" : "Leads", icon: "📥", active: false, path: "/inbox" },
+    { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false, path: "/profile" },
   ];
 
   return (
