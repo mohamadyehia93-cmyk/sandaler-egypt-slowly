@@ -7,10 +7,10 @@ const WhosWhoDashboard = () => {
   const navigate = useNavigate();
 
   const bottomNav = [
-    { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true },
-    { label: lang === "ar" ? "ملفي" : "My Profile", icon: "👤", active: false },
-    { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false },
-    { label: lang === "ar" ? "إعدادات" : "Settings", icon: "⚙️", active: false },
+    { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true, path: "/dashboard/whos-who" },
+    { label: lang === "ar" ? "ملفي" : "My Profile", icon: "👤", active: false, path: "/profile" },
+    { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false, path: "/inbox" },
+    { label: lang === "ar" ? "إعدادات" : "Settings", icon: "⚙️", active: false, path: "/profile/settings" },
   ];
 
   return (
