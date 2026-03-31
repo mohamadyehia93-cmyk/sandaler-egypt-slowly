@@ -44,6 +44,13 @@ import ProductSellerDashboard from "./pages/dashboards/ProductSellerDashboard.ts
 import TripOrganizerDashboard from "./pages/dashboards/TripOrganizerDashboard.tsx";
 import SubjectExpertDashboard from "./pages/dashboards/SubjectExpertDashboard.tsx";
 import NewExperience from "./pages/dashboards/NewExperience.tsx";
+import NewArticle from "./pages/dashboards/NewArticle.tsx";
+import NewProduct from "./pages/dashboards/NewProduct.tsx";
+import NewTrip from "./pages/dashboards/NewTrip.tsx";
+import NewSession from "./pages/dashboards/NewSession.tsx";
+import NewProgram from "./pages/dashboards/NewProgram.tsx";
+import NewFlagReport from "./pages/dashboards/NewFlagReport.tsx";
+import NewCollection from "./pages/dashboards/NewCollection.tsx";
 
 const queryClient = new QueryClient();
 
