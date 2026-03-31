@@ -461,15 +461,6 @@ const SplashPage = () => {
               </div>
             </div>
 
-            <div className="px-4 py-4 border-t border-border bg-background">
-              <button
-                onClick={() => { if (selectedRole) { setRoleQuestionIdx(0); setSelectedRoleAnswers({}); goTo("roleDetails"); } }}
-                disabled={!selectedRole}
-                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {lang === "ar" ? "التالي" : "Continue"}
-              </button>
-            </div>
           </motion.div>
         )}
 
