@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, MapPin, ShoppingCart, Leaf, Package, Users } from "lucide-react";
+import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
 import { products } from "@/lib/sampleData";
 
