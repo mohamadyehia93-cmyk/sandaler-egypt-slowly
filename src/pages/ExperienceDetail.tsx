@@ -3,6 +3,7 @@ import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { experiences } from "@/lib/sampleData";
+import { experienceToProvider } from "@/lib/providerMappings";
 import DetailTestimonials from "@/components/DetailTestimonials";
 
 const experienceHosts: Record<string, { name: { en: string; ar: string }; image: string; bio: { en: string; ar: string }; years: number; languages: { en: string; ar: string } }> = {
