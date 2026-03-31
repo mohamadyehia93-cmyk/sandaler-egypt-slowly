@@ -460,6 +460,115 @@ const SplashPage = () => {
           </motion.div>
         )}
 
+        {/* STEP 3c: Role-specific Questions */}
+        {step === "roleDetails" && selectedRole && roleQuestions[selectedRole] && (() => {
+          const questions = roleQuestions[selectedRole];
+          const currentQ = questions[roleQuestionIdx];
+          if (!currentQ) return null;
+          const currentAnswers = selectedRoleAnswers[roleQuestionIdx] || [];
+
+          const toggleAnswer = (key: string) => {
+            setSelectedRoleAnswers(prev => {
+              const curr = prev[roleQuestionIdx] || [];
+              if (currentQ.multi === false) {
+                return { ...prev, [roleQuestionIdx]: [key] };
+              }
+              return {
+                ...prev,
+                [roleQuestionIdx]: curr.includes(key) ? curr.filter(k => k !== key) : [...curr, key],
+              };
+            });
+          };
+
+          const handleNext = () => {
+            if (roleQuestionIdx < questions.length - 1) {
+              setRoleQuestionIdx(roleQuestionIdx + 1);
+            } else {
+              goTo("city");
+            }
+          };
+
+          const handleBack = () => {
+            if (roleQuestionIdx > 0) {
+              setRoleQuestionIdx(roleQuestionIdx - 1);
+            } else {
+              goTo("localRole", -1);
+            }
+          };
+
+          return (
+            <motion.div
+              key={`roleDetails-${roleQuestionIdx}`}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.3 }}
+              className="min-h-screen bg-background flex flex-col"
+            >
+              <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
+                <button onClick={handleBack} className="p-1.5 rounded-full hover:bg-secondary">
+                  <ArrowLeft className="w-5 h-5 text-foreground" />
+                </button>
+                <div className="flex-1">
+                  <h1 className="text-lg font-bold text-foreground">{currentQ.title[lang]}</h1>
+                  <p className="text-xs text-muted-foreground">{currentQ.subtitle[lang]}</p>
+                </div>
+                <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">
+                  {roleQuestionIdx + 1}/{questions.length}
+                </span>
+              </header>
+
+              <div className="flex-1 overflow-y-auto px-4 py-4">
+                <div className="grid grid-cols-2 gap-3">
+                  {currentQ.options.map(({ key, icon: Icon, label }) => {
+                    const isSelected = currentAnswers.includes(key);
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => toggleAnswer(key)}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                          isSelected
+                            ? "border-primary bg-primary/5 shadow-card"
+                            : "border-border bg-card hover:border-primary/30"
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          isSelected ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                        }`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <span className="text-xs font-semibold text-foreground text-center">{label[lang]}</span>
+                        {isSelected && <Check className="w-4 h-4 text-primary" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="px-4 py-4 border-t border-border bg-background space-y-2">
+                <button
+                  onClick={handleNext}
+                  disabled={currentAnswers.length === 0}
+                  className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {roleQuestionIdx < questions.length - 1
+                    ? (lang === "ar" ? "التالي" : "Next")
+                    : (lang === "ar" ? "التالي" : "Continue")
+                  }
+                </button>
+                <button
+                  onClick={handleNext}
+                  className="w-full py-2 text-xs text-muted-foreground font-medium"
+                >
+                  {lang === "ar" ? "تخطي" : "Skip"}
+                </button>
+              </div>
+            </motion.div>
+          );
+        })()}
+
         {/* STEP 4: City Selection */}
         {step === "city" && (
           <motion.div
