@@ -1,6 +1,8 @@
 import { Heart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { products } from "@/lib/sampleData";
+import { productToProvider, providerShortInfo } from "@/lib/providerMappings";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
 
