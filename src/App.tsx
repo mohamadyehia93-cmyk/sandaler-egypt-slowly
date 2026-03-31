@@ -43,6 +43,7 @@ import AmbassadorDashboard from "./pages/dashboards/AmbassadorDashboard.tsx";
 import ProductSellerDashboard from "./pages/dashboards/ProductSellerDashboard.tsx";
 import TripOrganizerDashboard from "./pages/dashboards/TripOrganizerDashboard.tsx";
 import SubjectExpertDashboard from "./pages/dashboards/SubjectExpertDashboard.tsx";
+import NewExperience from "./pages/dashboards/NewExperience.tsx";
 
 const queryClient = new QueryClient();
 
