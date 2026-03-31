@@ -19,10 +19,10 @@ const ServiceProviderDashboard = () => {
   ];
 
   const bottomNav = [
-    { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true },
-    { label: lang === "ar" ? "قوائمي" : "My Listings", icon: "📋", active: false },
-    { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false },
-    { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false },
+    { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true, path: "/dashboard/service-provider" },
+    { label: lang === "ar" ? "قوائمي" : "My Listings", icon: "📋", active: false, path: "/" },
+    { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false, path: "/inbox" },
+    { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false, path: "/profile" },
   ];
 
   return (
