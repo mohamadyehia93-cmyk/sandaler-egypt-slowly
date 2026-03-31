@@ -69,9 +69,20 @@ const Profile = () => {
           </div>
           <div className="flex items-center gap-1 mt-1">
             <span className="w-2 h-2 rounded-full bg-primary" />
-            <span className="text-xs font-medium text-primary">{lang === "ar" ? "مستكشف" : "Explorer"}</span>
+            <span className="text-xs font-medium text-primary">{roleLabels[userRole]?.[lang] || (lang === "ar" ? "مستكشف" : "Explorer")}</span>
           </div>
         </div>
+
+        {/* Switch to Dashboard / View as Visitor */}
+        {userRole !== "visitor" && roleDashboardRoutes[userRole] && (
+          <button
+            onClick={() => navigate(roleDashboardRoutes[userRole])}
+            className="w-full bg-primary text-primary-foreground rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2 mb-6"
+          >
+            <ArrowRightLeft className="w-4 h-4" />
+            {lang === "ar" ? "الذهاب للوحة التحكم" : "Go to Dashboard"}
+          </button>
+        )}
 
         {/* Stats */}
         <div className="flex bg-card rounded-xl shadow-card mb-6">
