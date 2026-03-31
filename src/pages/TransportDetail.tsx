@@ -19,8 +19,8 @@ const TransportDetail = () => {
         <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
-        <h1 className="text-lg font-bold text-foreground">{item.title[lang]}</h1>
-      </header>
+        <h1 className="text-lg font-bold text-foreground flex-1">{item.title[lang]}</h1>
+        <WishlistButton className="p-1.5 rounded-full hover:bg-secondary" />
 
       {/* Icon Hero */}
       <div className="flex flex-col items-center py-8 bg-surface">
