@@ -77,7 +77,7 @@ const ProductSellerDashboard = () => {
           </div>
         </div>
 
-        <button className="w-full bg-role-product-seller text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
+        <button onClick={() => navigate("/dashboard/product-seller/new-product")} className="w-full bg-role-product-seller text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
           <Plus className="w-4 h-4" /> {lang === "ar" ? "إضافة منتج" : "Add Product"}
         </button>
       </div>
