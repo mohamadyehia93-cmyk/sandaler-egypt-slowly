@@ -84,7 +84,7 @@ const AmbassadorDashboard = () => {
           ))}
         </div>
 
-        <button className="w-full bg-role-ambassador text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
+        <button onClick={() => navigate("/dashboard/ambassador/flag-issue")} className="w-full bg-role-ambassador text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
           <Flag className="w-4 h-4" /> {lang === "ar" ? "إبلاغ عن مشكلة" : "Flag Issue"}
         </button>
       </div>
