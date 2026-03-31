@@ -131,7 +131,7 @@ const SplashPage = () => {
           </motion.div>
         )}
 
-        {/* STEP 3: Role Selection */}
+        {/* STEP 3: Role Selection (Visitor vs Local) */}
         {step === "role" && (
           <motion.div
             key="role"
@@ -149,7 +149,7 @@ const SplashPage = () => {
               </button>
               <div>
                 <h1 className="text-lg font-bold text-foreground">
-                  {lang === "ar" ? "اختر دورك" : "Choose Your Role"}
+                  {lang === "ar" ? "من أنت؟" : "Who are you?"}
                 </h1>
                 <p className="text-xs text-muted-foreground">
                   {lang === "ar" ? "يمكنك تغييره لاحقاً" : "You can change this later"}
@@ -157,9 +157,63 @@ const SplashPage = () => {
               </div>
             </header>
 
+            <div className="flex-1 flex flex-col items-center justify-center px-6 gap-4">
+              {topRoles.map(({ key, icon: Icon, label, desc }) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    if (key === "visitor") {
+                      setSelectedRole("visitor");
+                      goTo("profile");
+                    } else {
+                      goTo("localRole");
+                    }
+                  }}
+                  className="w-full max-w-xs flex items-center gap-4 p-5 rounded-2xl border-2 border-border bg-card hover:border-primary/40 transition-all text-start shadow-card"
+                >
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <Icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-base font-bold text-foreground">{label[lang]}</p>
+                    <p className="text-xs text-muted-foreground">{desc[lang]}</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 ms-auto" />
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* STEP 3b: Local Role Selection */}
+        {step === "localRole" && (
+          <motion.div
+            key="localRole"
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.3 }}
+            className="min-h-screen bg-background flex flex-col"
+          >
+            <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
+              <button onClick={() => goTo("role", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+                <ArrowLeft className="w-5 h-5 text-foreground" />
+              </button>
+              <div>
+                <h1 className="text-lg font-bold text-foreground">
+                  {lang === "ar" ? "اختر دورك" : "Choose Your Role"}
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  {lang === "ar" ? "كيف تريد المساهمة؟" : "How do you want to contribute?"}
+                </p>
+              </div>
+            </header>
+
             <div className="flex-1 overflow-y-auto px-4 py-4">
               <div className="grid grid-cols-1 gap-2.5">
-                {roles.map(({ key, icon: Icon, label, desc }) => (
+                {localRoles.map(({ key, icon: Icon, label, desc }) => (
                   <button
                     key={key}
                     onClick={() => setSelectedRole(key)}
