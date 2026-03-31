@@ -3,6 +3,7 @@ import { ArrowLeft, Star, MapPin, Users, Clock, DoorOpen, Heart, Check, Shopping
 import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
 import { accommodation, hosts } from "@/lib/sampleData";
+import { accommodationToProvider } from "@/lib/providerMappings";
 
 const AccommodationDetail = () => {
   const { id } = useParams();
