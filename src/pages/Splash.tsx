@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { User, Pen, Briefcase, Home, Truck, Map, ShoppingBag, Building2, Shield, GraduationCap, ArrowLeft, ArrowRight } from "lucide-react";
+import { User, Pen, Briefcase, Home, Truck, Map, ShoppingBag, Building2, Shield, ArrowLeft, ArrowRight, MapPin, Compass, Headphones, Heart, UtensilsCrossed, Camera, Music, Palette, Check } from "lucide-react";
+import { regions, regionCities } from "@/lib/sampleData";
 
-type OnboardingStep = "splash" | "language" | "role" | "localRole" | "profile";
+type OnboardingStep = "splash" | "language" | "role" | "localRole" | "city" | "interests" | "profile";
 
 const topRoles = [
   { key: "visitor", icon: User, label: { en: "Visitor", ar: "زائر" }, desc: { en: "Discover rural Egypt as a traveler", ar: "اكتشف ريف مصر كمسافر" } },
@@ -24,6 +25,26 @@ const localRoles = [
 
 const allRoles = [topRoles[0], ...localRoles];
 
+const interests = [
+  { key: "experiences", icon: Compass, label: { en: "Experiences", ar: "تجارب" } },
+  { key: "audio-tours", icon: Headphones, label: { en: "Audio Tours", ar: "جولات صوتية" } },
+  { key: "causes", icon: Heart, label: { en: "Local Causes", ar: "قضايا محلية" } },
+  { key: "food", icon: UtensilsCrossed, label: { en: "Food & Cuisine", ar: "طعام ومأكولات" } },
+  { key: "photography", icon: Camera, label: { en: "Photography", ar: "تصوير" } },
+  { key: "music", icon: Music, label: { en: "Music & Folklore", ar: "موسيقى وفلكلور" } },
+  { key: "crafts", icon: Palette, label: { en: "Crafts & Art", ar: "حرف وفنون" } },
+  { key: "stays", icon: Home, label: { en: "Places to Stay", ar: "أماكن إقامة" } },
+  { key: "shopping", icon: ShoppingBag, label: { en: "Local Products", ar: "منتجات محلية" } },
+  { key: "trips", icon: Map, label: { en: "Group Trips", ar: "رحلات جماعية" } },
+];
+
+const regionNames: Record<string, { en: string; ar: string }> = {
+  "nile-delta": { en: "Nile Delta", ar: "دلتا النيل" },
+  "suez-canal": { en: "Suez Canal", ar: "قناة السويس" },
+  "upper-egypt": { en: "Upper Egypt", ar: "صعيد مصر" },
+  "frontiers": { en: "Frontiers", ar: "الحدود" },
+};
+
 const slideVariants = {
   enter: (dir: number) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
   center: { x: 0, opacity: 1 },
@@ -36,6 +57,9 @@ const SplashPage = () => {
   const [step, setStep] = useState<OnboardingStep>("splash");
   const [direction, setDirection] = useState(1);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [name, setName] = useState("");
 
   const goTo = (next: OnboardingStep, dir = 1) => {
@@ -43,13 +67,28 @@ const SplashPage = () => {
     setStep(next);
   };
 
-  const handleFinish = () => {
-    navigate("/");
+  const handleFinish = () => navigate("/");
+  const handleGuestMode = () => navigate("/");
+
+  const toggleCity = (cityId: string) => {
+    setSelectedCities(prev =>
+      prev.includes(cityId) ? prev.filter(c => c !== cityId) : [...prev, cityId]
+    );
   };
 
-  const handleGuestMode = () => {
-    navigate("/");
+  const toggleInterest = (key: string) => {
+    setSelectedInterests(prev =>
+      prev.includes(key) ? prev.filter(i => i !== key) : [...prev, key]
+    );
   };
+
+  const availableCities = Object.entries(regionCities).flatMap(([regionId, cities]) =>
+    cities.map(c => ({ ...c, regionId }))
+  );
+
+  const filteredCities = selectedRegion
+    ? regionCities[selectedRegion] || []
+    : availableCities;
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
@@ -122,16 +161,13 @@ const SplashPage = () => {
                 <span className="text-lg font-semibold text-foreground font-cairo">العربية</span>
               </button>
             </div>
-            <button
-              onClick={handleGuestMode}
-              className="text-sm text-muted-foreground underline"
-            >
+            <button onClick={handleGuestMode} className="text-sm text-muted-foreground underline">
               {lang === "ar" ? "تصفح كزائر" : "Browse as guest"}
             </button>
           </motion.div>
         )}
 
-        {/* STEP 3: Role Selection (Visitor vs Local) */}
+        {/* STEP 3: Visitor vs Local */}
         {step === "role" && (
           <motion.div
             key="role"
@@ -164,7 +200,7 @@ const SplashPage = () => {
                   onClick={() => {
                     if (key === "visitor") {
                       setSelectedRole("visitor");
-                      goTo("profile");
+                      goTo("city");
                     } else {
                       goTo("localRole");
                     }
@@ -244,7 +280,7 @@ const SplashPage = () => {
 
             <div className="px-4 py-4 border-t border-border bg-background">
               <button
-                onClick={() => selectedRole && goTo("profile")}
+                onClick={() => selectedRole && goTo("city")}
                 disabled={!selectedRole}
                 className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed"
               >
@@ -254,10 +290,10 @@ const SplashPage = () => {
           </motion.div>
         )}
 
-        {/* STEP 4: Profile Setup */}
-        {step === "profile" && (
+        {/* STEP 4: City Selection */}
+        {step === "city" && (
           <motion.div
-            key="profile"
+            key="city"
             custom={direction}
             variants={slideVariants}
             initial="enter"
@@ -272,6 +308,173 @@ const SplashPage = () => {
               </button>
               <div>
                 <h1 className="text-lg font-bold text-foreground">
+                  {lang === "ar" ? "اختر مدنك" : "Pick Your Cities"}
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  {lang === "ar" ? "أي مدن تريد استكشافها؟" : "Which cities interest you?"}
+                </p>
+              </div>
+            </header>
+
+            {/* Region filter chips */}
+            <div className="px-4 pt-4 pb-2 flex gap-2 overflow-x-auto no-scrollbar">
+              <button
+                onClick={() => setSelectedRegion(null)}
+                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  !selectedRegion ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                }`}
+              >
+                {lang === "ar" ? "الكل" : "All"}
+              </button>
+              {regions.map(r => (
+                <button
+                  key={r.id}
+                  onClick={() => setSelectedRegion(r.id)}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    selectedRegion === r.id ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  {r.emoji} {regionNames[r.id]?.[lang] || r.id}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-4 py-2">
+              <div className="grid grid-cols-2 gap-2.5">
+                {filteredCities.map((city) => {
+                  const isSelected = selectedCities.includes(city.id);
+                  return (
+                    <button
+                      key={city.id}
+                      onClick={() => toggleCity(city.id)}
+                      className={`relative flex items-center gap-2 p-3 rounded-xl border-2 transition-all text-start ${
+                        isSelected
+                          ? "border-primary bg-primary/5"
+                          : "border-border bg-card hover:border-primary/30"
+                      }`}
+                    >
+                      <MapPin className={`w-4 h-4 shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                      <span className="text-sm font-medium text-foreground truncate">{city.name[lang]}</span>
+                      {isSelected && (
+                        <Check className="w-3.5 h-3.5 text-primary absolute top-2 end-2" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="px-4 py-4 border-t border-border bg-background space-y-2">
+              <button
+                onClick={() => goTo("interests")}
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
+              >
+                {selectedCities.length > 0
+                  ? `${lang === "ar" ? "التالي" : "Continue"} (${selectedCities.length})`
+                  : lang === "ar" ? "التالي" : "Continue"
+                }
+              </button>
+              <button
+                onClick={() => goTo("interests")}
+                className="w-full py-2 text-xs text-muted-foreground font-medium"
+              >
+                {lang === "ar" ? "تخطي" : "Skip"}
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* STEP 5: Interests */}
+        {step === "interests" && (
+          <motion.div
+            key="interests"
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.3 }}
+            className="min-h-screen bg-background flex flex-col"
+          >
+            <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
+              <button onClick={() => goTo("city", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+                <ArrowLeft className="w-5 h-5 text-foreground" />
+              </button>
+              <div>
+                <h1 className="text-lg font-bold text-foreground">
+                  {lang === "ar" ? "ما يهمك" : "What Interests You?"}
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  {lang === "ar" ? "اختر ٣ أو أكثر لتخصيص تجربتك" : "Pick 3+ to personalize your feed"}
+                </p>
+              </div>
+            </header>
+
+            <div className="flex-1 overflow-y-auto px-4 py-4">
+              <div className="grid grid-cols-2 gap-3">
+                {interests.map(({ key, icon: Icon, label }) => {
+                  const isSelected = selectedInterests.includes(key);
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => toggleInterest(key)}
+                      className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                        isSelected
+                          ? "border-primary bg-primary/5 shadow-card"
+                          : "border-border bg-card hover:border-primary/30"
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        isSelected ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                      }`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <span className="text-xs font-semibold text-foreground text-center">{label[lang]}</span>
+                      {isSelected && (
+                        <Check className="w-4 h-4 text-primary" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="px-4 py-4 border-t border-border bg-background space-y-2">
+              <button
+                onClick={() => goTo("profile")}
+                disabled={selectedInterests.length < 3}
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {lang === "ar" ? "التالي" : "Continue"} ({selectedInterests.length}/3+)
+              </button>
+              <button
+                onClick={() => goTo("profile")}
+                className="w-full py-2 text-xs text-muted-foreground font-medium"
+              >
+                {lang === "ar" ? "تخطي" : "Skip"}
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* STEP 6: Profile Setup */}
+        {step === "profile" && (
+          <motion.div
+            key="profile"
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.3 }}
+            className="min-h-screen bg-background flex flex-col"
+          >
+            <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
+              <button onClick={() => goTo("interests", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+                <ArrowLeft className="w-5 h-5 text-foreground" />
+              </button>
+              <div>
+                <h1 className="text-lg font-bold text-foreground">
                   {lang === "ar" ? "أنشئ ملفك الشخصي" : "Set Up Your Profile"}
                 </h1>
                 <p className="text-xs text-muted-foreground">
@@ -280,7 +483,7 @@ const SplashPage = () => {
               </div>
             </header>
 
-            <div className="flex-1 px-4 py-6 space-y-5">
+            <div className="flex-1 overflow-y-auto px-4 py-6 space-y-5">
               {/* Avatar placeholder */}
               <div className="flex flex-col items-center">
                 <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-2">
@@ -316,38 +519,63 @@ const SplashPage = () => {
                 />
               </div>
 
-              {/* Region */}
-              <div>
-                <label className="text-sm font-semibold text-foreground block mb-1.5">
-                  {lang === "ar" ? "المنطقة" : "Region"}
-                </label>
-                <select className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
-                  <option value="">{lang === "ar" ? "اختر منطقتك" : "Select your region"}</option>
-                  <option value="cairo">{lang === "ar" ? "القاهرة" : "Cairo"}</option>
-                  <option value="alexandria">{lang === "ar" ? "الإسكندرية" : "Alexandria"}</option>
-                  <option value="nile-delta">{lang === "ar" ? "دلتا النيل" : "Nile Delta"}</option>
-                  <option value="suez-canal">{lang === "ar" ? "قناة السويس" : "Suez Canal"}</option>
-                  <option value="upper-egypt">{lang === "ar" ? "صعيد مصر" : "Upper Egypt"}</option>
-                  <option value="frontiers">{lang === "ar" ? "الحدود" : "Frontiers"}</option>
-                </select>
-              </div>
+              {/* Summary badges */}
+              <div className="space-y-2">
+                {/* Role */}
+                <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                    {(() => {
+                      const role = allRoles.find(r => r.key === selectedRole);
+                      if (!role) return null;
+                      const RoleIcon = role.icon;
+                      return <RoleIcon className="w-4 h-4" />;
+                    })()}
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">{lang === "ar" ? "دورك" : "Your role"}</p>
+                    <p className="text-sm font-semibold text-foreground">
+                      {allRoles.find(r => r.key === selectedRole)?.label[lang]}
+                    </p>
+                  </div>
+                </div>
 
-              {/* Selected role badge */}
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20">
-                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                  {(() => {
-                    const role = allRoles.find(r => r.key === selectedRole);
-                    if (!role) return null;
-                    const RoleIcon = role.icon;
-                    return <RoleIcon className="w-4 h-4" />;
-                  })()}
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">{lang === "ar" ? "دورك" : "Your role"}</p>
-                  <p className="text-sm font-semibold text-foreground">
-                    {allRoles.find(r => r.key === selectedRole)?.label[lang]}
-                  </p>
-                </div>
+                {/* Cities */}
+                {selectedCities.length > 0 && (
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-muted-foreground">{lang === "ar" ? "مدنك" : "Your cities"}</p>
+                      <p className="text-sm font-semibold text-foreground truncate">
+                        {selectedCities.slice(0, 3).map(id => {
+                          const city = availableCities.find(c => c.id === id);
+                          return city?.name[lang];
+                        }).filter(Boolean).join(", ")}
+                        {selectedCities.length > 3 && ` +${selectedCities.length - 3}`}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Interests */}
+                {selectedInterests.length > 0 && (
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                      <Compass className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-muted-foreground">{lang === "ar" ? "اهتماماتك" : "Your interests"}</p>
+                      <p className="text-sm font-semibold text-foreground truncate">
+                        {selectedInterests.slice(0, 3).map(key => {
+                          const interest = interests.find(i => i.key === key);
+                          return interest?.label[lang];
+                        }).filter(Boolean).join(", ")}
+                        {selectedInterests.length > 3 && ` +${selectedInterests.length - 3}`}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
