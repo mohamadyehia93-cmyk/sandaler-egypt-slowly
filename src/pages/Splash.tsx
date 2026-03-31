@@ -4,10 +4,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { User, Pen, Briefcase, Home, Truck, Map, ShoppingBag, Building2, Shield, GraduationCap, ArrowLeft, ArrowRight } from "lucide-react";
 
-type OnboardingStep = "splash" | "language" | "role" | "profile";
+type OnboardingStep = "splash" | "language" | "role" | "localRole" | "profile";
 
-const roles = [
-  { key: "visitor", icon: User, label: { en: "Visitor", ar: "زائر" }, desc: { en: "Discover rural Egypt", ar: "اكتشف ريف مصر" } },
+const topRoles = [
+  { key: "visitor", icon: User, label: { en: "Visitor", ar: "زائر" }, desc: { en: "Discover rural Egypt as a traveler", ar: "اكتشف ريف مصر كمسافر" } },
+  { key: "local", icon: Home, label: { en: "Local", ar: "محلي" }, desc: { en: "I live here and want to contribute", ar: "أعيش هنا وأريد المساهمة" } },
+];
+
+const localRoles = [
   { key: "culture-actor", icon: Pen, label: { en: "Culture Actor", ar: "فاعل ثقافي" }, desc: { en: "Share your community's story", ar: "شارك قصة مجتمعك" } },
   { key: "service-provider", icon: Briefcase, label: { en: "Service Provider", ar: "مقدم خدمة" }, desc: { en: "List experiences & activities", ar: "اعرض تجارب وأنشطة" } },
   { key: "accommodation-host", icon: Home, label: { en: "Accommodation Host", ar: "مضيف إقامة" }, desc: { en: "Host travelers in your home", ar: "استضف مسافرين في بيتك" } },
@@ -17,6 +21,8 @@ const roles = [
   { key: "organization", icon: Building2, label: { en: "Organization", ar: "منظمة" }, desc: { en: "Recruit volunteers & donors", ar: "اجذب متطوعين ومتبرعين" } },
   { key: "ambassador", icon: Shield, label: { en: "Ambassador", ar: "سفير" }, desc: { en: "Verify & support providers", ar: "تحقق وادعم المقدمين" } },
 ];
+
+const allRoles = [topRoles[0], ...localRoles];
 
 const slideVariants = {
   enter: (dir: number) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
