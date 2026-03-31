@@ -85,7 +85,7 @@ const WhosWhoDashboard = () => {
           <p className="text-xs text-muted-foreground">{lang === "ar" ? "مستحق في ١٥ يناير — سيتواصل معك السفير" : "Due Jan 15 — Ambassador will reach out"}</p>
         </div>
 
-        <button className="w-full border-2 border-role-whos-who text-role-whos-who rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
+        <button onClick={() => navigate("/dashboard/whos-who/new-session")} className="w-full border-2 border-role-whos-who text-role-whos-who rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
           <Plus className="w-4 h-4" /> {lang === "ar" ? "إنشاء جلسة" : "Create Session"}
         </button>
       </div>
