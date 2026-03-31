@@ -18,10 +18,10 @@ const AmbassadorDashboard = () => {
   ];
 
   const bottomNav = [
-    { label: lang === "ar" ? "المنطقة" : "Zone", icon: "🗺️", active: true },
-    { label: lang === "ar" ? "المهام" : "Tasks", icon: "✅", active: false },
-    { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false },
-    { label: lang === "ar" ? "الأداء" : "Performance", icon: "📊", active: false },
+    { label: lang === "ar" ? "المنطقة" : "Zone", icon: "🗺️", active: true, path: "/dashboard/ambassador" },
+    { label: lang === "ar" ? "المهام" : "Tasks", icon: "✅", active: false, path: "/dashboard/ambassador" },
+    { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false, path: "/inbox" },
+    { label: lang === "ar" ? "الأداء" : "Performance", icon: "📊", active: false, path: "/profile/impact" },
   ];
 
   return (
