@@ -78,13 +78,13 @@ const SubjectExpertDashboard = () => {
         </div>
 
         <div className="space-y-2">
-          <button className="w-full bg-role-subject-expert text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
+          <button onClick={() => navigate("/dashboard/subject-expert/new-collection")} className="w-full bg-role-subject-expert text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
             <Plus className="w-4 h-4" /> {lang === "ar" ? "مجموعة جديدة" : "New Collection"}
           </button>
-          <button className="w-full border-2 border-role-subject-expert text-role-subject-expert rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
+          <button onClick={() => navigate("/dashboard/subject-expert/new-collection")} className="w-full border-2 border-role-subject-expert text-role-subject-expert rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
             <BookOpen className="w-4 h-4" /> {lang === "ar" ? "كتابة مقال" : "Write Essay"}
           </button>
-          <button className="w-full border-2 border-role-subject-expert text-role-subject-expert rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
+          <button onClick={() => navigate("/dashboard/subject-expert/new-collection")} className="w-full border-2 border-role-subject-expert text-role-subject-expert rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
             <GraduationCap className="w-4 h-4" /> {lang === "ar" ? "حقيبة تعليمية" : "Create Teacher Pack"}
           </button>
         </div>
