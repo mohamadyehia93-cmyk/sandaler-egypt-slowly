@@ -2,10 +2,177 @@ import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { User, Pen, Briefcase, Home, Truck, Map, ShoppingBag, Building2, Shield, ArrowLeft, ArrowRight, MapPin, Compass, Headphones, Heart, UtensilsCrossed, Camera, Music, Palette, Check } from "lucide-react";
+import { User, Pen, Briefcase, Home, Truck, Map, ShoppingBag, Building2, Shield, ArrowLeft, ArrowRight, MapPin, Compass, Headphones, Heart, UtensilsCrossed, Camera, Music, Palette, Check, BookOpen, Mic, Landmark, Wheat, Tent, Car, Bus, Ship, Package, Gem, Leaf, GraduationCap, Users, HandHeart, Eye } from "lucide-react";
 import { regions, regionCities } from "@/lib/sampleData";
 
-type OnboardingStep = "splash" | "language" | "role" | "localRole" | "city" | "interests" | "profile";
+type OnboardingStep = "splash" | "language" | "role" | "localRole" | "roleDetails" | "city" | "interests" | "profile";
+
+type RoleQuestion = {
+  title: { en: string; ar: string };
+  subtitle: { en: string; ar: string };
+  options: { key: string; icon: any; label: { en: string; ar: string } }[];
+  multi?: boolean;
+};
+
+const roleQuestions: Record<string, RoleQuestion[]> = {
+  "culture-actor": [
+    {
+      title: { en: "What do you create?", ar: "ماذا تنشئ؟" },
+      subtitle: { en: "Select your content types", ar: "اختر أنواع المحتوى" },
+      options: [
+        { key: "articles", icon: BookOpen, label: { en: "Articles & Stories", ar: "مقالات وقصص" } },
+        { key: "photography", icon: Camera, label: { en: "Photography", ar: "تصوير فوتوغرافي" } },
+        { key: "audio", icon: Mic, label: { en: "Audio & Podcasts", ar: "صوتيات وبودكاست" } },
+        { key: "video", icon: Eye, label: { en: "Video & Film", ar: "فيديو وأفلام" } },
+        { key: "music-folklore", icon: Music, label: { en: "Music & Folklore", ar: "موسيقى وفلكلور" } },
+        { key: "heritage", icon: Landmark, label: { en: "Heritage Research", ar: "بحث تراثي" } },
+      ],
+      multi: true,
+    },
+    {
+      title: { en: "Your expertise areas?", ar: "مجالات خبرتك؟" },
+      subtitle: { en: "What topics do you cover?", ar: "ما المواضيع التي تغطيها؟" },
+      options: [
+        { key: "history", icon: Landmark, label: { en: "History & Archaeology", ar: "تاريخ وآثار" } },
+        { key: "cuisine", icon: UtensilsCrossed, label: { en: "Food & Cuisine", ar: "طعام ومأكولات" } },
+        { key: "crafts", icon: Palette, label: { en: "Crafts & Traditions", ar: "حرف وتقاليد" } },
+        { key: "nature", icon: Leaf, label: { en: "Nature & Environment", ar: "طبيعة وبيئة" } },
+        { key: "people", icon: Users, label: { en: "People & Communities", ar: "ناس ومجتمعات" } },
+        { key: "architecture", icon: Building2, label: { en: "Architecture", ar: "عمارة" } },
+      ],
+      multi: true,
+    },
+  ],
+  "service-provider": [
+    {
+      title: { en: "What experiences do you offer?", ar: "ما التجارب التي تقدمها؟" },
+      subtitle: { en: "Select your experience types", ar: "اختر أنواع تجاربك" },
+      options: [
+        { key: "workshops", icon: Palette, label: { en: "Workshops & Classes", ar: "ورش عمل ودروس" } },
+        { key: "guided-tours", icon: Compass, label: { en: "Guided Tours", ar: "جولات مرشدة" } },
+        { key: "food-exp", icon: UtensilsCrossed, label: { en: "Food Experiences", ar: "تجارب طعام" } },
+        { key: "nature-exp", icon: Leaf, label: { en: "Nature & Outdoor", ar: "طبيعة ونشاطات خارجية" } },
+        { key: "cultural-events", icon: Music, label: { en: "Cultural Events", ar: "فعاليات ثقافية" } },
+        { key: "wellness", icon: Heart, label: { en: "Wellness & Healing", ar: "صحة واستشفاء" } },
+      ],
+      multi: true,
+    },
+  ],
+  "accommodation-host": [
+    {
+      title: { en: "What type of stay?", ar: "ما نوع الإقامة؟" },
+      subtitle: { en: "Describe your accommodation", ar: "صف مكان إقامتك" },
+      options: [
+        { key: "guesthouse", icon: Home, label: { en: "Guesthouse", ar: "بيت ضيافة" } },
+        { key: "homestay", icon: Users, label: { en: "Homestay", ar: "إقامة منزلية" } },
+        { key: "ecolodge", icon: Leaf, label: { en: "Eco-lodge", ar: "نزل بيئي" } },
+        { key: "camp", icon: Tent, label: { en: "Camp / Tent", ar: "مخيم / خيمة" } },
+        { key: "farm-stay", icon: Wheat, label: { en: "Farm Stay", ar: "إقامة مزرعة" } },
+        { key: "heritage-house", icon: Landmark, label: { en: "Heritage House", ar: "بيت تراثي" } },
+      ],
+      multi: false,
+    },
+    {
+      title: { en: "What do you offer guests?", ar: "ماذا تقدم للضيوف؟" },
+      subtitle: { en: "Select your amenities", ar: "اختر وسائل الراحة" },
+      options: [
+        { key: "meals", icon: UtensilsCrossed, label: { en: "Home-cooked Meals", ar: "وجبات منزلية" } },
+        { key: "tours", icon: Compass, label: { en: "Local Tours", ar: "جولات محلية" } },
+        { key: "workshops-host", icon: Palette, label: { en: "Craft Workshops", ar: "ورش حرف" } },
+        { key: "nature-access", icon: Leaf, label: { en: "Nature Access", ar: "وصول للطبيعة" } },
+        { key: "cultural-immersion", icon: Music, label: { en: "Cultural Immersion", ar: "انغماس ثقافي" } },
+        { key: "farm-activities", icon: Wheat, label: { en: "Farm Activities", ar: "أنشطة زراعية" } },
+      ],
+      multi: true,
+    },
+  ],
+  "transport-provider": [
+    {
+      title: { en: "What transport do you offer?", ar: "ما نوع المواصلات؟" },
+      subtitle: { en: "Select your vehicle types", ar: "اختر أنواع مركباتك" },
+      options: [
+        { key: "car", icon: Car, label: { en: "Private Car", ar: "سيارة خاصة" } },
+        { key: "minibus", icon: Bus, label: { en: "Minibus / Van", ar: "ميني باص / فان" } },
+        { key: "boat", icon: Ship, label: { en: "Boat / Felucca", ar: "قارب / فلوكة" } },
+        { key: "tuktuk", icon: Truck, label: { en: "Tuk-tuk", ar: "توك توك" } },
+        { key: "bicycle", icon: Compass, label: { en: "Bicycle Rental", ar: "تأجير دراجات" } },
+        { key: "donkey-camel", icon: Map, label: { en: "Donkey / Camel", ar: "حمار / جمل" } },
+      ],
+      multi: true,
+    },
+  ],
+  "trip-organizer": [
+    {
+      title: { en: "What trips do you organize?", ar: "ما نوع الرحلات؟" },
+      subtitle: { en: "Select trip styles", ar: "اختر أنماط الرحلات" },
+      options: [
+        { key: "day-trips", icon: Compass, label: { en: "Day Trips", ar: "رحلات يومية" } },
+        { key: "multi-day", icon: Map, label: { en: "Multi-day Tours", ar: "جولات متعددة الأيام" } },
+        { key: "hiking", icon: Leaf, label: { en: "Hiking & Trekking", ar: "مشي وتسلق" } },
+        { key: "cultural-tours", icon: Landmark, label: { en: "Cultural Tours", ar: "جولات ثقافية" } },
+        { key: "food-tours", icon: UtensilsCrossed, label: { en: "Food Tours", ar: "جولات طعام" } },
+        { key: "photography-tours", icon: Camera, label: { en: "Photography Tours", ar: "جولات تصوير" } },
+      ],
+      multi: true,
+    },
+  ],
+  "product-seller": [
+    {
+      title: { en: "What do you sell?", ar: "ماذا تبيع؟" },
+      subtitle: { en: "Select product categories", ar: "اختر فئات المنتجات" },
+      options: [
+        { key: "textiles", icon: Palette, label: { en: "Textiles & Weaving", ar: "نسيج وحياكة" } },
+        { key: "pottery", icon: Package, label: { en: "Pottery & Ceramics", ar: "فخار وسيراميك" } },
+        { key: "jewelry", icon: Gem, label: { en: "Jewelry & Accessories", ar: "مجوهرات وإكسسوارات" } },
+        { key: "food-products", icon: UtensilsCrossed, label: { en: "Food & Spices", ar: "طعام وتوابل" } },
+        { key: "natural-products", icon: Leaf, label: { en: "Natural & Herbal", ar: "طبيعي وعشبي" } },
+        { key: "woodwork", icon: Home, label: { en: "Woodwork & Furniture", ar: "أعمال خشبية وأثاث" } },
+      ],
+      multi: true,
+    },
+  ],
+  "organization": [
+    {
+      title: { en: "What causes do you support?", ar: "ما القضايا التي تدعمها؟" },
+      subtitle: { en: "Select your focus areas", ar: "اختر مجالات تركيزك" },
+      options: [
+        { key: "education", icon: GraduationCap, label: { en: "Education", ar: "تعليم" } },
+        { key: "environment", icon: Leaf, label: { en: "Environment", ar: "بيئة" } },
+        { key: "heritage-preservation", icon: Landmark, label: { en: "Heritage Preservation", ar: "حفظ التراث" } },
+        { key: "women-empowerment", icon: Users, label: { en: "Women Empowerment", ar: "تمكين المرأة" } },
+        { key: "community-dev", icon: Building2, label: { en: "Community Development", ar: "تنمية مجتمعية" } },
+        { key: "health", icon: Heart, label: { en: "Health & Wellbeing", ar: "صحة ورفاهية" } },
+      ],
+      multi: true,
+    },
+    {
+      title: { en: "What support do you need?", ar: "ما الدعم الذي تحتاجه؟" },
+      subtitle: { en: "How can people help?", ar: "كيف يمكن للناس المساعدة؟" },
+      options: [
+        { key: "volunteers", icon: Users, label: { en: "Volunteers", ar: "متطوعين" } },
+        { key: "donations", icon: HandHeart, label: { en: "Donations", ar: "تبرعات" } },
+        { key: "consulting", icon: Briefcase, label: { en: "Expert Consulting", ar: "استشارات خبراء" } },
+        { key: "gifts", icon: ShoppingBag, label: { en: "In-kind Gifts", ar: "هدايا عينية" } },
+      ],
+      multi: true,
+    },
+  ],
+  "ambassador": [
+    {
+      title: { en: "What will you verify?", ar: "ماذا ستتحقق منه؟" },
+      subtitle: { en: "Select areas you can review", ar: "اختر المجالات التي يمكنك مراجعتها" },
+      options: [
+        { key: "experiences-amb", icon: Compass, label: { en: "Experiences", ar: "تجارب" } },
+        { key: "stays-amb", icon: Home, label: { en: "Accommodations", ar: "أماكن إقامة" } },
+        { key: "transport-amb", icon: Truck, label: { en: "Transport", ar: "مواصلات" } },
+        { key: "products-amb", icon: ShoppingBag, label: { en: "Products", ar: "منتجات" } },
+        { key: "causes-amb", icon: Heart, label: { en: "Causes", ar: "قضايا" } },
+        { key: "content-amb", icon: BookOpen, label: { en: "Content & Posts", ar: "محتوى ومنشورات" } },
+      ],
+      multi: true,
+    },
+  ],
+};
 
 const topRoles = [
   { key: "visitor", icon: User, label: { en: "Visitor", ar: "زائر" }, desc: { en: "Discover rural Egypt as a traveler", ar: "اكتشف ريف مصر كمسافر" } },
