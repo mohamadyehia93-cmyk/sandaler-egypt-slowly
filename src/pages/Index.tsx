@@ -141,6 +141,13 @@ const Index = () => {
             <RegionScroll />
             <LatestPosts />
             <AudioTourCards />
+            <ExperienceCards />
+            <TripCards />
+            <AccommodationCards />
+            <TransportCards />
+            <HomeCausesSection />
+            <ProductGrid />
+            <MeetUpSection />
             <Testimonials />
             <Partners />
             <Certifications />
