@@ -29,8 +29,8 @@ const ServiceProviderDashboard = () => {
     <div className="min-h-screen bg-surface pb-20">
       <header className="bg-role-service-provider text-white px-4 py-4">
         <div className="flex items-center justify-between mb-3">
-          <button onClick={() => navigate("/")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-          <button className="relative p-1"><Bell className="w-5 h-5" /><span className="absolute top-0 right-0 w-2 h-2 bg-destructive rounded-full" /></button>
+          <button onClick={() => navigate("/profile")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+          <button onClick={() => navigate("/inbox")} className="relative p-1"><Bell className="w-5 h-5" /><span className="absolute top-0 right-0 w-2 h-2 bg-destructive rounded-full" /></button>
         </div>
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl">⚓</div>
