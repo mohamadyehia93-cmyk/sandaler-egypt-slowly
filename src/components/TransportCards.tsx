@@ -1,5 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { transport } from "@/lib/sampleData";
+import { transportToProvider, providerShortInfo } from "@/lib/providerMappings";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
 
