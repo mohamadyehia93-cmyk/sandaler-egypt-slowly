@@ -8,6 +8,7 @@ import CityBadge from "./CityBadge";
 
 const ProductGrid = () => {
   const { lang, t } = useI18n();
+  const navigate = useNavigate();
 
   return (
     <SectionHeader titleKey="section.products" onSeeAll={() => {}}>
@@ -30,7 +31,7 @@ const ProductGrid = () => {
                 const provider = pid ? providerShortInfo[pid] : null;
                 return provider ? (
                   <button
-                    onClick={(ev) => { ev.stopPropagation(); navigate(`/provider/${pid}`); }}
+                    onClick={() => navigate(`/provider/${pid}`)}
                     className="flex items-center gap-1.5 mb-1"
                   >
                     <img src={provider.avatar} alt="" className="w-3.5 h-3.5 rounded-full object-cover" />
@@ -40,7 +41,6 @@ const ProductGrid = () => {
               })()}
               <div className="mb-1"><CityBadge cityId={p.cityId} /></div>
               <span className="text-sm font-bold text-primary-dark">{p.price} {t("common.egp")}</span>
-            </div>
             </div>
           </div>
         ))}

@@ -7,6 +7,7 @@ import CityBadge from "./CityBadge";
 
 const TransportCards = () => {
   const { lang, t } = useI18n();
+  const navigate = useNavigate();
 
   return (
     <SectionHeader titleKey="section.gettingAround" onSeeAll={() => {}}>
