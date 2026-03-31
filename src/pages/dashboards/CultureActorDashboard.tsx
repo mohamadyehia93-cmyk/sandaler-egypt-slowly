@@ -93,10 +93,10 @@ const CultureActorDashboard = () => {
 
         {/* Quick Actions */}
         <div className="space-y-2">
-          <button className="w-full bg-role-culture-actor text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
+          <button onClick={() => navigate("/dashboard/culture-actor/new-article")} className="w-full bg-role-culture-actor text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
             <Plus className="w-4 h-4" /> {lang === "ar" ? "مقال جديد" : "New Article"}
           </button>
-          <button className="w-full border-2 border-role-culture-actor text-role-culture-actor rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
+          <button onClick={() => navigate("/dashboard/culture-actor/new-article")} className="w-full border-2 border-role-culture-actor text-role-culture-actor rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
             <Mic className="w-4 h-4" /> {lang === "ar" ? "سرد صوتي جديد" : "New Audio Narrative"}
           </button>
         </div>
