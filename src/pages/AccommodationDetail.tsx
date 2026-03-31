@@ -3,6 +3,7 @@ import { ArrowLeft, Star, MapPin, Users, Clock, DoorOpen, Heart, Check, Shopping
 import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
 import { accommodation, hosts } from "@/lib/sampleData";
+import { accommodationToProvider } from "@/lib/providerMappings";
 
 const AccommodationDetail = () => {
   const { id } = useParams();
@@ -53,9 +54,9 @@ const AccommodationDetail = () => {
           const host = hosts.find((h) => h.id === place.hostId);
           return (
             <div className="mb-5">
-              <div
-                className="flex items-center gap-3 p-3 rounded-t-xl bg-surface cursor-pointer"
-                onClick={() => { if (host) navigate(`/host/${host.id}`); }}
+              <button
+                className="flex items-center gap-3 p-3 rounded-t-xl bg-surface w-full text-start"
+                onClick={() => { const pid = accommodationToProvider[place.id]; if (pid) navigate(`/provider/${pid}`); else if (host) navigate(`/host/${host.id}`); }}
               >
                 {host ? (
                   <img src={host.image} alt={host.name[lang]} className="w-11 h-11 rounded-full object-cover" />
@@ -65,8 +66,9 @@ const AccommodationDetail = () => {
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-primary">{lang === "ar" ? "المضيف" : "Hosted by"} {place.host[lang]}</p>
                   <p className="text-xs text-muted-foreground">{place.type[lang]} · {place.location[lang]}</p>
+                  <span className="text-[10px] text-primary font-medium">{lang === "ar" ? "عرض الملف ←" : "View profile →"}</span>
                 </div>
-              </div>
+              </button>
               {host?.bio && (
                 <div className="px-3 pb-3 rounded-b-xl bg-surface border-t border-border">
                   <p className="text-xs text-muted-foreground leading-relaxed pt-2.5">{host.bio[lang]}</p>

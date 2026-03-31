@@ -1,11 +1,14 @@
 import { Heart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { products } from "@/lib/sampleData";
+import { productToProvider, providerShortInfo } from "@/lib/providerMappings";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
 
 const ProductGrid = () => {
   const { lang, t } = useI18n();
+  const navigate = useNavigate();
 
   return (
     <SectionHeader titleKey="section.products" onSeeAll={() => {}}>
@@ -23,6 +26,19 @@ const ProductGrid = () => {
             </div>
             <div className="p-2.5">
               <h3 className="text-xs font-semibold text-foreground line-clamp-2 mb-1">{p.title[lang]}</h3>
+              {(() => {
+                const pid = productToProvider[p.id];
+                const provider = pid ? providerShortInfo[pid] : null;
+                return provider ? (
+                  <button
+                    onClick={() => navigate(`/provider/${pid}`)}
+                    className="flex items-center gap-1.5 mb-1"
+                  >
+                    <img src={provider.avatar} alt="" className="w-3.5 h-3.5 rounded-full object-cover" />
+                    <span className="text-[9px] text-primary font-medium truncate">{provider.name[lang]}</span>
+                  </button>
+                ) : null;
+              })()}
               <div className="mb-1"><CityBadge cityId={p.cityId} /></div>
               <span className="text-sm font-bold text-primary-dark">{p.price} {t("common.egp")}</span>
             </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Heart, MapPin, ChevronDown } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { experiences, experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
+import { experienceToProvider, providerShortInfo } from "@/lib/providerMappings";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
 import { useNavigate } from "react-router-dom";
@@ -107,6 +108,19 @@ const ExperienceCards = () => {
             </div>
             <div className="p-3">
               <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">{e.title[lang]}</h3>
+              {(() => {
+                const pid = experienceToProvider[e.id];
+                const provider = pid ? providerShortInfo[pid] : null;
+                return provider ? (
+                  <button
+                    onClick={(ev) => { ev.stopPropagation(); navigate(`/provider/${pid}`); }}
+                    className="flex items-center gap-1.5 mb-1.5"
+                  >
+                    <img src={provider.avatar} alt="" className="w-4 h-4 rounded-full object-cover" />
+                    <span className="text-[10px] text-primary font-medium truncate">{provider.name[lang]}</span>
+                  </button>
+                ) : null;
+              })()}
               <div className="flex items-center gap-2 mb-2">
                 <CityBadge cityId={e.cityId} />
                 <span className="text-[10px] text-muted-foreground">{e.date}</span>

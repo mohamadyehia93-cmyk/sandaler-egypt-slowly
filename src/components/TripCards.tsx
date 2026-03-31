@@ -3,6 +3,7 @@ import { MapPin, ChevronDown, Users, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { trips, experienceThemes, ExperienceTheme, regions, TripAccessType, TripDuration } from "@/lib/sampleData";
+import { tripToProvider, providerShortInfo } from "@/lib/providerMappings";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
 
@@ -170,7 +171,20 @@ const TripCards = () => {
                 <CityBadge cityId={tr.cityId} />
                 <span className="text-[10px] text-muted-foreground">{tr.route[lang]}</span>
               </div>
-              <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-2">{tr.title[lang]}</h3>
+              <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">{tr.title[lang]}</h3>
+              {(() => {
+                const pid = tripToProvider[tr.id];
+                const provider = pid ? providerShortInfo[pid] : null;
+                return provider ? (
+                  <button
+                    onClick={(ev) => { ev.stopPropagation(); navigate(`/provider/${pid}`); }}
+                    className="flex items-center gap-1.5 mb-2"
+                  >
+                    <img src={provider.avatar} alt="" className="w-4 h-4 rounded-full object-cover" />
+                    <span className="text-[10px] text-primary font-medium truncate">{provider.name[lang]}</span>
+                  </button>
+                ) : null;
+              })()}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-primary-dark">{tr.price} {t("common.egp")}</span>
                 <button className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
