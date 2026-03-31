@@ -661,7 +661,7 @@ const SplashPage = () => {
 
             <div className="px-4 py-4 border-t border-border bg-background space-y-2">
               <button
-                onClick={() => goTo("interests")}
+                onClick={() => goTo(selectedRole === "visitor" ? "interests" : "profile")}
                 className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
               >
                 {selectedCities.length > 0
@@ -670,7 +670,7 @@ const SplashPage = () => {
                 }
               </button>
               <button
-                onClick={() => goTo("interests")}
+                onClick={() => goTo(selectedRole === "visitor" ? "interests" : "profile")}
                 className="w-full py-2 text-xs text-muted-foreground font-medium"
               >
                 {lang === "ar" ? "تخطي" : "Skip"}
