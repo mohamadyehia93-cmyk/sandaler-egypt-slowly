@@ -229,6 +229,9 @@ const SplashPage = () => {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [name, setName] = useState("");
 
+  const [selectedRoleAnswers, setSelectedRoleAnswers] = useState<Record<number, string[]>>({});
+  const [roleQuestionIdx, setRoleQuestionIdx] = useState(0);
+
   const goTo = (next: OnboardingStep, dir = 1) => {
     setDirection(dir);
     setStep(next);
