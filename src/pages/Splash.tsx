@@ -345,7 +345,7 @@ const SplashPage = () => {
                 <div>
                   <p className="text-xs text-muted-foreground">{lang === "ar" ? "دورك" : "Your role"}</p>
                   <p className="text-sm font-semibold text-foreground">
-                    {roles.find(r => r.key === selectedRole)?.label[lang]}
+                    {allRoles.find(r => r.key === selectedRole)?.label[lang]}
                   </p>
                 </div>
               </div>
