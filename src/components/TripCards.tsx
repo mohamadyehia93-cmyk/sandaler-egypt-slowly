@@ -3,6 +3,7 @@ import { MapPin, ChevronDown, Users, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { trips, experienceThemes, ExperienceTheme, regions, TripAccessType, TripDuration } from "@/lib/sampleData";
+import { tripToProvider, providerShortInfo } from "@/lib/providerMappings";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
 
