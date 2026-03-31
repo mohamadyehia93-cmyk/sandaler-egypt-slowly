@@ -49,6 +49,7 @@ const Settings = () => {
           icon: LogOut,
           label: { en: "Log Out", ar: "تسجيل الخروج" },
           danger: true,
+          action: () => navigate("/welcome"),
         },
       ],
     },
