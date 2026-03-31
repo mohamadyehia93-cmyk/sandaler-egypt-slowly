@@ -89,7 +89,7 @@ const ServiceProviderDashboard = () => {
         </div>
 
         {/* Quick Action */}
-        <button className="w-full bg-role-service-provider text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
+        <button onClick={() => navigate("/experience/1")} className="w-full bg-role-service-provider text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
           <Plus className="w-4 h-4" /> {lang === "ar" ? "تجربة جديدة" : "New Experience"}
         </button>
       </div>
