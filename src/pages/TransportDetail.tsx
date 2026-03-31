@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Clock, MapPin, Route, Lightbulb, ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { transport } from "@/lib/sampleData";
+import WishlistButton from "@/components/WishlistButton";
 
 const TransportDetail = () => {
   const { id } = useParams();
