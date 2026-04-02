@@ -7,6 +7,7 @@ const testimonials = [
   {
     id: "t1",
     name: { en: "Sarah M.", ar: "سارة م." },
+    visitorId: "sarah-m",
     location: { en: "London, UK", ar: "لندن، المملكة المتحدة" },
     text: { en: "Sandal showed me an Egypt I never knew existed. The bird watching tour on Lake Manzala was absolutely magical!", ar: "صندل أرتني مصر لم أكن أعرف بوجودها. جولة مراقبة الطيور على بحيرة المنزلة كانت ساحرة!" },
     rating: 5,
