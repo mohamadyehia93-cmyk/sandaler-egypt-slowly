@@ -42,6 +42,7 @@ const samplePosts: CommunityPost[] = [
   {
     id: "2",
     author: "Ahmed K.",
+    authorId: "ahmed-k",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
     category: "tip",
     content: "Pro tip: Visit the Siwa Oasis during spring (March-April). The weather is perfect, and you'll catch the date harvest season. Don't miss the salt lakes! 🌴",
