@@ -220,6 +220,9 @@ const CityDetail = () => {
           </div>
         </div>
 
+        {/* Categorized Posts/Articles */}
+        {cityPosts.length > 0 && <CityPostsSection posts={cityPosts} lang={lang} navigate={navigate} />}
+
         {/* Who's Who */}
         {cityPeople.length > 0 && (
           <SectionHeader titleKey="section.whosWho" onSeeAll={() => {}}>
