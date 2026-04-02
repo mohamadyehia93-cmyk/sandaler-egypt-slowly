@@ -18,7 +18,7 @@ const HomeCausesSection = () => {
             <div
               key={cause.id}
               onClick={() => navigate(`/cause/${cause.id}`)}
-              className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
+              className="min-w-[220px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
             >
               <div className="relative h-28">
                 <img src={cause.image} alt={cause.title[lang]} className="w-full h-full object-cover" />
