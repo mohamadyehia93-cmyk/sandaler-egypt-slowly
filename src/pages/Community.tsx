@@ -238,10 +238,10 @@ const Community = () => {
             <article key={post.id} className="bg-background rounded-xl border border-border overflow-hidden">
               {/* Post Header */}
               <div className="flex items-center gap-3 p-3 pb-0">
-                <img src={post.avatar} alt={post.author} className="w-9 h-9 rounded-full object-cover" />
+                <img onClick={() => navigate(`/visitor/${post.authorId}`)} src={post.avatar} alt={post.author} className="w-9 h-9 rounded-full object-cover cursor-pointer" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-foreground">{post.author}</span>
+                    <span onClick={() => navigate(`/visitor/${post.authorId}`)} className="text-sm font-semibold text-foreground cursor-pointer hover:text-primary transition-colors">{post.author}</span>
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${cfg.color}`}>
                       <CatIcon className="w-3 h-3" />
                       {cfg.label[lang]}
