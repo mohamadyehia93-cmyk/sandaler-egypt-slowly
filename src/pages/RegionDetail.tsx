@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned, Compass, BookOpen, Palette, Mountain } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
@@ -7,6 +7,94 @@ import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
 import RegionMap from "@/components/RegionMap";
 import BottomNav from "@/components/BottomNav";
+
+type PostItem = (typeof latestPosts)[number];
+
+const RegionPostsSection = ({
+  posts,
+  lang,
+  navigate,
+}: {
+  posts: PostItem[];
+  lang: "en" | "ar";
+  navigate: ReturnType<typeof useNavigate>;
+}) => {
+  const [activeCategory, setActiveCategory] = useState("all");
+
+  const categories = useMemo(() => {
+    const cats = new Map<string, string>();
+    posts.forEach((p) => {
+      const key = p.category.en.toLowerCase();
+      if (!cats.has(key)) cats.set(key, p.category[lang]);
+    });
+    return Array.from(cats.entries()).map(([key, label]) => ({ key, label }));
+  }, [posts, lang]);
+
+  const filtered =
+    activeCategory === "all"
+      ? posts
+      : posts.filter((p) => p.category.en.toLowerCase() === activeCategory);
+
+  const allLabel = lang === "ar" ? "الكل" : "All";
+
+  return (
+    <div className="space-y-3">
+      <div className="px-4 flex items-center gap-2">
+        <BookOpen className="w-4 h-4 text-primary" />
+        <h3 className="text-base font-bold text-foreground">
+          {lang === "ar" ? "مقالات ومنشورات" : "Posts & Articles"}
+        </h3>
+      </div>
+      <div className="flex gap-2 px-4 overflow-x-auto hide-scrollbar">
+        <button
+          onClick={() => setActiveCategory("all")}
+          className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+            activeCategory === "all" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+          }`}
+        >
+          {allLabel}
+        </button>
+        {categories.map((cat) => (
+          <button
+            key={cat.key}
+            onClick={() => setActiveCategory(cat.key)}
+            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+              activeCategory === cat.key ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+            }`}
+          >
+            {cat.label}
+          </button>
+        ))}
+      </div>
+      <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+        {filtered.map((post) => (
+          <div
+            key={post.id}
+            onClick={() => navigate(`/post/${post.id}`)}
+            className="min-w-[220px] shrink-0 rounded-xl overflow-hidden shadow-card bg-card cursor-pointer"
+          >
+            <div className="relative h-32">
+              <img src={post.image} alt={post.title[lang]} className="w-full h-full object-cover" />
+              <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
+                {post.category[lang]}
+              </span>
+            </div>
+            <div className="p-3">
+              <h4 className="text-sm font-semibold text-foreground line-clamp-2 leading-snug mb-2">{post.title[lang]}</h4>
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-muted-foreground truncate">{post.author[lang]}</span>
+                <span className="flex items-center gap-1 text-[10px] text-muted-foreground shrink-0">
+                  <Clock className="w-3 h-3" />
+                  {post.readTime} {lang === "ar" ? "د" : "min"}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const RegionDetail = () => {
   const { regionId } = useParams();
@@ -123,26 +211,9 @@ const RegionDetail = () => {
       </div>
 
       <div className="space-y-6 pt-1">
-        {/* Latest Posts */}
-        {regionPosts.length > 0 && (
-          <SectionHeader titleKey="section.latestPosts" onSeeAll={() => {}}>
-            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-              {regionPosts.map((post) => (
-                <div key={post.id} className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/post/${post.id}`)}>
-                  <div className="relative h-28">
-                    <img src={post.image} alt={post.title[lang]} className="w-full h-full object-cover" />
-                    <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
-                      {post.category[lang]}
-                    </span>
-                  </div>
-                  <div className="p-3">
-                    <h3 className="text-sm font-semibold text-foreground line-clamp-2">{post.title[lang]}</h3>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </SectionHeader>
-        )}
+        {/* Categorized Posts/Articles */}
+        {regionPosts.length > 0 && <RegionPostsSection posts={regionPosts} lang={lang} navigate={navigate} />}
+
         {/* Who's Who */}
         {regionPeople.length > 0 && (
           <SectionHeader titleKey="section.whosWho" onSeeAll={() => {}}>
