@@ -432,29 +432,57 @@ const AudioTourDetail = () => {
           </span>
         </div>
 
-        {/* Audio Player Preview */}
+        {/* Audio Player */}
         <div className="bg-surface rounded-xl p-4 mb-6 border border-border">
+          {/* Now Playing Info */}
           <div className="flex items-center gap-3 mb-3">
-            <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-elevated"
-            >
-              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
-            </button>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-foreground">{lang === "ar" ? "استمع للجولة" : "Listen to Tour"}</p>
-              <p className="text-xs text-muted-foreground">{tour.duration} {t("common.min")} · {tour.stops} {t("common.stops")}</p>
+            <img src={tour.image} alt="" className="w-12 h-12 rounded-lg object-cover" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground truncate">
+                {stops[activeStopIndex]?.[lang] || tour.title[lang]}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {lang === "ar" ? `المحطة ${activeStopIndex + 1} من ${tour.stops}` : `Stop ${activeStopIndex + 1} of ${tour.stops}`}
+              </p>
             </div>
-            <button className="p-2 rounded-full bg-secondary">
-              <Download className="w-4 h-4 text-secondary-foreground" />
+            <button onClick={toggleMute} className="p-2 rounded-full bg-secondary">
+              {isMuted ? <VolumeX className="w-4 h-4 text-secondary-foreground" /> : <Volume2 className="w-4 h-4 text-secondary-foreground" />}
             </button>
           </div>
-          <div className="w-full bg-border rounded-full h-1.5">
-            <div className="bg-primary h-1.5 rounded-full" style={{ width: isPlaying ? "15%" : "0%" }} />
+
+          {/* Progress Slider */}
+          <Slider
+            value={[progressPercent]}
+            max={100}
+            step={0.1}
+            onValueChange={handleSeek}
+            className="mb-1"
+          />
+          <div className="flex justify-between mb-4">
+            <span className="text-[10px] text-muted-foreground">{formatTime(currentTime)}</span>
+            <span className="text-[10px] text-muted-foreground">{duration > 0 ? formatTime(duration) : `${tour.duration}:00`}</span>
           </div>
-          <div className="flex justify-between mt-1">
-            <span className="text-[10px] text-muted-foreground">{isPlaying ? "0:45" : "0:00"}</span>
-            <span className="text-[10px] text-muted-foreground">{tour.duration}:00</span>
+
+          {/* Controls */}
+          <div className="flex items-center justify-center gap-4">
+            <button onClick={cycleSpeed} className="px-2 py-1 rounded-md bg-secondary text-xs font-bold text-secondary-foreground min-w-[40px]">
+              {playbackRate}x
+            </button>
+            <button onClick={skipBackward} className="p-2 rounded-full hover:bg-secondary transition-colors">
+              <SkipBack className="w-5 h-5 text-foreground" />
+            </button>
+            <button
+              onClick={togglePlay}
+              className="w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-elevated"
+            >
+              {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}
+            </button>
+            <button onClick={skipForward} className="p-2 rounded-full hover:bg-secondary transition-colors">
+              <SkipForward className="w-5 h-5 text-foreground" />
+            </button>
+            <button onClick={toggleMute} className="p-2 rounded-full hover:bg-secondary transition-colors">
+              {isMuted ? <VolumeX className="w-5 h-5 text-foreground" /> : <Volume2 className="w-5 h-5 text-foreground" />}
+            </button>
           </div>
         </div>
 
