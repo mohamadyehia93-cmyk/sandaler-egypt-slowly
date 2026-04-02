@@ -12,6 +12,7 @@ type PostCategory = "memory" | "tip" | "question";
 interface CommunityPost {
   id: string;
   author: string;
+  authorId: string;
   avatar: string;
   category: PostCategory;
   content: string;
@@ -27,6 +28,7 @@ const samplePosts: CommunityPost[] = [
   {
     id: "1",
     author: "Sarah M.",
+    authorId: "sarah-m",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
     category: "memory",
     content: "Just had the most magical sunset felucca ride in Aswan! The colors reflecting off the Nile were absolutely breathtaking. Highly recommend going at golden hour 🌅",
@@ -40,6 +42,7 @@ const samplePosts: CommunityPost[] = [
   {
     id: "2",
     author: "Ahmed K.",
+    authorId: "ahmed-k",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
     category: "tip",
     content: "Pro tip: Visit the Siwa Oasis during spring (March-April). The weather is perfect, and you'll catch the date harvest season. Don't miss the salt lakes! 🌴",
@@ -53,6 +56,7 @@ const samplePosts: CommunityPost[] = [
   {
     id: "3",
     author: "Nour A.",
+    authorId: "nour-a",
     avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100",
     category: "question",
     content: "Has anyone done the White Desert overnight camping trip? Looking for recommendations on local guides. Is it better to go from Cairo or Bahariya?",
@@ -65,6 +69,7 @@ const samplePosts: CommunityPost[] = [
   {
     id: "4",
     author: "Marco R.",
+    authorId: "marco-r",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100",
     category: "memory",
     content: "Discovered this hidden gem in Rashid (Rosetta) — a traditional coffee house where locals gather every evening. The stories, the chai, the hospitality… unforgettable ☕",
@@ -108,6 +113,7 @@ const Community = () => {
     const post: CommunityPost = {
       id: Date.now().toString(),
       author: lang === "ar" ? "أنت" : "You",
+      authorId: "me",
       avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100",
       category: newCategory,
       content: newContent,
@@ -232,10 +238,10 @@ const Community = () => {
             <article key={post.id} className="bg-background rounded-xl border border-border overflow-hidden">
               {/* Post Header */}
               <div className="flex items-center gap-3 p-3 pb-0">
-                <img src={post.avatar} alt={post.author} className="w-9 h-9 rounded-full object-cover" />
+                <img onClick={() => navigate(`/visitor/${post.authorId}`)} src={post.avatar} alt={post.author} className="w-9 h-9 rounded-full object-cover cursor-pointer" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-foreground">{post.author}</span>
+                    <span onClick={() => navigate(`/visitor/${post.authorId}`)} className="text-sm font-semibold text-foreground cursor-pointer hover:text-primary transition-colors">{post.author}</span>
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${cfg.color}`}>
                       <CatIcon className="w-3 h-3" />
                       {cfg.label[lang]}

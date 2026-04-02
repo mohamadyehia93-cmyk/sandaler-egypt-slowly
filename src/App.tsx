@@ -53,6 +53,7 @@ import NewProgram from "./pages/dashboards/NewProgram.tsx";
 import NewFlagReport from "./pages/dashboards/NewFlagReport.tsx";
 import NewCollection from "./pages/dashboards/NewCollection.tsx";
 import Community from "./pages/Community.tsx";
+import VisitorProfile from "./pages/VisitorProfile.tsx";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,7 @@ const App = () => (
             <Route path="/partner/:id" element={<PartnerDetail />} />
             <Route path="/provider/:id" element={<ProviderProfile />} />
             <Route path="/community" element={<Community />} />
+            <Route path="/visitor/:id" element={<VisitorProfile />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
