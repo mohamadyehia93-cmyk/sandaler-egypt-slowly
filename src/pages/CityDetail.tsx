@@ -73,37 +73,31 @@ const CityPostsSection = ({
         ))}
       </div>
 
-      {/* Post Cards */}
-      <div className="px-4 space-y-3">
+      {/* Horizontal Post Cards */}
+      <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {filtered.map((post) => (
-          <article
+          <div
             key={post.id}
             onClick={() => navigate(`/post/${post.id}`)}
-            className="flex gap-3 bg-card rounded-xl border border-border overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+            className="min-w-[220px] shrink-0 rounded-xl overflow-hidden shadow-card bg-card cursor-pointer"
           >
-            <img
-              src={post.image}
-              alt={post.title[lang]}
-              className="w-28 h-28 object-cover shrink-0"
-            />
-            <div className="flex-1 py-2.5 pr-3 flex flex-col justify-between min-w-0">
-              <div>
-                <span className="inline-block bg-primary/10 text-primary text-[10px] font-medium px-2 py-0.5 rounded-full mb-1.5">
-                  {post.category[lang]}
-                </span>
-                <h4 className="text-sm font-semibold text-foreground line-clamp-2 leading-snug">
-                  {post.title[lang]}
-                </h4>
-              </div>
+            <div className="relative h-32">
+              <img src={post.image} alt={post.title[lang]} className="w-full h-full object-cover" />
+              <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
+                {post.category[lang]}
+              </span>
+            </div>
+            <div className="p-3">
+              <h4 className="text-sm font-semibold text-foreground line-clamp-2 leading-snug mb-2">{post.title[lang]}</h4>
               <div className="flex items-center justify-between">
-                <span className="text-[11px] text-muted-foreground">{post.author[lang]}</span>
-                <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                <span className="text-[11px] text-muted-foreground truncate">{post.author[lang]}</span>
+                <span className="flex items-center gap-1 text-[10px] text-muted-foreground shrink-0">
                   <Clock className="w-3 h-3" />
                   {post.readTime} {lang === "ar" ? "د" : "min"}
                 </span>
               </div>
             </div>
-          </article>
+          </div>
         ))}
       </div>
     </div>
