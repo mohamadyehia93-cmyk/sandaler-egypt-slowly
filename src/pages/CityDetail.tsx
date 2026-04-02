@@ -1,5 +1,6 @@
+import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route } from "lucide-react";
+import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock, ChevronRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cityData, experiences, audioTours, accommodation, products, whosWho, causes, latestPosts, transport, trips } from "@/lib/sampleData";
 import SectionHeader from "@/components/SectionHeader";
