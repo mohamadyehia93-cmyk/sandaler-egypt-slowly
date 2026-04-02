@@ -12,6 +12,7 @@ type PostCategory = "memory" | "tip" | "question";
 interface CommunityPost {
   id: string;
   author: string;
+  authorId: string;
   avatar: string;
   category: PostCategory;
   content: string;
