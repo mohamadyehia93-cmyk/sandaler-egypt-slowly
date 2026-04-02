@@ -1,4 +1,5 @@
 import { Star, Quote } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import SectionHeader from "./SectionHeader";
 
@@ -6,6 +7,7 @@ const testimonials = [
   {
     id: "t1",
     name: { en: "Sarah M.", ar: "سارة م." },
+    visitorId: "sarah-m",
     location: { en: "London, UK", ar: "لندن، المملكة المتحدة" },
     text: { en: "Sandal showed me an Egypt I never knew existed. The bird watching tour on Lake Manzala was absolutely magical!", ar: "صندل أرتني مصر لم أكن أعرف بوجودها. جولة مراقبة الطيور على بحيرة المنزلة كانت ساحرة!" },
     rating: 5,
@@ -15,6 +17,7 @@ const testimonials = [
   {
     id: "t2",
     name: { en: "Ahmed K.", ar: "أحمد ك." },
+    visitorId: "ahmed-k",
     location: { en: "Dubai, UAE", ar: "دبي، الإمارات" },
     text: { en: "Cooking with Grandma Fatma in Rosetta was the highlight of my trip. Authentic, warm, unforgettable.", ar: "الطبخ مع جدة فاطمة في رشيد كان أجمل لحظات رحلتي. أصيل ودافئ ولا يُنسى." },
     rating: 5,
@@ -24,6 +27,7 @@ const testimonials = [
   {
     id: "t3",
     name: { en: "Maria L.", ar: "ماريا ل." },
+    visitorId: "maria-l",
     location: { en: "Rome, Italy", ar: "روما، إيطاليا" },
     text: { en: "The sandboarding in Siwa was thrilling! Omar is the best guide — so knowledgeable about the desert.", ar: "التزلج على الرمال في سيوة كان مثيراً! عمر أفضل مرشد — يعرف الصحراء جيداً." },
     rating: 5,
@@ -34,6 +38,7 @@ const testimonials = [
 
 const Testimonials = () => {
   const { lang } = useI18n();
+  const navigate = useNavigate();
 
   return (
     <SectionHeader titleKey="section.testimonials" onSeeAll={() => {}}>
@@ -47,10 +52,10 @@ const Testimonials = () => {
                 <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
               ))}
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/visitor/${t.visitorId}`)}>
               <img src={t.image} alt={t.name[lang]} className="w-9 h-9 rounded-full object-cover" />
               <div>
-                <p className="text-xs font-semibold text-foreground">{t.name[lang]}</p>
+                <p className="text-xs font-semibold text-foreground hover:text-primary transition-colors">{t.name[lang]}</p>
                 <p className="text-[10px] text-muted-foreground">{t.location[lang]}</p>
               </div>
             </div>
