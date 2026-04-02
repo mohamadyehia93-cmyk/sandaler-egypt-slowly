@@ -15,6 +15,7 @@ const reviews = [
   {
     id: "r2",
     name: { en: "Ahmed K.", ar: "أحمد ك." },
+    visitorId: "ahmed-k",
     text: { en: "Authentic and unforgettable. The local food was the best part. Will definitely come back!", ar: "أصيلة ولا تُنسى. الطعام المحلي كان أفضل جزء. سأعود بالتأكيد!" },
     rating: 5,
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
