@@ -118,7 +118,6 @@ const Community = () => {
       timeAgo: lang === "ar" ? "الآن" : "Just now",
       liked: false,
     };
-    setPosts([post, ...prev => prev]);
     setPosts((prev) => [post, ...prev]);
     setNewContent("");
     setNewLocation("");
