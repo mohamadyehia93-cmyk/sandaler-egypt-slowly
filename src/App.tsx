@@ -52,6 +52,7 @@ import NewSession from "./pages/dashboards/NewSession.tsx";
 import NewProgram from "./pages/dashboards/NewProgram.tsx";
 import NewFlagReport from "./pages/dashboards/NewFlagReport.tsx";
 import NewCollection from "./pages/dashboards/NewCollection.tsx";
+import Community from "./pages/Community.tsx";
 
 const queryClient = new QueryClient();
 
