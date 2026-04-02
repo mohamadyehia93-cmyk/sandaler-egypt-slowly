@@ -69,6 +69,7 @@ const samplePosts: CommunityPost[] = [
   {
     id: "4",
     author: "Marco R.",
+    authorId: "marco-r",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100",
     category: "memory",
     content: "Discovered this hidden gem in Rashid (Rosetta) — a traditional coffee house where locals gather every evening. The stories, the chai, the hospitality… unforgettable ☕",
