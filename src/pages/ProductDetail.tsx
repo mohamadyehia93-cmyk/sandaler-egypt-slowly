@@ -36,38 +36,50 @@ const ProductDetail = () => {
         </div>
 
         {/* Description */}
-        <h2 className="text-base font-bold text-primary-dark mb-2">{lang === "ar" ? "عن المنتج" : "About This Product"}</h2>
-        <p className="text-sm text-foreground leading-relaxed mb-5">{product.description[lang]}</p>
+        {product.description && (
+          <>
+            <h2 className="text-base font-bold text-primary-dark mb-2">{lang === "ar" ? "عن المنتج" : "About This Product"}</h2>
+            <p className="text-sm text-foreground leading-relaxed mb-5">{product.description[lang]}</p>
+          </>
+        )}
 
         {/* Artisan */}
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-surface mb-5">
-          <div className="w-11 h-11 rounded-full bg-primary/20 flex items-center justify-center text-lg">🧑‍🎨</div>
-          <div>
-            <p className="text-xs text-muted-foreground">{lang === "ar" ? "صنع بواسطة" : "Made by"}</p>
-            <p className="text-sm font-semibold text-foreground">{product.artisan[lang]}</p>
+        {product.artisan && (
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-surface mb-5">
+            <div className="w-11 h-11 rounded-full bg-primary/20 flex items-center justify-center text-lg">🧑‍🎨</div>
+            <div>
+              <p className="text-xs text-muted-foreground">{lang === "ar" ? "صنع بواسطة" : "Made by"}</p>
+              <p className="text-sm font-semibold text-foreground">{product.artisan[lang]}</p>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Materials */}
-        <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "المواد" : "Materials"}</h2>
-        <div className="flex flex-wrap gap-2 mb-5">
-          {product.materials[lang].map((m, i) => (
-            <span key={i} className="flex items-center gap-1 text-xs font-medium bg-secondary text-secondary-foreground px-2.5 py-1.5 rounded-full">
-              <Package className="w-3 h-3" /> {m}
-            </span>
-          ))}
-        </div>
+        {product.materials && (
+          <>
+            <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "المواد" : "Materials"}</h2>
+            <div className="flex flex-wrap gap-2 mb-5">
+              {product.materials[lang].map((m, i) => (
+                <span key={i} className="flex items-center gap-1 text-xs font-medium bg-secondary text-secondary-foreground px-2.5 py-1.5 rounded-full">
+                  <Package className="w-3 h-3" /> {m}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Impact */}
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-primary/5 border border-primary/20 mb-5">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <Leaf className="w-5 h-5 text-primary" />
+        {product.impact && (
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-primary/5 border border-primary/20 mb-5">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Leaf className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{lang === "ar" ? "الأثر المجتمعي" : "Community Impact"}</p>
+              <p className="text-sm font-semibold text-foreground">{product.impact[lang]}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">{lang === "ar" ? "الأثر المجتمعي" : "Community Impact"}</p>
-            <p className="text-sm font-semibold text-foreground">{product.impact[lang]}</p>
-          </div>
-        </div>
+        )}
 
         {/* Shipping & Options */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "خيارات الشراء" : "Purchase Options"}</h2>
