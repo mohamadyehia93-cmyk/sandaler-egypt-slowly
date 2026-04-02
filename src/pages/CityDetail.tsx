@@ -1,108 +1,13 @@
 import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock, ChevronRight } from "lucide-react";
+import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cityData, experiences, audioTours, accommodation, products, whosWho, causes, latestPosts, transport, trips } from "@/lib/sampleData";
 import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
 import BottomNav from "@/components/BottomNav";
 
-const CityDetail = () => {
-  const { cityId } = useParams();
-  const navigate = useNavigate();
-  const { lang, t } = useI18n();
-
-  const city = cityData[cityId || ""];
-  if (!city) return <div className="p-8 text-center text-muted-foreground">City not found</div>;
-
-  const cityExperiences = experiences.filter((e) => e.cityId === cityId);
-  const cityAudioTours = audioTours.filter((a) => a.cityId === cityId);
-  const cityAccommodation = accommodation.filter((a) => a.cityId === cityId);
-  const cityProducts = products.filter((p) => p.cityId === cityId);
-  const cityPeople = whosWho.filter((w) => w.cityId === cityId);
-  const cityCauses = causes.filter((c) => c.cityId === cityId);
-  const cityPosts = latestPosts.filter((p) => (p as any).cityId === cityId);
-  const cityTransport = transport.filter((tr) => tr.cityId === cityId);
-  const cityTrips = trips.filter((tr) => tr.cityId === cityId);
-
-  return (
-    <div className="min-h-screen bg-surface pb-20">
-      {/* Header */}
-      <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40">
-        <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary">
-          <ArrowLeft className="w-5 h-5 text-foreground" />
-        </button>
-        <h1 className="text-lg font-bold text-foreground">{city.name[lang]}</h1>
-      </header>
-
-      {/* Hero Image */}
-      <div className="relative h-48 mx-4 mt-2 rounded-xl overflow-hidden">
-        <img src={city.image} alt={city.name[lang]} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute bottom-3 left-4 right-4">
-          <h2 className="text-xl font-bold text-white mb-1">{city.name[lang]}</h2>
-          <div className="flex items-center gap-2 text-white/80 text-xs">
-            <MapPin className="w-3 h-3" />
-            <span>{city.governorate[lang]}</span>
-            <span>•</span>
-            <Users className="w-3 h-3" />
-            <span>{city.population}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-5 pt-4">
-        {/* About Section */}
-        <div className="px-4 space-y-4">
-          {/* Overview */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Compass className="w-4 h-4 text-primary" />
-              <h3 className="text-base font-bold text-foreground">
-                {lang === "ar" ? "نظرة عامة" : "Overview"}
-              </h3>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.overview[lang]}</p>
-          </div>
-
-          {/* History */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <BookOpen className="w-4 h-4 text-primary" />
-              <h3 className="text-base font-bold text-foreground">
-                {lang === "ar" ? "التاريخ" : "History"}
-              </h3>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.history[lang]}</p>
-          </div>
-
-          {/* Culture */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Palette className="w-4 h-4 text-primary" />
-              <h3 className="text-base font-bold text-foreground">
-                {lang === "ar" ? "الثقافة" : "Culture"}
-              </h3>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.culture[lang]}</p>
-          </div>
-
-          {/* Geography */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Mountain className="w-4 h-4 text-primary" />
-              <h3 className="text-base font-bold text-foreground">
-                {lang === "ar" ? "الجغرافيا" : "Geography"}
-              </h3>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.geography[lang]}</p>
-          </div>
-        </div>
-
-        {/* Categorized Posts/Articles */}
-        {cityPosts.length > 0 && <CityPostsSection posts={cityPosts} lang={lang} navigate={navigate} />}
-
-type PostItem = typeof latestPosts[number];
+type PostItem = (typeof latestPosts)[number];
 
 const CityPostsSection = ({
   posts,
@@ -124,7 +29,10 @@ const CityPostsSection = ({
     return Array.from(cats.entries()).map(([key, label]) => ({ key, label }));
   }, [posts, lang]);
 
-  const filtered = activeCategory === "all" ? posts : posts.filter((p) => p.category.en.toLowerCase() === activeCategory);
+  const filtered =
+    activeCategory === "all"
+      ? posts
+      : posts.filter((p) => p.category.en.toLowerCase() === activeCategory);
 
   const allLabel = lang === "ar" ? "الكل" : "All";
 
@@ -202,14 +110,91 @@ const CityPostsSection = ({
   );
 };
 
+const CityDetail = () => {
+  const { cityId } = useParams();
+  const navigate = useNavigate();
+  const { lang, t } = useI18n();
+
+  const city = cityData[cityId || ""];
+  if (!city) return <div className="p-8 text-center text-muted-foreground">City not found</div>;
+
+  const cityExperiences = experiences.filter((e) => e.cityId === cityId);
+  const cityAudioTours = audioTours.filter((a) => a.cityId === cityId);
+  const cityAccommodation = accommodation.filter((a) => a.cityId === cityId);
+  const cityProducts = products.filter((p) => p.cityId === cityId);
+  const cityPeople = whosWho.filter((w) => w.cityId === cityId);
+  const cityCauses = causes.filter((c) => c.cityId === cityId);
+  const cityPosts = latestPosts.filter((p) => (p as any).cityId === cityId);
+  const cityTransport = transport.filter((tr) => tr.cityId === cityId);
+  const cityTrips = trips.filter((tr) => tr.cityId === cityId);
+
+  return (
+    <div className="min-h-screen bg-surface pb-20">
+      {/* Header */}
+      <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40">
+        <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary">
+          <ArrowLeft className="w-5 h-5 text-foreground" />
+        </button>
+        <h1 className="text-lg font-bold text-foreground">{city.name[lang]}</h1>
+      </header>
+
+      {/* Hero Image */}
+      <div className="relative h-48 mx-4 mt-2 rounded-xl overflow-hidden">
+        <img src={city.image} alt={city.name[lang]} className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-3 left-4 right-4">
+          <h2 className="text-xl font-bold text-white mb-1">{city.name[lang]}</h2>
+          <div className="flex items-center gap-2 text-white/80 text-xs">
+            <MapPin className="w-3 h-3" />
+            <span>{city.governorate[lang]}</span>
+            <span>•</span>
+            <Users className="w-3 h-3" />
+            <span>{city.population}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-5 pt-4">
+        {/* About Section */}
+        <div className="px-4 space-y-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Compass className="w-4 h-4 text-primary" />
+              <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "نظرة عامة" : "Overview"}</h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.overview[lang]}</p>
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <BookOpen className="w-4 h-4 text-primary" />
+              <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "التاريخ" : "History"}</h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.history[lang]}</p>
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Palette className="w-4 h-4 text-primary" />
+              <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "الثقافة" : "Culture"}</h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.culture[lang]}</p>
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Mountain className="w-4 h-4 text-primary" />
+              <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "الجغرافيا" : "Geography"}</h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.geography[lang]}</p>
+          </div>
+        </div>
+
+        {/* Categorized Posts/Articles */}
+        {cityPosts.length > 0 && <CityPostsSection posts={cityPosts} lang={lang} navigate={navigate} />}
 
         {/* Highlights */}
         <div className="px-4">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-4 h-4 text-primary" />
-            <h3 className="text-base font-bold text-foreground">
-              {lang === "ar" ? "أبرز المعالم" : "Highlights"}
-            </h3>
+            <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "أبرز المعالم" : "Highlights"}</h3>
           </div>
           <div className="grid grid-cols-2 gap-2">
             {city.highlights[lang].map((h, i) => (
@@ -224,15 +209,11 @@ const CityPostsSection = ({
         <div className="px-4">
           <div className="flex items-center gap-2 mb-2">
             <Heart className="w-4 h-4 text-primary" />
-            <h3 className="text-base font-bold text-foreground">
-              {lang === "ar" ? "تشتهر بـ" : "Known For"}
-            </h3>
+            <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "تشتهر بـ" : "Known For"}</h3>
           </div>
           <div className="flex flex-wrap gap-2">
             {city.knownFor[lang].map((k, i) => (
-              <span key={i} className="text-xs font-medium text-primary bg-primary/10 px-3 py-1.5 rounded-full">
-                {k}
-              </span>
+              <span key={i} className="text-xs font-medium text-primary bg-primary/10 px-3 py-1.5 rounded-full">{k}</span>
             ))}
           </div>
         </div>
