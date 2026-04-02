@@ -38,6 +38,7 @@ const testimonials = [
 
 const Testimonials = () => {
   const { lang } = useI18n();
+  const navigate = useNavigate();
 
   return (
     <SectionHeader titleKey="section.testimonials" onSeeAll={() => {}}>
