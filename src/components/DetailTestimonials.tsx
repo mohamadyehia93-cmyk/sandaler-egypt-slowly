@@ -56,10 +56,10 @@ const DetailTestimonials = () => {
                 <Star key={i} className="w-3 h-3 text-muted-foreground/30" />
               ))}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate(`/visitor/${r.visitorId}`)}>
               <img src={r.image} alt={r.name[lang]} className="w-7 h-7 rounded-full object-cover" />
               <div>
-                <p className="text-[11px] font-semibold text-foreground">{r.name[lang]}</p>
+                <p className="text-[11px] font-semibold text-foreground hover:text-primary transition-colors">{r.name[lang]}</p>
                 <p className="text-[10px] text-muted-foreground">{r.date[lang]}</p>
               </div>
             </div>
