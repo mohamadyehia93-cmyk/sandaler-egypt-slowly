@@ -11,9 +11,9 @@ const LatestPosts = () => {
 
   return (
     <SectionHeader titleKey="section.latestPosts" onSeeAll={() => {}}>
-      <div className="grid grid-cols-2 gap-3 px-4">
+      <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {latestPosts.map((p) => (
-          <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card relative cursor-pointer" onClick={() => navigate(`/post/${p.id}`)}>
+          <div key={p.id} className="min-w-[220px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card relative cursor-pointer" onClick={() => navigate(`/post/${p.id}`)}>
             <div className="relative h-40">
               <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
               <div className="absolute inset-0 gradient-overlay" />
