@@ -1,20 +1,129 @@
-import { ArrowLeft, Heart, Share2, Headphones, Play, Pause, Download, MapPin, Clock, Navigation, Wifi, WifiOff, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, Heart, Share2, Headphones, Play, Pause, Download, MapPin, Clock, Navigation, Wifi, WifiOff, ChevronRight, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { audioTours, regions } from "@/lib/sampleData";
 import DetailTestimonials from "@/components/DetailTestimonials";
 import TourStopsMap from "@/components/TourStopsMap";
+import { Slider } from "@/components/ui/slider";
+
+// Sample ambient audio for demo purposes
+const SAMPLE_AUDIO_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+
+const formatTime = (seconds: number) => {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+};
 
 const AudioTourDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [activeStopIndex, setActiveStopIndex] = useState(0);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const tour = audioTours.find((a) => a.id === id) || audioTours[0];
   const region = regions.find((r) => r.id === tour.regionId);
+
+  // Audio playback logic
+  useEffect(() => {
+    const audio = new Audio(SAMPLE_AUDIO_URL);
+    audio.preload = "metadata";
+    audioRef.current = audio;
+
+    const onLoaded = () => { setDuration(audio.duration); setIsLoaded(true); };
+    const onTimeUpdate = () => setCurrentTime(audio.duration ? audio.currentTime : 0);
+    const onEnded = () => { setIsPlaying(false); setCurrentTime(0); setActiveStopIndex(0); };
+
+    audio.addEventListener("loadedmetadata", onLoaded);
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("ended", onEnded);
+
+    return () => {
+      audio.pause();
+      audio.removeEventListener("loadedmetadata", onLoaded);
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("ended", onEnded);
+      audio.src = "";
+    };
+  }, [tour.id]);
+
+  // Update active stop based on progress
+  useEffect(() => {
+    if (duration > 0) {
+      const progress = currentTime / duration;
+      const stopIdx = Math.min(Math.floor(progress * tour.stops), tour.stops - 1);
+      setActiveStopIndex(stopIdx);
+    }
+  }, [currentTime, duration, tour.stops]);
+
+  const togglePlay = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play().catch(() => {});
+    }
+    setIsPlaying(!isPlaying);
+  }, [isPlaying]);
+
+  const handleSeek = useCallback((value: number[]) => {
+    const audio = audioRef.current;
+    if (!audio || !duration) return;
+    const newTime = (value[0] / 100) * duration;
+    audio.currentTime = newTime;
+    setCurrentTime(newTime);
+  }, [duration]);
+
+  const skipToStop = useCallback((stopIndex: number) => {
+    const audio = audioRef.current;
+    if (!audio || !duration) return;
+    const newTime = (stopIndex / tour.stops) * duration;
+    audio.currentTime = newTime;
+    setCurrentTime(newTime);
+    setActiveStopIndex(stopIndex);
+    if (!isPlaying) {
+      audio.play().catch(() => {});
+      setIsPlaying(true);
+    }
+  }, [duration, tour.stops, isPlaying]);
+
+  const skipForward = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = Math.min(audio.currentTime + 15, duration);
+  }, [duration]);
+
+  const skipBackward = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = Math.max(audio.currentTime - 15, 0);
+  }, []);
+
+  const cycleSpeed = useCallback(() => {
+    const speeds = [0.75, 1, 1.25, 1.5, 2];
+    const nextIdx = (speeds.indexOf(playbackRate) + 1) % speeds.length;
+    const newRate = speeds[nextIdx];
+    setPlaybackRate(newRate);
+    if (audioRef.current) audioRef.current.playbackRate = newRate;
+  }, [playbackRate]);
+
+  const toggleMute = useCallback(() => {
+    if (audioRef.current) audioRef.current.muted = !isMuted;
+    setIsMuted(!isMuted);
+  }, [isMuted]);
+
+  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   // Narrator data per tour
   const tourNarrators: Record<string, { name: { en: string; ar: string }; image: string; bio: { en: string; ar: string }; title: { en: string; ar: string }; profileId?: string }> = {
@@ -323,29 +432,57 @@ const AudioTourDetail = () => {
           </span>
         </div>
 
-        {/* Audio Player Preview */}
+        {/* Audio Player */}
         <div className="bg-surface rounded-xl p-4 mb-6 border border-border">
+          {/* Now Playing Info */}
           <div className="flex items-center gap-3 mb-3">
-            <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-elevated"
-            >
-              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
-            </button>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-foreground">{lang === "ar" ? "استمع للجولة" : "Listen to Tour"}</p>
-              <p className="text-xs text-muted-foreground">{tour.duration} {t("common.min")} · {tour.stops} {t("common.stops")}</p>
+            <img src={tour.image} alt="" className="w-12 h-12 rounded-lg object-cover" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground truncate">
+                {stops[activeStopIndex]?.[lang] || tour.title[lang]}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {lang === "ar" ? `المحطة ${activeStopIndex + 1} من ${tour.stops}` : `Stop ${activeStopIndex + 1} of ${tour.stops}`}
+              </p>
             </div>
-            <button className="p-2 rounded-full bg-secondary">
-              <Download className="w-4 h-4 text-secondary-foreground" />
+            <button onClick={toggleMute} className="p-2 rounded-full bg-secondary">
+              {isMuted ? <VolumeX className="w-4 h-4 text-secondary-foreground" /> : <Volume2 className="w-4 h-4 text-secondary-foreground" />}
             </button>
           </div>
-          <div className="w-full bg-border rounded-full h-1.5">
-            <div className="bg-primary h-1.5 rounded-full" style={{ width: isPlaying ? "15%" : "0%" }} />
+
+          {/* Progress Slider */}
+          <Slider
+            value={[progressPercent]}
+            max={100}
+            step={0.1}
+            onValueChange={handleSeek}
+            className="mb-1"
+          />
+          <div className="flex justify-between mb-4">
+            <span className="text-[10px] text-muted-foreground">{formatTime(currentTime)}</span>
+            <span className="text-[10px] text-muted-foreground">{duration > 0 ? formatTime(duration) : `${tour.duration}:00`}</span>
           </div>
-          <div className="flex justify-between mt-1">
-            <span className="text-[10px] text-muted-foreground">{isPlaying ? "0:45" : "0:00"}</span>
-            <span className="text-[10px] text-muted-foreground">{tour.duration}:00</span>
+
+          {/* Controls */}
+          <div className="flex items-center justify-center gap-4">
+            <button onClick={cycleSpeed} className="px-2 py-1 rounded-md bg-secondary text-xs font-bold text-secondary-foreground min-w-[40px]">
+              {playbackRate}x
+            </button>
+            <button onClick={skipBackward} className="p-2 rounded-full hover:bg-secondary transition-colors">
+              <SkipBack className="w-5 h-5 text-foreground" />
+            </button>
+            <button
+              onClick={togglePlay}
+              className="w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-elevated"
+            >
+              {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-0.5" />}
+            </button>
+            <button onClick={skipForward} className="p-2 rounded-full hover:bg-secondary transition-colors">
+              <SkipForward className="w-5 h-5 text-foreground" />
+            </button>
+            <button onClick={toggleMute} className="p-2 rounded-full hover:bg-secondary transition-colors">
+              {isMuted ? <VolumeX className="w-5 h-5 text-foreground" /> : <Volume2 className="w-5 h-5 text-foreground" />}
+            </button>
           </div>
         </div>
 
@@ -395,12 +532,32 @@ const AudioTourDetail = () => {
         <TourStopsMap stops={mapStops} />
         <div className="relative mb-6">
           {stops.map((stop, i) => (
-            <div key={i} className="flex gap-3 pb-4">
+            <div
+              key={i}
+              onClick={() => skipToStop(i)}
+              className={`flex gap-3 pb-4 cursor-pointer group transition-colors ${i === activeStopIndex ? "" : ""}`}
+            >
               <div className="flex flex-col items-center">
-                <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">{i + 1}</div>
-                {i < stops.length - 1 && <div className="w-0.5 flex-1 bg-primary/20 mt-1" />}
+                <div className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-all ${
+                  i === activeStopIndex
+                    ? "bg-primary text-primary-foreground scale-110 ring-2 ring-primary/30"
+                    : i < activeStopIndex
+                    ? "bg-primary/60 text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground"
+                }`}>{i + 1}</div>
+                {i < stops.length - 1 && <div className={`w-0.5 flex-1 mt-1 ${i < activeStopIndex ? "bg-primary/60" : "bg-primary/20"}`} />}
               </div>
-              <p className="text-sm text-foreground pt-1">{stop[lang]}</p>
+              <div className="flex-1 pt-1">
+                <p className={`text-sm transition-colors ${
+                  i === activeStopIndex ? "text-primary font-semibold" : "text-foreground group-hover:text-primary"
+                }`}>{stop[lang]}</p>
+                {i === activeStopIndex && isPlaying && (
+                  <p className="text-[10px] text-primary mt-0.5 flex items-center gap-1">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                    {lang === "ar" ? "يتم التشغيل الآن" : "Now playing"}
+                  </p>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -431,19 +588,20 @@ const AudioTourDetail = () => {
           <span className="text-lg font-bold text-primary-dark">
             {tour.price === 0 ? t("common.free") : `${tour.price} ${t("common.egp")}`}
           </span>
-          <span className="text-xs text-muted-foreground block">{t("common.audioTour")}</span>
+          {isPlaying && (
+            <span className="text-xs text-primary block font-medium">
+              {formatTime(currentTime)} / {duration > 0 ? formatTime(duration) : `${tour.duration}:00`}
+            </span>
+          )}
+          {!isPlaying && <span className="text-xs text-muted-foreground block">{t("common.audioTour")}</span>}
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-3 rounded-xl bg-secondary text-secondary-foreground font-bold text-sm">
-            <Download className="w-4 h-4 inline mr-1" />
-            {lang === "ar" ? "تحميل" : "Download"}
-          </button>
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
+            onClick={togglePlay}
+            className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated flex items-center gap-1.5"
           >
-            <Play className="w-4 h-4 inline mr-1" />
-            {lang === "ar" ? "استمع" : "Listen"}
+            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            {isPlaying ? (lang === "ar" ? "إيقاف" : "Pause") : (lang === "ar" ? "استمع" : "Listen")}
           </button>
         </div>
       </div>
