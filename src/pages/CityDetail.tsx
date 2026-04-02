@@ -181,9 +181,6 @@ const CityDetail = () => {
           </div>
         </div>
 
-        {/* Categorized Posts/Articles */}
-        {cityPosts.length > 0 && <CityPostsSection posts={cityPosts} lang={lang} navigate={navigate} />}
-
         {/* Highlights */}
         <div className="px-4">
           <div className="flex items-center gap-2 mb-2">
