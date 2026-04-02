@@ -27,6 +27,7 @@ const testimonials = [
   {
     id: "t3",
     name: { en: "Maria L.", ar: "ماريا ل." },
+    visitorId: "maria-l",
     location: { en: "Rome, Italy", ar: "روما، إيطاليا" },
     text: { en: "The sandboarding in Siwa was thrilling! Omar is the best guide — so knowledgeable about the desert.", ar: "التزلج على الرمال في سيوة كان مثيراً! عمر أفضل مرشد — يعرف الصحراء جيداً." },
     rating: 5,
