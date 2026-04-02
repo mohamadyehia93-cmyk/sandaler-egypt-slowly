@@ -24,6 +24,7 @@ const reviews = [
   {
     id: "r3",
     name: { en: "Maria L.", ar: "ماريا ل." },
+    visitorId: "maria-l",
     text: { en: "Well organized and great value for money. The scenery was breathtaking.", ar: "منظمة جيداً وقيمة ممتازة مقابل السعر. المناظر كانت خلابة." },
     rating: 4,
     image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80",
