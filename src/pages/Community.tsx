@@ -113,6 +113,7 @@ const Community = () => {
     const post: CommunityPost = {
       id: Date.now().toString(),
       author: lang === "ar" ? "أنت" : "You",
+      authorId: "me",
       avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100",
       category: newCategory,
       content: newContent,
