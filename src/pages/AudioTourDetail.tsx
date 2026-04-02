@@ -532,12 +532,32 @@ const AudioTourDetail = () => {
         <TourStopsMap stops={mapStops} />
         <div className="relative mb-6">
           {stops.map((stop, i) => (
-            <div key={i} className="flex gap-3 pb-4">
+            <div
+              key={i}
+              onClick={() => skipToStop(i)}
+              className={`flex gap-3 pb-4 cursor-pointer group transition-colors ${i === activeStopIndex ? "" : ""}`}
+            >
               <div className="flex flex-col items-center">
-                <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">{i + 1}</div>
-                {i < stops.length - 1 && <div className="w-0.5 flex-1 bg-primary/20 mt-1" />}
+                <div className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-all ${
+                  i === activeStopIndex
+                    ? "bg-primary text-primary-foreground scale-110 ring-2 ring-primary/30"
+                    : i < activeStopIndex
+                    ? "bg-primary/60 text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground"
+                }`}>{i + 1}</div>
+                {i < stops.length - 1 && <div className={`w-0.5 flex-1 mt-1 ${i < activeStopIndex ? "bg-primary/60" : "bg-primary/20"}`} />}
               </div>
-              <p className="text-sm text-foreground pt-1">{stop[lang]}</p>
+              <div className="flex-1 pt-1">
+                <p className={`text-sm transition-colors ${
+                  i === activeStopIndex ? "text-primary font-semibold" : "text-foreground group-hover:text-primary"
+                }`}>{stop[lang]}</p>
+                {i === activeStopIndex && isPlaying && (
+                  <p className="text-[10px] text-primary mt-0.5 flex items-center gap-1">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                    {lang === "ar" ? "يتم التشغيل الآن" : "Now playing"}
+                  </p>
+                )}
+              </div>
             </div>
           ))}
         </div>
