@@ -152,7 +152,10 @@ const Index = () => {
       </div>
 
       {/* FAB */}
-      <button className="fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-elevated flex items-center justify-center text-2xl">
+      <button
+        onClick={() => navigate("/community")}
+        className="fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-elevated flex items-center justify-center text-2xl"
+      >
         +
       </button>
 
