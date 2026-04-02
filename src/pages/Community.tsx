@@ -56,6 +56,7 @@ const samplePosts: CommunityPost[] = [
   {
     id: "3",
     author: "Nour A.",
+    authorId: "nour-a",
     avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100",
     category: "question",
     content: "Has anyone done the White Desert overnight camping trip? Looking for recommendations on local guides. Is it better to go from Cairo or Bahariya?",
