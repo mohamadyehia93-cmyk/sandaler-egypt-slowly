@@ -28,6 +28,7 @@ const samplePosts: CommunityPost[] = [
   {
     id: "1",
     author: "Sarah M.",
+    authorId: "sarah-m",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
     category: "memory",
     content: "Just had the most magical sunset felucca ride in Aswan! The colors reflecting off the Nile were absolutely breathtaking. Highly recommend going at golden hour 🌅",
