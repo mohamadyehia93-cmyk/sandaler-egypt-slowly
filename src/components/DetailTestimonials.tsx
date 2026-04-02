@@ -6,6 +6,7 @@ const reviews = [
   {
     id: "r1",
     name: { en: "Sarah M.", ar: "سارة م." },
+    visitorId: "sarah-m",
     text: { en: "An incredible experience! Our guide was so knowledgeable and passionate. Highly recommend.", ar: "تجربة مذهلة! مرشدنا كان على دراية كبيرة وشغوف. أنصح بها بشدة." },
     rating: 5,
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
