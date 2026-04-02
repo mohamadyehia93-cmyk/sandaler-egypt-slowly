@@ -34,6 +34,97 @@ const AudioTourDetail = () => {
   const tour = audioTours.find((a) => a.id === id) || audioTours[0];
   const region = regions.find((r) => r.id === tour.regionId);
 
+  // Audio playback logic
+  useEffect(() => {
+    const audio = new Audio(SAMPLE_AUDIO_URL);
+    audio.preload = "metadata";
+    audioRef.current = audio;
+
+    const onLoaded = () => { setDuration(audio.duration); setIsLoaded(true); };
+    const onTimeUpdate = () => setCurrentTime(audio.duration ? audio.currentTime : 0);
+    const onEnded = () => { setIsPlaying(false); setCurrentTime(0); setActiveStopIndex(0); };
+
+    audio.addEventListener("loadedmetadata", onLoaded);
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("ended", onEnded);
+
+    return () => {
+      audio.pause();
+      audio.removeEventListener("loadedmetadata", onLoaded);
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("ended", onEnded);
+      audio.src = "";
+    };
+  }, [tour.id]);
+
+  // Update active stop based on progress
+  useEffect(() => {
+    if (duration > 0) {
+      const progress = currentTime / duration;
+      const stopIdx = Math.min(Math.floor(progress * tour.stops), tour.stops - 1);
+      setActiveStopIndex(stopIdx);
+    }
+  }, [currentTime, duration, tour.stops]);
+
+  const togglePlay = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play().catch(() => {});
+    }
+    setIsPlaying(!isPlaying);
+  }, [isPlaying]);
+
+  const handleSeek = useCallback((value: number[]) => {
+    const audio = audioRef.current;
+    if (!audio || !duration) return;
+    const newTime = (value[0] / 100) * duration;
+    audio.currentTime = newTime;
+    setCurrentTime(newTime);
+  }, [duration]);
+
+  const skipToStop = useCallback((stopIndex: number) => {
+    const audio = audioRef.current;
+    if (!audio || !duration) return;
+    const newTime = (stopIndex / tour.stops) * duration;
+    audio.currentTime = newTime;
+    setCurrentTime(newTime);
+    setActiveStopIndex(stopIndex);
+    if (!isPlaying) {
+      audio.play().catch(() => {});
+      setIsPlaying(true);
+    }
+  }, [duration, tour.stops, isPlaying]);
+
+  const skipForward = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = Math.min(audio.currentTime + 15, duration);
+  }, [duration]);
+
+  const skipBackward = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = Math.max(audio.currentTime - 15, 0);
+  }, []);
+
+  const cycleSpeed = useCallback(() => {
+    const speeds = [0.75, 1, 1.25, 1.5, 2];
+    const nextIdx = (speeds.indexOf(playbackRate) + 1) % speeds.length;
+    const newRate = speeds[nextIdx];
+    setPlaybackRate(newRate);
+    if (audioRef.current) audioRef.current.playbackRate = newRate;
+  }, [playbackRate]);
+
+  const toggleMute = useCallback(() => {
+    if (audioRef.current) audioRef.current.muted = !isMuted;
+    setIsMuted(!isMuted);
+  }, [isMuted]);
+
+  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+
   // Narrator data per tour
   const tourNarrators: Record<string, { name: { en: string; ar: string }; image: string; bio: { en: string; ar: string }; title: { en: string; ar: string }; profileId?: string }> = {
     a1: { name: { en: "Yasmine Hussein", ar: "ياسمين حسين" }, image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80", title: { en: "Historian & Rosetta native", ar: "مؤرخة وابنة رشيد" }, bio: { en: "Yasmine grew up among the Ottoman merchant houses of Rosetta. A published historian, she brings the city's rich past to life with vivid storytelling — from the discovery of the Rosetta Stone to the palm groves that define the city's skyline.", ar: "نشأت ياسمين بين بيوت التجار العثمانية في رشيد. كمؤرخة منشورة، تُحيي ماضي المدينة الغني بسرد حي — من اكتشاف حجر رشيد إلى بساتين النخيل التي تحدد أفق المدينة." }, profileId: "ca8" },
