@@ -34,6 +34,7 @@ const reviews = [
 
 const DetailTestimonials = () => {
   const { lang, t } = useI18n();
+  const navigate = useNavigate();
 
   return (
     <div className="mb-6">
