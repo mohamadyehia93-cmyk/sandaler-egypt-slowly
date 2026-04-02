@@ -588,19 +588,20 @@ const AudioTourDetail = () => {
           <span className="text-lg font-bold text-primary-dark">
             {tour.price === 0 ? t("common.free") : `${tour.price} ${t("common.egp")}`}
           </span>
-          <span className="text-xs text-muted-foreground block">{t("common.audioTour")}</span>
+          {isPlaying && (
+            <span className="text-xs text-primary block font-medium">
+              {formatTime(currentTime)} / {duration > 0 ? formatTime(duration) : `${tour.duration}:00`}
+            </span>
+          )}
+          {!isPlaying && <span className="text-xs text-muted-foreground block">{t("common.audioTour")}</span>}
         </div>
         <div className="flex gap-2">
-          <button className="px-4 py-3 rounded-xl bg-secondary text-secondary-foreground font-bold text-sm">
-            <Download className="w-4 h-4 inline mr-1" />
-            {lang === "ar" ? "تحميل" : "Download"}
-          </button>
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
+            onClick={togglePlay}
+            className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated flex items-center gap-1.5"
           >
-            <Play className="w-4 h-4 inline mr-1" />
-            {lang === "ar" ? "استمع" : "Listen"}
+            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            {isPlaying ? (lang === "ar" ? "إيقاف" : "Pause") : (lang === "ar" ? "استمع" : "Listen")}
           </button>
         </div>
       </div>
