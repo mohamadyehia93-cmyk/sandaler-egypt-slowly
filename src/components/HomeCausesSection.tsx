@@ -11,14 +11,14 @@ const HomeCausesSection = () => {
 
   return (
     <SectionHeader titleKey="section.causes" onSeeAll={() => {}}>
-      <div className="grid grid-cols-2 gap-3 px-4">
+      <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {causes.slice(0, 4).map((cause) => {
           const progress = Math.round((cause.raised / cause.goal) * 100);
           return (
             <div
               key={cause.id}
               onClick={() => navigate(`/cause/${cause.id}`)}
-              className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
+              className="min-w-[220px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
             >
               <div className="relative h-28">
                 <img src={cause.image} alt={cause.title[lang]} className="w-full h-full object-cover" />
