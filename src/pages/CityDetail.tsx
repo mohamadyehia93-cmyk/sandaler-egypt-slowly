@@ -102,6 +102,106 @@ const CityDetail = () => {
         {/* Categorized Posts/Articles */}
         {cityPosts.length > 0 && <CityPostsSection posts={cityPosts} lang={lang} navigate={navigate} />}
 
+type PostItem = typeof latestPosts[number];
+
+const CityPostsSection = ({
+  posts,
+  lang,
+  navigate,
+}: {
+  posts: PostItem[];
+  lang: "en" | "ar";
+  navigate: ReturnType<typeof useNavigate>;
+}) => {
+  const [activeCategory, setActiveCategory] = useState("all");
+
+  const categories = useMemo(() => {
+    const cats = new Map<string, string>();
+    posts.forEach((p) => {
+      const key = p.category.en.toLowerCase();
+      if (!cats.has(key)) cats.set(key, p.category[lang]);
+    });
+    return Array.from(cats.entries()).map(([key, label]) => ({ key, label }));
+  }, [posts, lang]);
+
+  const filtered = activeCategory === "all" ? posts : posts.filter((p) => p.category.en.toLowerCase() === activeCategory);
+
+  const allLabel = lang === "ar" ? "الكل" : "All";
+
+  return (
+    <div className="space-y-3">
+      <div className="px-4 flex items-center gap-2">
+        <BookOpen className="w-4 h-4 text-primary" />
+        <h3 className="text-base font-bold text-foreground">
+          {lang === "ar" ? "مقالات ومنشورات" : "Posts & Articles"}
+        </h3>
+        <span className="text-xs text-muted-foreground">({posts.length})</span>
+      </div>
+
+      {/* Category Tabs */}
+      <div className="flex gap-2 px-4 overflow-x-auto hide-scrollbar">
+        <button
+          onClick={() => setActiveCategory("all")}
+          className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+            activeCategory === "all"
+              ? "bg-primary text-primary-foreground"
+              : "bg-secondary text-secondary-foreground"
+          }`}
+        >
+          {allLabel}
+        </button>
+        {categories.map((cat) => (
+          <button
+            key={cat.key}
+            onClick={() => setActiveCategory(cat.key)}
+            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+              activeCategory === cat.key
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground"
+            }`}
+          >
+            {cat.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Post Cards */}
+      <div className="px-4 space-y-3">
+        {filtered.map((post) => (
+          <article
+            key={post.id}
+            onClick={() => navigate(`/post/${post.id}`)}
+            className="flex gap-3 bg-card rounded-xl border border-border overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+          >
+            <img
+              src={post.image}
+              alt={post.title[lang]}
+              className="w-28 h-28 object-cover shrink-0"
+            />
+            <div className="flex-1 py-2.5 pr-3 flex flex-col justify-between min-w-0">
+              <div>
+                <span className="inline-block bg-primary/10 text-primary text-[10px] font-medium px-2 py-0.5 rounded-full mb-1.5">
+                  {post.category[lang]}
+                </span>
+                <h4 className="text-sm font-semibold text-foreground line-clamp-2 leading-snug">
+                  {post.title[lang]}
+                </h4>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-muted-foreground">{post.author[lang]}</span>
+                <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                  <Clock className="w-3 h-3" />
+                  {post.readTime} {lang === "ar" ? "د" : "min"}
+                </span>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 
         {/* Highlights */}
         <div className="px-4">
