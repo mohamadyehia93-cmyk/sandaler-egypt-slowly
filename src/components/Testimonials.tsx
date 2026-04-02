@@ -17,6 +17,7 @@ const testimonials = [
   {
     id: "t2",
     name: { en: "Ahmed K.", ar: "أحمد ك." },
+    visitorId: "ahmed-k",
     location: { en: "Dubai, UAE", ar: "دبي، الإمارات" },
     text: { en: "Cooking with Grandma Fatma in Rosetta was the highlight of my trip. Authentic, warm, unforgettable.", ar: "الطبخ مع جدة فاطمة في رشيد كان أجمل لحظات رحلتي. أصيل ودافئ ولا يُنسى." },
     rating: 5,
