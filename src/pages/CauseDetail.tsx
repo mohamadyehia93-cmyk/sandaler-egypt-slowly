@@ -2,6 +2,7 @@ import { ArrowLeft, Heart, Share2, Users, Calendar, MapPin, ExternalLink, Gift, 
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { causes, regions } from "@/lib/sampleData";
+import ProviderBioCard from "@/components/ProviderBioCard";
 import DetailTestimonials from "@/components/DetailTestimonials";
 
 const supportOptions = [
