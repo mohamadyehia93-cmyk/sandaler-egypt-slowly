@@ -4311,6 +4311,304 @@ export const latestPosts = [
       ar: "من الشروق إلى الغروب، تجربة إيقاعات الحياة اليومية في العريش."
     },
   },
+  // === MULTIMEDIA CONTENT ===
+  // Podcasts
+  {
+    id: "lp-pod1",
+    title: { en: "Voices of the Nile: Delta Fishermen", ar: "أصوات النيل: صيادو الدلتا" },
+    category: { en: "Culture", ar: "ثقافة" },
+    contentType: "podcast",
+    image: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "manzala",
+    author: { en: "Sara Khalil", ar: "سارة خليل" },
+    authorId: "ca3",
+    date: "2025-03-05",
+    readTime: 25,
+    body: {
+      en: "In this episode, we join three generations of fishermen on Lake Manzala at dawn. Hassan, 72, remembers when the lake stretched endlessly — before land reclamation shrank it to a third of its original size. His son Mahmoud navigates the channels between reed islands, while grandson Ahmed dreams of marine biology.\n\nThe sounds of the lake are mesmerizing: the rhythmic splash of oars, the call of herons, the creak of wooden boats. Through their voices, we hear a story of resilience, adaptation, and an unbreakable bond with water.\n\nFeaturing original field recordings from Lake Manzala, traditional fishing songs, and interviews with environmental researchers studying the lake's ecosystem.\n\nThis podcast was recorded over three dawn sessions in January 2025, capturing the authentic soundscape of one of the Mediterranean's most important wetlands.",
+      ar: "في هذه الحلقة، ننضم إلى ثلاثة أجيال من الصيادين على بحيرة المنزلة عند الفجر. حسن، ٧٢ عاماً، يتذكر حين كانت البحيرة تمتد بلا نهاية — قبل أن يقلص الاستصلاح مساحتها.\n\nابنه محمود يبحر بين جزر القصب، بينما حفيده أحمد يحلم ببيولوجيا البحار. أصوات البحيرة ساحرة: إيقاع المجاديف، نداء مالك الحزين، صرير القوارب الخشبية.\n\nيتضمن تسجيلات ميدانية أصلية وأغاني صيد تقليدية ومقابلات مع باحثين بيئيين.\n\nسُجل هذا البودكاست على مدار ثلاث جلسات فجرية في يناير ٢٠٢٥."
+    },
+  },
+  {
+    id: "lp-pod2",
+    title: { en: "The Spice Road: A Quseir Story", ar: "طريق البهارات: قصة القصير" },
+    category: { en: "History", ar: "تاريخ" },
+    contentType: "podcast",
+    image: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400&q=80",
+    regionId: "frontiers",
+    cityId: "quseir",
+    author: { en: "Omar Siwan", ar: "عمر السيوي" },
+    authorId: "ca6",
+    date: "2025-03-08",
+    readTime: 30,
+    body: {
+      en: "Quseir was once the Red Sea's busiest port — a gateway connecting Pharaonic Egypt to the spice lands of Arabia, India, and East Africa. In this two-part podcast, historian Dr. Laila Nassef walks us through the ancient port's ruins.\n\nWe explore the Ottoman fortress, the coral-stone merchant houses, and the 16th-century pilgrimage route to Mecca. Dr. Nassef reads from medieval Arabic trade manuscripts describing the cargoes: cinnamon from Ceylon, pepper from Malabar, frankincense from Somalia.\n\nToday, a handful of families still blend spices using recipes their ancestors brought back from these ancient trade routes. We visit the last traditional spice blender in Quseir's old souk.\n\nRecorded on location with ambient sounds from the old port, the souk, and the Red Sea shore.",
+      ar: "كانت القصير أكثر موانئ البحر الأحمر ازدحاماً — بوابة تربط مصر الفرعونية بأراضي البهارات في الجزيرة العربية والهند وشرق أفريقيا.\n\nفي هذا البودكاست، تأخذنا المؤرخة د. ليلى ناصف في جولة عبر أطلال الميناء القديم. نستكشف القلعة العثمانية وبيوت التجار المرجانية وطريق الحج إلى مكة.\n\nنزور آخر خلّاط بهارات تقليدي في سوق القصير القديم.\n\nمسجل في الموقع مع أصوات محيطة من الميناء القديم والسوق وشاطئ البحر الأحمر."
+    },
+  },
+  {
+    id: "lp-pod3",
+    title: { en: "Sufi Nights: Chanting in Desouk", ar: "ليالي صوفية: الإنشاد في دسوق" },
+    category: { en: "Culture", ar: "ثقافة" },
+    contentType: "podcast",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "desouk",
+    author: { en: "Sheikh Ibrahim", ar: "الشيخ إبراهيم" },
+    authorId: "ww15",
+    date: "2025-03-12",
+    readTime: 20,
+    body: {
+      en: "Every Thursday night, the Sufi circles gather near the shrine of Ibrahim El-Desouki. This audio journey captures the mesmerizing dhikr ceremonies — rhythmic chanting, tambourines, and the collective breathing that builds to a transcendent crescendo.\n\nSheikh Ibrahim, a 5th-generation munshid (chanter), explains the spiritual meaning behind each phrase and melody. 'Each repetition peels away a layer of the self,' he says.\n\nThe episode includes rare recordings of the hadra ceremony, interviews with young Sufis about why they continue the tradition, and reflections from visitors experiencing it for the first time.",
+      ar: "كل ليلة خميس، تجتمع الحلقات الصوفية قرب ضريح إبراهيم الدسوقي. هذه الرحلة الصوتية تلتقط حفلات الذكر المذهلة — الإنشاد الإيقاعي والدفوف والتنفس الجماعي.\n\nالشيخ إبراهيم، منشد من الجيل الخامس، يشرح المعنى الروحي وراء كل عبارة. 'كل تكرار يزيل طبقة من الذات'.\n\nتتضمن الحلقة تسجيلات نادرة لحفل الحضرة ومقابلات مع شباب صوفيين."
+    },
+  },
+  // Short Documentaries
+  {
+    id: "lp-doc1",
+    title: { en: "The Last Loom of Fuwwah", ar: "آخر نول في فوة" },
+    category: { en: "Culture", ar: "ثقافة" },
+    contentType: "documentary",
+    image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "fuwwah",
+    author: { en: "Hajja Karima", ar: "الحاجة كريمة" },
+    authorId: "ww13",
+    date: "2025-03-10",
+    readTime: 12,
+    body: {
+      en: "This 12-minute documentary follows Hajja Karima, Fuwwah's most celebrated kilim weaver, through a single day at her loom. At 70, she is one of fewer than 20 master weavers remaining in a town that once had thousands.\n\nThe film opens before dawn as Karima prepares her wool — sorting, spinning, and dyeing with natural pigments extracted from pomegranate skins and indigo plants. By mid-morning, the rhythmic clatter of her wooden loom fills the narrow workshop.\n\nEach kilim takes 2–3 weeks to complete. The geometric patterns are not drawn — they exist only in the weaver's memory, passed from mother to daughter. 'My patterns are my grandmother's dreams,' Karima says.\n\nThe documentary also profiles three young women Karima is training, exploring the tension between preserving tradition and making it economically viable in the modern era.\n\nShot over five days in January 2025. Directed by the Fuwwah Cultural Heritage Initiative.",
+      ar: "هذا الفيلم الوثائقي بمدة ١٢ دقيقة يتابع الحاجة كريمة، أشهر نساجة كليم في فوة، خلال يوم واحد على نولها. في السبعين من عمرها، هي واحدة من أقل من ٢٠ نساجة ماهرة متبقية.\n\nيبدأ الفيلم قبل الفجر مع تحضير كريمة للصوف — الفرز والغزل والصباغة بأصباغ طبيعية من قشور الرمان والنيلة.\n\nكل كليم يستغرق ٢-٣ أسابيع. الأنماط الهندسية غير مرسومة — تتواجد فقط في ذاكرة النساجة. 'أنماطي أحلام جدتي' تقول كريمة.\n\nيتناول الفيلم أيضاً ثلاث شابات تدربهن كريمة. صُوّر على مدار خمسة أيام."
+    },
+  },
+  {
+    id: "lp-doc2",
+    title: { en: "Salt of the Earth: Siwa's White Gold", ar: "ملح الأرض: ذهب سيوة الأبيض" },
+    category: { en: "Nature", ar: "طبيعة" },
+    contentType: "documentary",
+    image: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=400&q=80",
+    regionId: "frontiers",
+    cityId: "siwa",
+    author: { en: "Omar Siwan", ar: "عمر السيوي" },
+    authorId: "ca6",
+    date: "2025-03-15",
+    readTime: 18,
+    body: {
+      en: "Siwa Oasis sits atop one of the world's largest natural salt deposits. This 18-minute documentary explores the ancient salt lakes — Birket Siwa and Birket Zeitoun — where Berber families have harvested therapeutic salt for generations.\n\nThe film captures the surreal beauty of the salt lakes: crystalline formations that glow pink at sunset, salt islands that grow and reshape with the seasons, and the mirror-still waters that reflect the desert sky.\n\nWe follow Mohamed, a fourth-generation salt harvester, as he demonstrates the traditional extraction method: wading chest-deep into the brine to break salt slabs with wooden tools, then sun-drying them on palm-frond mats.\n\nThe documentary examines Siwa's emerging wellness tourism — salt therapy caves carved into natural formations — and the delicate balance between economic development and preserving the oasis ecosystem.\n\nNarrated by Dr. Amira Hashem, environmental geologist at Cairo University.",
+      ar: "تقع واحة سيوة فوق أحد أكبر رواسب الملح الطبيعية في العالم. هذا الفيلم الوثائقي يستكشف بحيرات الملح القديمة حيث حصدت عائلات أمازيغية الملح العلاجي لأجيال.\n\nيلتقط الفيلم الجمال السريالي: تكوينات بلورية تتوهج بالوردي عند الغروب، جزر ملح تنمو وتتشكل مع الفصول.\n\nnتابع محمد، حاصد ملح من الجيل الرابع. يستكشف الفيلم سياحة العافية الناشئة — كهوف العلاج بالملح — والتوازن الدقيق بين التنمية والحفاظ على النظام البيئي."
+    },
+  },
+  {
+    id: "lp-doc3",
+    title: { en: "Crossing Giants: Life at the Suez Canal", ar: "عبور العمالقة: الحياة عند قناة السويس" },
+    category: { en: "History", ar: "تاريخ" },
+    contentType: "documentary",
+    image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=400&q=80",
+    regionId: "suez-canal",
+    cityId: "port-said",
+    author: { en: "Captain Mahmoud", ar: "الكابتن محمود" },
+    authorId: "ca7",
+    date: "2025-03-18",
+    readTime: 15,
+    body: {
+      en: "Every day, over 50 massive container ships pass through the Suez Canal. This 15-minute documentary tells the story from the perspective of three people whose lives revolve around this engineering marvel.\n\nCaptain Mahmoud, a retired canal pilot, shares 40 years of stories — from guiding supertankers through the narrow Ballah Bypass to the day the Ever Given blocked the waterway. Umm Ahmed runs a tea stall on the canal bank where ship-watchers gather daily. And 12-year-old Nour dreams of becoming the first female canal pilot.\n\nThe film weaves archival footage of the canal's 1869 opening with contemporary scenes of the massive New Suez Canal expansion completed in 2015.\n\nFilmed across Port Said, Ismailia, and Suez over two weeks.",
+      ar: "كل يوم، أكثر من ٥٠ سفينة حاويات عملاقة تعبر قناة السويس. هذا الفيلم الوثائقي يروي القصة من منظور ثلاثة أشخاص تدور حياتهم حول هذه الأعجوبة الهندسية.\n\nالكابتن محمود يشارك ٤٠ عاماً من القصص. أم أحمد تدير كشك شاي على ضفة القناة. ونور، ١٢ عاماً، تحلم بأن تصبح أول مرشدة قناة.\n\nيمزج الفيلم لقطات أرشيفية لافتتاح القناة عام ١٨٦٩ مع مشاهد معاصرة لتوسعة القناة الجديدة."
+    },
+  },
+  // Photo Series
+  {
+    id: "lp-photo1",
+    title: { en: "Colors of Nubia: A Visual Journey", ar: "ألوان النوبة: رحلة بصرية" },
+    category: { en: "Culture", ar: "ثقافة" },
+    contentType: "photo-series",
+    image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "aswan",
+    author: { en: "Hana Sobhi", ar: "هنا صبحي" },
+    authorId: "ca5",
+    date: "2025-03-20",
+    readTime: 8,
+    body: {
+      en: "A collection of 24 photographs documenting the vivid architectural palette of Aswan's Nubian villages. Every house is a canvas — painted in electric blues, sunset oranges, lime greens, and deep magentas.\n\nThe series is organized by color family: the Blues (protection and spirituality), the Greens (the Nile's fertility), the Yellows and Oranges (sun and desert), and the Patterns (geometric murals that tell family stories).\n\nEach photograph is accompanied by a note from the homeowner explaining their color choices. 'I painted my door blue because my son went to sea,' explains Fatma, 68. 'Blue brings him home safely.'\n\nThe series also documents the mural painting process — how natural pigments are mixed and applied, and the communal tradition where neighbors gather to help repaint a house.\n\n📸 24 photographs | Shot on medium format film | January–February 2025",
+      ar: "مجموعة من ٢٤ صورة فوتوغرافية توثق لوحة الألوان المعمارية الزاهية للقرى النوبية في أسوان. كل منزل لوحة فنية.\n\nالسلسلة منظمة حسب عائلات الألوان: الأزرق (الحماية والروحانية)، الأخضر (خصوبة النيل)، الأصفر والبرتقالي (الشمس والصحراء)، والأنماط (جداريات هندسية تروي قصص العائلات).\n\nكل صورة مصحوبة بملاحظة من صاحب المنزل. 'طليت بابي أزرق لأن ابني ذهب للبحر' تقول فاطمة.\n\n📸 ٢٤ صورة | تصوير فيلم متوسط الحجم | يناير–فبراير ٢٠٢٥"
+    },
+  },
+  {
+    id: "lp-photo2",
+    title: { en: "Dawn Patrol: Fishermen of Rosetta", ar: "دورية الفجر: صيادو رشيد" },
+    category: { en: "Nature", ar: "طبيعة" },
+    contentType: "photo-series",
+    image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "rosetta",
+    author: { en: "Ahmed Mansour", ar: "أحمد منصور" },
+    authorId: "ca1",
+    date: "2025-03-22",
+    readTime: 6,
+    body: {
+      en: "This photo series follows Rosetta's fishing fleet from 4 AM departure to the morning market. The images capture the interplay of light and water — golden hour reflections on the Nile's surface, silhouetted boats against the pre-dawn sky, and the bustle of the fish auction.\n\nThe series documents the traditional 'markib' boats unique to Rosetta — flat-bottomed wooden craft designed for the shallow waters where the Nile meets the Mediterranean.\n\nKey moments: the casting of nets at first light, the sorting of the catch by species, and the animated bargaining at the riverside market where restaurateurs compete for the freshest fish.\n\n📸 18 photographs | Documentary photography | February 2025",
+      ar: "هذه السلسلة تتابع أسطول صيد رشيد من الانطلاق الساعة ٤ فجراً حتى سوق الصباح. الصور تلتقط تفاعل الضوء والماء — انعكاسات الساعة الذهبية على سطح النيل.\n\nتوثق السلسلة قوارب 'المركب' التقليدية الفريدة لرشيد — مراكب خشبية مسطحة القاع لمياه دلتا النيل الضحلة.\n\n📸 ١٨ صورة | تصوير وثائقي | فبراير ٢٠٢٥"
+    },
+  },
+  {
+    id: "lp-photo3",
+    title: { en: "Temples After Hours: Luxor at Night", ar: "المعابد بعد الإغلاق: الأقصر ليلاً" },
+    category: { en: "History", ar: "تاريخ" },
+    contentType: "photo-series",
+    image: "https://images.unsplash.com/photo-1568322445389-f64c5bb0df1d?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "luxor",
+    author: { en: "Mahmoud Rizk", ar: "محمود رزق" },
+    authorId: "ca4",
+    date: "2025-03-25",
+    readTime: 7,
+    body: {
+      en: "With special permission from the Ministry of Tourism, photographer Mahmoud Rizk spent three nights capturing Luxor's temples after closing time. The results are breathtaking — ancient columns lit only by moonlight, hieroglyphs casting shadows, and the Avenue of Sphinxes stretching into darkness.\n\nThe series includes Karnak Temple's Hypostyle Hall (photographed during a full moon), Luxor Temple's courtyard with its Ramesses II colossi, and Medinet Habu's rarely-seen night profile.\n\nLong-exposure techniques reveal details invisible to the daytime eye: star trails above the obelisks, the warm glow of village lights behind the temples, and the Nile's surface reflecting the ancient stones.\n\n📸 30 photographs | Long-exposure night photography | December 2024",
+      ar: "بتصريح خاص من وزارة السياحة، قضى المصور محمود رزق ثلاث ليالٍ في تصوير معابد الأقصر بعد الإغلاق. النتائج مذهلة — أعمدة قديمة مضاءة بضوء القمر فقط.\n\nتشمل السلسلة صالة الأعمدة الكبرى في الكرنك، وفناء معبد الأقصر، ومدينة هابو ليلاً.\n\nتقنيات التعريض الطويل تكشف تفاصيل خفية: مسارات النجوم فوق المسلات، توهج أضواء القرى خلف المعابد.\n\n📸 ٣٠ صورة | تصوير ليلي بتعريض طويل | ديسمبر ٢٠٢٤"
+    },
+  },
+  // Interviews
+  {
+    id: "lp-int1",
+    title: { en: "Meet the Master: Assiut's Silver Thread Artisan", ar: "لقاء مع الأستاذ: حرفي الخيط الفضي في أسيوط" },
+    category: { en: "Culture", ar: "ثقافة" },
+    contentType: "interview",
+    image: "https://images.unsplash.com/photo-1515562141589-67f0d569b6c4?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "assiut",
+    author: { en: "Hana Sobhi", ar: "هنا صبحي" },
+    authorId: "ca5",
+    date: "2025-03-28",
+    readTime: 10,
+    body: {
+      en: "Q: When did you start working with silver thread?\n\nA: I was seven years old. My father would give me scraps of mesh to practice on. By ten, I could hammer silver strips thin enough to thread through cotton mesh. I'm 63 now — that's 56 years of this work.\n\nQ: The 'Assiut net' became world-famous in the 1920s. What happened?\n\nA: European travelers discovered our shawls and took them back to Paris and London. Suddenly everyone wanted one. My grandfather exported hundreds. But after the 1950s, demand collapsed. Cheap machine-made imitations flooded the market.\n\nQ: How many artisans are left?\n\nA: In my grandfather's time, there were over 200 workshops in Assiut. Now there are perhaps 15. Most young people don't want to spend six months hammering silver for what they can earn in a week driving a taxi.\n\nQ: What gives you hope?\n\nA: The internet. Young designers are discovering our work and creating modern pieces using traditional techniques. Last year, a fashion house in Milan used our mesh in their collection. My granddaughter is studying design — she wants to bring this craft into the 21st century.",
+      ar: "س: متى بدأت العمل بالخيط الفضي؟\n\nج: كنت في السابعة. أبي كان يعطيني قصاصات شبك للتمرين. في العاشرة كنت أطرق شرائح الفضة رقيقة بما يكفي. عمري ٦٣ الآن — ٥٦ عاماً في هذا العمل.\n\nس: شبكة أسيوط أصبحت شهيرة عالمياً في العشرينيات. ماذا حدث؟\n\nج: المسافرون الأوروبيون اكتشفوا شالاتنا وأخذوها لباريس ولندن. فجأة الجميع أرادها. لكن بعد الخمسينيات انهار الطلب.\n\nس: كم حرفياً متبقٍ؟\n\nج: في زمن جدي كان هناك أكثر من ٢٠٠ ورشة. الآن ربما ١٥.\n\nس: ما الذي يمنحك الأمل؟\n\nج: الإنترنت. مصممون شباب يكتشفون عملنا. حفيدتي تدرس التصميم — تريد إحياء هذه الحرفة في القرن الحادي والعشرين."
+    },
+  },
+  {
+    id: "lp-int2",
+    title: { en: "Desert Wisdom: A Siwan Elder Speaks", ar: "حكمة الصحراء: حديث شيخ سيوي" },
+    category: { en: "Culture", ar: "ثقافة" },
+    contentType: "interview",
+    image: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=400&q=80",
+    regionId: "frontiers",
+    cityId: "siwa",
+    author: { en: "Omar Siwan", ar: "عمر السيوي" },
+    authorId: "ca6",
+    date: "2025-03-30",
+    readTime: 12,
+    body: {
+      en: "Sheikh Suleiman is 89 years old and one of Siwa's last speakers of the ancient Siwi Berber language. In this intimate interview conducted partly in Siwi and partly in Arabic, he shares memories of a vanishing world.\n\nQ: What was Siwa like when you were young?\n\nA: There were no cars, no electricity. We lived inside the fortress of Shali. At night, the only light was oil lamps and stars. The stars in Siwa — you cannot imagine. The sky was white with them.\n\nQ: What do you want the world to know about Siwa?\n\nA: That we are not Arab, not Egyptian in the way Cairo is. We are Amazigh — free people. Our language, our food, our music — it all comes from a different root. When I die, part of that root dies with me. That's why I talk to young people. I tell them: your language is your identity. Don't let it become sand.\n\nQ: What's your favorite Siwan tradition?\n\nA: The Tagella bread. Women bake it underground in the sand, covered with embers. It takes four hours. When you break it open, the smell — it's the smell of Siwa itself.",
+      ar: "الشيخ سليمان عمره ٨٩ عاماً وأحد آخر المتحدثين بلغة سيوة الأمازيغية القديمة.\n\nس: كيف كانت سيوة حين كنت صغيراً؟\n\nج: لم تكن هناك سيارات ولا كهرباء. عشنا داخل قلعة شالي. في الليل، الضوء الوحيد كان مصابيح الزيت والنجوم.\n\nس: ماذا تريد أن يعرف العالم عن سيوة؟\n\nج: أننا أمازيغ — أحرار. لغتنا وطعامنا وموسيقانا كلها من جذر مختلف. عندما أموت، جزء من ذلك الجذر يموت معي.\n\nس: ما تقليدك السيوي المفضل؟\n\nج: خبز التاڨلا. النساء يخبزنه تحت الأرض في الرمل مغطى بالجمر. يستغرق أربع ساعات. حين تكسره، الرائحة — رائحة سيوة نفسها."
+    },
+  },
+  // Recipe Videos
+  {
+    id: "lp-recipe1",
+    title: { en: "Recipe: Authentic Damietta Sayadeya", ar: "وصفة: صيادية دمياط الأصلية" },
+    category: { en: "Food", ar: "طعام" },
+    contentType: "recipe-video",
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "damietta",
+    author: { en: "Nour El-Din", ar: "نور الدين" },
+    authorId: "ca2",
+    date: "2025-04-01",
+    readTime: 8,
+    body: {
+      en: "Teta Fatma's legendary sayadeya recipe, filmed step-by-step in her Damietta kitchen. This spiced fish and rice dish is the crown jewel of delta cuisine.\n\nIngredients:\n• 1 kg fresh Nile mullet (bouri), cleaned\n• 3 large onions, thinly sliced\n• 2 cups Egyptian rice\n• 1 tbsp cumin, 1 tsp coriander, ½ tsp turmeric\n• 4 cloves garlic, crushed\n• Fish stock from boiling the fish heads\n• Salt, pepper, and dried lime (loomi)\n\nMethod:\n1. Boil the fish in seasoned water with onion, bay leaf, and cardamom. Reserve the stock.\n2. Slowly caramelize three onions in oil until deep golden — this is the secret to Damietta sayadeya.\n3. Add spices, then rice, then the fish stock. Layer the fish on top.\n4. Cover and cook on low heat for 25 minutes.\n5. Flip onto a platter so the caramelized onion layer crowns the dish.\n\n'The patience with the onions — that's the whole recipe,' says Teta Fatma. 'Thirty minutes minimum. Most people give up at ten.'\n\n🎥 Full video: 8 minutes | Filmed in Rosetta, January 2025",
+      ar: "وصفة الصيادية الأسطورية لتيتا فاطمة، مصورة خطوة بخطوة في مطبخها بدمياط.\n\nالمكونات:\n• ١ كجم بوري نيلي طازج\n• ٣ بصلات كبيرة مقطعة شرائح رفيعة\n• ٢ كوب أرز مصري\n• ١ ملعقة كمون، ١ ملعقة كزبرة، ½ ملعقة كركم\n\nالطريقة:\n١. اسلقي السمك في ماء متبل. احتفظي بالمرق.\n٢. حمّري البصل ببطء حتى يصبح ذهبياً غامقاً.\n٣. أضيفي البهارات ثم الأرز ثم المرق.\n٤. غطي واطبخي على نار هادئة ٢٥ دقيقة.\n\n'الصبر مع البصل — هو كل الوصفة' تقول تيتا فاطمة.\n\n🎥 فيديو كامل: ٨ دقائق"
+    },
+  },
+  {
+    id: "lp-recipe2",
+    title: { en: "Recipe: Siwan Tagella Bread", ar: "وصفة: خبز التاڨلا السيوي" },
+    category: { en: "Food", ar: "طعام" },
+    contentType: "recipe-video",
+    image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&q=80",
+    regionId: "frontiers",
+    cityId: "siwa",
+    author: { en: "Omar Siwan", ar: "عمر السيوي" },
+    authorId: "ca6",
+    date: "2025-04-02",
+    readTime: 10,
+    body: {
+      en: "Tagella is Siwa's ancient Berber bread — baked underground in hot sand and embers. This recipe video was filmed in a traditional Siwan home with Amina, who has baked tagella for 40 years.\n\nIngredients:\n• 4 cups whole wheat flour (Siwan ground)\n• 1 cup warm water\n• 1 tsp salt\n• Olive oil (Siwan cold-pressed)\n• Hot sand and wood embers\n\nMethod:\n1. Mix flour, salt, and water into a firm dough. Knead for 15 minutes.\n2. Shape into a thick disc, about 3 cm tall.\n3. Dig a shallow pit in clean sand. Build a fire and let it burn to embers.\n4. Push embers aside, place the dough on the hot sand, cover with more sand and embers.\n5. Bake for 3–4 hours. The sand creates a natural crust.\n6. Brush off all sand. Crack open to reveal soft, smoky bread inside.\n\nServe with Siwan olive oil and date honey. The contrast of the crusty exterior and tender, smoke-infused interior is unlike any bread you've tasted.\n\n🎥 Full video: 10 minutes | Filmed in Siwa Oasis, February 2025",
+      ar: "التاڨلا خبز سيوة الأمازيغي القديم — يُخبز تحت الأرض في الرمل الحار والجمر.\n\nالمكونات:\n• ٤ أكواب دقيق قمح كامل\n• ١ كوب ماء دافئ\n• ١ ملعقة ملح\n• زيت زيتون سيوي\n\nالطريقة:\n١. اعجني الدقيق والملح والماء لمدة ١٥ دقيقة.\n٢. شكلي قرصاً سميكاً.\n٣. احفري حفرة ضحلة في رمل نظيف. أشعلي ناراً واتركيها تصبح جمراً.\n٤. ضعي العجين على الرمل الحار، غطيه بالرمل والجمر.\n٥. اخبزي ٣-٤ ساعات.\n\nقدمي مع زيت زيتون سيوي وعسل التمر.\n\n🎥 فيديو كامل: ١٠ دقائق"
+    },
+  },
+  // Field Reports
+  {
+    id: "lp-field1",
+    title: { en: "Field Report: Coral Restoration in Hurghada", ar: "تقرير ميداني: استعادة المرجان في الغردقة" },
+    category: { en: "Nature", ar: "طبيعة" },
+    contentType: "field-report",
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&q=80",
+    regionId: "frontiers",
+    cityId: "hurghada",
+    author: { en: "Travel Writer", ar: "كاتب رحلات" },
+    authorId: "ca4",
+    date: "2025-04-03",
+    readTime: 9,
+    body: {
+      en: "LOCATION: Hurghada Marine Research Station\nDATE: March 2025\nSTATUS: Ongoing — Phase 2 of 3\n\nThe Red Sea's coral reefs are among the most biodiverse marine ecosystems on Earth. But rising sea temperatures and overtourism have damaged significant portions of the reef system near Hurghada.\n\nThis field report documents the work of the Hurghada Environmental Protection and Conservation Association (HEPCA) and their ambitious coral nursery program.\n\nKey Findings:\n• 3,200 coral fragments have been successfully transplanted to degraded reef areas\n• Survival rate: 78% after 12 months (above the 65% global average)\n• Species focus: Acropora and Pocillopora — fast-growing branching corals\n• Local dive operators are trained as volunteer reef monitors\n\nThe program employs 15 marine biologists and has trained over 200 local divers in coral monitoring techniques. Revenue from eco-diving tours funds the ongoing research.\n\nNext steps: Phase 3 will expand to the offshore islands of Giftun, where pristine reef sections serve as genetic source material for nursery propagation.",
+      ar: "الموقع: محطة أبحاث الغردقة البحرية\nالتاريخ: مارس ٢٠٢٥\nالحالة: مستمر — المرحلة ٢ من ٣\n\nالشعاب المرجانية للبحر الأحمر من أكثر النظم البحرية تنوعاً. لكن ارتفاع درجات الحرارة والسياحة المفرطة أضرت بأجزاء كبيرة.\n\nنتائج رئيسية:\n• ٣,٢٠٠ شظية مرجانية تم زرعها بنجاح\n• معدل البقاء: ٧٨٪ بعد ١٢ شهراً\n• التركيز على أنواع سريعة النمو\n• تدريب مشغلي الغوص المحليين كمراقبين متطوعين"
+    },
+  },
+  {
+    id: "lp-field2",
+    title: { en: "Field Report: Saving Fayoum's Water Wheels", ar: "تقرير ميداني: إنقاذ سواقي الفيوم" },
+    category: { en: "History", ar: "تاريخ" },
+    contentType: "field-report",
+    image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "fayoum",
+    author: { en: "Mahmoud Rizk", ar: "محمود رزق" },
+    authorId: "ca4",
+    date: "2025-04-04",
+    readTime: 7,
+    body: {
+      en: "LOCATION: Fayoum, multiple sites\nDATE: February 2025\nSTATUS: Critical — urgent restoration needed\n\nFayoum's iconic water wheels (saqiyas) have turned for over 2,000 years, channeling water from Bahr Youssef into the oasis farmlands. Of the 200+ wheels documented in the 1950s, fewer than 40 remain operational.\n\nThis field report surveys the current state of Fayoum's water wheels and the grassroots effort to preserve them.\n\nKey Findings:\n• 37 water wheels confirmed operational (down from 42 last year)\n• Primary threats: canal modernization replacing wheels with pumps, wood rot, and neglect\n• The distinctive creaking sound of the wheels — once Fayoum's ambient soundtrack — is fading\n• UNESCO tentative list application submitted in 2024\n\nThe Fayoum Heritage Foundation has restored 5 wheels using traditional carpentry techniques, sourcing sycamore wood from local farms. Each restoration costs approximately 50,000 EGP and takes three weeks.\n\nRecommendation: Urgent mapping and documentation of all remaining wheels before more are lost.",
+      ar: "الموقع: الفيوم، مواقع متعددة\nالتاريخ: فبراير ٢٠٢٥\nالحالة: حرجة — ترميم عاجل مطلوب\n\nسواقي الفيوم الشهيرة تدور منذ أكثر من ٢٠٠٠ عام. من أكثر من ٢٠٠ ساقية موثقة في الخمسينيات، أقل من ٤٠ لا تزال تعمل.\n\nنتائج رئيسية:\n• ٣٧ ساقية مؤكدة العمل (انخفاض من ٤٢ العام الماضي)\n• التهديدات: تحديث القنوات، تعفن الخشب، والإهمال\n• تم تقديم طلب لقائمة اليونسكو المؤقتة في ٢٠٢٤\n\nمؤسسة الفيوم التراثية رممت ٥ سواقي بتقنيات نجارة تقليدية."
+    },
+  },
+  // Walking Tour Guides
+  {
+    id: "lp-walk1",
+    title: { en: "Walking Guide: Islamic Rosetta in 3 Hours", ar: "دليل المشي: رشيد الإسلامية في ٣ ساعات" },
+    category: { en: "History", ar: "تاريخ" },
+    contentType: "walking-guide",
+    image: "https://images.unsplash.com/photo-1568322445389-f64c5bb0df1d?w=400&q=80",
+    regionId: "nile-delta",
+    cityId: "rosetta",
+    author: { en: "Ahmed Mansour", ar: "أحمد منصور" },
+    authorId: "ca1",
+    date: "2025-04-05",
+    readTime: 15,
+    body: {
+      en: "A self-guided walking tour through Rosetta's remarkable collection of Ottoman-era merchant houses — the largest concentration of Islamic domestic architecture in Egypt outside Cairo.\n\n🚶 Distance: 2.5 km | Duration: 3 hours | Difficulty: Easy\n\nStop 1: Beit El-Amasyali (Start)\nThis 17th-century merchant house features Rosetta's signature style: red and black brick facades with intricate mashrabiya windows. Note the Chinese porcelain plates embedded in the walls — a status symbol of wealthy delta traders.\n\nStop 2: Beit Killi\nThe finest example of Rosetta's delta baroque. Three stories tall with a rooftop terrace overlooking the Nile. The carved wooden ceilings inside are museum-quality.\n\nStop 3: The Hammam\nOne of Egypt's last surviving Ottoman public baths, recently restored. The domed roof with its star-shaped glass openings creates an ethereal interior light.\n\nStop 4: Abu Shaheen Mosque\nA stunning Ottoman mosque with a painted wooden ceiling and Nilometer used to measure the annual flood.\n\nStop 5: The Rashid National Museum\nHoused in a restored merchant house. Don't miss the replica of the Rosetta Stone — the original is in the British Museum, but this is where it was found in 1799.\n\n🗺️ GPS coordinates and offline map available for download",
+      ar: "جولة مشي ذاتية التوجيه عبر مجموعة رشيد الرائعة من البيوت العثمانية — أكبر تجمع للعمارة الإسلامية المنزلية في مصر خارج القاهرة.\n\n🚶 المسافة: ٢.٥ كم | المدة: ٣ ساعات | الصعوبة: سهل\n\nمحطة ١: بيت الأمصيلي\nبيت تاجر من القرن ١٧ بنمط رشيد المميز: واجهات طوب أحمر وأسود مع مشربيات.\n\nمحطة ٢: بيت كيللي\nأفضل مثال لباروك الدلتا. ثلاثة طوابق مع تراس يطل على النيل.\n\nمحطة ٣: الحمام\nأحد آخر الحمامات العثمانية العامة في مصر.\n\nمحطة ٤: مسجد أبو شاهين\nمسجد عثماني مذهل بسقف خشبي ملون ومقياس للنيل.\n\nمحطة ٥: متحف رشيد الوطني\nلا تفوت نسخة حجر رشيد."
+    },
+  },
+  // Mini-Documentary (Cultural Practice)
+  {
+    id: "lp-doc4",
+    title: { en: "The Potters of Qena: Fire and Earth", ar: "فخاريو قنا: النار والتراب" },
+    category: { en: "Culture", ar: "ثقافة" },
+    contentType: "documentary",
+    image: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=400&q=80",
+    regionId: "upper-egypt",
+    cityId: "qena",
+    author: { en: "Hana Sobhi", ar: "هنا صبحي" },
+    authorId: "ca5",
+    date: "2025-04-05",
+    readTime: 14,
+    body: {
+      en: "Qena has been Egypt's pottery capital for over 5,000 years. This 14-minute documentary visits the village of El-Ballas, where almost every family is involved in the pottery trade.\n\nThe film follows the complete lifecycle of a 'qulla' — the iconic Egyptian water jug that keeps water cool through evaporation. From digging Nile clay, to hand-shaping on kick wheels, to firing in massive communal kilns that glow orange through the night.\n\nMaster potter Hajj Mustafa, 75, demonstrates how to judge clay quality by taste — a technique as old as the pyramids. 'Sweet clay makes strong pots,' he says, placing a pinch on his tongue.\n\nThe documentary also addresses the crisis facing traditional potters: plastic water bottles and refrigerators have decimated demand for the qulla. But a new generation is finding customers through social media and eco-conscious consumers.\n\nFilmed over one week in El-Ballas village, Qena Governorate.",
+      ar: "قنا عاصمة الفخار في مصر منذ أكثر من ٥٠٠٠ عام. هذا الفيلم يزور قرية البلاص حيث كل عائلة تقريباً تعمل في الفخار.\n\nيتابع الفيلم دورة حياة كاملة لـ'القُلة' — إبريق الماء المصري الشهير. من حفر طين النيل إلى التشكيل اليدوي إلى الحرق في أفران جماعية ضخمة.\n\nالحاج مصطفى، ٧٥ عاماً، يوضح كيف يحكم على جودة الطين بالتذوق. 'الطين الحلو يصنع أوانٍ قوية'.\n\nيتناول الفيلم أيضاً أزمة الفخاريين التقليديين ولكن جيلاً جديداً يجد زبائن عبر وسائل التواصل الاجتماعي."
+    },
+  },
 ];
 
 export const whosWho = [
