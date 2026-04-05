@@ -74,10 +74,12 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <I18nProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
+        <UserRoleProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <RouteGuard>
+              <Routes>
             <Route path="/welcome" element={<Splash />} />
             <Route path="/" element={<Index />} />
             <Route path="/calendar" element={<EventCalendar />} />
