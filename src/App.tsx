@@ -141,7 +141,9 @@ const App = () => (
             <Route path="/dashboard/subject-expert" element={<SubjectExpertDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </RouteGuard>
         </BrowserRouter>
+        </UserRoleProvider>
       </I18nProvider>
     </TooltipProvider>
   </QueryClientProvider>
