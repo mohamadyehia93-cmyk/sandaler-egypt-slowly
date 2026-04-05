@@ -11,7 +11,30 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { format, isSameDay } from "date-fns";
+import { format } from "date-fns";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+const cityCoordinates: Record<string, [number, number]> = {
+  damietta: [31.4175, 31.8144], rosetta: [31.404, 30.4164], ismailia: [30.5965, 32.2715],
+  "port-said": [31.2565, 32.2841], aswan: [24.0889, 32.8998], siwa: [29.2032, 25.5195],
+  dahab: [28.5091, 34.5131], manzala: [31.1617, 32.0417], mansoura: [31.0409, 31.3785],
+  tanta: [30.7865, 31.0004], "el-mahalla": [30.9697, 31.1667], fuwwah: [31.2039, 30.5514],
+  desouk: [31.1312, 30.6463], bilbeis: [30.4214, 31.5614], suez: [29.9668, 32.5498],
+  luxor: [25.6872, 32.6396], edfu: [24.978, 32.8734], esna: [25.2917, 32.5556],
+  sohag: [26.5591, 31.6948], qena: [26.155, 32.7269], assiut: [27.1783, 31.1859],
+  minya: [28.0871, 30.7618], fayoum: [29.3084, 30.8428], "marsa-alam": [25.0667, 34.9],
+  hurghada: [27.2579, 33.8116], quseir: [26.1, 34.2833], "marsa-matrouh": [31.3543, 27.2373],
+  "el-arish": [31.1313, 33.7981],
+};
+
+const markerIcon = new L.Icon({
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41],
+});
 
 const AccommodationDetail = () => {
   const { id } = useParams();
@@ -162,6 +185,27 @@ const AccommodationDetail = () => {
             </div>
           ))}
         </div>
+
+        {/* Location Map */}
+        {(place as any).cityId && cityCoordinates[(place as any).cityId] && (
+          <>
+            <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "الموقع" : "Location"}</h2>
+            <div className="rounded-xl overflow-hidden border border-border shadow-card mb-6" style={{ height: 200 }}>
+              <MapContainer
+                center={cityCoordinates[(place as any).cityId]}
+                zoom={13}
+                scrollWheelZoom={false}
+                style={{ height: "100%", width: "100%" }}
+                attributionControl={false}
+              >
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <Marker position={cityCoordinates[(place as any).cityId]} icon={markerIcon}>
+                  <Popup>{place.title[lang]}<br /><span className="text-xs text-muted-foreground">{place.location[lang]}</span></Popup>
+                </Marker>
+              </MapContainer>
+            </div>
+          </>
+        )}
 
         {/* Testimonials */}
         <DetailTestimonials />
