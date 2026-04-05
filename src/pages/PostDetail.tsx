@@ -294,6 +294,55 @@ const PostDetail = () => {
         ))}
       </article>
 
+      {/* Author Bio Section */}
+      {(() => {
+        const actor = cultureActors.find((a) => a.id === post.authorId);
+        if (!actor) return null;
+        return (
+          <div className="mx-4 mt-6 rounded-xl bg-card border border-border p-4 shadow-sm">
+            <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">
+              {lang === "ar" ? "عن الكاتب" : "About the Author"}
+            </h2>
+            <div className="flex items-start gap-3">
+              <img
+                src={actor.image}
+                alt={actor.name[lang]}
+                className="w-14 h-14 rounded-full object-cover flex-shrink-0 border-2 border-primary/20 cursor-pointer"
+                onClick={() => navigate(`/culture-actor/${actor.id}`)}
+              />
+              <div className="flex-1 min-w-0">
+                <p
+                  className="text-sm font-bold text-foreground cursor-pointer hover:text-primary transition-colors"
+                  onClick={() => navigate(`/culture-actor/${actor.id}`)}
+                >
+                  {actor.name[lang]}
+                </p>
+                <p className="text-[11px] text-primary font-medium">{actor.title[lang]}</p>
+                <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed line-clamp-3">{actor.bio[lang]}</p>
+                {actor.expertise && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {actor.expertise[lang].slice(0, 3).map((tag, i) => (
+                      <span key={i} className="text-[9px] bg-primary/10 text-primary font-medium px-1.5 py-0.5 rounded-full">{tag}</span>
+                    ))}
+                  </div>
+                )}
+                {actor.quote && (
+                  <p className="text-[11px] italic text-muted-foreground mt-2 border-s-2 border-primary/30 ps-2">
+                    "{actor.quote[lang]}"
+                  </p>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={() => navigate(`/culture-actor/${actor.id}`)}
+              className="w-full mt-3 text-xs font-semibold text-primary bg-primary/10 hover:bg-primary/15 rounded-lg py-2 transition-colors"
+            >
+              {lang === "ar" ? "عرض الملف الشخصي" : "View Full Profile"}
+            </button>
+          </div>
+        );
+      })()}
+
       {/* Related Posts */}
       {relatedPosts.length > 0 && (
         <div className="mt-8 px-4">
