@@ -22,7 +22,7 @@ const LatestPosts = () => {
   const navigate = useNavigate();
 
   return (
-    <SectionHeader titleKey="section.latestPosts" onSeeAll={() => {}}>
+    <SectionHeader titleKey="section.latestPosts" onSeeAll={() => navigate("/posts")}>
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {latestPosts.map((p) => {
           const ct = (p as any).contentType ? contentTypeConfig[(p as any).contentType] : null;
