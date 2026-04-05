@@ -54,6 +54,7 @@ import NewFlagReport from "./pages/dashboards/NewFlagReport.tsx";
 import NewCollection from "./pages/dashboards/NewCollection.tsx";
 import Community from "./pages/Community.tsx";
 import AllPosts from "./pages/AllPosts.tsx";
+import AllAudioTours from "./pages/AllAudioTours.tsx";
 import VisitorProfile from "./pages/VisitorProfile.tsx";
 // Provider Management Pages
 import MyContent from "./pages/dashboards/MyContent.tsx";
@@ -79,6 +80,7 @@ const App = () => (
             <Route path="/calendar" element={<EventCalendar />} />
             <Route path="/experience/:id" element={<ExperienceDetail />} />
             <Route path="/trip/:id" element={<TripDetail />} />
+            <Route path="/audio-tours" element={<AllAudioTours />} />
             <Route path="/audio-tour/:id" element={<AudioTourDetail />} />
             <Route path="/cause/:id" element={<CauseDetail />} />
             <Route path="/cause/:id/gift" element={<CauseSupportGift />} />
