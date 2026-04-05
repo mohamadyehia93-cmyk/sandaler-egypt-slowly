@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useUserRole, type UserRole } from "@/hooks/useUserRole";
 import { User, Pen, Briefcase, Home, Truck, Map, ShoppingBag, Building2, Shield, ArrowLeft, ArrowRight, MapPin, Compass, Headphones, Heart, UtensilsCrossed, Camera, Music, Palette, Check, BookOpen, Mic, Landmark, Wheat, Tent, Car, Bus, Ship, Package, Gem, Leaf, GraduationCap, Users, HandHeart, Eye } from "lucide-react";
 import { regions, regionCities } from "@/lib/sampleData";
 
