@@ -9,8 +9,8 @@ export const experienceToProvider: Record<string, string> = {
 
 // Accommodation → Host
 export const accommodationToProvider: Record<string, string> = {
-  a1: "p3", a2: "p3", a3: "p3", a4: "p3", a5: "p3",
-  a6: "p3", a7: "p3", a8: "p3", a9: "p3", a10: "p3",
+  ac1: "p3", ac2: "p3", ac3: "p3", ac4: "p3", ac5: "p3",
+  ac6: "p3", ac7: "p3", ac8: "p3", ac9: "p3", ac10: "p3",
 };
 
 // Trip → Trip Organizer
