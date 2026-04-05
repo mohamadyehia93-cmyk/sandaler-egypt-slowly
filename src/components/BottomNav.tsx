@@ -1,24 +1,35 @@
-import { Compass, Heart, MessageCircle, User } from "lucide-react";
+import { Compass, Heart, MessageCircle, User, LayoutDashboard } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useUserRole } from "@/hooks/useUserRole";
 
-const tabs = [
-  { key: "explore", icon: Compass, labelKey: "nav.explore", path: "/" },
-  { key: "wishlists", icon: Heart, labelKey: "nav.wishlists", path: "/wishlists" },
-  { key: "inbox", icon: MessageCircle, labelKey: "nav.inbox", path: "/inbox" },
-  { key: "profile", icon: User, labelKey: "nav.profile", path: "/profile" },
+const visitorTabs = [
+  { key: "explore", icon: Compass, labelEn: "Explore", labelAr: "استكشف", path: "/" },
+  { key: "wishlists", icon: Heart, labelEn: "Wishlists", labelAr: "المفضلة", path: "/wishlists" },
+  { key: "inbox", icon: MessageCircle, labelEn: "Inbox", labelAr: "الرسائل", path: "/inbox" },
+  { key: "profile", icon: User, labelEn: "Profile", labelAr: "الملف", path: "/profile" },
+];
+
+const providerTabs = (dashboardPath: string) => [
+  { key: "dashboard", icon: LayoutDashboard, labelEn: "Dashboard", labelAr: "لوحة التحكم", path: dashboardPath },
+  { key: "inbox", icon: MessageCircle, labelEn: "Inbox", labelAr: "الرسائل", path: "/inbox" },
+  { key: "profile", icon: User, labelEn: "Profile", labelAr: "الملف", path: "/profile" },
 ];
 
 const BottomNav = () => {
-  const { t } = useI18n();
+  const { lang } = useI18n();
   const location = useLocation();
   const navigate = useNavigate();
+  const { isProvider, isVisitorMode, dashboardPath } = useUserRole();
+
+  const showProviderNav = isProvider && !isVisitorMode;
+  const tabs = showProviderNav && dashboardPath ? providerTabs(dashboardPath) : visitorTabs;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-primary shadow-elevated safe-bottom">
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
-        {tabs.map(({ key, icon: Icon, labelKey, path }) => {
-          const active = location.pathname === path;
+        {tabs.map(({ key, icon: Icon, labelEn, labelAr, path }) => {
+          const active = location.pathname === path || (key === "dashboard" && location.pathname.startsWith("/dashboard"));
           return (
             <button
               key={key}
@@ -28,7 +39,7 @@ const BottomNav = () => {
               }`}
             >
               <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 1.8} />
-              <span className="text-[10px] font-medium">{t(labelKey)}</span>
+              <span className="text-[10px] font-medium">{lang === "ar" ? labelAr : labelEn}</span>
             </button>
           );
         })}
