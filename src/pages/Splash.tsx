@@ -265,10 +265,9 @@ const SplashPage = () => {
   };
 
   const handleFinish = () => {
-    const route = selectedRole && selectedRole !== "visitor" && selectedRole !== "local" 
-      ? roleRoutMap[selectedRole] || "/" 
-      : "/";
-    localStorage.setItem("sandal-role", selectedRole || "visitor");
+    const mappedRole = selectedRole ? (onboardingToUserRole[selectedRole] || "visitor") : "visitor";
+    setRole(mappedRole);
+    const route = mappedRole !== "visitor" ? (roleRoutMap[mappedRole] || "/") : "/";
     navigate(route);
   };
   const handleGuestMode = () => navigate("/");
