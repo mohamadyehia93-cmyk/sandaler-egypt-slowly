@@ -1,10 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Star, MapPin, Users, Clock, DoorOpen, Heart, Check, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Star, MapPin, Users, Clock, DoorOpen, Heart, Check, ShoppingCart, CalendarCheck } from "lucide-react";
 import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
 import { accommodation, hosts } from "@/lib/sampleData";
 import { accommodationToProvider } from "@/lib/providerMappings";
 import ProviderBioCard from "@/components/ProviderBioCard";
+import DetailTestimonials from "@/components/DetailTestimonials";
 
 const AccommodationDetail = () => {
   const { id } = useParams();
@@ -54,8 +55,29 @@ const AccommodationDetail = () => {
         <ProviderBioCard providerId={accommodationToProvider[place.id]} roleLabel={{ en: "Your Host", ar: "مضيفك" }} />
 
         {/* Description */}
-        <h2 className="text-base font-bold text-primary-dark mb-2">{lang === "ar" ? "عن المكان" : "About This Place"}</h2>
+        <h2 className="text-base font-bold text-primary-dark mb-2 mt-6">{lang === "ar" ? "عن المكان" : "About This Place"}</h2>
         <p className="text-sm text-foreground leading-relaxed mb-5">{place.description[lang]}</p>
+
+        {/* Availability */}
+        <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "التوافر" : "Availability"}</h2>
+        <div className="grid grid-cols-2 gap-2 mb-5">
+          {[
+            { label: lang === "ar" ? "اليوم" : "Today", status: "available" },
+            { label: lang === "ar" ? "غداً" : "Tomorrow", status: "available" },
+            { label: lang === "ar" ? "نهاية الأسبوع" : "This Weekend", status: "limited" },
+            { label: lang === "ar" ? "الأسبوع القادم" : "Next Week", status: "available" },
+          ].map((slot, i) => (
+            <div key={i} className="flex items-center gap-2 p-2.5 rounded-lg bg-surface border border-border">
+              <CalendarCheck className={`w-3.5 h-3.5 flex-shrink-0 ${slot.status === "available" ? "text-green-500" : "text-amber-500"}`} />
+              <div>
+                <span className="text-xs font-medium text-foreground block">{slot.label}</span>
+                <span className={`text-[10px] font-medium ${slot.status === "available" ? "text-green-600" : "text-amber-600"}`}>
+                  {slot.status === "available" ? (lang === "ar" ? "متاح" : "Available") : (lang === "ar" ? "محدود" : "Limited")}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
 
         {/* Amenities */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "المرافق والخدمات" : "What's Included"}</h2>
@@ -83,6 +105,9 @@ const AccommodationDetail = () => {
             </div>
           ))}
         </div>
+
+        {/* Testimonials */}
+        <DetailTestimonials />
       </div>
 
       {/* Sticky Bottom */}
