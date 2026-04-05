@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, Plus, Users, Heart, Calendar, TrendingUp, CheckCircle, ChevronRight } from "lucide-react";
+import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 
 const OrganizationDashboard = () => {
   const { lang } = useI18n();
@@ -25,7 +26,10 @@ const OrganizationDashboard = () => {
       <header className="bg-role-organization text-white px-4 py-4">
         <div className="flex items-center justify-between mb-3">
           <button onClick={() => navigate("/profile")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-          <button onClick={() => navigate("/inbox")} className="relative p-1"><Bell className="w-5 h-5" /></button>
+          <div className="flex items-center gap-2">
+            <VisitorModeHeaderToggle />
+            <button onClick={() => navigate("/inbox")} className="relative p-1"><Bell className="w-5 h-5" /></button>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl">🏛️</div>

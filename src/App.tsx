@@ -4,6 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/lib/i18n";
+import { UserRoleProvider } from "@/hooks/useUserRole";
+import RouteGuard from "@/components/RouteGuard";
 import Index from "./pages/Index.tsx";
 import Splash from "./pages/Splash.tsx";
 import ExperienceDetail from "./pages/ExperienceDetail.tsx";
@@ -72,10 +74,12 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <I18nProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
+        <UserRoleProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <RouteGuard>
+              <Routes>
             <Route path="/welcome" element={<Splash />} />
             <Route path="/" element={<Index />} />
             <Route path="/calendar" element={<EventCalendar />} />
@@ -137,7 +141,9 @@ const App = () => (
             <Route path="/dashboard/subject-expert" element={<SubjectExpertDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </RouteGuard>
         </BrowserRouter>
+        </UserRoleProvider>
       </I18nProvider>
     </TooltipProvider>
   </QueryClientProvider>
