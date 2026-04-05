@@ -61,22 +61,38 @@ const AccommodationDetail = () => {
         {/* Availability */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "التوافر" : "Availability"}</h2>
         <div className="grid grid-cols-2 gap-2 mb-5">
-          {[
-            { label: lang === "ar" ? "اليوم" : "Today", status: "available" },
-            { label: lang === "ar" ? "غداً" : "Tomorrow", status: "available" },
-            { label: lang === "ar" ? "نهاية الأسبوع" : "This Weekend", status: "limited" },
-            { label: lang === "ar" ? "الأسبوع القادم" : "Next Week", status: "available" },
-          ].map((slot, i) => (
-            <div key={i} className="flex items-center gap-2 p-2.5 rounded-lg bg-surface border border-border">
-              <CalendarCheck className={`w-3.5 h-3.5 flex-shrink-0 ${slot.status === "available" ? "text-green-500" : "text-amber-500"}`} />
-              <div>
-                <span className="text-xs font-medium text-foreground block">{slot.label}</span>
-                <span className={`text-[10px] font-medium ${slot.status === "available" ? "text-green-600" : "text-amber-600"}`}>
-                  {slot.status === "available" ? (lang === "ar" ? "متاح" : "Available") : (lang === "ar" ? "محدود" : "Limited")}
-                </span>
-              </div>
-            </div>
-          ))}
+          {(() => {
+            // Generate deterministic availability based on listing id
+            const seed = place.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
+            const statuses: ("available" | "limited" | "booked")[] = ["available", "limited", "booked"];
+            const slots = [
+              { label: { en: "Today", ar: "اليوم" } },
+              { label: { en: "Tomorrow", ar: "غداً" } },
+              { label: { en: "This Weekend", ar: "نهاية الأسبوع" } },
+              { label: { en: "Next Week", ar: "الأسبوع القادم" } },
+              { label: { en: "In 2 Weeks", ar: "بعد أسبوعين" } },
+              { label: { en: "Next Month", ar: "الشهر القادم" } },
+            ];
+            return slots.map((slot, i) => {
+              const status = statuses[(seed + i * 7) % 3];
+              const colorClass = status === "available" ? "text-green-500" : status === "limited" ? "text-amber-500" : "text-red-400";
+              const textColorClass = status === "available" ? "text-green-600" : status === "limited" ? "text-amber-600" : "text-red-500";
+              const statusLabel = status === "available"
+                ? (lang === "ar" ? "متاح" : "Available")
+                : status === "limited"
+                ? (lang === "ar" ? "محدود" : "Limited")
+                : (lang === "ar" ? "محجوز" : "Booked");
+              return (
+                <div key={i} className="flex items-center gap-2 p-2.5 rounded-lg bg-surface border border-border">
+                  <CalendarCheck className={`w-3.5 h-3.5 flex-shrink-0 ${colorClass}`} />
+                  <div>
+                    <span className="text-xs font-medium text-foreground block">{slot.label[lang]}</span>
+                    <span className={`text-[10px] font-medium ${textColorClass}`}>{statusLabel}</span>
+                  </div>
+                </div>
+              );
+            });
+          })()}
         </div>
 
         {/* Amenities */}
