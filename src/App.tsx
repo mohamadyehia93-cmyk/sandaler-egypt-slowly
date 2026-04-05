@@ -55,6 +55,7 @@ import NewProgram from "./pages/dashboards/NewProgram.tsx";
 import NewFlagReport from "./pages/dashboards/NewFlagReport.tsx";
 import NewCollection from "./pages/dashboards/NewCollection.tsx";
 import Community from "./pages/Community.tsx";
+import ItineraryPlanner from "./pages/ItineraryPlanner.tsx";
 import AllPosts from "./pages/AllPosts.tsx";
 import AllAudioTours from "./pages/AllAudioTours.tsx";
 import AllCauses from "./pages/AllCauses.tsx";
@@ -105,6 +106,7 @@ const App = () => (
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/partner/:id" element={<PartnerDetail />} />
             <Route path="/provider/:id" element={<ProviderProfile />} />
+            <Route path="/planner" element={<ItineraryPlanner />} />
             <Route path="/community" element={<Community />} />
             <Route path="/visitor/:id" element={<VisitorProfile />} />
             <Route path="/booking" element={<Booking />} />

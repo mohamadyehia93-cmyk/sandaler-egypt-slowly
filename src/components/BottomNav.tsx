@@ -1,10 +1,11 @@
-import { Compass, Heart, MessageCircle, User, LayoutDashboard } from "lucide-react";
+import { Compass, Heart, MessageCircle, User, LayoutDashboard, Sparkles } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUserRole } from "@/hooks/useUserRole";
 
 const visitorTabs = [
   { key: "explore", icon: Compass, labelEn: "Explore", labelAr: "استكشف", path: "/" },
+  { key: "planner", icon: Sparkles, labelEn: "Planner", labelAr: "المخطط", path: "/planner" },
   { key: "wishlists", icon: Heart, labelEn: "Wishlists", labelAr: "المفضلة", path: "/wishlists" },
   { key: "inbox", icon: MessageCircle, labelEn: "Inbox", labelAr: "الرسائل", path: "/inbox" },
   { key: "profile", icon: User, labelEn: "Profile", labelAr: "الملف", path: "/profile" },
