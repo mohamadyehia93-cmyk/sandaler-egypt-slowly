@@ -55,6 +55,7 @@ import NewCollection from "./pages/dashboards/NewCollection.tsx";
 import Community from "./pages/Community.tsx";
 import AllPosts from "./pages/AllPosts.tsx";
 import AllAudioTours from "./pages/AllAudioTours.tsx";
+import AllCauses from "./pages/AllCauses.tsx";
 import VisitorProfile from "./pages/VisitorProfile.tsx";
 // Provider Management Pages
 import MyContent from "./pages/dashboards/MyContent.tsx";
@@ -82,6 +83,7 @@ const App = () => (
             <Route path="/trip/:id" element={<TripDetail />} />
             <Route path="/audio-tours" element={<AllAudioTours />} />
             <Route path="/audio-tour/:id" element={<AudioTourDetail />} />
+            <Route path="/causes" element={<AllCauses />} />
             <Route path="/cause/:id" element={<CauseDetail />} />
             <Route path="/cause/:id/gift" element={<CauseSupportGift />} />
             <Route path="/cause/:id/donate" element={<CauseSupportDonate />} />
