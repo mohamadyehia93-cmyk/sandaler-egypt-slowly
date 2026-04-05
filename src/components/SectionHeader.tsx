@@ -17,7 +17,7 @@ const SectionHeader = ({ titleKey, onSeeAll, children }: SectionHeaderProps) => 
       <div className="flex items-center justify-between px-4 mb-3">
         <h2 className="text-lg font-bold text-primary-dark tracking-tight">{t(titleKey)}</h2>
         {onSeeAll && (
-          <button className="flex items-center gap-0.5 text-sm font-medium text-primary">
+          <button onClick={onSeeAll} className="flex items-center gap-0.5 text-sm font-medium text-primary">
             {t("section.seeAll")}
             <Arrow className="w-4 h-4" />
           </button>
