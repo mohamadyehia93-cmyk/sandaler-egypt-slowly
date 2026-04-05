@@ -50,34 +50,8 @@ const AccommodationDetail = () => {
           </span>
         </div>
 
-        {/* Host */}
-        {(() => {
-          const host = hosts.find((h) => h.id === place.hostId);
-          return (
-            <div className="mb-5">
-              <button
-                className="flex items-center gap-3 p-3 rounded-t-xl bg-surface w-full text-start"
-                onClick={() => { const pid = accommodationToProvider[place.id]; if (pid) navigate(`/provider/${pid}`); else if (host) navigate(`/host/${host.id}`); }}
-              >
-                {host ? (
-                  <img src={host.image} alt={host.name[lang]} className="w-11 h-11 rounded-full object-cover" />
-                ) : (
-                  <div className="w-11 h-11 rounded-full bg-primary/20 flex items-center justify-center text-lg">🏠</div>
-                )}
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-primary">{lang === "ar" ? "المضيف" : "Hosted by"} {place.host[lang]}</p>
-                  <p className="text-xs text-muted-foreground">{place.type[lang]} · {place.location[lang]}</p>
-                  <span className="text-[10px] text-primary font-medium">{lang === "ar" ? "عرض الملف ←" : "View profile →"}</span>
-                </div>
-              </button>
-              {host?.bio && (
-                <div className="px-3 pb-3 rounded-b-xl bg-surface border-t border-border">
-                  <p className="text-xs text-muted-foreground leading-relaxed pt-2.5">{host.bio[lang]}</p>
-                </div>
-              )}
-            </div>
-          );
-        })()}
+        {/* Host Bio */}
+        <ProviderBioCard providerId={accommodationToProvider[place.id]} roleLabel={{ en: "Your Host", ar: "مضيفك" }} />
 
         {/* Description */}
         <h2 className="text-base font-bold text-primary-dark mb-2">{lang === "ar" ? "عن المكان" : "About This Place"}</h2>
