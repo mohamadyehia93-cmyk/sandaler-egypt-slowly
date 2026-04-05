@@ -1,4 +1,4 @@
-import { Compass, Heart, MessageCircle, User, LayoutDashboard } from "lucide-react";
+import { Compass, Heart, MessageCircle, User, LayoutDashboard, Sparkles } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUserRole } from "@/hooks/useUserRole";
