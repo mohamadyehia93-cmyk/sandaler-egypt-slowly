@@ -15,7 +15,7 @@ const OrganizationDashboard = () => {
 
   const bottomNav = [
     { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true, path: "/dashboard/organization" },
-    { label: lang === "ar" ? "البرامج" : "Programs", icon: "📋", active: false, path: "/" },
+    { label: lang === "ar" ? "البرامج" : "Programs", icon: "📋", active: false, path: "/dashboard/organization/my-programs" },
     { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false, path: "/inbox" },
     { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false, path: "/profile" },
   ];

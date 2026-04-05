@@ -20,7 +20,7 @@ const ServiceProviderDashboard = () => {
 
   const bottomNav = [
     { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true, path: "/dashboard/service-provider" },
-    { label: lang === "ar" ? "قوائمي" : "My Listings", icon: "📋", active: false, path: "/" },
+    { label: lang === "ar" ? "قوائمي" : "My Listings", icon: "📋", active: false, path: "/dashboard/service-provider/my-listings" },
     { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false, path: "/inbox" },
     { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false, path: "/profile" },
   ];

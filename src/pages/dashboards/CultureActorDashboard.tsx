@@ -19,7 +19,7 @@ const CultureActorDashboard = () => {
 
   const bottomNav = [
     { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "📊", active: true, path: "/dashboard/culture-actor" },
-    { label: lang === "ar" ? "محتواي" : "My Content", icon: "✍️", active: false, path: "/" },
+    { label: lang === "ar" ? "محتواي" : "My Content", icon: "✍️", active: false, path: "/dashboard/culture-actor/my-content" },
     { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false, path: "/inbox" },
     { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false, path: "/profile" },
   ];

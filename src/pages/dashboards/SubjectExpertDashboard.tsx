@@ -15,7 +15,7 @@ const SubjectExpertDashboard = () => {
 
   const bottomNav = [
     { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true, path: "/dashboard/subject-expert" },
-    { label: lang === "ar" ? "مجموعاتي" : "My Collections", icon: "📚", active: false, path: "/" },
+    { label: lang === "ar" ? "مجموعاتي" : "My Collections", icon: "📚", active: false, path: "/dashboard/subject-expert/my-collections" },
     { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false, path: "/inbox" },
     { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false, path: "/profile" },
   ];
