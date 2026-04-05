@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, FileText, Eye, Bookmark, TrendingUp, Plus, Sparkles, Mic, ChevronRight, Bell } from "lucide-react";
+import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 
 const CultureActorDashboard = () => {
   const { lang } = useI18n();
