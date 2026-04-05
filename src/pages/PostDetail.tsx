@@ -10,13 +10,13 @@ const PostDetail = () => {
   const navigate = useNavigate();
   const { lang } = useI18n();
 
-  const post = latestPosts.find((p) => p.id === id);
+  const post = latestPosts.find((p) => p?.id === id);
   if (!post) return <div className="p-8 text-center text-muted-foreground">Post not found</div>;
 
   const ct = (post as any).contentType ? contentTypeConfig[(post as any).contentType] : null;
   const CtIcon = ct?.icon;
 
-  const relatedPosts = latestPosts.filter((p) => p.id !== id && p.regionId === post.regionId).slice(0, 3);
+  const relatedPosts = latestPosts.filter((p) => p && p.id !== id && p.regionId === post.regionId).slice(0, 3);
   const formattedDate = new Date(post.date).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US", {
     year: "numeric", month: "long", day: "numeric",
   });
