@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, User, MessageSquare, Calendar, ToggleRight, Clock, Plus, ChevronRight } from "lucide-react";
+import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 
 const WhosWhoDashboard = () => {
   const { lang } = useI18n();
