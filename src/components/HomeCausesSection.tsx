@@ -10,7 +10,7 @@ const HomeCausesSection = () => {
   const navigate = useNavigate();
 
   return (
-    <SectionHeader titleKey="section.causes" onSeeAll={() => {}}>
+    <SectionHeader titleKey="section.causes" onSeeAll={() => navigate("/causes")}>
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {causes.slice(0, 4).map((cause) => {
           const progress = Math.round((cause.raised / cause.goal) * 100);
