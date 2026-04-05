@@ -73,15 +73,28 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Switch to Dashboard / View as Visitor */}
+        {/* Switch to Dashboard / Explore as Visitor */}
         {userRole !== "visitor" && roleDashboardRoutes[userRole] && (
-          <button
-            onClick={() => navigate(roleDashboardRoutes[userRole])}
-            className="w-full bg-primary text-primary-foreground rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2 mb-6"
-          >
-            <ArrowRightLeft className="w-4 h-4" />
-            {lang === "ar" ? "الذهاب للوحة التحكم" : "Go to Dashboard"}
-          </button>
+          <div className="flex gap-2 mb-6">
+            <button
+              onClick={() => navigate(roleDashboardRoutes[userRole])}
+              className="flex-1 bg-primary text-primary-foreground rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2"
+            >
+              <ArrowRightLeft className="w-4 h-4" />
+              {lang === "ar" ? "لوحة التحكم" : "Dashboard"}
+            </button>
+            <button
+              onClick={() => {
+                localStorage.setItem("sandal-role", "visitor");
+                setUserRole("visitor");
+                navigate("/");
+              }}
+              className="flex-1 border-2 border-primary text-primary rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2"
+            >
+              <Eye className="w-4 h-4" />
+              {lang === "ar" ? "استكشف كزائر" : "Explore as Visitor"}
+            </button>
+          </div>
         )}
 
         {/* Stats */}
