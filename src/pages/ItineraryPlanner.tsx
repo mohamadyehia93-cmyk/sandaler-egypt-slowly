@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { ArrowLeft, Send, Sparkles, MapPin, Calendar, Users, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n";
+import { experiences, audioTours, accommodation, trips } from "@/lib/sampleData";
 import BottomNav from "@/components/BottomNav";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -25,13 +27,41 @@ const quickPrompts = {
   ],
 };
 
+function buildCatalog(lang: "en" | "ar"): string {
+  const lines: string[] = [];
+
+  lines.push("EXPERIENCES:");
+  experiences.slice(0, 35).forEach((e) => {
+    lines.push(`- [${e.title[lang]}](/experience/${e.id}) | ${e.region[lang]} | ${e.theme} | EGP ${e.price} | ⭐${e.rating}`);
+  });
+
+  lines.push("\nACCOMMODATION:");
+  accommodation.slice(0, 25).forEach((a) => {
+    lines.push(`- [${a.title[lang]}](/stay/${a.id}) | ${a.location[lang]} | ${a.type[lang]} | EGP ${a.price}/night | ⭐${a.rating}`);
+  });
+
+  lines.push("\nTRIPS:");
+  trips.slice(0, 16).forEach((t) => {
+    lines.push(`- [${t.title[lang]}](/trip/${t.id}) | ${t.route[lang]} | EGP ${t.price} | ${t.duration}`);
+  });
+
+  lines.push("\nAUDIO TOURS:");
+  audioTours.slice(0, 28).forEach((a) => {
+    lines.push(`- [${a.title[lang]}](/audio-tour/${a.id}) | ${a.region[lang]} | ${a.duration}min | ${a.price === 0 ? "Free" : `EGP ${a.price}`}`);
+  });
+
+  return lines.join("\n");
+}
+
 async function streamChat({
   messages,
+  catalog,
   onDelta,
   onDone,
   onError,
 }: {
   messages: Msg[];
+  catalog: string;
   onDelta: (t: string) => void;
   onDone: () => void;
   onError: (e: string) => void;
@@ -43,7 +73,7 @@ async function streamChat({
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({ messages, catalog }),
     });
 
     if (!resp.ok) {
@@ -91,6 +121,22 @@ async function streamChat({
   }
 }
 
+// Custom link renderer for react-markdown that uses React Router
+const MarkdownLink = ({ href, children }: { href?: string; children?: React.ReactNode }) => {
+  const navigate = useNavigate();
+  if (href && (href.startsWith("/experience/") || href.startsWith("/stay/") || href.startsWith("/trip/") || href.startsWith("/audio-tour/"))) {
+    return (
+      <button
+        onClick={() => navigate(href)}
+        className="text-primary font-semibold underline underline-offset-2 hover:text-primary/80 transition-colors inline"
+      >
+        {children}
+      </button>
+    );
+  }
+  return <a href={href} className="text-primary underline">{children}</a>;
+};
+
 const ItineraryPlanner = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
@@ -99,6 +145,8 @@ const ItineraryPlanner = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const catalog = useMemo(() => buildCatalog(lang), [lang]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -127,6 +175,7 @@ const ItineraryPlanner = () => {
 
     await streamChat({
       messages: allMessages,
+      catalog,
       onDelta: upsert,
       onDone: () => setIsLoading(false),
       onError: (e) => {
@@ -166,8 +215,8 @@ const ItineraryPlanner = () => {
               </h2>
               <p className="text-sm text-muted-foreground max-w-xs mx-auto">
                 {lang === "ar"
-                  ? "أخبرني عن وجهتك المفضلة وسأبني لك خطة رحلة مخصصة"
-                  : "Tell me about your dream destination and I'll craft a personalized itinerary for you"}
+                  ? "أخبرني عن وجهتك المفضلة وسأبني لك خطة رحلة مخصصة من العروض المتاحة"
+                  : "Tell me your dream destination and I'll craft a personalized itinerary from our available experiences, stays & tours"}
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2 w-full max-w-sm">
@@ -188,13 +237,32 @@ const ItineraryPlanner = () => {
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
-              className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+              className={`max-w-[90%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 m.role === "user"
                   ? "bg-primary text-primary-foreground rounded-br-md"
                   : "bg-background border border-border text-foreground rounded-bl-md"
               }`}
             >
-              {m.content}
+              {m.role === "assistant" ? (
+                <div className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground prose-a:no-underline">
+                  <ReactMarkdown
+                    components={{
+                      a: ({ href, children }) => <MarkdownLink href={href}>{children}</MarkdownLink>,
+                      h1: ({ children }) => <h3 className="text-base font-bold mt-3 mb-1 text-foreground">{children}</h3>,
+                      h2: ({ children }) => <h4 className="text-sm font-bold mt-3 mb-1 text-foreground">{children}</h4>,
+                      h3: ({ children }) => <h5 className="text-sm font-semibold mt-2 mb-1 text-foreground">{children}</h5>,
+                      p: ({ children }) => <p className="mb-2 text-foreground">{children}</p>,
+                      ul: ({ children }) => <ul className="mb-2 space-y-1 list-none pl-0">{children}</ul>,
+                      li: ({ children }) => <li className="text-foreground flex gap-1.5"><span className="shrink-0">•</span><span>{children}</span></li>,
+                      hr: () => <hr className="my-3 border-border" />,
+                    }}
+                  >
+                    {m.content}
+                  </ReactMarkdown>
+                </div>
+              ) : (
+                <span className="whitespace-pre-wrap">{m.content}</span>
+              )}
             </div>
           </div>
         ))}
