@@ -53,6 +53,7 @@ import NewProgram from "./pages/dashboards/NewProgram.tsx";
 import NewFlagReport from "./pages/dashboards/NewFlagReport.tsx";
 import NewCollection from "./pages/dashboards/NewCollection.tsx";
 import Community from "./pages/Community.tsx";
+import AllPosts from "./pages/AllPosts.tsx";
 import VisitorProfile from "./pages/VisitorProfile.tsx";
 // Provider Management Pages
 import MyContent from "./pages/dashboards/MyContent.tsx";
@@ -87,6 +88,7 @@ const App = () => (
             <Route path="/region/:regionId" element={<RegionDetail />} />
             <Route path="/person/:id" element={<PersonDetail />} />
             <Route path="/city/:cityId" element={<CityDetail />} />
+            <Route path="/posts" element={<AllPosts />} />
             <Route path="/post/:id" element={<PostDetail />} />
             <Route path="/culture-actor/:id" element={<CultureActorDetail />} />
             <Route path="/stay/:id" element={<AccommodationDetail />} />
