@@ -3,6 +3,8 @@ import { ArrowLeft, Clock, MapPin, Route, Lightbulb, ArrowRight } from "lucide-r
 import { useI18n } from "@/lib/i18n";
 import { transport } from "@/lib/sampleData";
 import WishlistButton from "@/components/WishlistButton";
+import ProviderBioCard from "@/components/ProviderBioCard";
+import { transportToProvider } from "@/lib/providerMappings";
 
 const TransportDetail = () => {
   const { id } = useParams();
