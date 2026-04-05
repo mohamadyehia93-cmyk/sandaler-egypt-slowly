@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useUserRole, type UserRole } from "@/hooks/useUserRole";
 import { User, Pen, Briefcase, Home, Truck, Map, ShoppingBag, Building2, Shield, ArrowLeft, ArrowRight, MapPin, Compass, Headphones, Heart, UtensilsCrossed, Camera, Music, Palette, Check, BookOpen, Mic, Landmark, Wheat, Tent, Car, Bus, Ship, Package, Gem, Leaf, GraduationCap, Users, HandHeart, Eye } from "lucide-react";
 import { regions, regionCities } from "@/lib/sampleData";
 
@@ -218,9 +219,23 @@ const slideVariants = {
   exit: (dir: number) => ({ x: dir > 0 ? -300 : 300, opacity: 0 }),
 };
 
+// Map onboarding role keys to UserRole types
+const onboardingToUserRole: Record<string, UserRole> = {
+  "visitor": "visitor",
+  "culture-actor": "culture-actor",
+  "service-provider": "service-provider",
+  "accommodation-host": "service-provider",
+  "transport-provider": "service-provider",
+  "trip-organizer": "trip-organizer",
+  "product-seller": "product-seller",
+  "organization": "organization",
+  "ambassador": "ambassador",
+};
+
 const SplashPage = () => {
   const { t, lang, setLang } = useI18n();
   const navigate = useNavigate();
+  const { setRole } = useUserRole();
   const [step, setStep] = useState<OnboardingStep>("splash");
   const [direction, setDirection] = useState(1);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -250,10 +265,9 @@ const SplashPage = () => {
   };
 
   const handleFinish = () => {
-    const route = selectedRole && selectedRole !== "visitor" && selectedRole !== "local" 
-      ? roleRoutMap[selectedRole] || "/" 
-      : "/";
-    localStorage.setItem("sandal-role", selectedRole || "visitor");
+    const mappedRole = selectedRole ? (onboardingToUserRole[selectedRole] || "visitor") : "visitor";
+    setRole(mappedRole);
+    const route = mappedRole !== "visitor" ? (roleRoutMap[mappedRole] || "/") : "/";
     navigate(route);
   };
   const handleGuestMode = () => navigate("/");
