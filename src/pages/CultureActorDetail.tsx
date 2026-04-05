@@ -74,8 +74,27 @@ const CultureActorDetail = () => {
           )}
         </div>
 
-        {/* Follow Button */}
-        <FollowButton lang={lang} following={following} onToggle={() => setFollowing(!following)} />
+        {/* Follow & Message Buttons */}
+        <div className="flex gap-2 mt-4">
+          <button
+            onClick={() => setFollowing(!following)}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              following
+                ? "bg-secondary text-foreground border border-border"
+                : "bg-primary text-primary-foreground"
+            }`}
+          >
+            {following ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+            {following ? (lang === "ar" ? "متابَع" : "Following") : (lang === "ar" ? "متابعة" : "Follow")}
+          </button>
+          <button
+            onClick={() => navigate(`/inbox?personId=${actor.id}&name=${encodeURIComponent(actor.name.en)}&nameAr=${encodeURIComponent(actor.name.ar)}&image=${encodeURIComponent(actor.image)}`)}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-card border border-border text-foreground hover:bg-secondary transition-colors"
+          >
+            <MessageCircle className="w-4 h-4 text-primary" />
+            {lang === "ar" ? "رسالة" : "Message"}
+          </button>
+        </div>
       </div>
 
       {/* Quote */}
