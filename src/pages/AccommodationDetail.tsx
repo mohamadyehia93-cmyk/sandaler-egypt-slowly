@@ -1,18 +1,42 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Star, MapPin, Users, Clock, DoorOpen, Heart, Check, ShoppingCart, CalendarCheck } from "lucide-react";
+import { ArrowLeft, Star, MapPin, Users, Clock, DoorOpen, Heart, Check, ShoppingCart, CalendarCheck, CalendarIcon } from "lucide-react";
+import { useState, useMemo } from "react";
 import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
 import { accommodation, hosts } from "@/lib/sampleData";
 import { accommodationToProvider } from "@/lib/providerMappings";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import DetailTestimonials from "@/components/DetailTestimonials";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { format, isSameDay } from "date-fns";
 
 const AccommodationDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   const place = accommodation.find((a) => a.id === id);
+
+  // Generate deterministic availability statuses for 60 days based on listing id
+  const availabilityMap = useMemo(() => {
+    if (!place) return new Map<string, "available" | "limited" | "booked">();
+    const seed = place.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    const statuses: ("available" | "limited" | "booked")[] = ["available", "limited", "booked"];
+    const map = new Map<string, "available" | "limited" | "booked">();
+    const today = new Date();
+    for (let i = 0; i < 60; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const key = format(d, "yyyy-MM-dd");
+      map.set(key, statuses[(seed + i * 7) % 3]);
+    }
+    return map;
+  }, [place?.id]);
+
   if (!place) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
 
   return (
@@ -60,40 +84,57 @@ const AccommodationDetail = () => {
 
         {/* Availability */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "التوافر" : "Availability"}</h2>
-        <div className="grid grid-cols-2 gap-2 mb-5">
-          {(() => {
-            // Generate deterministic availability based on listing id
-            const seed = place.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
-            const statuses: ("available" | "limited" | "booked")[] = ["available", "limited", "booked"];
-            const slots = [
-              { label: { en: "Today", ar: "اليوم" } },
-              { label: { en: "Tomorrow", ar: "غداً" } },
-              { label: { en: "This Weekend", ar: "نهاية الأسبوع" } },
-              { label: { en: "Next Week", ar: "الأسبوع القادم" } },
-              { label: { en: "In 2 Weeks", ar: "بعد أسبوعين" } },
-              { label: { en: "Next Month", ar: "الشهر القادم" } },
-            ];
-            return slots.map((slot, i) => {
-              const status = statuses[(seed + i * 7) % 3];
-              const colorClass = status === "available" ? "text-green-500" : status === "limited" ? "text-amber-500" : "text-red-400";
-              const textColorClass = status === "available" ? "text-green-600" : status === "limited" ? "text-amber-600" : "text-red-500";
-              const statusLabel = status === "available"
-                ? (lang === "ar" ? "متاح" : "Available")
-                : status === "limited"
-                ? (lang === "ar" ? "محدود" : "Limited")
-                : (lang === "ar" ? "محجوز" : "Booked");
-              return (
-                <div key={i} className="flex items-center gap-2 p-2.5 rounded-lg bg-surface border border-border">
-                  <CalendarCheck className={`w-3.5 h-3.5 flex-shrink-0 ${colorClass}`} />
-                  <div>
-                    <span className="text-xs font-medium text-foreground block">{slot.label[lang]}</span>
-                    <span className={`text-[10px] font-medium ${textColorClass}`}>{statusLabel}</span>
-                  </div>
-                </div>
-              );
-            });
-          })()}
-        </div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className={cn("w-full justify-start text-left font-normal mb-2", !selectedDate && "text-muted-foreground")}>
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {selectedDate ? format(selectedDate, "PPP") : (lang === "ar" ? "اختر تاريخاً" : "Pick a date")}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+              modifiers={{
+                available: Array.from(availabilityMap.entries()).filter(([, s]) => s === "available").map(([k]) => new Date(k)),
+                limited: Array.from(availabilityMap.entries()).filter(([, s]) => s === "limited").map(([k]) => new Date(k)),
+                booked: Array.from(availabilityMap.entries()).filter(([, s]) => s === "booked").map(([k]) => new Date(k)),
+              }}
+              modifiersStyles={{
+                available: { backgroundColor: "hsl(142 71% 93%)", color: "hsl(142 71% 29%)" },
+                limited: { backgroundColor: "hsl(38 92% 90%)", color: "hsl(38 92% 35%)" },
+                booked: { backgroundColor: "hsl(0 84% 92%)", color: "hsl(0 84% 40%)" },
+              }}
+            />
+          </PopoverContent>
+        </Popover>
+        {/* Selected date status */}
+        {selectedDate && (() => {
+          const key = format(selectedDate, "yyyy-MM-dd");
+          const status = availabilityMap.get(key);
+          const statusLabel = status === "available"
+            ? (lang === "ar" ? "✅ متاح" : "✅ Available")
+            : status === "limited"
+            ? (lang === "ar" ? "⚠️ محدود" : "⚠️ Limited")
+            : (lang === "ar" ? "❌ محجوز" : "❌ Booked");
+          const statusClass = status === "available" ? "text-green-600 bg-green-50" : status === "limited" ? "text-amber-600 bg-amber-50" : "text-red-500 bg-red-50";
+          return (
+            <div className={`p-3 rounded-lg text-sm font-medium mb-5 ${statusClass}`}>
+              {format(selectedDate, "EEEE, MMM d")} — {statusLabel}
+            </div>
+          );
+        })()}
+        {!selectedDate && (
+          <div className="flex gap-3 text-[10px] text-muted-foreground mb-5">
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-200 inline-block" /> {lang === "ar" ? "متاح" : "Available"}</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-200 inline-block" /> {lang === "ar" ? "محدود" : "Limited"}</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-200 inline-block" /> {lang === "ar" ? "محجوز" : "Booked"}</span>
+          </div>
+        )}
 
         {/* Amenities */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "المرافق والخدمات" : "What's Included"}</h2>
