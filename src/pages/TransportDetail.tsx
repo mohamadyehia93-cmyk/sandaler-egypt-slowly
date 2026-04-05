@@ -87,6 +87,9 @@ const TransportDetail = () => {
         </div>
       </div>
 
+      {/* Transport Provider Bio */}
+      <ProviderBioCard providerId={transportToProvider[item.id]} roleLabel={{ en: "Transport Provider", ar: "مقدم النقل" }} />
+
       {/* Sticky Bottom */}
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
         <div>
