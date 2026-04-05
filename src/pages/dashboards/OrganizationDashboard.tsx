@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, Plus, Users, Heart, Calendar, TrendingUp, CheckCircle, ChevronRight } from "lucide-react";
+import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 
 const OrganizationDashboard = () => {
   const { lang } = useI18n();
