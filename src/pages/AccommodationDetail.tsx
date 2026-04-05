@@ -186,6 +186,27 @@ const AccommodationDetail = () => {
           ))}
         </div>
 
+        {/* Location Map */}
+        {(place as any).cityId && cityCoordinates[(place as any).cityId] && (
+          <>
+            <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "الموقع" : "Location"}</h2>
+            <div className="rounded-xl overflow-hidden border border-border shadow-card mb-6" style={{ height: 200 }}>
+              <MapContainer
+                center={cityCoordinates[(place as any).cityId]}
+                zoom={13}
+                scrollWheelZoom={false}
+                style={{ height: "100%", width: "100%" }}
+                attributionControl={false}
+              >
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <Marker position={cityCoordinates[(place as any).cityId]} icon={markerIcon}>
+                  <Popup>{place.title[lang]}<br /><span className="text-xs text-muted-foreground">{place.location[lang]}</span></Popup>
+                </Marker>
+              </MapContainer>
+            </div>
+          </>
+        )}
+
         {/* Testimonials */}
         <DetailTestimonials />
       </div>
