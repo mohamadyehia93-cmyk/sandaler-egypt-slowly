@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { ArrowLeft, Send, Sparkles, MapPin, Calendar, Users, Loader2 } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,42 +29,30 @@ const quickPrompts = {
 
 function buildCatalog(lang: "en" | "ar"): string {
   const lines: string[] = [];
-
   lines.push("EXPERIENCES:");
   experiences.slice(0, 35).forEach((e) => {
     lines.push(`- [${e.title[lang]}](/experience/${e.id}) | ${e.region[lang]} | ${e.theme} | EGP ${e.price} | ⭐${e.rating}`);
   });
-
   lines.push("\nACCOMMODATION:");
   accommodation.slice(0, 25).forEach((a) => {
     lines.push(`- [${a.title[lang]}](/stay/${a.id}) | ${a.location[lang]} | ${a.type[lang]} | EGP ${a.price}/night | ⭐${a.rating}`);
   });
-
   lines.push("\nTRIPS:");
   trips.slice(0, 16).forEach((t) => {
     lines.push(`- [${t.title[lang]}](/trip/${t.id}) | ${t.route[lang]} | EGP ${t.price} | ${t.duration}`);
   });
-
   lines.push("\nAUDIO TOURS:");
   audioTours.slice(0, 28).forEach((a) => {
     lines.push(`- [${a.title[lang]}](/audio-tour/${a.id}) | ${a.region[lang]} | ${a.duration}min | ${a.price === 0 ? "Free" : `EGP ${a.price}`}`);
   });
-
   return lines.join("\n");
 }
 
 async function streamChat({
-  messages,
-  catalog,
-  onDelta,
-  onDone,
-  onError,
+  messages, catalog, onDelta, onDone, onError,
 }: {
-  messages: Msg[];
-  catalog: string;
-  onDelta: (t: string) => void;
-  onDone: () => void;
-  onError: (e: string) => void;
+  messages: Msg[]; catalog: string;
+  onDelta: (t: string) => void; onDone: () => void; onError: (e: string) => void;
 }) {
   try {
     const resp = await fetch(CHAT_URL, {
@@ -75,27 +63,19 @@ async function streamChat({
       },
       body: JSON.stringify({ messages, catalog }),
     });
-
     if (!resp.ok) {
       const err = await resp.json().catch(() => ({ error: "Request failed" }));
       onError(err.error || `Error ${resp.status}`);
       return;
     }
-
-    if (!resp.body) {
-      onError("No response stream");
-      return;
-    }
-
+    if (!resp.body) { onError("No response stream"); return; }
     const reader = resp.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
-
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
       buffer += decoder.decode(value, { stream: true });
-
       let idx: number;
       while ((idx = buffer.indexOf("\n")) !== -1) {
         let line = buffer.slice(0, idx);
@@ -114,14 +94,29 @@ async function streamChat({
         }
       }
     }
-
     onDone();
   } catch (e) {
     onError(e instanceof Error ? e.message : "Connection failed");
   }
 }
 
-// Custom link renderer for react-markdown that uses React Router
+// Parse [CHOICES: A | B | C] blocks from message content
+function parseChoices(content: string): { textParts: string[]; choiceGroups: string[][] } {
+  const regex = /\[CHOICES:\s*(.+?)\]/g;
+  const textParts: string[] = [];
+  const choiceGroups: string[][] = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(content)) !== null) {
+    textParts.push(content.slice(lastIndex, match.index));
+    choiceGroups.push(match[1].split("|").map((s) => s.trim()));
+    lastIndex = match.index + match[0].length;
+  }
+  textParts.push(content.slice(lastIndex));
+  return { textParts, choiceGroups };
+}
+
 const MarkdownLink = ({ href, children }: { href?: string; children?: React.ReactNode }) => {
   const navigate = useNavigate();
   if (href && (href.startsWith("/experience/") || href.startsWith("/stay/") || href.startsWith("/trip/") || href.startsWith("/audio-tour/"))) {
@@ -135,6 +130,55 @@ const MarkdownLink = ({ href, children }: { href?: string; children?: React.Reac
     );
   }
   return <a href={href} className="text-primary underline">{children}</a>;
+};
+
+const mdComponents = {
+  a: ({ href, children }: any) => <MarkdownLink href={href}>{children}</MarkdownLink>,
+  h1: ({ children }: any) => <h3 className="text-base font-bold mt-3 mb-1 text-foreground">{children}</h3>,
+  h2: ({ children }: any) => <h4 className="text-sm font-bold mt-3 mb-1 text-foreground">{children}</h4>,
+  h3: ({ children }: any) => <h5 className="text-sm font-semibold mt-2 mb-1 text-foreground">{children}</h5>,
+  p: ({ children }: any) => <p className="mb-2 text-foreground">{children}</p>,
+  ul: ({ children }: any) => <ul className="mb-2 space-y-1 list-none pl-0">{children}</ul>,
+  li: ({ children }: any) => <li className="text-foreground flex gap-1.5"><span className="shrink-0">•</span><span>{children}</span></li>,
+  hr: () => <hr className="my-3 border-border" />,
+};
+
+const ChoiceChips = ({ choices, onSelect, disabled }: { choices: string[]; onSelect: (c: string) => void; disabled: boolean }) => (
+  <div className="flex flex-wrap gap-2 mt-2">
+    {choices.map((c, i) => (
+      <button
+        key={i}
+        disabled={disabled}
+        onClick={() => onSelect(c)}
+        className="px-3 py-2 rounded-xl bg-primary/10 border border-primary/20 text-sm font-medium text-primary hover:bg-primary/20 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-left"
+      >
+        {c}
+      </button>
+    ))}
+  </div>
+);
+
+const AssistantMessage = ({ content, onChoiceSelect, isLastMessage, isLoading }: {
+  content: string; onChoiceSelect: (c: string) => void; isLastMessage: boolean; isLoading: boolean;
+}) => {
+  const { textParts, choiceGroups } = useMemo(() => parseChoices(content), [content]);
+
+  return (
+    <div className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground prose-a:no-underline">
+      {textParts.map((text, i) => (
+        <div key={i}>
+          {text.trim() && <ReactMarkdown components={mdComponents}>{text}</ReactMarkdown>}
+          {choiceGroups[i] && (
+            <ChoiceChips
+              choices={choiceGroups[i]}
+              onSelect={onChoiceSelect}
+              disabled={!isLastMessage || isLoading}
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  );
 };
 
 const ItineraryPlanner = () => {
@@ -152,7 +196,7 @@ const ItineraryPlanner = () => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
-  const send = async (text: string) => {
+  const send = useCallback(async (text: string) => {
     if (!text.trim() || isLoading) return;
     setError(null);
     const userMsg: Msg = { role: "user", content: text.trim() };
@@ -178,18 +222,14 @@ const ItineraryPlanner = () => {
       catalog,
       onDelta: upsert,
       onDone: () => setIsLoading(false),
-      onError: (e) => {
-        setError(e);
-        setIsLoading(false);
-      },
+      onError: (e) => { setError(e); setIsLoading(false); },
     });
-  };
+  }, [messages, isLoading, catalog]);
 
   const prompts = quickPrompts[lang] || quickPrompts.en;
 
   return (
     <div className="min-h-screen bg-surface pb-20 flex flex-col">
-      {/* Header */}
       <header className="flex items-center gap-3 px-4 py-3 bg-background border-b border-border">
         <button onClick={() => navigate(-1)}>
           <ArrowLeft className="w-5 h-5 text-foreground" />
@@ -202,7 +242,6 @@ const ItineraryPlanner = () => {
         </div>
       </header>
 
-      {/* Chat area */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center pt-8 space-y-6">
@@ -244,22 +283,12 @@ const ItineraryPlanner = () => {
               }`}
             >
               {m.role === "assistant" ? (
-                <div className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground prose-a:no-underline">
-                  <ReactMarkdown
-                    components={{
-                      a: ({ href, children }) => <MarkdownLink href={href}>{children}</MarkdownLink>,
-                      h1: ({ children }) => <h3 className="text-base font-bold mt-3 mb-1 text-foreground">{children}</h3>,
-                      h2: ({ children }) => <h4 className="text-sm font-bold mt-3 mb-1 text-foreground">{children}</h4>,
-                      h3: ({ children }) => <h5 className="text-sm font-semibold mt-2 mb-1 text-foreground">{children}</h5>,
-                      p: ({ children }) => <p className="mb-2 text-foreground">{children}</p>,
-                      ul: ({ children }) => <ul className="mb-2 space-y-1 list-none pl-0">{children}</ul>,
-                      li: ({ children }) => <li className="text-foreground flex gap-1.5"><span className="shrink-0">•</span><span>{children}</span></li>,
-                      hr: () => <hr className="my-3 border-border" />,
-                    }}
-                  >
-                    {m.content}
-                  </ReactMarkdown>
-                </div>
+                <AssistantMessage
+                  content={m.content}
+                  onChoiceSelect={send}
+                  isLastMessage={i === messages.length - 1}
+                  isLoading={isLoading}
+                />
               ) : (
                 <span className="whitespace-pre-wrap">{m.content}</span>
               )}
@@ -282,15 +311,8 @@ const ItineraryPlanner = () => {
         )}
       </div>
 
-      {/* Input */}
       <div className="px-4 py-3 bg-background border-t border-border">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            send(input);
-          }}
-          className="flex items-center gap-2"
-        >
+        <form onSubmit={(e) => { e.preventDefault(); send(input); }} className="flex items-center gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -298,12 +320,7 @@ const ItineraryPlanner = () => {
             className="flex-1 h-10 bg-secondary border-none text-sm"
             disabled={isLoading}
           />
-          <Button
-            type="submit"
-            size="icon"
-            disabled={!input.trim() || isLoading}
-            className="h-10 w-10 rounded-full shrink-0"
-          >
+          <Button type="submit" size="icon" disabled={!input.trim() || isLoading} className="h-10 w-10 rounded-full shrink-0">
             <Send className="w-4 h-4" />
           </Button>
         </form>
