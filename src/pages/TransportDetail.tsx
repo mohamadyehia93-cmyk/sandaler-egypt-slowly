@@ -3,6 +3,8 @@ import { ArrowLeft, Clock, MapPin, Route, Lightbulb, ArrowRight } from "lucide-r
 import { useI18n } from "@/lib/i18n";
 import { transport } from "@/lib/sampleData";
 import WishlistButton from "@/components/WishlistButton";
+import ProviderBioCard from "@/components/ProviderBioCard";
+import { transportToProvider } from "@/lib/providerMappings";
 
 const TransportDetail = () => {
   const { id } = useParams();
@@ -84,6 +86,9 @@ const TransportDetail = () => {
           ))}
         </div>
       </div>
+
+      {/* Transport Provider Bio */}
+      <ProviderBioCard providerId={transportToProvider[item.id]} roleLabel={{ en: "Transport Provider", ar: "مقدم النقل" }} />
 
       {/* Sticky Bottom */}
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">

@@ -3,6 +3,8 @@ import { ArrowLeft, Heart, MapPin, ShoppingCart, Leaf, Package, Users } from "lu
 import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
 import { products } from "@/lib/sampleData";
+import ProviderBioCard from "@/components/ProviderBioCard";
+import { productToProvider } from "@/lib/providerMappings";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -97,6 +99,9 @@ const ProductDetail = () => {
           ))}
         </div>
       </div>
+
+      {/* Artisan / Seller Bio */}
+      <ProviderBioCard providerId={productToProvider[product.id]} roleLabel={{ en: "Artisan / Seller", ar: "الحرفي / البائع" }} />
 
       {/* Sticky Bottom */}
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">

@@ -2,6 +2,7 @@ import { ArrowLeft, Heart, Share2, Users, Calendar, MapPin, ExternalLink, Gift, 
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { causes, regions } from "@/lib/sampleData";
+import ProviderBioCard from "@/components/ProviderBioCard";
 import DetailTestimonials from "@/components/DetailTestimonials";
 
 const supportOptions = [
@@ -125,6 +126,9 @@ const CauseDetail = () => {
         {/* Testimonials */}
         <DetailTestimonials />
       </div>
+
+      {/* Organization Bio */}
+      <ProviderBioCard providerId="p7" roleLabel={{ en: "Supporting Organization", ar: "المنظمة الداعمة" }} />
 
       {/* Sticky Bottom */}
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
