@@ -1,16 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Bell, Plus, Users, Heart, Calendar, TrendingUp, CheckCircle } from "lucide-react";
+import { ArrowLeft, Bell, Plus, Users, Heart, Calendar, TrendingUp, CheckCircle, ChevronRight } from "lucide-react";
 
 const OrganizationDashboard = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
 
   const overview = [
-    { value: "4", label: lang === "ar" ? "برامج نشطة" : "Active Programs" },
-    { value: "23", label: lang === "ar" ? "متطوعون هذا الشهر" : "Volunteers This Month" },
-    { value: "8,500", label: lang === "ar" ? "تبرعات هذا الشهر" : "Donations This Month", suffix: lang === "ar" ? "ج.م" : "EGP" },
-    { value: "2", label: lang === "ar" ? "فعاليات قادمة" : "Upcoming Events" },
+    { value: "4", label: lang === "ar" ? "برامج نشطة" : "Active Programs", path: "/dashboard/organization/my-programs" },
+    { value: "23", label: lang === "ar" ? "متطوعون هذا الشهر" : "Volunteers This Month", path: "/dashboard/organization/my-programs" },
+    { value: "8,500", label: lang === "ar" ? "تبرعات هذا الشهر" : "Donations This Month", suffix: lang === "ar" ? "ج.م" : "EGP", path: "/profile/impact" },
+    { value: "2", label: lang === "ar" ? "فعاليات قادمة" : "Upcoming Events", path: "/calendar" },
   ];
 
   const bottomNav = [
@@ -46,7 +46,7 @@ const OrganizationDashboard = () => {
         {/* Overview */}
         <div className="grid grid-cols-2 gap-3">
           {overview.map((o, i) => (
-            <div key={i} className="bg-card rounded-xl shadow-card p-3 text-center">
+            <div key={i} onClick={() => navigate(o.path)} className="bg-card rounded-xl shadow-card p-3 text-center cursor-pointer hover:shadow-md transition-shadow active:scale-[0.97]">
               <span className="text-xl font-bold text-foreground block">{o.value}{o.suffix && <span className="text-xs ml-1">{o.suffix}</span>}</span>
               <span className="text-[10px] text-muted-foreground">{o.label}</span>
             </div>
@@ -54,10 +54,11 @@ const OrganizationDashboard = () => {
         </div>
 
         {/* Impact Snapshot */}
-        <div className="bg-card rounded-xl shadow-card p-4">
+        <div onClick={() => navigate("/profile/impact")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-role-organization" />
             {lang === "ar" ? "ملخص التأثير" : "Impact Snapshot"}
+            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
           </h3>
           <div className="flex justify-between text-center">
             <div><span className="text-lg font-bold text-foreground">156</span><p className="text-[10px] text-muted-foreground">{lang === "ar" ? "متطوعون" : "Volunteers"}</p></div>

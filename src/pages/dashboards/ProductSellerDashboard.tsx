@@ -1,16 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Bell, Plus, Package, AlertTriangle, TrendingUp, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Bell, Plus, Package, AlertTriangle, TrendingUp, ShoppingCart, ChevronRight } from "lucide-react";
 
 const ProductSellerDashboard = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
 
   const overview = [
-    { value: "8", label: lang === "ar" ? "منتجات نشطة" : "Active Products" },
-    { value: "5", label: lang === "ar" ? "طلبات هذا الأسبوع" : "Orders This Week" },
-    { value: "3,100", label: lang === "ar" ? "إيرادات الشهر" : "Revenue This Month", suffix: lang === "ar" ? "ج.م" : "EGP" },
-    { value: "2", label: lang === "ar" ? "مخزون منخفض" : "Low Stock" },
+    { value: "8", label: lang === "ar" ? "منتجات نشطة" : "Active Products", path: "/dashboard/product-seller/my-products" },
+    { value: "5", label: lang === "ar" ? "طلبات هذا الأسبوع" : "Orders This Week", path: "/inbox" },
+    { value: "3,100", label: lang === "ar" ? "إيرادات الشهر" : "Revenue This Month", suffix: lang === "ar" ? "ج.م" : "EGP", path: "/profile/impact" },
+    { value: "2", label: lang === "ar" ? "مخزون منخفض" : "Low Stock", path: "/dashboard/product-seller/my-products" },
   ];
 
   const lowStock = [
@@ -44,7 +44,7 @@ const ProductSellerDashboard = () => {
       <div className="px-4 py-4 space-y-4">
         <div className="grid grid-cols-2 gap-3">
           {overview.map((o, i) => (
-            <div key={i} className="bg-card rounded-xl shadow-card p-3 text-center">
+            <div key={i} onClick={() => navigate(o.path)} className="bg-card rounded-xl shadow-card p-3 text-center cursor-pointer hover:shadow-md transition-shadow active:scale-[0.97]">
               <span className="text-xl font-bold text-foreground block">{o.value}{o.suffix && <span className="text-xs ml-1">{o.suffix}</span>}</span>
               <span className="text-[10px] text-muted-foreground">{o.label}</span>
             </div>
@@ -52,10 +52,11 @@ const ProductSellerDashboard = () => {
         </div>
 
         {/* Low Stock Alerts */}
-        <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4">
+        <div onClick={() => navigate("/dashboard/product-seller/my-products")} className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 cursor-pointer hover:shadow-md transition-shadow">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-destructive" />
             {lang === "ar" ? "تنبيه مخزون منخفض" : "Low Stock Alerts"}
+            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
           </h3>
           {lowStock.map((p, i) => (
             <div key={i} className="flex items-center justify-between py-2 border-b border-destructive/10 last:border-0">
@@ -66,10 +67,11 @@ const ProductSellerDashboard = () => {
         </div>
 
         {/* New Orders */}
-        <div className="bg-card rounded-xl shadow-card p-4">
+        <div onClick={() => navigate("/inbox")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
             <ShoppingCart className="w-4 h-4 text-role-product-seller" />
             {lang === "ar" ? "طلبات جديدة" : "New Orders"}
+            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
           </h3>
           <div className="border border-border rounded-lg p-3">
             <p className="text-xs font-semibold text-foreground">{lang === "ar" ? "مجوهرات بحرية × ٢" : "Sea Jewelry × 2"}</p>
