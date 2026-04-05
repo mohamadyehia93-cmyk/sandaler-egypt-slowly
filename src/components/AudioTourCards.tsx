@@ -10,7 +10,7 @@ const AudioTourCards = () => {
   const navigate = useNavigate();
 
   return (
-    <SectionHeader titleKey="section.audioTours" onSeeAll={() => {}}>
+    <SectionHeader titleKey="section.audioTours" onSeeAll={() => navigate("/audio-tours")}>
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {audioTours.map((a) => (
           <div

@@ -54,6 +54,7 @@ import NewFlagReport from "./pages/dashboards/NewFlagReport.tsx";
 import NewCollection from "./pages/dashboards/NewCollection.tsx";
 import Community from "./pages/Community.tsx";
 import AllPosts from "./pages/AllPosts.tsx";
+import AllAudioTours from "./pages/AllAudioTours.tsx";
 import VisitorProfile from "./pages/VisitorProfile.tsx";
 // Provider Management Pages
 import MyContent from "./pages/dashboards/MyContent.tsx";
