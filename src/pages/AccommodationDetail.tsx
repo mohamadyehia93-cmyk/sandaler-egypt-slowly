@@ -17,8 +17,26 @@ const AccommodationDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   const place = accommodation.find((a) => a.id === id);
+
+  // Generate deterministic availability statuses for 60 days based on listing id
+  const availabilityMap = useMemo(() => {
+    if (!place) return new Map<string, "available" | "limited" | "booked">();
+    const seed = place.id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    const statuses: ("available" | "limited" | "booked")[] = ["available", "limited", "booked"];
+    const map = new Map<string, "available" | "limited" | "booked">();
+    const today = new Date();
+    for (let i = 0; i < 60; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const key = format(d, "yyyy-MM-dd");
+      map.set(key, statuses[(seed + i * 7) % 3]);
+    }
+    return map;
+  }, [place?.id]);
+
   if (!place) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
 
   return (
