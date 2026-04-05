@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { trips, regions } from "@/lib/sampleData";
 import DetailTestimonials from "@/components/DetailTestimonials";
+import ProviderBioCard from "@/components/ProviderBioCard";
+import { tripToProvider } from "@/lib/providerMappings";
 
 const TripDetail = () => {
   const { id } = useParams();
