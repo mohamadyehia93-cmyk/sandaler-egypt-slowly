@@ -3,6 +3,8 @@ import { ArrowLeft, Heart, MapPin, ShoppingCart, Leaf, Package, Users } from "lu
 import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
 import { products } from "@/lib/sampleData";
+import ProviderBioCard from "@/components/ProviderBioCard";
+import { productToProvider } from "@/lib/providerMappings";
 
 const ProductDetail = () => {
   const { id } = useParams();
