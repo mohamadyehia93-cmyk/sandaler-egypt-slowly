@@ -219,9 +219,23 @@ const slideVariants = {
   exit: (dir: number) => ({ x: dir > 0 ? -300 : 300, opacity: 0 }),
 };
 
+// Map onboarding role keys to UserRole types
+const onboardingToUserRole: Record<string, UserRole> = {
+  "visitor": "visitor",
+  "culture-actor": "culture-actor",
+  "service-provider": "service-provider",
+  "accommodation-host": "service-provider",
+  "transport-provider": "service-provider",
+  "trip-organizer": "trip-organizer",
+  "product-seller": "product-seller",
+  "organization": "organization",
+  "ambassador": "ambassador",
+};
+
 const SplashPage = () => {
   const { t, lang, setLang } = useI18n();
   const navigate = useNavigate();
+  const { setRole } = useUserRole();
   const [step, setStep] = useState<OnboardingStep>("splash");
   const [direction, setDirection] = useState(1);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
