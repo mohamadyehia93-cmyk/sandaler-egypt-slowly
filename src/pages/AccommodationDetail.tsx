@@ -4,6 +4,7 @@ import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
 import { accommodation, hosts } from "@/lib/sampleData";
 import { accommodationToProvider } from "@/lib/providerMappings";
+import ProviderBioCard from "@/components/ProviderBioCard";
 
 const AccommodationDetail = () => {
   const { id } = useParams();
