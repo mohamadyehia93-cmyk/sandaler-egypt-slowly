@@ -16,7 +16,7 @@ const PostDetail = () => {
   const ct = (post as any).contentType ? contentTypeConfig[(post as any).contentType] : null;
   const CtIcon = ct?.icon;
 
-  const relatedPosts = latestPosts.filter((p) => p.id !== id && p.regionId === post.regionId).slice(0, 3);
+  const relatedPosts = latestPosts.filter((p) => p && p.id !== id && p.regionId === post.regionId).slice(0, 3);
   const formattedDate = new Date(post.date).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US", {
     year: "numeric", month: "long", day: "numeric",
   });
