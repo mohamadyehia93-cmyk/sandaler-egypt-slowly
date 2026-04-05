@@ -10,7 +10,7 @@ const PostDetail = () => {
   const navigate = useNavigate();
   const { lang } = useI18n();
 
-  const post = latestPosts.find((p) => p.id === id);
+  const post = latestPosts.find((p) => p?.id === id);
   if (!post) return <div className="p-8 text-center text-muted-foreground">Post not found</div>;
 
   const ct = (post as any).contentType ? contentTypeConfig[(post as any).contentType] : null;
