@@ -1,15 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Bell, MapPin, CheckCircle, AlertTriangle, Clock, Flag, Plus } from "lucide-react";
+import { ArrowLeft, Bell, MapPin, CheckCircle, AlertTriangle, Clock, Flag, Plus, ChevronRight } from "lucide-react";
 
 const AmbassadorDashboard = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
 
   const taskSummary = [
-    { value: "3", label: lang === "ar" ? "للتنفيذ" : "To Do", color: "bg-warning" },
-    { value: "1", label: lang === "ar" ? "قيد التنفيذ" : "In Progress", color: "bg-role-ambassador" },
-    { value: "12", label: lang === "ar" ? "مكتمل" : "Done", color: "bg-success" },
+    { value: "3", label: lang === "ar" ? "للتنفيذ" : "To Do", color: "bg-warning", path: "/dashboard/ambassador/my-tasks" },
+    { value: "1", label: lang === "ar" ? "قيد التنفيذ" : "In Progress", color: "bg-role-ambassador", path: "/dashboard/ambassador/my-tasks" },
+    { value: "12", label: lang === "ar" ? "مكتمل" : "Done", color: "bg-success", path: "/dashboard/ambassador/my-tasks" },
   ];
 
   const urgentTasks = [
@@ -60,7 +60,7 @@ const AmbassadorDashboard = () => {
         {/* Task Summary */}
         <div className="flex gap-3">
           {taskSummary.map((t, i) => (
-            <div key={i} className="flex-1 bg-card rounded-xl shadow-card p-3 text-center">
+            <div key={i} onClick={() => navigate(t.path)} className="flex-1 bg-card rounded-xl shadow-card p-3 text-center cursor-pointer hover:shadow-md transition-shadow active:scale-[0.97]">
               <div className={`w-2 h-2 rounded-full ${t.color} mx-auto mb-1`} />
               <span className="text-lg font-bold text-foreground block">{t.value}</span>
               <span className="text-[10px] text-muted-foreground">{t.label}</span>
@@ -69,8 +69,11 @@ const AmbassadorDashboard = () => {
         </div>
 
         {/* Urgent Tasks */}
-        <div className="bg-card rounded-xl shadow-card p-4">
-          <h3 className="text-sm font-bold text-foreground mb-3">{lang === "ar" ? "مهام عاجلة" : "Urgent Tasks"}</h3>
+        <div onClick={() => navigate("/dashboard/ambassador/my-tasks")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
+          <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+            {lang === "ar" ? "مهام عاجلة" : "Urgent Tasks"}
+            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
+          </h3>
           {urgentTasks.map((t, i) => (
             <div key={i} className={`flex items-center justify-between py-2.5 border-b border-border last:border-0 ${t.priority === "urgent" ? "border-l-2 border-l-destructive pl-2" : ""}`}>
               <div>

@@ -1,16 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Bell, Plus, BookOpen, GraduationCap, Library, TrendingUp, Download } from "lucide-react";
+import { ArrowLeft, Bell, Plus, BookOpen, GraduationCap, Library, TrendingUp, Download, ChevronRight } from "lucide-react";
 
 const SubjectExpertDashboard = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
 
   const overview = [
-    { value: "3", label: lang === "ar" ? "مجموعات منشورة" : "Published Collections" },
-    { value: "7", label: lang === "ar" ? "مقالات" : "Essays" },
-    { value: "2", label: lang === "ar" ? "حقائب تعليمية" : "Teacher Packs" },
-    { value: "45", label: lang === "ar" ? "تحميلات" : "Downloads" },
+    { value: "3", label: lang === "ar" ? "مجموعات منشورة" : "Published Collections", path: "/dashboard/subject-expert/my-collections" },
+    { value: "7", label: lang === "ar" ? "مقالات" : "Essays", path: "/dashboard/subject-expert/my-collections" },
+    { value: "2", label: lang === "ar" ? "حقائب تعليمية" : "Teacher Packs", path: "/dashboard/subject-expert/my-collections" },
+    { value: "45", label: lang === "ar" ? "تحميلات" : "Downloads", path: "/profile/impact" },
   ];
 
   const bottomNav = [
@@ -39,7 +39,7 @@ const SubjectExpertDashboard = () => {
       <div className="px-4 py-4 space-y-4">
         <div className="grid grid-cols-2 gap-3">
           {overview.map((o, i) => (
-            <div key={i} className="bg-card rounded-xl shadow-card p-3 text-center">
+            <div key={i} onClick={() => navigate(o.path)} className="bg-card rounded-xl shadow-card p-3 text-center cursor-pointer hover:shadow-md transition-shadow active:scale-[0.97]">
               <span className="text-xl font-bold text-foreground block">{o.value}</span>
               <span className="text-[10px] text-muted-foreground">{o.label}</span>
             </div>
@@ -47,10 +47,11 @@ const SubjectExpertDashboard = () => {
         </div>
 
         {/* Analytics */}
-        <div className="bg-card rounded-xl shadow-card p-4">
+        <div onClick={() => navigate("/profile/impact")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-role-subject-expert" />
             {lang === "ar" ? "تحليلات" : "Analytics"}
+            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
           </h3>
           <div className="flex justify-between text-center">
             <div><span className="text-lg font-bold text-foreground">1.2K</span><p className="text-[10px] text-muted-foreground">{lang === "ar" ? "قراءات" : "Reads"}</p></div>
@@ -66,13 +67,16 @@ const SubjectExpertDashboard = () => {
         </div>
 
         {/* Collaboration Inbox */}
-        <div className="bg-card rounded-xl shadow-card p-4">
-          <h3 className="text-sm font-bold text-foreground mb-2">{lang === "ar" ? "طلبات تعاون" : "Collaboration Requests"}</h3>
+        <div onClick={() => navigate("/inbox")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
+          <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+            {lang === "ar" ? "طلبات تعاون" : "Collaboration Requests"}
+            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
+          </h3>
           <div className="border border-border rounded-lg p-3">
             <p className="text-xs font-semibold text-foreground">{lang === "ar" ? "أحمد حسن يريد التعاون في مجموعة عن رشيد" : "Ahmed Hassan wants to co-author a Rosetta collection"}</p>
             <div className="flex gap-2 mt-2">
-              <button className="text-[10px] font-semibold bg-role-subject-expert text-white px-3 py-1.5 rounded-md">{lang === "ar" ? "قبول" : "Accept"}</button>
-              <button className="text-[10px] font-semibold border border-border text-foreground px-3 py-1.5 rounded-md">{lang === "ar" ? "رفض" : "Decline"}</button>
+              <button onClick={(e) => e.stopPropagation()} className="text-[10px] font-semibold bg-role-subject-expert text-white px-3 py-1.5 rounded-md">{lang === "ar" ? "قبول" : "Accept"}</button>
+              <button onClick={(e) => e.stopPropagation()} className="text-[10px] font-semibold border border-border text-foreground px-3 py-1.5 rounded-md">{lang === "ar" ? "رفض" : "Decline"}</button>
             </div>
           </div>
         </div>

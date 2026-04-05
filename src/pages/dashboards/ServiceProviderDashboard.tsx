@@ -1,16 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Bell, Plus, Calendar, MessageSquare, TrendingUp, CheckCircle, XCircle, Clock } from "lucide-react";
+import { ArrowLeft, Bell, Plus, Calendar, MessageSquare, TrendingUp, CheckCircle, XCircle, Clock, ChevronRight } from "lucide-react";
 
 const ServiceProviderDashboard = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
 
   const overview = [
-    { value: "5", label: lang === "ar" ? "قوائم نشطة" : "Active Listings" },
-    { value: "8", label: lang === "ar" ? "حجوزات هذا الأسبوع" : "Bookings This Week" },
-    { value: "4,200", label: lang === "ar" ? "إيرادات الشهر" : "Revenue This Month", suffix: lang === "ar" ? "ج.م" : "EGP" },
-    { value: "3", label: lang === "ar" ? "رسائل" : "Messages" },
+    { value: "5", label: lang === "ar" ? "قوائم نشطة" : "Active Listings", path: "/dashboard/service-provider/my-listings" },
+    { value: "8", label: lang === "ar" ? "حجوزات هذا الأسبوع" : "Bookings This Week", path: "/inbox" },
+    { value: "4,200", label: lang === "ar" ? "إيرادات الشهر" : "Revenue This Month", suffix: lang === "ar" ? "ج.م" : "EGP", path: "/profile/impact" },
+    { value: "3", label: lang === "ar" ? "رسائل" : "Messages", path: "/inbox" },
   ];
 
   const bookings = [
@@ -45,7 +45,7 @@ const ServiceProviderDashboard = () => {
         {/* Overview Cards */}
         <div className="grid grid-cols-2 gap-3">
           {overview.map((o, i) => (
-            <div key={i} className="bg-card rounded-xl shadow-card p-3 text-center">
+            <div key={i} onClick={() => navigate(o.path)} className="bg-card rounded-xl shadow-card p-3 text-center cursor-pointer hover:shadow-md transition-shadow active:scale-[0.97]">
               <span className="text-xl font-bold text-foreground block">{o.value}{o.suffix && <span className="text-xs ml-1">{o.suffix}</span>}</span>
               <span className="text-[10px] text-muted-foreground">{o.label}</span>
             </div>
@@ -53,27 +53,29 @@ const ServiceProviderDashboard = () => {
         </div>
 
         {/* Pending Booking Alert */}
-        <div className="bg-warning/10 border border-warning/30 rounded-xl p-4">
+        <div onClick={() => navigate("/inbox")} className="bg-warning/10 border border-warning/30 rounded-xl p-4 cursor-pointer hover:shadow-md transition-shadow">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-4 h-4 text-warning" />
             <h3 className="text-sm font-bold text-foreground">{lang === "ar" ? "طلب حجز جديد" : "New Booking Request"}</h3>
+            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
           </div>
           <p className="text-xs text-muted-foreground mb-3">{bookings[0].visitor} — {bookings[0].experience}</p>
           <div className="flex gap-2">
-            <button className="flex-1 bg-primary text-primary-foreground rounded-lg py-2 text-xs font-semibold flex items-center justify-center gap-1">
+            <button onClick={(e) => e.stopPropagation()} className="flex-1 bg-primary text-primary-foreground rounded-lg py-2 text-xs font-semibold flex items-center justify-center gap-1">
               <CheckCircle className="w-3.5 h-3.5" /> {lang === "ar" ? "تأكيد" : "Confirm"}
             </button>
-            <button className="flex-1 border border-border text-foreground rounded-lg py-2 text-xs font-semibold flex items-center justify-center gap-1">
+            <button onClick={(e) => e.stopPropagation()} className="flex-1 border border-border text-foreground rounded-lg py-2 text-xs font-semibold flex items-center justify-center gap-1">
               <XCircle className="w-3.5 h-3.5" /> {lang === "ar" ? "رفض" : "Decline"}
             </button>
           </div>
         </div>
 
         {/* Upcoming Bookings */}
-        <div className="bg-card rounded-xl shadow-card p-4">
+        <div onClick={() => navigate("/inbox")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4 text-role-service-provider" />
             {lang === "ar" ? "الحجوزات القادمة" : "Upcoming Bookings"}
+            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
           </h3>
           {bookings.map((b, i) => (
             <div key={i} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">

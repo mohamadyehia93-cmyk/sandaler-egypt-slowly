@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Bell, User, MessageSquare, Calendar, ToggleRight, Clock, Plus } from "lucide-react";
+import { ArrowLeft, Bell, User, MessageSquare, Calendar, ToggleRight, Clock, Plus, ChevronRight } from "lucide-react";
 
 const WhosWhoDashboard = () => {
   const { lang } = useI18n();
@@ -31,10 +31,13 @@ const WhosWhoDashboard = () => {
 
       <div className="px-4 py-4 space-y-4">
         {/* Profile Completeness */}
-        <div className="bg-card rounded-xl shadow-card p-4">
+        <div onClick={() => navigate("/profile")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-bold text-foreground">{lang === "ar" ? "اكتمال الملف" : "Profile Completeness"}</h3>
-            <span className="text-sm font-bold text-role-whos-who">85%</span>
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-bold text-role-whos-who">85%</span>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </div>
           </div>
           <div className="w-full bg-border rounded-full h-2">
             <div className="bg-role-whos-who h-2 rounded-full" style={{ width: "85%" }} />
@@ -43,7 +46,7 @@ const WhosWhoDashboard = () => {
         </div>
 
         {/* Availability Toggle */}
-        <div className="bg-card rounded-xl shadow-card p-4 flex items-center justify-between">
+        <div onClick={() => navigate("/profile/settings")} className="bg-card rounded-xl shadow-card p-4 flex items-center justify-between cursor-pointer hover:shadow-md transition-shadow">
           <div className="flex items-center gap-3">
             <ToggleRight className="w-5 h-5 text-success" />
             <div>
@@ -51,24 +54,26 @@ const WhosWhoDashboard = () => {
               <p className="text-[10px] text-muted-foreground">{lang === "ar" ? "السبت-الخميس، ٩ ص - ١ م" : "Sat–Thu, 9 AM – 1 PM"}</p>
             </div>
           </div>
-          <div className="w-10 h-6 bg-success rounded-full relative"><div className="absolute right-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow" /></div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </div>
 
         {/* Contact Requests */}
-        <div className="bg-card rounded-xl shadow-card p-4">
+        <div onClick={() => navigate("/inbox")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-role-whos-who" />
             {lang === "ar" ? "طلبات التواصل هذا الشهر" : "Contact Requests This Month"}
+            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
           </h3>
           <span className="text-3xl font-bold text-role-whos-who">7</span>
           <p className="text-[10px] text-muted-foreground mt-1">{lang === "ar" ? "٣ في انتظار الرد" : "3 awaiting response"}</p>
         </div>
 
         {/* Upcoming Sessions */}
-        <div className="bg-card rounded-xl shadow-card p-4">
+        <div onClick={() => navigate("/calendar")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4 text-role-whos-who" />
             {lang === "ar" ? "الجلسات القادمة" : "Upcoming Sessions"}
+            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
           </h3>
           <div className="border border-border rounded-lg p-3">
             <p className="text-xs font-semibold text-foreground">{lang === "ar" ? "أمسية قصص عن طرق صيد المنزلة" : "Evening of stories about Manzala's fishing routes"}</p>

@@ -1,16 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Bell, Plus, Map, Users, Calendar, TrendingUp, Send } from "lucide-react";
+import { ArrowLeft, Bell, Plus, Map, Users, Calendar, TrendingUp, Send, ChevronRight } from "lucide-react";
 
 const TripOrganizerDashboard = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
 
   const overview = [
-    { value: "6", label: lang === "ar" ? "رحلات نشطة" : "Active Trips" },
-    { value: "14", label: lang === "ar" ? "حجوزات هذا الشهر" : "Bookings This Month" },
-    { value: "12,800", label: lang === "ar" ? "إيرادات" : "Revenue", suffix: lang === "ar" ? "ج.م" : "EGP" },
-    { value: "3", label: lang === "ar" ? "رحلات قادمة" : "Upcoming Departures" },
+    { value: "6", label: lang === "ar" ? "رحلات نشطة" : "Active Trips", path: "/dashboard/trip-organizer/my-trips" },
+    { value: "14", label: lang === "ar" ? "حجوزات هذا الشهر" : "Bookings This Month", path: "/inbox" },
+    { value: "12,800", label: lang === "ar" ? "إيرادات" : "Revenue", suffix: lang === "ar" ? "ج.م" : "EGP", path: "/profile/impact" },
+    { value: "3", label: lang === "ar" ? "رحلات قادمة" : "Upcoming Departures", path: "/dashboard/trip-organizer/my-trips" },
   ];
 
   const departures = [
@@ -44,7 +44,7 @@ const TripOrganizerDashboard = () => {
       <div className="px-4 py-4 space-y-4">
         <div className="grid grid-cols-2 gap-3">
           {overview.map((o, i) => (
-            <div key={i} className="bg-card rounded-xl shadow-card p-3 text-center">
+            <div key={i} onClick={() => navigate(o.path)} className="bg-card rounded-xl shadow-card p-3 text-center cursor-pointer hover:shadow-md transition-shadow active:scale-[0.97]">
               <span className="text-xl font-bold text-foreground block">{o.value}{o.suffix && <span className="text-xs ml-1">{o.suffix}</span>}</span>
               <span className="text-[10px] text-muted-foreground">{o.label}</span>
             </div>
@@ -52,19 +52,21 @@ const TripOrganizerDashboard = () => {
         </div>
 
         {/* New Lead Alert */}
-        <div className="bg-primary/10 border border-primary/30 rounded-xl p-4">
+        <div onClick={() => navigate("/inbox")} className="bg-primary/10 border border-primary/30 rounded-xl p-4 cursor-pointer hover:shadow-md transition-shadow">
           <h3 className="text-sm font-bold text-foreground mb-1 flex items-center gap-2">
             <Users className="w-4 h-4 text-primary" />
             {lang === "ar" ? "استفسار جديد" : "New Lead"}
+            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
           </h3>
           <p className="text-xs text-muted-foreground">{lang === "ar" ? "مجموعة من ٦ أشخاص تسأل عن رحلة خاصة لدمياط" : "Group of 6 asking about a private trip to Damietta"}</p>
         </div>
 
         {/* Upcoming Departures */}
-        <div className="bg-card rounded-xl shadow-card p-4">
+        <div onClick={() => navigate("/dashboard/trip-organizer/my-trips")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4 text-role-trip-organizer" />
             {lang === "ar" ? "الرحلات القادمة" : "Upcoming Departures"}
+            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
           </h3>
           {departures.map((d, i) => (
             <div key={i} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
@@ -72,7 +74,7 @@ const TripOrganizerDashboard = () => {
                 <p className="text-xs font-semibold text-foreground">{d.name}</p>
                 <p className="text-[10px] text-muted-foreground">{d.date} · {d.confirmed} {lang === "ar" ? "مؤكد" : "confirmed"}</p>
               </div>
-              <button className="p-1.5 rounded-md bg-role-trip-organizer/10">
+              <button onClick={(e) => e.stopPropagation()} className="p-1.5 rounded-md bg-role-trip-organizer/10">
                 <Send className="w-3.5 h-3.5 text-role-trip-organizer" />
               </button>
             </div>

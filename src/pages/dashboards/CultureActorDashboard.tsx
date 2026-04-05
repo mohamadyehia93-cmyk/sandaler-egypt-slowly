@@ -7,9 +7,9 @@ const CultureActorDashboard = () => {
   const navigate = useNavigate();
 
   const stats = [
-    { value: "12", label: lang === "ar" ? "منشور" : "Published", icon: FileText },
-    { value: "3", label: lang === "ar" ? "مسودات" : "Drafts", icon: FileText },
-    { value: "2", label: lang === "ar" ? "قيد المراجعة" : "Under Review", icon: Eye },
+    { value: "12", label: lang === "ar" ? "منشور" : "Published", icon: FileText, path: "/dashboard/culture-actor/my-content" },
+    { value: "3", label: lang === "ar" ? "مسودات" : "Drafts", icon: FileText, path: "/dashboard/culture-actor/my-content" },
+    { value: "2", label: lang === "ar" ? "قيد المراجعة" : "Under Review", icon: Eye, path: "/dashboard/culture-actor/my-content" },
   ];
 
   const prompts = [
@@ -48,7 +48,7 @@ const CultureActorDashboard = () => {
         {/* Stats */}
         <div className="flex gap-3">
           {stats.map((s, i) => (
-            <div key={i} className="flex-1 bg-card rounded-xl shadow-card p-3 text-center">
+            <div key={i} onClick={() => navigate(s.path)} className="flex-1 bg-card rounded-xl shadow-card p-3 text-center cursor-pointer hover:shadow-md transition-shadow active:scale-[0.97]">
               <s.icon className="w-4 h-4 text-role-culture-actor mx-auto mb-1" />
               <span className="text-lg font-bold text-foreground block">{s.value}</span>
               <span className="text-[10px] text-muted-foreground">{s.label}</span>
@@ -57,10 +57,11 @@ const CultureActorDashboard = () => {
         </div>
 
         {/* Today's Analytics */}
-        <div className="bg-card rounded-xl shadow-card p-4">
+        <div onClick={() => navigate("/profile/impact")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-role-culture-actor" />
             {lang === "ar" ? "تحليلات اليوم" : "Today's Analytics"}
+            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
           </h3>
           <div className="flex justify-between text-center">
             <div><span className="text-lg font-bold text-foreground">248</span><p className="text-[10px] text-muted-foreground">{lang === "ar" ? "مشاهدات" : "Views"}</p></div>
@@ -70,9 +71,14 @@ const CultureActorDashboard = () => {
         </div>
 
         {/* Earnings */}
-        <div className="bg-card rounded-xl shadow-card p-4">
-          <h3 className="text-sm font-bold text-foreground mb-1">{lang === "ar" ? "أرباح هذا الشهر" : "Earnings This Month"}</h3>
-          <span className="text-2xl font-bold text-role-culture-actor">2,450 {lang === "ar" ? "ج.م" : "EGP"}</span>
+        <div onClick={() => navigate("/profile/impact")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-bold text-foreground mb-1">{lang === "ar" ? "أرباح هذا الشهر" : "Earnings This Month"}</h3>
+              <span className="text-2xl font-bold text-role-culture-actor">2,450 {lang === "ar" ? "ج.م" : "EGP"}</span>
+            </div>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          </div>
         </div>
 
         {/* Active Prompts */}
@@ -84,7 +90,7 @@ const CultureActorDashboard = () => {
           {prompts.map((p, i) => (
             <div key={i} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
               <span className="text-xs text-foreground flex-1">{p[lang]}</span>
-              <button className="text-[10px] font-semibold text-primary-foreground bg-role-culture-actor px-3 py-1.5 rounded-md ml-2">
+              <button onClick={() => navigate("/dashboard/culture-actor/new-article")} className="text-[10px] font-semibold text-primary-foreground bg-role-culture-actor px-3 py-1.5 rounded-md ml-2">
                 {lang === "ar" ? "اكتب" : "Write"}
               </button>
             </div>
