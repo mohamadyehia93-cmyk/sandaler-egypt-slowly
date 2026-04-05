@@ -19,7 +19,11 @@ const WhosWhoDashboard = () => {
       <header className="bg-role-whos-who text-white px-4 py-4">
         <div className="flex items-center justify-between mb-3">
           <button onClick={() => navigate("/profile")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-          <button onClick={() => navigate("/inbox")} className="relative p-1"><Bell className="w-5 h-5" /></button>
+          <div className="flex items-center gap-2">
+            <VisitorModeHeaderToggle />
+            <button onClick={() => navigate("/inbox")} className="relative p-1"><Bell className="w-5 h-5" /></button>
+          </div>
+        </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl">📚</div>
