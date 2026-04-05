@@ -20,7 +20,7 @@ const TripOrganizerDashboard = () => {
 
   const bottomNav = [
     { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true, path: "/dashboard/trip-organizer" },
-    { label: lang === "ar" ? "رحلاتي" : "My Trips", icon: "🗺️", active: false, path: "/" },
+    { label: lang === "ar" ? "رحلاتي" : "My Trips", icon: "🗺️", active: false, path: "/dashboard/trip-organizer/my-trips" },
     { label: lang === "ar" ? "العملاء" : "Leads", icon: "📥", active: false, path: "/inbox" },
     { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false, path: "/profile" },
   ];
