@@ -124,13 +124,13 @@ export const useMessages = (conversationId: string | null) => {
 
   const sendMessage = useCallback(async (text: string, messageType = "text", bookingMeta?: Record<string, unknown>) => {
     if (!user || !conversationId) return;
-    await supabase.from("messages").insert({
+    await supabase.from("messages").insert([{
       conversation_id: conversationId,
       sender_id: user.id,
       text,
       message_type: messageType,
-      booking_meta: bookingMeta ?? null,
-    });
+      booking_meta: (bookingMeta ?? null) as any,
+    }]);
     // Update conversation preview
     await supabase.from("conversations").update({
       last_message_text: text,
