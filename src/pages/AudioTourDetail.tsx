@@ -33,7 +33,7 @@ const AudioTourDetail = () => {
 
   const { data: tour, isLoading } = useQuery({
     queryKey: ["audio_tour", id],
-    queryFn: () => fetchByIdOrSlug<any>("audio_tours", id!),
+    queryFn: () => fetchByIdOrSlug("audio_tours", id!),
     enabled: !!id,
   });
 

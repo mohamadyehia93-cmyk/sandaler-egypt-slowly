@@ -15,7 +15,7 @@ const TripDetail = () => {
 
   const { data: trip, isLoading } = useQuery({
     queryKey: ["trip", id],
-    queryFn: () => fetchByIdOrSlug<any>("trips", id!),
+    queryFn: () => fetchByIdOrSlug("trips", id!),
     enabled: !!id,
   });
 

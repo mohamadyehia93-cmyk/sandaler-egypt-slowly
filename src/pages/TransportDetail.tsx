@@ -14,7 +14,7 @@ const TransportDetail = () => {
 
   const { data: item, isLoading } = useQuery({
     queryKey: ["transport", id],
-    queryFn: () => fetchByIdOrSlug<any>("transport", id!),
+    queryFn: () => fetchByIdOrSlug("transport", id!),
     enabled: !!id,
   });
 

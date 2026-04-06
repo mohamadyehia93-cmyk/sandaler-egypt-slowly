@@ -15,7 +15,7 @@ const ExperienceDetail = () => {
 
   const { data: exp, isLoading } = useQuery({
     queryKey: ["experience", id],
-    queryFn: () => fetchByIdOrSlug<any>("experiences", id!),
+    queryFn: () => fetchByIdOrSlug("experiences", id!),
     enabled: !!id,
   });
 

@@ -22,7 +22,7 @@ const AccommodationDetail = () => {
 
   const { data: place, isLoading } = useQuery({
     queryKey: ["accommodation", id],
-    queryFn: () => fetchByIdOrSlug<any>("accommodations", id!),
+    queryFn: () => fetchByIdOrSlug("accommodations", id!),
     enabled: !!id,
   });
 
