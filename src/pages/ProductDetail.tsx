@@ -12,14 +12,18 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { lang, t } = useI18n();
 
+  const isUuid = id ? /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) : false;
+
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .or(`id.eq.${id},slug.eq.${id}`)
-        .maybeSingle();
+      let query = supabase.from("products").select("*");
+      if (isUuid) {
+        query = query.eq("id", id);
+      } else {
+        query = query.eq("slug", id);
+      }
+      const { data, error } = await query.maybeSingle();
       if (error) throw error;
       return data;
     },
