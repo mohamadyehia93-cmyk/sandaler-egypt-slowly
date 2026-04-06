@@ -390,7 +390,7 @@ const ItineraryPlanner = () => {
               {m.role === "assistant" ? (
                 <AssistantMessage
                   content={m.content}
-                  onChoiceSelect={send}
+                  onSubmitAll={(answers) => send(answers.join("\n"))}
                   isLastMessage={i === messages.length - 1}
                   isLoading={isLoading}
                 />
