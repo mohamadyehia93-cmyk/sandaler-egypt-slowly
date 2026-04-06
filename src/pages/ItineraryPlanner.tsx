@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import { ArrowLeft, Send, Sparkles, MapPin, Calendar, Users, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowLeft, Send, Sparkles, MapPin, Calendar, Users, Loader2, Save } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { experiences, audioTours, accommodation, trips } from "@/lib/sampleData";
 import BottomNav from "@/components/BottomNav";
 
