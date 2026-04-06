@@ -3,10 +3,18 @@ import { useI18n } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useUserRole, type UserRole } from "@/hooks/useUserRole";
-import { User, Pen, Briefcase, Home, Truck, Map, ShoppingBag, Building2, Shield, ArrowLeft, ArrowRight, MapPin, Compass, Headphones, Heart, UtensilsCrossed, Camera, Music, Palette, Check, BookOpen, Mic, Landmark, Wheat, Tent, Car, Bus, Ship, Package, Gem, Leaf, GraduationCap, Users, HandHeart, Eye } from "lucide-react";
-import { regions, regionCities } from "@/lib/sampleData";
+import { useRegions, useCities } from "@/hooks/useListings";
+import {
+  User, Pen, Briefcase, Home, Truck, Map, ShoppingBag, Building2, Shield,
+  ArrowLeft, ArrowRight, MapPin, Compass, Headphones, Heart, UtensilsCrossed,
+  Camera, Music, Palette, Check, BookOpen, Mic, Landmark, Wheat, Tent, Car,
+  Bus, Ship, Package, Gem, Leaf, GraduationCap, Users, HandHeart, Eye,
+  Sparkles, Zap, Clock, DollarSign, Crown, Coins, Star, Globe, Mountain
+} from "lucide-react";
 
-type OnboardingStep = "splash" | "language" | "role" | "localRole" | "roleDetails" | "city" | "interests" | "profile";
+type OnboardingStep =
+  | "splash" | "language" | "role" | "localRole" | "roleDetails"
+  | "city" | "interests" | "travelStyle" | "budget" | "profile";
 
 type RoleQuestion = {
   title: { en: string; ar: string };
@@ -59,47 +67,19 @@ const roleQuestions: Record<string, RoleQuestion[]> = {
       multi: true,
     },
   ],
-  "accommodation-host": [
+  "whos-who": [
     {
-      title: { en: "What type of stay?", ar: "ما نوع الإقامة؟" },
-      subtitle: { en: "Describe your accommodation", ar: "صف مكان إقامتك" },
+      title: { en: "What is your field?", ar: "ما مجالك؟" },
+      subtitle: { en: "Select your area of expertise", ar: "اختر مجال خبرتك" },
       options: [
-        { key: "guesthouse", icon: Home, label: { en: "Guesthouse", ar: "بيت ضيافة" } },
-        { key: "homestay", icon: Users, label: { en: "Homestay", ar: "إقامة منزلية" } },
-        { key: "ecolodge", icon: Leaf, label: { en: "Eco-lodge", ar: "نزل بيئي" } },
-        { key: "camp", icon: Tent, label: { en: "Camp / Tent", ar: "مخيم / خيمة" } },
-        { key: "farm-stay", icon: Wheat, label: { en: "Farm Stay", ar: "إقامة مزرعة" } },
-        { key: "heritage-house", icon: Landmark, label: { en: "Heritage House", ar: "بيت تراثي" } },
+        { key: "artisan", icon: Palette, label: { en: "Artisan & Craftsperson", ar: "حرفي وصانع" } },
+        { key: "historian", icon: Landmark, label: { en: "Historian & Researcher", ar: "مؤرخ وباحث" } },
+        { key: "chef", icon: UtensilsCrossed, label: { en: "Chef & Food Expert", ar: "طاهٍ وخبير طعام" } },
+        { key: "musician", icon: Music, label: { en: "Musician & Performer", ar: "موسيقي ومؤدي" } },
+        { key: "elder", icon: Star, label: { en: "Community Elder", ar: "شيخ المجتمع" } },
+        { key: "guide", icon: Compass, label: { en: "Local Guide", ar: "مرشد محلي" } },
       ],
       multi: false,
-    },
-    {
-      title: { en: "What do you offer guests?", ar: "ماذا تقدم للضيوف؟" },
-      subtitle: { en: "Select your amenities", ar: "اختر وسائل الراحة" },
-      options: [
-        { key: "meals", icon: UtensilsCrossed, label: { en: "Home-cooked Meals", ar: "وجبات منزلية" } },
-        { key: "tours", icon: Compass, label: { en: "Local Tours", ar: "جولات محلية" } },
-        { key: "workshops-host", icon: Palette, label: { en: "Craft Workshops", ar: "ورش حرف" } },
-        { key: "nature-access", icon: Leaf, label: { en: "Nature Access", ar: "وصول للطبيعة" } },
-        { key: "cultural-immersion", icon: Music, label: { en: "Cultural Immersion", ar: "انغماس ثقافي" } },
-        { key: "farm-activities", icon: Wheat, label: { en: "Farm Activities", ar: "أنشطة زراعية" } },
-      ],
-      multi: true,
-    },
-  ],
-  "transport-provider": [
-    {
-      title: { en: "What transport do you offer?", ar: "ما نوع المواصلات؟" },
-      subtitle: { en: "Select your vehicle types", ar: "اختر أنواع مركباتك" },
-      options: [
-        { key: "car", icon: Car, label: { en: "Private Car", ar: "سيارة خاصة" } },
-        { key: "minibus", icon: Bus, label: { en: "Minibus / Van", ar: "ميني باص / فان" } },
-        { key: "boat", icon: Ship, label: { en: "Boat / Felucca", ar: "قارب / فلوكة" } },
-        { key: "tuktuk", icon: Truck, label: { en: "Tuk-tuk", ar: "توك توك" } },
-        { key: "bicycle", icon: Compass, label: { en: "Bicycle Rental", ar: "تأجير دراجات" } },
-        { key: "donkey-camel", icon: Map, label: { en: "Donkey / Camel", ar: "حمار / جمل" } },
-      ],
-      multi: true,
     },
   ],
   "trip-organizer": [
@@ -109,7 +89,7 @@ const roleQuestions: Record<string, RoleQuestion[]> = {
       options: [
         { key: "day-trips", icon: Compass, label: { en: "Day Trips", ar: "رحلات يومية" } },
         { key: "multi-day", icon: Map, label: { en: "Multi-day Tours", ar: "جولات متعددة الأيام" } },
-        { key: "hiking", icon: Leaf, label: { en: "Hiking & Trekking", ar: "مشي وتسلق" } },
+        { key: "hiking", icon: Mountain, label: { en: "Hiking & Trekking", ar: "مشي وتسلق" } },
         { key: "cultural-tours", icon: Landmark, label: { en: "Cultural Tours", ar: "جولات ثقافية" } },
         { key: "food-tours", icon: UtensilsCrossed, label: { en: "Food Tours", ar: "جولات طعام" } },
         { key: "photography-tours", icon: Camera, label: { en: "Photography Tours", ar: "جولات تصوير" } },
@@ -173,6 +153,21 @@ const roleQuestions: Record<string, RoleQuestion[]> = {
       multi: true,
     },
   ],
+  "subject-expert": [
+    {
+      title: { en: "What topics do you curate?", ar: "ما المواضيع التي تنظمها؟" },
+      subtitle: { en: "Select your knowledge domains", ar: "اختر مجالات معرفتك" },
+      options: [
+        { key: "history-expert", icon: Landmark, label: { en: "History & Heritage", ar: "تاريخ وتراث" } },
+        { key: "ecology", icon: Leaf, label: { en: "Ecology & Nature", ar: "بيئة وطبيعة" } },
+        { key: "architecture-expert", icon: Building2, label: { en: "Architecture", ar: "عمارة" } },
+        { key: "ethnography", icon: Users, label: { en: "Ethnography & Folklore", ar: "إثنوغرافيا وفلكلور" } },
+        { key: "gastronomy", icon: UtensilsCrossed, label: { en: "Food & Gastronomy", ar: "طعام وفن الطبخ" } },
+        { key: "archaeology", icon: Globe, label: { en: "Archaeology", ar: "آثار" } },
+      ],
+      multi: true,
+    },
+  ],
 };
 
 const topRoles = [
@@ -183,12 +178,12 @@ const topRoles = [
 const localRoles = [
   { key: "culture-actor", icon: Pen, label: { en: "Culture Actor", ar: "فاعل ثقافي" }, desc: { en: "Share your community's story", ar: "شارك قصة مجتمعك" } },
   { key: "service-provider", icon: Briefcase, label: { en: "Service Provider", ar: "مقدم خدمة" }, desc: { en: "List experiences & activities", ar: "اعرض تجارب وأنشطة" } },
-  { key: "accommodation-host", icon: Home, label: { en: "Accommodation Host", ar: "مضيف إقامة" }, desc: { en: "Host travelers in your home", ar: "استضف مسافرين في بيتك" } },
-  { key: "transport-provider", icon: Truck, label: { en: "Transport Provider", ar: "مقدم مواصلات" }, desc: { en: "Offer rides & transport", ar: "قدم رحلات ومواصلات" } },
+  { key: "whos-who", icon: Star, label: { en: "Who's Who", ar: "شخصية بارزة" }, desc: { en: "Be recognized as a local figure", ar: "كن شخصية محلية معروفة" } },
   { key: "trip-organizer", icon: Map, label: { en: "Trip Organizer", ar: "منظم رحلات" }, desc: { en: "Create & lead group trips", ar: "أنشئ وقُد رحلات جماعية" } },
   { key: "product-seller", icon: ShoppingBag, label: { en: "Product Seller", ar: "بائع منتجات" }, desc: { en: "Sell local crafts & goods", ar: "بِع حرفاً ومنتجات محلية" } },
   { key: "organization", icon: Building2, label: { en: "Organization", ar: "منظمة" }, desc: { en: "Recruit volunteers & donors", ar: "اجذب متطوعين ومتبرعين" } },
   { key: "ambassador", icon: Shield, label: { en: "Ambassador", ar: "سفير" }, desc: { en: "Verify & support providers", ar: "تحقق وادعم المقدمين" } },
+  { key: "subject-expert", icon: GraduationCap, label: { en: "Subject Expert", ar: "خبير متخصص" }, desc: { en: "Curate knowledge & collections", ar: "نظّم المعرفة والمجموعات" } },
 ];
 
 const allRoles = [topRoles[0], ...localRoles];
@@ -206,12 +201,19 @@ const interests = [
   { key: "trips", icon: Map, label: { en: "Group Trips", ar: "رحلات جماعية" } },
 ];
 
-const regionNames: Record<string, { en: string; ar: string }> = {
-  "nile-delta": { en: "Nile Delta", ar: "دلتا النيل" },
-  "suez-canal": { en: "Suez Canal", ar: "قناة السويس" },
-  "upper-egypt": { en: "Upper Egypt", ar: "صعيد مصر" },
-  "frontiers": { en: "Frontiers", ar: "الحدود" },
-};
+const travelStyles = [
+  { key: "slow", icon: Clock, label: { en: "Slow & Immersive", ar: "بطيء وعميق" }, desc: { en: "Deep cultural dives, long stays", ar: "غوص ثقافي عميق وإقامات طويلة" } },
+  { key: "adventure", icon: Mountain, label: { en: "Adventure & Active", ar: "مغامرة ونشاط" }, desc: { en: "Hiking, outdoor activities", ar: "مشي وأنشطة خارجية" } },
+  { key: "social", icon: Users, label: { en: "Social & Community", ar: "اجتماعي ومجتمعي" }, desc: { en: "Meet locals, join events", ar: "قابل السكان المحليين وشارك في الفعاليات" } },
+  { key: "explorer", icon: Globe, label: { en: "Explorer & Curious", ar: "مستكشف وفضولي" }, desc: { en: "See everything, cover more ground", ar: "شاهد كل شيء وغطِّ مساحة أكبر" } },
+];
+
+const budgetOptions = [
+  { key: "budget", icon: Coins, label: { en: "Budget-Friendly", ar: "اقتصادي" }, desc: { en: "Under 500 EGP/day", ar: "أقل من ٥٠٠ ج.م/يوم" } },
+  { key: "mid", icon: DollarSign, label: { en: "Mid-Range", ar: "متوسط" }, desc: { en: "500–1500 EGP/day", ar: "٥٠٠–١٥٠٠ ج.م/يوم" } },
+  { key: "premium", icon: Crown, label: { en: "Premium", ar: "فاخر" }, desc: { en: "1500+ EGP/day", ar: "+١٥٠٠ ج.م/يوم" } },
+  { key: "flexible", icon: Sparkles, label: { en: "Flexible", ar: "مرن" }, desc: { en: "Depends on the experience", ar: "يعتمد على التجربة" } },
+];
 
 const slideVariants = {
   enter: (dir: number) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
@@ -219,31 +221,34 @@ const slideVariants = {
   exit: (dir: number) => ({ x: dir > 0 ? -300 : 300, opacity: 0 }),
 };
 
-// Map onboarding role keys to UserRole types
 const onboardingToUserRole: Record<string, UserRole> = {
   "visitor": "visitor",
   "culture-actor": "culture-actor",
   "service-provider": "service-provider",
-  "accommodation-host": "service-provider",
-  "transport-provider": "service-provider",
+  "whos-who": "whos-who",
   "trip-organizer": "trip-organizer",
   "product-seller": "product-seller",
   "organization": "organization",
   "ambassador": "ambassador",
+  "subject-expert": "subject-expert",
 };
 
 const SplashPage = () => {
   const { t, lang, setLang } = useI18n();
   const navigate = useNavigate();
   const { setRole } = useUserRole();
+  const { data: dbRegions } = useRegions();
+  const { data: dbCities } = useCities();
+
   const [step, setStep] = useState<OnboardingStep>("splash");
   const [direction, setDirection] = useState(1);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
+  const [selectedBudget, setSelectedBudget] = useState<string | null>(null);
   const [name, setName] = useState("");
-
   const [selectedRoleAnswers, setSelectedRoleAnswers] = useState<Record<number, string[]>>({});
   const [roleQuestionIdx, setRoleQuestionIdx] = useState(0);
 
@@ -252,8 +257,7 @@ const SplashPage = () => {
     setStep(next);
   };
 
-  const roleRoutMap: Record<string, string> = {
-    "visitor": "/",
+  const roleDashboardPaths: Record<string, string> = {
     "culture-actor": "/dashboard/culture-actor",
     "service-provider": "/dashboard/service-provider",
     "whos-who": "/dashboard/whos-who",
@@ -267,10 +271,20 @@ const SplashPage = () => {
   const handleFinish = () => {
     const mappedRole = selectedRole ? (onboardingToUserRole[selectedRole] || "visitor") : "visitor";
     setRole(mappedRole);
-    const route = mappedRole !== "visitor" ? (roleRoutMap[mappedRole] || "/") : "/";
+    // Save personalization to localStorage
+    if (selectedInterests.length > 0) localStorage.setItem("sandal-interests", JSON.stringify(selectedInterests));
+    if (selectedStyle) localStorage.setItem("sandal-travel-style", selectedStyle);
+    if (selectedBudget) localStorage.setItem("sandal-budget", selectedBudget);
+    if (selectedCities.length > 0) localStorage.setItem("sandal-cities", JSON.stringify(selectedCities));
+    localStorage.setItem("sandal-onboarded", "true");
+    const route = mappedRole !== "visitor" ? (roleDashboardPaths[mappedRole] || "/") : "/";
     navigate(route);
   };
-  const handleGuestMode = () => navigate("/");
+
+  const handleGuestMode = () => {
+    localStorage.setItem("sandal-onboarded", "true");
+    navigate("/");
+  };
 
   const toggleCity = (cityId: string) => {
     setSelectedCities(prev =>
@@ -284,13 +298,16 @@ const SplashPage = () => {
     );
   };
 
-  const availableCities = Object.entries(regionCities).flatMap(([regionId, cities]) =>
-    cities.map(c => ({ ...c, regionId }))
-  );
-
+  // Build city list from database
+  const regionsList = dbRegions || [];
+  const citiesList = dbCities || [];
   const filteredCities = selectedRegion
-    ? regionCities[selectedRegion] || []
-    : availableCities;
+    ? citiesList.filter(c => c.region_id === selectedRegion)
+    : citiesList;
+
+  // Progress indicator for visitor quiz
+  const visitorSteps = ["interests", "travelStyle", "budget"] as const;
+  const currentVisitorStep = visitorSteps.indexOf(step as any);
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
@@ -423,7 +440,7 @@ const SplashPage = () => {
           </motion.div>
         )}
 
-        {/* STEP 3b: Local Role Selection */}
+        {/* STEP 3b: Local Role Selection (8 cards) */}
         {step === "localRole" && (
           <motion.div
             key="localRole"
@@ -458,7 +475,11 @@ const SplashPage = () => {
                       setSelectedRole(key);
                       setRoleQuestionIdx(0);
                       setSelectedRoleAnswers({});
-                      goTo("roleDetails");
+                      if (roleQuestions[key]) {
+                        goTo("roleDetails");
+                      } else {
+                        goTo("city");
+                      }
                     }}
                     className="flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-start border-border bg-card hover:border-primary/30"
                   >
@@ -474,7 +495,6 @@ const SplashPage = () => {
                 ))}
               </div>
             </div>
-
           </motion.div>
         )}
 
@@ -587,7 +607,7 @@ const SplashPage = () => {
           );
         })()}
 
-        {/* STEP 4: City Selection */}
+        {/* STEP 4: City Selection (from database) */}
         {step === "city" && (
           <motion.div
             key="city"
@@ -639,7 +659,7 @@ const SplashPage = () => {
               >
                 {lang === "ar" ? "الكل" : "All"}
               </button>
-              {regions.map(r => (
+              {regionsList.map(r => (
                 <button
                   key={r.id}
                   onClick={() => setSelectedRegion(r.id)}
@@ -647,7 +667,7 @@ const SplashPage = () => {
                     selectedRegion === r.id ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
                   }`}
                 >
-                  {r.emoji} {regionNames[r.id]?.[lang] || r.id}
+                  {r.emoji} {lang === "ar" ? r.name_ar : r.name_en}
                 </button>
               ))}
             </div>
@@ -667,7 +687,9 @@ const SplashPage = () => {
                       }`}
                     >
                       <MapPin className={`w-4 h-4 shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
-                      <span className="text-sm font-medium text-foreground truncate">{city.name[lang]}</span>
+                      <span className="text-sm font-medium text-foreground truncate">
+                        {lang === "ar" ? city.name_ar : city.name_en}
+                      </span>
                       {isSelected && (
                         <Check className="w-3.5 h-3.5 text-primary absolute top-2 end-2" />
                       )}
@@ -697,7 +719,7 @@ const SplashPage = () => {
           </motion.div>
         )}
 
-        {/* STEP 5: Interests */}
+        {/* STEP 5a: Interests (Visitor Quiz 1/3) */}
         {step === "interests" && (
           <motion.div
             key="interests"
@@ -713,7 +735,7 @@ const SplashPage = () => {
               <button onClick={() => goTo("city", -1)} className="p-1.5 rounded-full hover:bg-secondary">
                 <ArrowLeft className="w-5 h-5 text-foreground" />
               </button>
-              <div>
+              <div className="flex-1">
                 <h1 className="text-lg font-bold text-foreground">
                   {lang === "ar" ? "ما يهمك" : "What Interests You?"}
                 </h1>
@@ -721,7 +743,13 @@ const SplashPage = () => {
                   {lang === "ar" ? "اختر ٣ أو أكثر لتخصيص تجربتك" : "Pick 3+ to personalize your feed"}
                 </p>
               </div>
+              <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">1/3</span>
             </header>
+
+            {/* Progress bar */}
+            <div className="h-1 bg-secondary">
+              <div className="h-1 bg-primary transition-all" style={{ width: "33%" }} />
+            </div>
 
             <div className="flex-1 overflow-y-auto px-4 py-4">
               <div className="grid grid-cols-2 gap-3">
@@ -743,9 +771,165 @@ const SplashPage = () => {
                         <Icon className="w-5 h-5" />
                       </div>
                       <span className="text-xs font-semibold text-foreground text-center">{label[lang]}</span>
-                      {isSelected && (
-                        <Check className="w-4 h-4 text-primary" />
-                      )}
+                      {isSelected && <Check className="w-4 h-4 text-primary" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="px-4 py-4 border-t border-border bg-background space-y-2">
+              <button
+                onClick={() => goTo("travelStyle")}
+                disabled={selectedInterests.length < 3}
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {lang === "ar" ? "التالي" : "Continue"} ({selectedInterests.length}/3+)
+              </button>
+              <button
+                onClick={() => goTo("travelStyle")}
+                className="w-full py-2 text-xs text-muted-foreground font-medium"
+              >
+                {lang === "ar" ? "تخطي" : "Skip"}
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* STEP 5b: Travel Style (Visitor Quiz 2/3) */}
+        {step === "travelStyle" && (
+          <motion.div
+            key="travelStyle"
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.3 }}
+            className="min-h-screen bg-background flex flex-col"
+          >
+            <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
+              <button onClick={() => goTo("interests", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+                <ArrowLeft className="w-5 h-5 text-foreground" />
+              </button>
+              <div className="flex-1">
+                <h1 className="text-lg font-bold text-foreground">
+                  {lang === "ar" ? "أسلوب سفرك" : "Your Travel Style"}
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  {lang === "ar" ? "كيف تحب أن تسافر؟" : "How do you like to travel?"}
+                </p>
+              </div>
+              <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">2/3</span>
+            </header>
+
+            <div className="h-1 bg-secondary">
+              <div className="h-1 bg-primary transition-all" style={{ width: "66%" }} />
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-4 py-6">
+              <div className="space-y-3">
+                {travelStyles.map(({ key, icon: Icon, label, desc }) => {
+                  const isSelected = selectedStyle === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setSelectedStyle(key)}
+                      className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-start ${
+                        isSelected
+                          ? "border-primary bg-primary/5 shadow-card"
+                          : "border-border bg-card hover:border-primary/30"
+                      }`}
+                    >
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
+                        isSelected ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                      }`}>
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-foreground">{label[lang]}</p>
+                        <p className="text-xs text-muted-foreground">{desc[lang]}</p>
+                      </div>
+                      {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="px-4 py-4 border-t border-border bg-background space-y-2">
+              <button
+                onClick={() => goTo("budget")}
+                disabled={!selectedStyle}
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {lang === "ar" ? "التالي" : "Continue"}
+              </button>
+              <button
+                onClick={() => goTo("budget")}
+                className="w-full py-2 text-xs text-muted-foreground font-medium"
+              >
+                {lang === "ar" ? "تخطي" : "Skip"}
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* STEP 5c: Budget (Visitor Quiz 3/3) */}
+        {step === "budget" && (
+          <motion.div
+            key="budget"
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.3 }}
+            className="min-h-screen bg-background flex flex-col"
+          >
+            <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
+              <button onClick={() => goTo("travelStyle", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+                <ArrowLeft className="w-5 h-5 text-foreground" />
+              </button>
+              <div className="flex-1">
+                <h1 className="text-lg font-bold text-foreground">
+                  {lang === "ar" ? "ميزانيتك" : "Your Budget"}
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  {lang === "ar" ? "كم تخطط لإنفاقه يومياً؟" : "How much do you plan to spend daily?"}
+                </p>
+              </div>
+              <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">3/3</span>
+            </header>
+
+            <div className="h-1 bg-secondary">
+              <div className="h-1 bg-primary transition-all" style={{ width: "100%" }} />
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-4 py-6">
+              <div className="space-y-3">
+                {budgetOptions.map(({ key, icon: Icon, label, desc }) => {
+                  const isSelected = selectedBudget === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setSelectedBudget(key)}
+                      className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-start ${
+                        isSelected
+                          ? "border-primary bg-primary/5 shadow-card"
+                          : "border-border bg-card hover:border-primary/30"
+                      }`}
+                    >
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
+                        isSelected ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
+                      }`}>
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-foreground">{label[lang]}</p>
+                        <p className="text-xs text-muted-foreground">{desc[lang]}</p>
+                      </div>
+                      {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
                     </button>
                   );
                 })}
@@ -755,10 +939,10 @@ const SplashPage = () => {
             <div className="px-4 py-4 border-t border-border bg-background space-y-2">
               <button
                 onClick={() => goTo("profile")}
-                disabled={selectedInterests.length < 3}
+                disabled={!selectedBudget}
                 className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {lang === "ar" ? "التالي" : "Continue"} ({selectedInterests.length}/3+)
+                {lang === "ar" ? "التالي" : "Continue"}
               </button>
               <button
                 onClick={() => goTo("profile")}
@@ -783,7 +967,7 @@ const SplashPage = () => {
             className="min-h-screen bg-background flex flex-col"
           >
             <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
-              <button onClick={() => goTo(selectedRole === "visitor" ? "interests" : "city", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+              <button onClick={() => goTo(selectedRole === "visitor" ? "budget" : "city", -1)} className="p-1.5 rounded-full hover:bg-secondary">
                 <ArrowLeft className="w-5 h-5 text-foreground" />
               </button>
               <div>
@@ -820,18 +1004,6 @@ const SplashPage = () => {
                 />
               </div>
 
-              {/* Email */}
-              <div>
-                <label className="text-sm font-semibold text-foreground block mb-1.5">
-                  {lang === "ar" ? "البريد الإلكتروني" : "Email"}
-                </label>
-                <input
-                  type="email"
-                  placeholder={lang === "ar" ? "example@email.com" : "example@email.com"}
-                  className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                />
-              </div>
-
               {/* Summary badges */}
               <div className="space-y-2">
                 {/* Role */}
@@ -862,9 +1034,9 @@ const SplashPage = () => {
                       <p className="text-xs text-muted-foreground">{lang === "ar" ? "مدنك" : "Your cities"}</p>
                       <p className="text-sm font-semibold text-foreground truncate">
                         {selectedCities.slice(0, 3).map(id => {
-                          const city = availableCities.find(c => c.id === id);
-                          return city?.name[lang];
-                        }).filter(Boolean).join(", ")}
+                          const city = citiesList.find(c => c.id === id);
+                          return city ? (lang === "ar" ? city.name_ar : city.name_en) : id;
+                        }).join(", ")}
                         {selectedCities.length > 3 && ` +${selectedCities.length - 3}`}
                       </p>
                     </div>
@@ -885,6 +1057,36 @@ const SplashPage = () => {
                           return interest?.label[lang];
                         }).filter(Boolean).join(", ")}
                         {selectedInterests.length > 3 && ` +${selectedInterests.length - 3}`}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Travel Style */}
+                {selectedStyle && (
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                      <Zap className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">{lang === "ar" ? "أسلوبك" : "Your style"}</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        {travelStyles.find(s => s.key === selectedStyle)?.label[lang]}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Budget */}
+                {selectedBudget && (
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                      <DollarSign className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">{lang === "ar" ? "ميزانيتك" : "Your budget"}</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        {budgetOptions.find(b => b.key === selectedBudget)?.label[lang]}
                       </p>
                     </div>
                   </div>
