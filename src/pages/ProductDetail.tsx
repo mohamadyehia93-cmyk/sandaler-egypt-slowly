@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, MapPin, ShoppingCart, Leaf, Package } from "lucide-react";
 import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
+import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -12,21 +12,9 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { lang, t } = useI18n();
 
-  const isUuid = id ? /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) : false;
-
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
-    queryFn: async () => {
-      let query = supabase.from("products").select("*");
-      if (isUuid) {
-        query = query.eq("id", id);
-      } else {
-        query = query.eq("slug", id);
-      }
-      const { data, error } = await query.maybeSingle();
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => fetchByIdOrSlug("products", id!),
     enabled: !!id,
   });
 
