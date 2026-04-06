@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, MapPin, ShoppingCart, Leaf, Package } from "lucide-react";
 import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
+import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -14,15 +14,7 @@ const ProductDetail = () => {
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .or(`id.eq.${id},slug.eq.${id}`)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => fetchByIdOrSlug("products", id!),
     enabled: !!id,
   });
 
