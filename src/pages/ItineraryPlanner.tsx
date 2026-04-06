@@ -187,13 +187,35 @@ const AssistantMessage = ({ content, onChoiceSelect, isLastMessage, isLoading }:
 const ItineraryPlanner = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedId, setSavedId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const catalog = useMemo(() => buildCatalog(lang), [lang]);
+
+  // Load saved itinerary if ?id= is present
+  useEffect(() => {
+    const id = searchParams.get("id");
+    if (!id || !user) return;
+    supabase
+      .from("saved_itineraries")
+      .select("*")
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setMessages(data.messages as Msg[]);
+          setSavedId(data.id);
+        }
+      });
+  }, [searchParams, user]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
