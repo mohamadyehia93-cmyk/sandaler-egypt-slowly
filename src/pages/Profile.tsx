@@ -83,7 +83,10 @@ const Profile = () => {
     );
   }
 
-  const displayName = profile?.display_name || user.email || (lang === "ar" ? "مسافر" : "Traveler");
+  const googleAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+  const googleName = user.user_metadata?.full_name || user.user_metadata?.name;
+  const displayName = profile?.display_name || googleName || user.email || (lang === "ar" ? "مسافر" : "Traveler");
+  const avatarUrl = profile?.avatar_url || googleAvatar;
 
   const stats = [
     { value: String(itineraries.length), label: lang === "ar" ? "خطط" : "Plans" },
