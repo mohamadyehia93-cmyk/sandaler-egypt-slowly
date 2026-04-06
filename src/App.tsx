@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/lib/i18n";
 import { UserRoleProvider } from "@/hooks/useUserRole";
+import { AuthProvider } from "@/hooks/useAuth";
 import RouteGuard from "@/components/RouteGuard";
 import Index from "./pages/Index.tsx";
 import Splash from "./pages/Splash.tsx";
@@ -56,6 +57,10 @@ import NewFlagReport from "./pages/dashboards/NewFlagReport.tsx";
 import NewCollection from "./pages/dashboards/NewCollection.tsx";
 import Community from "./pages/Community.tsx";
 import ItineraryPlanner from "./pages/ItineraryPlanner.tsx";
+import Login from "./pages/Login.tsx";
+import Signup from "./pages/Signup.tsx";
+import ForgotPassword from "./pages/ForgotPassword.tsx";
+import ResetPassword from "./pages/ResetPassword.tsx";
 import AllPosts from "./pages/AllPosts.tsx";
 import AllAudioTours from "./pages/AllAudioTours.tsx";
 import AllCauses from "./pages/AllCauses.tsx";
@@ -76,6 +81,7 @@ const App = () => (
     <TooltipProvider>
       <I18nProvider>
         <UserRoleProvider>
+        <AuthProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -107,6 +113,10 @@ const App = () => (
             <Route path="/partner/:id" element={<PartnerDetail />} />
             <Route path="/provider/:id" element={<ProviderProfile />} />
             <Route path="/planner" element={<ItineraryPlanner />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/community" element={<Community />} />
             <Route path="/visitor/:id" element={<VisitorProfile />} />
             <Route path="/booking" element={<Booking />} />
@@ -145,6 +155,7 @@ const App = () => (
           </Routes>
           </RouteGuard>
         </BrowserRouter>
+        </AuthProvider>
         </UserRoleProvider>
       </I18nProvider>
     </TooltipProvider>
