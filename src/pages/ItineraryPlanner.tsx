@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import { ArrowLeft, Send, Sparkles, MapPin, Calendar, Users, Loader2, Save } from "lucide-react";
+import { useState, useRef, useEffect, useMemo, useCallback, Fragment } from "react";
+import { ArrowLeft, Send, Sparkles, MapPin, Calendar, Users, Loader2, Save, Check } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
