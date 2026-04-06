@@ -56,6 +56,9 @@ Examples:
 **What pace do you prefer?**
 [CHOICES: 🐢 Relaxed — fewer activities, more free time | ⚡ Packed — see as much as possible | ⚖️ Balanced — mix of both]
 
+**How will you get around?**
+[CHOICES: 🚗 Private car/taxi | 🚌 Public transport | 🚂 Train | 🚕 Mix of options]
+
 You can ask multiple questions at once, each with its own [CHOICES:] block.
 NEVER number the questions — just use bold text and choices.
 
