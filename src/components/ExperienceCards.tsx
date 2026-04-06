@@ -1,33 +1,36 @@
 import { useState } from "react";
 import { Heart, MapPin, ChevronDown } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { experiences, experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
-import { experienceToProvider, providerShortInfo } from "@/lib/providerMappings";
+import { experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
+import { useExperiences, useRegions } from "@/hooks/useListings";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
 import { useNavigate } from "react-router-dom";
-
-const regionOptions = [
-  { id: "all", label: { en: "All Regions", ar: "كل المناطق" } },
-  ...regions.map((r) => ({ id: r.id, label: { en: r.nameKey, ar: r.nameKey } })),
-];
+import { Skeleton } from "./ui/skeleton";
 
 const ExperienceCards = () => {
   const { lang, t } = useI18n();
   const navigate = useNavigate();
+  const { data: experiences, isLoading } = useExperiences();
+  const { data: dbRegions } = useRegions();
   const [activeTheme, setActiveTheme] = useState<ExperienceTheme | "all">("all");
   const [activeRegion, setActiveRegion] = useState("all");
   const [regionOpen, setRegionOpen] = useState(false);
 
-  const filtered = experiences.filter((e) => {
+  const filtered = (experiences ?? []).filter((e) => {
     const themeMatch = activeTheme === "all" || e.theme === activeTheme;
-    const regionMatch = activeRegion === "all" || e.region.en.toLowerCase().replace(/\s/g, "-") === activeRegion;
+    const regionMatch = activeRegion === "all" || e.region_id === activeRegion;
     return themeMatch && regionMatch;
   });
 
+  const regionsList = dbRegions ?? regions.map(r => ({ id: r.id, name_en: r.nameKey, name_ar: r.nameKey, emoji: r.emoji }));
+
   const activeRegionLabel = activeRegion === "all"
     ? (lang === "ar" ? "كل المناطق" : "All Regions")
-    : t(regions.find((r) => r.id === activeRegion)?.nameKey ?? "");
+    : (() => {
+        const r = regionsList.find(r => r.id === activeRegion);
+        return r ? (lang === "ar" ? r.name_ar : r.name_en) : "";
+      })();
 
   return (
     <SectionHeader titleKey="section.experiences" onSeeAll={() => {}}>
@@ -76,13 +79,13 @@ const ExperienceCards = () => {
             >
               {lang === "ar" ? "كل المناطق" : "All Regions"}
             </button>
-            {regions.map((r) => (
+            {regionsList.map((r) => (
               <button
                 key={r.id}
                 onClick={() => { setActiveRegion(r.id); setRegionOpen(false); }}
                 className={`w-full text-start px-3 py-2 text-xs ${activeRegion === r.id ? "text-primary font-semibold bg-secondary" : "text-foreground"}`}
               >
-                {r.emoji} {t(r.nameKey)}
+                {r.emoji} {lang === "ar" ? r.name_ar : r.name_en}
               </button>
             ))}
           </div>
@@ -91,14 +94,18 @@ const ExperienceCards = () => {
 
       {/* Cards */}
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-        {filtered.map((e) => (
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="min-w-[200px] h-[220px] rounded-lg" />
+          ))
+        ) : filtered.map((e) => (
           <button
             key={e.id}
             onClick={() => navigate(`/experience/${e.id}`)}
             className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card text-start"
           >
             <div className="relative h-32">
-              <img src={e.image} alt={e.title[lang]} className="w-full h-full object-cover" />
+              <img src={e.image ?? ""} alt={lang === "ar" ? e.title_ar : e.title_en} className="w-full h-full object-cover" />
               <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
                 <Heart className="w-4 h-4 text-foreground" />
               </button>
@@ -107,23 +114,20 @@ const ExperienceCards = () => {
               </span>
             </div>
             <div className="p-3">
-              <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">{e.title[lang]}</h3>
-              {(() => {
-                const pid = experienceToProvider[e.id];
-                const provider = pid ? providerShortInfo[pid] : null;
-                return provider ? (
-                  <button
-                    onClick={(ev) => { ev.stopPropagation(); navigate(`/provider/${pid}`); }}
-                    className="flex items-center gap-1.5 mb-1.5"
-                  >
-                    <img src={provider.avatar} alt="" className="w-4 h-4 rounded-full object-cover" />
-                    <span className="text-[10px] text-primary font-medium truncate">{provider.name[lang]}</span>
-                  </button>
-                ) : null;
-              })()}
+              <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">
+                {lang === "ar" ? e.title_ar : e.title_en}
+              </h3>
+              {e.host_name_en && (
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  {e.host_image && <img src={e.host_image} alt="" className="w-4 h-4 rounded-full object-cover" />}
+                  <span className="text-[10px] text-primary font-medium truncate">
+                    {lang === "ar" ? e.host_name_ar : e.host_name_en}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-2 mb-2">
-                <CityBadge cityId={e.cityId} />
-                <span className="text-[10px] text-muted-foreground">{e.date}</span>
+                {e.city_id && <CityBadge cityId={e.city_id} />}
+                {e.date && <span className="text-[10px] text-muted-foreground">{e.date}</span>}
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-primary-dark">

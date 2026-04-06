@@ -2,14 +2,20 @@ import { useState } from "react";
 import { MapPin, ChevronDown, Users, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { trips, experienceThemes, ExperienceTheme, regions, TripAccessType, TripDuration } from "@/lib/sampleData";
-import { tripToProvider, providerShortInfo } from "@/lib/providerMappings";
+import { experienceThemes, ExperienceTheme } from "@/lib/sampleData";
+import { useTrips, useRegions } from "@/hooks/useListings";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
+import { Skeleton } from "./ui/skeleton";
+
+type TripAccessType = "public" | "private";
+type TripDuration = "one-day" | "multi-day";
 
 const TripCards = () => {
   const { lang, t } = useI18n();
   const navigate = useNavigate();
+  const { data: trips, isLoading } = useTrips();
+  const { data: dbRegions } = useRegions();
   const [activeTheme, setActiveTheme] = useState<ExperienceTheme | "all">("all");
   const [activeRegion, setActiveRegion] = useState("all");
   const [regionOpen, setRegionOpen] = useState(false);
@@ -18,17 +24,23 @@ const TripCards = () => {
   const [activeDuration, setActiveDuration] = useState<TripDuration | "all">("all");
   const [durationOpen, setDurationOpen] = useState(false);
 
-  const filtered = trips.filter((tr) => {
-    const themeMatch = activeTheme === "all" || tr.theme === activeTheme;
-    const regionMatch = activeRegion === "all" || tr.regionId === activeRegion;
-    const accessMatch = activeAccess === "all" || tr.accessType === activeAccess;
-    const durationMatch = activeDuration === "all" || tr.duration === activeDuration;
+  const filtered = (trips ?? []).filter((tr) => {
+    const themeMatch = activeTheme === "all" || tr.trip_type === activeTheme;
+    const regionMatch = activeRegion === "all" || tr.region_id === activeRegion;
+    const accessMatch = activeAccess === "all" || tr.access_type === activeAccess;
+    const durationMatch = activeDuration === "all" || 
+      (activeDuration === "one-day" ? (tr.duration_days ?? 1) <= 1 : (tr.duration_days ?? 1) > 1);
     return themeMatch && regionMatch && accessMatch && durationMatch;
   });
 
+  const regionsList = dbRegions ?? [];
+
   const activeRegionLabel = activeRegion === "all"
     ? (lang === "ar" ? "كل المناطق" : "All Regions")
-    : t(regions.find((r) => r.id === activeRegion)?.nameKey ?? "");
+    : (() => {
+        const r = regionsList.find(r => r.id === activeRegion);
+        return r ? (lang === "ar" ? r.name_ar : r.name_en) : "";
+      })();
 
   return (
     <SectionHeader titleKey="section.trips" onSeeAll={() => {}}>
@@ -37,9 +49,7 @@ const TripCards = () => {
         <button
           onClick={() => setActiveTheme("all")}
           className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
-            activeTheme === "all"
-              ? "bg-primary text-primary-foreground"
-              : "bg-secondary text-secondary-foreground"
+            activeTheme === "all" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
           }`}
         >
           {lang === "ar" ? "الكل" : "All"}
@@ -49,9 +59,7 @@ const TripCards = () => {
             key={th.key}
             onClick={() => setActiveTheme(th.key)}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
-              activeTheme === th.key
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground"
+              activeTheme === th.key ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
             }`}
           >
             {th.emoji} {th.label[lang]}
@@ -79,13 +87,13 @@ const TripCards = () => {
               >
                 {lang === "ar" ? "كل المناطق" : "All Regions"}
               </button>
-              {regions.map((r) => (
+              {regionsList.map((r) => (
                 <button
                   key={r.id}
                   onClick={() => { setActiveRegion(r.id); setRegionOpen(false); }}
                   className={`w-full text-start px-3 py-2 text-xs ${activeRegion === r.id ? "text-primary font-semibold bg-secondary" : "text-foreground"}`}
                 >
-                  {r.emoji} {t(r.nameKey)}
+                  {r.emoji} {lang === "ar" ? r.name_ar : r.name_en}
                 </button>
               ))}
             </div>
@@ -161,30 +169,33 @@ const TripCards = () => {
 
       {/* Cards */}
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-        {filtered.map((tr) => (
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="min-w-[220px] h-[220px] rounded-lg" />
+          ))
+        ) : filtered.map((tr) => (
           <div key={tr.id} onClick={() => navigate(`/trip/${tr.id}`)} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer">
             <div className="relative h-32">
-              <img src={tr.image} alt={tr.title[lang]} className="w-full h-full object-cover" />
+              <img src={tr.image ?? ""} alt={lang === "ar" ? tr.title_ar : tr.title_en} className="w-full h-full object-cover" />
             </div>
             <div className="p-3">
               <div className="flex items-center gap-2 mb-1">
-                <CityBadge cityId={tr.cityId} />
-                <span className="text-[10px] text-muted-foreground">{tr.route[lang]}</span>
+                {tr.city_id && <CityBadge cityId={tr.city_id} />}
+                <span className="text-[10px] text-muted-foreground">
+                  {lang === "ar" ? tr.route_ar : tr.route_en}
+                </span>
               </div>
-              <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">{tr.title[lang]}</h3>
-              {(() => {
-                const pid = tripToProvider[tr.id];
-                const provider = pid ? providerShortInfo[pid] : null;
-                return provider ? (
-                  <button
-                    onClick={(ev) => { ev.stopPropagation(); navigate(`/provider/${pid}`); }}
-                    className="flex items-center gap-1.5 mb-2"
-                  >
-                    <img src={provider.avatar} alt="" className="w-4 h-4 rounded-full object-cover" />
-                    <span className="text-[10px] text-primary font-medium truncate">{provider.name[lang]}</span>
-                  </button>
-                ) : null;
-              })()}
+              <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">
+                {lang === "ar" ? tr.title_ar : tr.title_en}
+              </h3>
+              {tr.organizer_name_en && (
+                <div className="flex items-center gap-1.5 mb-2">
+                  {tr.organizer_image && <img src={tr.organizer_image} alt="" className="w-4 h-4 rounded-full object-cover" />}
+                  <span className="text-[10px] text-primary font-medium truncate">
+                    {lang === "ar" ? tr.organizer_name_ar : tr.organizer_name_en}
+                  </span>
+                </div>
+              )}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-primary-dark">{tr.price} {t("common.egp")}</span>
                 <button className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
