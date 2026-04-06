@@ -777,6 +777,93 @@ export type Database = {
         }
         Relationships: []
       }
+      providers: {
+        Row: {
+          avatar: string | null
+          bio_ar: string | null
+          bio_en: string | null
+          city_ar: string | null
+          city_en: string | null
+          cover_image: string | null
+          created_at: string
+          followers: number | null
+          id: string
+          languages: string | null
+          name_ar: string
+          name_en: string
+          rating: number | null
+          region_ar: string | null
+          region_en: string | null
+          review_count: number | null
+          role: string
+          slug: string | null
+          specialties: Json | null
+          status: string | null
+          tagline_ar: string | null
+          tagline_en: string | null
+          updated_at: string
+          user_id: string | null
+          verified: boolean | null
+          years_active: number | null
+        }
+        Insert: {
+          avatar?: string | null
+          bio_ar?: string | null
+          bio_en?: string | null
+          city_ar?: string | null
+          city_en?: string | null
+          cover_image?: string | null
+          created_at?: string
+          followers?: number | null
+          id?: string
+          languages?: string | null
+          name_ar: string
+          name_en: string
+          rating?: number | null
+          region_ar?: string | null
+          region_en?: string | null
+          review_count?: number | null
+          role?: string
+          slug?: string | null
+          specialties?: Json | null
+          status?: string | null
+          tagline_ar?: string | null
+          tagline_en?: string | null
+          updated_at?: string
+          user_id?: string | null
+          verified?: boolean | null
+          years_active?: number | null
+        }
+        Update: {
+          avatar?: string | null
+          bio_ar?: string | null
+          bio_en?: string | null
+          city_ar?: string | null
+          city_en?: string | null
+          cover_image?: string | null
+          created_at?: string
+          followers?: number | null
+          id?: string
+          languages?: string | null
+          name_ar?: string
+          name_en?: string
+          rating?: number | null
+          region_ar?: string | null
+          region_en?: string | null
+          review_count?: number | null
+          role?: string
+          slug?: string | null
+          specialties?: Json | null
+          status?: string | null
+          tagline_ar?: string | null
+          tagline_en?: string | null
+          updated_at?: string
+          user_id?: string | null
+          verified?: boolean | null
+          years_active?: number | null
+        }
+        Relationships: []
+      }
       regions: {
         Row: {
           about_ar: string | null
