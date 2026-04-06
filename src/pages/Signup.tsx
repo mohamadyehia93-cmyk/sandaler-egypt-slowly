@@ -115,11 +115,13 @@ const Signup = () => {
           variant="outline"
           className="w-full gap-2"
           onClick={async () => {
-            const result = await lovable.auth.signInWithOAuth("google", {
+          const result = await lovable.auth.signInWithOAuth("google", {
               redirect_uri: window.location.origin,
             });
             if (result.error) {
               toast.error(result.error instanceof Error ? result.error.message : "Google sign-in failed");
+            } else if (!result.redirected) {
+              navigate("/profile");
             }
           }}
         >

@@ -83,7 +83,10 @@ const Profile = () => {
     );
   }
 
-  const displayName = profile?.display_name || user.email || (lang === "ar" ? "مسافر" : "Traveler");
+  const googleAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+  const googleName = user.user_metadata?.full_name || user.user_metadata?.name;
+  const displayName = profile?.display_name || googleName || user.email || (lang === "ar" ? "مسافر" : "Traveler");
+  const avatarUrl = profile?.avatar_url || googleAvatar;
 
   const stats = [
     { value: String(itineraries.length), label: lang === "ar" ? "خطط" : "Plans" },
@@ -111,8 +114,8 @@ const Profile = () => {
         {/* Profile Card */}
         <div className="bg-card rounded-xl shadow-card p-5 flex flex-col items-center mb-6">
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="" className="w-20 h-20 rounded-full object-cover" />
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" className="w-20 h-20 rounded-full object-cover" />
             ) : (
               <User className="w-10 h-10 text-primary" />
             )}
