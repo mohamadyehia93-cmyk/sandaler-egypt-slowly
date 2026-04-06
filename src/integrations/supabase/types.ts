@@ -96,6 +96,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "accommodations_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "accommodations_region_id_fkey"
             columns: ["region_id"]
             isOneToOne: false
@@ -177,6 +184,13 @@ export type Database = {
             columns: ["city_id"]
             isOneToOne: false
             referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audio_tours_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
             referencedColumns: ["id"]
           },
           {
@@ -407,6 +421,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "experiences_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "experiences_region_id_fkey"
             columns: ["region_id"]
             isOneToOne: false
@@ -541,6 +562,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "organizations_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "organizations_region_id_fkey"
             columns: ["region_id"]
             isOneToOne: false
@@ -626,6 +654,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "posts_city_id_fkey"
             columns: ["city_id"]
@@ -745,6 +780,13 @@ export type Database = {
             referencedRelation: "regions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "products_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
@@ -774,6 +816,93 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      providers: {
+        Row: {
+          avatar: string | null
+          bio_ar: string | null
+          bio_en: string | null
+          city_ar: string | null
+          city_en: string | null
+          cover_image: string | null
+          created_at: string
+          followers: number | null
+          id: string
+          languages: string | null
+          name_ar: string
+          name_en: string
+          rating: number | null
+          region_ar: string | null
+          region_en: string | null
+          review_count: number | null
+          role: string
+          slug: string | null
+          specialties: Json | null
+          status: string | null
+          tagline_ar: string | null
+          tagline_en: string | null
+          updated_at: string
+          user_id: string | null
+          verified: boolean | null
+          years_active: number | null
+        }
+        Insert: {
+          avatar?: string | null
+          bio_ar?: string | null
+          bio_en?: string | null
+          city_ar?: string | null
+          city_en?: string | null
+          cover_image?: string | null
+          created_at?: string
+          followers?: number | null
+          id?: string
+          languages?: string | null
+          name_ar: string
+          name_en: string
+          rating?: number | null
+          region_ar?: string | null
+          region_en?: string | null
+          review_count?: number | null
+          role?: string
+          slug?: string | null
+          specialties?: Json | null
+          status?: string | null
+          tagline_ar?: string | null
+          tagline_en?: string | null
+          updated_at?: string
+          user_id?: string | null
+          verified?: boolean | null
+          years_active?: number | null
+        }
+        Update: {
+          avatar?: string | null
+          bio_ar?: string | null
+          bio_en?: string | null
+          city_ar?: string | null
+          city_en?: string | null
+          cover_image?: string | null
+          created_at?: string
+          followers?: number | null
+          id?: string
+          languages?: string | null
+          name_ar?: string
+          name_en?: string
+          rating?: number | null
+          region_ar?: string | null
+          region_en?: string | null
+          review_count?: number | null
+          role?: string
+          slug?: string | null
+          specialties?: Json | null
+          status?: string | null
+          tagline_ar?: string | null
+          tagline_en?: string | null
+          updated_at?: string
+          user_id?: string | null
+          verified?: boolean | null
+          years_active?: number | null
         }
         Relationships: []
       }
@@ -943,6 +1072,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "transport_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "transport_region_id_fkey"
             columns: ["region_id"]
             isOneToOne: false
@@ -1060,6 +1196,13 @@ export type Database = {
             columns: ["city_id"]
             isOneToOne: false
             referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trips_organizer_id_fkey"
+            columns: ["organizer_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
             referencedColumns: ["id"]
           },
           {
