@@ -81,6 +81,7 @@ const App = () => (
     <TooltipProvider>
       <I18nProvider>
         <UserRoleProvider>
+        <AuthProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
