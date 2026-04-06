@@ -113,6 +113,10 @@ const App = () => (
             <Route path="/partner/:id" element={<PartnerDetail />} />
             <Route path="/provider/:id" element={<ProviderProfile />} />
             <Route path="/planner" element={<ItineraryPlanner />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/community" element={<Community />} />
             <Route path="/visitor/:id" element={<VisitorProfile />} />
             <Route path="/booking" element={<Booking />} />
