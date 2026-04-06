@@ -146,40 +146,89 @@ const mdComponents = {
   hr: () => <hr className="my-3 border-border" />,
 };
 
-const ChoiceChips = ({ choices, onSelect, disabled }: { choices: string[]; onSelect: (c: string) => void; disabled: boolean }) => (
+const ChoiceChips = ({ choices, groupIndex, selected, onToggle, disabled }: {
+  choices: string[]; groupIndex: number; selected: string | null; onToggle: (groupIndex: number, choice: string) => void; disabled: boolean;
+}) => (
   <div className="flex flex-wrap gap-2 mt-2">
-    {choices.map((c, i) => (
-      <button
-        key={i}
-        disabled={disabled}
-        onClick={() => onSelect(c)}
-        className="px-3 py-2 rounded-xl bg-primary/10 border border-primary/20 text-sm font-medium text-primary hover:bg-primary/20 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-left"
-      >
-        {c}
-      </button>
-    ))}
+    {choices.map((c, i) => {
+      const isSelected = selected === c;
+      return (
+        <button
+          key={i}
+          disabled={disabled}
+          onClick={() => onToggle(groupIndex, c)}
+          className={`px-3 py-2 rounded-xl border text-sm font-medium active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-left flex items-center gap-1.5 ${
+            isSelected
+              ? "bg-primary text-primary-foreground border-primary"
+              : "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"
+          }`}
+        >
+          {isSelected && <Check className="w-3.5 h-3.5 shrink-0" />}
+          {c}
+        </button>
+      );
+    })}
   </div>
 );
 
-const AssistantMessage = ({ content, onChoiceSelect, isLastMessage, isLoading }: {
-  content: string; onChoiceSelect: (c: string) => void; isLastMessage: boolean; isLoading: boolean;
+const AssistantMessage = ({ content, onSubmitAll, isLastMessage, isLoading }: {
+  content: string; onSubmitAll: (answers: string[]) => void; isLastMessage: boolean; isLoading: boolean;
 }) => {
+  const { lang } = useI18n();
   const { textParts, choiceGroups } = useMemo(() => parseChoices(content), [content]);
+  const [selections, setSelections] = useState<Record<number, string>>({});
+  const hasChoices = choiceGroups.length > 0;
+  const allAnswered = hasChoices && choiceGroups.every((_, i) => selections[i]);
+  const canInteract = isLastMessage && !isLoading;
+
+  const handleToggle = useCallback((groupIndex: number, choice: string) => {
+    if (!canInteract) return;
+    setSelections((prev) => ({
+      ...prev,
+      [groupIndex]: prev[groupIndex] === choice ? undefined! : choice,
+    }));
+  }, [canInteract]);
+
+  const handleSubmit = useCallback(() => {
+    if (!allAnswered) return;
+    const answers = choiceGroups.map((_, i) => selections[i]);
+    onSubmitAll(answers);
+    setSelections({});
+  }, [allAnswered, selections, choiceGroups, onSubmitAll]);
 
   return (
     <div className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-li:text-foreground prose-strong:text-foreground prose-a:no-underline">
       {textParts.map((text, i) => (
-        <div key={i}>
+        <Fragment key={i}>
           {text.trim() && <ReactMarkdown components={mdComponents}>{text}</ReactMarkdown>}
           {choiceGroups[i] && (
             <ChoiceChips
               choices={choiceGroups[i]}
-              onSelect={onChoiceSelect}
-              disabled={!isLastMessage || isLoading}
+              groupIndex={i}
+              selected={selections[i] || null}
+              onToggle={handleToggle}
+              disabled={!canInteract}
             />
           )}
-        </div>
+        </Fragment>
       ))}
+      {hasChoices && canInteract && (
+        <button
+          onClick={handleSubmit}
+          disabled={!allAnswered}
+          className={`mt-4 w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            allAnswered
+              ? "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]"
+              : "bg-muted text-muted-foreground cursor-not-allowed"
+          }`}
+        >
+          {allAnswered
+            ? (lang === "ar" ? "إرسال الإجابات" : `Submit All ${choiceGroups.length} Answers`)
+            : (lang === "ar"
+              ? `اختر ${choiceGroups.length - Object.keys(selections).filter(k => selections[Number(k)]).length} إجابات أخرى`
+              : `Select ${choiceGroups.length - Object.keys(selections).filter(k => selections[Number(k)]).length} more to continue`)}
+        </button>
+      )}
     </div>
   );
 };
