@@ -251,6 +251,27 @@ const ItineraryPlanner = () => {
     });
   }, [messages, isLoading, catalog]);
 
+  const saveItinerary = useCallback(async () => {
+    if (!user || messages.length === 0) {
+      if (!user) toast.error(lang === "ar" ? "سجّل دخولك أولاً" : "Sign in to save");
+      return;
+    }
+    setSaving(true);
+    const title = messages[0]?.content.slice(0, 60) || "My Itinerary";
+    const payload = { user_id: user.id, title, messages: messages as any, destination: null, duration_days: null };
+
+    let result;
+    if (savedId) {
+      result = await supabase.from("saved_itineraries").update({ messages: messages as any, title }).eq("id", savedId);
+    } else {
+      result = await supabase.from("saved_itineraries").insert(payload).select("id").single();
+      if (result.data) setSavedId(result.data.id);
+    }
+    setSaving(false);
+    if (result.error) toast.error(result.error.message);
+    else toast.success(lang === "ar" ? "تم الحفظ!" : "Saved!");
+  }, [user, messages, savedId, lang]);
+
   const prompts = quickPrompts[lang] || quickPrompts.en;
 
   return (
@@ -259,12 +280,22 @@ const ItineraryPlanner = () => {
         <button onClick={() => navigate(-1)}>
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-1">
           <Sparkles className="w-5 h-5 text-primary" />
           <h1 className="text-lg font-bold text-foreground">
             {lang === "ar" ? "مخطط الرحلة" : "Trip Planner"}
           </h1>
         </div>
+        {messages.length > 0 && (
+          <button
+            onClick={saveItinerary}
+            disabled={saving || !user}
+            className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 disabled:opacity-50 transition-colors"
+          >
+            <Save className="w-4 h-4" />
+            {saving ? "..." : (savedId ? (lang === "ar" ? "تحديث" : "Update") : (lang === "ar" ? "حفظ" : "Save"))}
+          </button>
+        )}
       </header>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
