@@ -274,7 +274,7 @@ const CityDetail = () => {
           <SectionHeader titleKey="section.trips" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityTrips.map((trip) => (
-                <div key={trip.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/trip/${trip.slug || trip.id}`)}>
+                <div key={trip.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/trip/${(trip as any).slug || trip.id}`)}>
                   <div className="relative h-32">
                     <img src={trip.image} alt={trip.title[lang]} className="w-full h-full object-cover" />
                     <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
