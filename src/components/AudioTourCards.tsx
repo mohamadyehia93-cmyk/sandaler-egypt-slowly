@@ -21,7 +21,7 @@ const AudioTourCards = () => {
         ) : (audioTours ?? []).map((a) => (
           <div
             key={a.id}
-            onClick={() => navigate(`/audio-tour/${a.id}`)}
+            onClick={() => navigate(`/audio-tour/${a.slug || a.id}`)}
             className="min-w-[260px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
           >
             <div className="relative h-36">
