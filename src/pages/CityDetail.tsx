@@ -253,7 +253,7 @@ const CityDetail = () => {
           <SectionHeader titleKey="section.experiences" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityExperiences.map((e) => (
-                <div key={e.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/experience/${e.id}`)}>
+                <div key={e.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/experience/${(e as any).slug || e.id}`)}>
                   <div className="relative h-32">
                     <img src={e.image} alt={e.title[lang]} className="w-full h-full object-cover" />
                   </div>
@@ -274,7 +274,7 @@ const CityDetail = () => {
           <SectionHeader titleKey="section.trips" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityTrips.map((trip) => (
-                <div key={trip.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/trip/${trip.id}`)}>
+                <div key={trip.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/trip/${(trip as any).slug || trip.id}`)}>
                   <div className="relative h-32">
                     <img src={trip.image} alt={trip.title[lang]} className="w-full h-full object-cover" />
                     <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -298,7 +298,7 @@ const CityDetail = () => {
           <SectionHeader titleKey="section.audioTours" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityAudioTours.map((tour) => (
-                <div key={tour.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/audio-tour/${tour.id}`)}>
+                <div key={tour.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/audio-tour/${(tour as any).slug || tour.id}`)}>
                   <div className="relative h-32">
                     <img src={tour.image} alt={tour.title[lang]} className="w-full h-full object-cover" />
                   </div>
@@ -319,7 +319,7 @@ const CityDetail = () => {
           <SectionHeader titleKey="section.placesToStay" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityAccommodation.map((a) => (
-                <div key={a.id} className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${a.id}`)}>
+                <div key={a.id} className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${(a as any).slug || a.id}`)}>
                   <div className="relative h-32">
                     <img src={a.image} alt={a.title[lang]} className="w-full h-full object-cover" />
                     <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
@@ -352,7 +352,7 @@ const CityDetail = () => {
           <SectionHeader titleKey="section.gettingAround" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityTransport.map((tr) => (
-                <div key={tr.id} className="min-w-[140px] rounded-lg shadow-card bg-card p-4 flex flex-col items-center gap-2 cursor-pointer" onClick={() => navigate(`/transport/${tr.id}`)}>
+                <div key={tr.id} className="min-w-[140px] rounded-lg shadow-card bg-card p-4 flex flex-col items-center gap-2 cursor-pointer" onClick={() => navigate(`/transport/${(tr as any).slug || tr.id}`)}>
                   <span className="text-3xl">{tr.icon}</span>
                   <h3 className="text-xs font-semibold text-foreground text-center line-clamp-2">{tr.title[lang]}</h3>
                   <span className="text-sm font-bold text-primary-dark">{tr.price} {t("common.egp")}</span>
@@ -367,7 +367,7 @@ const CityDetail = () => {
           <SectionHeader titleKey="section.products" onSeeAll={() => {}}>
             <div className="grid grid-cols-2 gap-3 px-4">
               {cityProducts.map((p) => (
-                <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/product/${p.id}`)}>
+                <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/product/${(p as any).slug || p.id}`)}>
                   <div className="relative h-32">
                     <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
                     <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
