@@ -298,7 +298,7 @@ const CityDetail = () => {
           <SectionHeader titleKey="section.audioTours" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityAudioTours.map((tour) => (
-                <div key={tour.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/audio-tour/${tour.slug || tour.id}`)}>
+                <div key={tour.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/audio-tour/${(tour as any).slug || tour.id}`)}>
                   <div className="relative h-32">
                     <img src={tour.image} alt={tour.title[lang]} className="w-full h-full object-cover" />
                   </div>
