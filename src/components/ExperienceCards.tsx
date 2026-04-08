@@ -101,7 +101,7 @@ const ExperienceCards = () => {
         ) : filtered.map((e) => (
           <button
             key={e.id}
-            onClick={() => navigate(`/experience/${e.id}`)}
+            onClick={() => navigate(`/experience/${e.slug || e.id}`)}
             className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card text-start"
           >
             <div className="relative h-32">
