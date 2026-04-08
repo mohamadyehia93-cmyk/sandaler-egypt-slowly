@@ -318,6 +318,90 @@ export type Database = {
         }
         Relationships: []
       }
+      experience_reviews: {
+        Row: {
+          created_at: string
+          experience_id: string
+          id: string
+          rating: number
+          review_text: string | null
+          reviewer_avatar_bg: string | null
+          reviewer_city: string | null
+          reviewer_initials: string
+          reviewer_name: string
+          updated_at: string
+          user_id: string | null
+          verified_attendee: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          experience_id: string
+          id?: string
+          rating?: number
+          review_text?: string | null
+          reviewer_avatar_bg?: string | null
+          reviewer_city?: string | null
+          reviewer_initials?: string
+          reviewer_name: string
+          updated_at?: string
+          user_id?: string | null
+          verified_attendee?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          experience_id?: string
+          id?: string
+          rating?: number
+          review_text?: string | null
+          reviewer_avatar_bg?: string | null
+          reviewer_city?: string | null
+          reviewer_initials?: string
+          reviewer_name?: string
+          updated_at?: string
+          user_id?: string | null
+          verified_attendee?: boolean | null
+        }
+        Relationships: []
+      }
+      experience_slots: {
+        Row: {
+          created_at: string
+          end_time: string
+          experience_id: string
+          id: string
+          is_discounted: boolean | null
+          price: number
+          slot_date: string
+          spots_available: number
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_time: string
+          experience_id: string
+          id?: string
+          is_discounted?: boolean | null
+          price?: number
+          slot_date: string
+          spots_available?: number
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_time?: string
+          experience_id?: string
+          id?: string
+          is_discounted?: boolean | null
+          price?: number
+          slot_date?: string
+          spots_available?: number
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       experiences: {
         Row: {
           capacity_max: number | null
