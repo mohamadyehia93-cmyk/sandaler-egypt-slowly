@@ -253,7 +253,7 @@ const CityDetail = () => {
           <SectionHeader titleKey="section.experiences" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityExperiences.map((e) => (
-                <div key={e.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/experience/${e.slug || e.id}`)}>
+                <div key={e.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/experience/${(e as any).slug || e.id}`)}>
                   <div className="relative h-32">
                     <img src={e.image} alt={e.title[lang]} className="w-full h-full object-cover" />
                   </div>
