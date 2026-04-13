@@ -91,8 +91,8 @@ export const providers: Provider[] = [
       { en: "Delta Cooking", ar: "طبخ دلتاوي" },
     ],
     listings: [
-      { id: "e1", title: { en: "Bird Watching in Manzala Lake", ar: "مراقبة الطيور في بحيرة المنزلة" }, image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&q=80", rating: 4.8, price: "350 EGP" },
-      { id: "e7", title: { en: "Traditional Delta Cooking", ar: "طبخ دلتا تقليدي" }, image: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=400&q=80", rating: 4.9, price: "400 EGP" },
+      { id: "bird-watching-manzala", title: { en: "Bird Watching in Manzala Lake", ar: "مراقبة الطيور في بحيرة المنزلة" }, image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&q=80", rating: 4.8, price: "350 EGP" },
+      { id: "cooking-grandma-rosetta", title: { en: "Traditional Delta Cooking", ar: "طبخ دلتا تقليدي" }, image: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=400&q=80", rating: 4.9, price: "400 EGP" },
     ],
     stats: [
       { label: { en: "Experiences", ar: "تجارب" }, value: "5" },
