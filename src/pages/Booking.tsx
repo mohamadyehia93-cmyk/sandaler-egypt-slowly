@@ -1,20 +1,19 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Calendar, Users, CreditCard, ShieldCheck, CheckCircle2, Minus, Plus } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { experiences, trips, accommodation, transport, products } from "@/lib/sampleData";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type BookingType = "experience" | "trip" | "stay" | "transport" | "product";
 
-const getItem = (type: BookingType, id: string) => {
-  switch (type) {
-    case "experience": return experiences.find((e) => e.id === id);
-    case "trip": return trips.find((t) => t.id === id);
-    case "stay": return accommodation.find((a) => a.id === id);
-    case "transport": return transport.find((t) => t.id === id);
-    case "product": return products.find((p) => p.id === id);
-    default: return null;
-  }
+const tableMap: Record<BookingType, string> = {
+  experience: "experiences",
+  trip: "trips",
+  stay: "accommodations",
+  transport: "transport",
+  product: "products",
 };
 
 const Booking = () => {
@@ -24,18 +23,33 @@ const Booking = () => {
 
   const type = (params.get("type") || "experience") as BookingType;
   const id = params.get("id") || "";
-  const item = getItem(type, id);
+
+  const { data: item, isLoading } = useQuery({
+    queryKey: ["booking-item", type, id],
+    queryFn: () => fetchByIdOrSlug(tableMap[type], id),
+    enabled: !!id,
+  });
 
   const [guests, setGuests] = useState(1);
   const [selectedDate, setSelectedDate] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [step, setStep] = useState<"details" | "payment" | "confirmed">("details");
 
+  if (isLoading) return (
+    <div className="min-h-screen bg-surface p-4 space-y-4">
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-24 w-full rounded-xl" />
+      <Skeleton className="h-40 w-full rounded-xl" />
+    </div>
+  );
+
   if (!item) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
 
-  const itemTitle = (item as any).title?.[lang] || (item as any).name?.[lang] || "";
-  const itemImage = (item as any).image || "";
-  const unitPrice = (item as any).price || 0;
+  const itemTitle = (lang === "ar"
+    ? (item.title_ar || item.name_ar || "")
+    : (item.title_en || item.name_en || ""));
+  const itemImage = item.image || "";
+  const unitPrice = item.price ?? item.price_per_night ?? 0;
   const isStay = type === "stay";
   const isProduct = type === "product";
   const nights = isStay ? 2 : 0;
