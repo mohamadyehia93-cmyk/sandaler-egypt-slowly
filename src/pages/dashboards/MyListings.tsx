@@ -16,9 +16,9 @@ const MyListings = () => {
 
   const listings = {
     active: [
-      { id: "e1", title: lang === "ar" ? "جولة النيل عند الغروب" : "Sunset Nile Boat Tour", location: lang === "ar" ? "رشيد" : "Rosetta", rating: 4.8, bookings: 24, price: "450 EGP", image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=100&q=80" },
-      { id: "e2", title: lang === "ar" ? "ورشة فخار تقليدي" : "Traditional Pottery Workshop", location: lang === "ar" ? "قنا" : "Qena", rating: 4.9, bookings: 18, price: "300 EGP", image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=100&q=80" },
-      { id: "e3", title: lang === "ar" ? "طهي مع السكان المحليين" : "Cook with Locals", location: lang === "ar" ? "دمياط" : "Damietta", rating: 5.0, bookings: 31, price: "350 EGP", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100&q=80" },
+      { id: "sunset-felucca-rosetta", title: lang === "ar" ? "جولة النيل عند الغروب" : "Sunset Nile Boat Tour", location: lang === "ar" ? "رشيد" : "Rosetta", rating: 4.8, bookings: 24, price: "450 EGP", image: "https://images.unsplash.com/photo-1590077428593-a55bb07c4665?w=100&q=80" },
+      { id: "nubian-pottery-aswan", title: lang === "ar" ? "ورشة فخار تقليدي" : "Traditional Pottery Workshop", location: lang === "ar" ? "قنا" : "Qena", rating: 4.9, bookings: 18, price: "300 EGP", image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=100&q=80" },
+      { id: "desert-sandboarding-siwa", title: lang === "ar" ? "طهي مع السكان المحليين" : "Cook with Locals", location: lang === "ar" ? "دمياط" : "Damietta", rating: 5.0, bookings: 31, price: "350 EGP", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100&q=80" },
     ],
     drafts: [
       { id: "d1", title: lang === "ar" ? "جولة الواحة الليلية" : "Night Oasis Tour", location: lang === "ar" ? "سيوة" : "Siwa", rating: 0, bookings: 0, price: "600 EGP", image: "https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=100&q=80" },
