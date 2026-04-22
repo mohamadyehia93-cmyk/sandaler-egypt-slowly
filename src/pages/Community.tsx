@@ -111,19 +111,27 @@ const Community = () => {
   const [activeFilter, setActiveFilter] = useState<"all" | PostCategory>("all");
   const [openComments, setOpenComments] = useState<Record<string, boolean>>({});
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
+  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
+  const [replyingTo, setReplyingTo] = useState<Record<string, string | null>>({});
 
   const { user } = useAuth();
   const postKeys = useMemo(() => posts.map((p) => `community-${p.id}`), [posts]);
   const { data: dbComments } = usePostComments(postKeys);
   const addComment = useAddComment(postKeys);
 
-  // Group comments by post key
-  const commentsByPost = useMemo(() => {
-    const map: Record<string, typeof dbComments extends infer T ? (T extends Array<infer U> ? U[] : never) : never> = {} as any;
+  // Group into top-level comments + replies-by-parent per post
+  const threadsByPost = useMemo(() => {
+    type C = NonNullable<typeof dbComments>[number];
+    const out: Record<string, { roots: C[]; childrenByParent: Record<string, C[]> }> = {};
     (dbComments ?? []).forEach((c) => {
-      (map[c.post_key] ||= []).push(c);
+      const t = (out[c.post_key] ||= { roots: [], childrenByParent: {} });
+      if (c.parent_id) {
+        (t.childrenByParent[c.parent_id] ||= []).push(c);
+      } else {
+        t.roots.push(c);
+      }
     });
-    return map;
+    return out;
   }, [dbComments]);
 
   const filteredPosts = activeFilter === "all" ? posts : posts.filter((p) => p.category === activeFilter);
@@ -139,32 +147,59 @@ const Community = () => {
   const toggleComments = (id: string) =>
     setOpenComments((prev) => ({ ...prev, [id]: !prev[id] }));
 
-  const handleAddComment = async (id: string) => {
-    const text = (commentDrafts[id] || "").trim();
-    if (!text) return;
+  const buildAuthorPayload = () => ({
+    author_name:
+      (user!.user_metadata as any)?.display_name ||
+      (user!.user_metadata as any)?.full_name ||
+      user!.email ||
+      (lang === "ar" ? "مستخدم" : "User"),
+    author_avatar:
+      (user!.user_metadata as any)?.avatar_url ||
+      (user!.user_metadata as any)?.picture ||
+      null,
+  });
+
+  const requireAuth = () => {
     if (!user) {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول للتعليق" : "Please sign in to comment");
       navigate("/login");
-      return;
+      return false;
     }
+    return true;
+  };
+
+  const handleAddComment = async (id: string) => {
+    const text = (commentDrafts[id] || "").trim();
+    if (!text) return;
+    if (!requireAuth()) return;
     try {
       await addComment.mutateAsync({
         post_key: `community-${id}`,
         text,
-        author_name:
-          (user.user_metadata as any)?.display_name ||
-          (user.user_metadata as any)?.full_name ||
-          user.email ||
-          (lang === "ar" ? "مستخدم" : "User"),
-        author_avatar:
-          (user.user_metadata as any)?.avatar_url ||
-          (user.user_metadata as any)?.picture ||
-          null,
+        ...buildAuthorPayload(),
       });
       setCommentDrafts((prev) => ({ ...prev, [id]: "" }));
       setOpenComments((prev) => ({ ...prev, [id]: true }));
-    } catch (e: any) {
+    } catch {
       toast.error(lang === "ar" ? "فشل نشر التعليق" : "Failed to post comment");
+    }
+  };
+
+  const handleAddReply = async (postId: string, parentId: string) => {
+    const text = (replyDrafts[parentId] || "").trim();
+    if (!text) return;
+    if (!requireAuth()) return;
+    try {
+      await addComment.mutateAsync({
+        post_key: `community-${postId}`,
+        text,
+        parent_id: parentId,
+        ...buildAuthorPayload(),
+      });
+      setReplyDrafts((prev) => ({ ...prev, [parentId]: "" }));
+      setReplyingTo((prev) => ({ ...prev, [postId]: null }));
+    } catch {
+      toast.error(lang === "ar" ? "فشل نشر الرد" : "Failed to post reply");
     }
   };
 
