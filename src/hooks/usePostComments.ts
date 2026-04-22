@@ -8,6 +8,7 @@ export interface PostComment {
   author_name: string;
   author_avatar: string | null;
   text: string;
+  parent_id: string | null;
   created_at: string;
 }
 
@@ -37,6 +38,7 @@ export const useAddComment = (postKeys: string[]) => {
       text: string;
       author_name: string;
       author_avatar: string | null;
+      parent_id?: string | null;
     }) => {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error("auth_required");
@@ -48,6 +50,7 @@ export const useAddComment = (postKeys: string[]) => {
           text: input.text,
           author_name: input.author_name,
           author_avatar: input.author_avatar,
+          parent_id: input.parent_id ?? null,
         })
         .select()
         .single();
