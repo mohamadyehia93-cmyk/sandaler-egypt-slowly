@@ -295,7 +295,64 @@ const OrganizationDetail = () => {
         </div>
       </div>
 
-      {/* Contact */}
+      {/* Testimonials */}
+      <div className="px-4 mt-5">
+        <h2 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+          <Heart className="w-4 h-4 text-primary" />
+          {lang === "ar" ? "آراء الداعمين" : "Voices of Support"}
+        </h2>
+        <div className="space-y-2">
+          {[
+            {
+              name: { en: "Mariam Saleh", ar: "مريم صالح" },
+              role: { en: "Monthly Donor", ar: "متبرعة شهرية" },
+              initials: "MS",
+              quote: {
+                en: "Transparent reports and real impact on the ground. I see exactly where my contribution goes.",
+                ar: "تقارير شفافة وأثر حقيقي على أرض الواقع. أرى بوضوح أين تذهب مساهمتي.",
+              },
+            },
+            {
+              name: { en: "Ahmed Fathy", ar: "أحمد فتحي" },
+              role: { en: "Volunteer", ar: "متطوع" },
+              initials: "AF",
+              quote: {
+                en: "Working with this team changed how I see community work. Genuine people, genuine mission.",
+                ar: "العمل مع هذا الفريق غيّر نظرتي للعمل المجتمعي. أشخاص حقيقيون ورسالة صادقة.",
+              },
+            },
+            {
+              name: { en: "Layla Hassan", ar: "ليلى حسن" },
+              role: { en: "Beneficiary", ar: "مستفيدة" },
+              initials: "LH",
+              quote: {
+                en: "Their program gave my family hope when we needed it most. Forever grateful.",
+                ar: "برنامجهم منح عائلتي الأمل في أصعب الأوقات. ممتنة لهم دائماً.",
+              },
+            },
+          ].map((tst, i) => (
+            <div key={i} className="bg-card rounded-xl border border-border p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+                  {tst.initials}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-foreground truncate">
+                    {tst.name[lang]}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground truncate">
+                    {tst.role[lang]}
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-foreground leading-relaxed">
+                "{tst.quote[lang]}"
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="px-4 mt-5">
         <h2 className="text-sm font-bold text-foreground mb-2">
           {lang === "ar" ? "تواصل معنا" : "Get in Touch"}
