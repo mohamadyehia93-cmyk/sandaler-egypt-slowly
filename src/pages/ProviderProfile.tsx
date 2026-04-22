@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { Skeleton } from "@/components/ui/skeleton";
+import ProviderStatusView from "@/components/ProviderStatusView";
 import {
   ArrowLeft, Share2, MapPin, Star, CheckCircle, MessageSquare,
   Heart, Globe, Clock, ChevronRight, Users
@@ -223,6 +224,11 @@ const ProviderProfile = () => {
 
       {/* Info Cards */}
       <div className="px-4 mt-4 space-y-3">
+        {/* Today's Status */}
+        {provider.user_id && (
+          <ProviderStatusView userId={provider.user_id} accentText={textColor} />
+        )}
+
         {/* About */}
         {bio && (
           <div className="bg-card rounded-xl shadow-card p-4">
