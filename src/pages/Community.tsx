@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Image, MapPin, MessageCircle, Heart, Share2, Plus, HelpCircle, Lightbulb, Camera } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import BottomNav from "@/components/BottomNav";
+import { useAuth } from "@/hooks/useAuth";
+import { usePostComments, useAddComment } from "@/hooks/usePostComments";
+import { toast } from "sonner";
 
 type PostCategory = "memory" | "tip" | "question";
 
@@ -109,6 +112,20 @@ const Community = () => {
   const [openComments, setOpenComments] = useState<Record<string, boolean>>({});
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
 
+  const { user } = useAuth();
+  const postKeys = useMemo(() => posts.map((p) => `community-${p.id}`), [posts]);
+  const { data: dbComments } = usePostComments(postKeys);
+  const addComment = useAddComment(postKeys);
+
+  // Group comments by post key
+  const commentsByPost = useMemo(() => {
+    const map: Record<string, typeof dbComments extends infer T ? (T extends Array<infer U> ? U[] : never) : never> = {} as any;
+    (dbComments ?? []).forEach((c) => {
+      (map[c.post_key] ||= []).push(c);
+    });
+    return map;
+  }, [dbComments]);
+
   const filteredPosts = activeFilter === "all" ? posts : posts.filter((p) => p.category === activeFilter);
 
   const handleLike = (id: string) => {
@@ -122,25 +139,33 @@ const Community = () => {
   const toggleComments = (id: string) =>
     setOpenComments((prev) => ({ ...prev, [id]: !prev[id] }));
 
-  const handleAddComment = (id: string) => {
+  const handleAddComment = async (id: string) => {
     const text = (commentDrafts[id] || "").trim();
     if (!text) return;
-    const newComment: Comment = {
-      id: Date.now().toString(),
-      author: lang === "ar" ? "أنت" : "You",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100",
-      text,
-      timeAgo: lang === "ar" ? "الآن" : "Just now",
-    };
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? { ...p, commentList: [...(p.commentList || []), newComment], comments: p.comments + 1 }
-          : p
-      )
-    );
-    setCommentDrafts((prev) => ({ ...prev, [id]: "" }));
-    setOpenComments((prev) => ({ ...prev, [id]: true }));
+    if (!user) {
+      toast.error(lang === "ar" ? "يرجى تسجيل الدخول للتعليق" : "Please sign in to comment");
+      navigate("/login");
+      return;
+    }
+    try {
+      await addComment.mutateAsync({
+        post_key: `community-${id}`,
+        text,
+        author_name:
+          (user.user_metadata as any)?.display_name ||
+          (user.user_metadata as any)?.full_name ||
+          user.email ||
+          (lang === "ar" ? "مستخدم" : "User"),
+        author_avatar:
+          (user.user_metadata as any)?.avatar_url ||
+          (user.user_metadata as any)?.picture ||
+          null,
+      });
+      setCommentDrafts((prev) => ({ ...prev, [id]: "" }));
+      setOpenComments((prev) => ({ ...prev, [id]: true }));
+    } catch (e: any) {
+      toast.error(lang === "ar" ? "فشل نشر التعليق" : "Failed to post comment");
+    }
   };
 
   const handlePost = () => {
@@ -327,7 +352,7 @@ const Community = () => {
                   }`}
                 >
                   <MessageCircle className="w-4 h-4" />
-                  {post.comments}
+                  {post.comments + (commentsByPost[`community-${post.id}`]?.length || 0)}
                 </button>
                 <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground transition-all ml-auto">
                   <Share2 className="w-4 h-4" />
@@ -335,50 +360,68 @@ const Community = () => {
               </div>
 
               {/* Comments */}
-              {openComments[post.id] && (
-                <div className="border-t border-border bg-secondary/30 px-3 py-3 space-y-3">
-                  {(post.commentList || []).length === 0 && (
-                    <p className="text-xs text-muted-foreground text-center py-1">
-                      {lang === "ar" ? "كن أول من يعلّق" : "Be the first to comment"}
-                    </p>
-                  )}
-                  {(post.commentList || []).map((c) => (
-                    <div key={c.id} className="flex gap-2">
-                      <img src={c.avatar} alt={c.author} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="bg-background rounded-2xl px-3 py-2 border border-border">
-                          <p className="text-xs font-semibold text-foreground">{c.author}</p>
-                          <p className="text-xs text-foreground leading-relaxed mt-0.5">{c.text}</p>
+              {openComments[post.id] && (() => {
+                const list = commentsByPost[`community-${post.id}`] || [];
+                return (
+                  <div className="border-t border-border bg-secondary/30 px-3 py-3 space-y-3">
+                    {list.length === 0 && (
+                      <p className="text-xs text-muted-foreground text-center py-1">
+                        {lang === "ar" ? "كن أول من يعلّق" : "Be the first to comment"}
+                      </p>
+                    )}
+                    {list.map((c) => (
+                      <div key={c.id} className="flex gap-2">
+                        {c.author_avatar ? (
+                          <img src={c.author_avatar} alt={c.author_name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                        ) : (
+                          <div className="w-7 h-7 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[10px] font-bold flex-shrink-0">
+                            {c.author_name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="bg-background rounded-2xl px-3 py-2 border border-border">
+                            <p className="text-xs font-semibold text-foreground">{c.author_name}</p>
+                            <p className="text-xs text-foreground leading-relaxed mt-0.5 break-words">{c.text}</p>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground mt-1 ms-3">
+                            {new Date(c.created_at).toLocaleString(lang === "ar" ? "ar-EG" : "en-US", {
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            })}
+                          </p>
                         </div>
-                        <p className="text-[10px] text-muted-foreground mt-1 ms-3">{c.timeAgo}</p>
                       </div>
-                    </div>
-                  ))}
-                  <div className="flex items-center gap-2 pt-1">
-                    <Input
-                      value={commentDrafts[post.id] || ""}
-                      onChange={(e) =>
-                        setCommentDrafts((prev) => ({ ...prev, [post.id]: e.target.value }))
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          handleAddComment(post.id);
+                    ))}
+                    <div className="flex items-center gap-2 pt-1">
+                      <Input
+                        value={commentDrafts[post.id] || ""}
+                        onChange={(e) =>
+                          setCommentDrafts((prev) => ({ ...prev, [post.id]: e.target.value }))
                         }
-                      }}
-                      placeholder={lang === "ar" ? "اكتب تعليقًا..." : "Write a comment..."}
-                      className="h-9 bg-background text-xs rounded-full"
-                    />
-                    <Button
-                      size="sm"
-                      onClick={() => handleAddComment(post.id)}
-                      disabled={!(commentDrafts[post.id] || "").trim()}
-                    >
-                      {lang === "ar" ? "إرسال" : "Send"}
-                    </Button>
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleAddComment(post.id);
+                          }
+                        }}
+                        placeholder={
+                          user
+                            ? lang === "ar" ? "اكتب تعليقًا..." : "Write a comment..."
+                            : lang === "ar" ? "سجّل الدخول للتعليق" : "Sign in to comment"
+                        }
+                        className="h-9 bg-background text-xs rounded-full"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => handleAddComment(post.id)}
+                        disabled={!(commentDrafts[post.id] || "").trim() || addComment.isPending}
+                      >
+                        {lang === "ar" ? "إرسال" : "Send"}
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </article>
           );
         })}
