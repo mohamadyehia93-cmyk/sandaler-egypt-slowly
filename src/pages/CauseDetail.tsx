@@ -74,7 +74,10 @@ const CauseDetail = () => {
 
         {/* Organization */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "المنظمة" : "The Organization"}</h2>
-        <div className="bg-surface rounded-xl p-4 mb-6 border border-border">
+        <button
+          onClick={() => navigate(`/organization/${id}`)}
+          className="w-full text-start bg-surface rounded-xl p-4 mb-6 border border-border hover:border-primary transition-colors"
+        >
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center text-2xl">{cause.org.logo}</div>
             <div className="flex-1">
@@ -83,12 +86,15 @@ const CauseDetail = () => {
                 {lang === "ar" ? `تأسست ${cause.org.founded}` : `Founded ${cause.org.founded}`} · {cause.org.members} {lang === "ar" ? "عضو" : "members"}
               </p>
             </div>
+            <span className="text-[10px] text-primary font-semibold">
+              {lang === "ar" ? "عرض الملف" : "View profile"} →
+            </span>
           </div>
           <div className="flex gap-2">
             <span className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium">✅ {lang === "ar" ? "موثّقة" : "Verified"}</span>
             <span className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium">📋 {lang === "ar" ? "مسجلة رسمياً" : "Registered NGO"}</span>
           </div>
-        </div>
+        </button>
 
         {/* How to Support */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "كيف تدعم" : "How to Support"}</h2>
