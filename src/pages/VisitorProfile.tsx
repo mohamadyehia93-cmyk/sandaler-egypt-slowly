@@ -91,6 +91,7 @@ const VisitorProfile = () => {
   const navigate = useNavigate();
 
   const visitor = visitorData[id || ""] || defaultVisitor;
+  const { data: extraFollowers = 0 } = useFollowerCount("visitor", id || "sarah-m");
 
   return (
     <div className="min-h-screen bg-surface pb-20">
