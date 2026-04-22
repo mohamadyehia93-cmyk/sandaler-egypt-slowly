@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, MapPin, CheckCircle, AlertTriangle, Clock, Flag, Plus, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
+import DailyStatusCard from "@/components/DailyStatusCard";
 
 const AmbassadorDashboard = () => {
   const { lang } = useI18n();
@@ -46,6 +47,8 @@ const AmbassadorDashboard = () => {
       </header>
 
       <div className="px-4 py-4 space-y-4">
+        <DailyStatusCard accentBg="bg-role-ambassador" accentText="text-role-ambassador" />
+
         {/* Zone Map Placeholder */}
         <div className="bg-card rounded-xl shadow-card overflow-hidden">
           <div className="h-40 bg-secondary flex items-center justify-center">

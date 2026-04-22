@@ -50,6 +50,8 @@ const CultureActorDashboard = () => {
       </header>
 
       <div className="px-4 py-4 space-y-4">
+        <DailyStatusCard accentBg="bg-role-culture-actor" accentText="text-role-culture-actor" />
+
         {/* Stats */}
         <div className="flex gap-3">
           {stats.map((s, i) => (
