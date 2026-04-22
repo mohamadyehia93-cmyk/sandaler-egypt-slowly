@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, Plus, Users, Heart, Calendar, TrendingUp, CheckCircle, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
+import DailyStatusCard from "@/components/DailyStatusCard";
 
 const OrganizationDashboard = () => {
   const { lang } = useI18n();
@@ -41,6 +42,8 @@ const OrganizationDashboard = () => {
       </header>
 
       <div className="px-4 py-4 space-y-4">
+        <DailyStatusCard accentBg="bg-role-organization" accentText="text-role-organization" />
+
         {/* Verification Badge */}
         <div className="bg-success/10 border border-success/30 rounded-xl p-3 flex items-center gap-2">
           <CheckCircle className="w-4 h-4 text-success" />

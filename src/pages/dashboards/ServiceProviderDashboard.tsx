@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, Plus, Calendar, MessageSquare, TrendingUp, CheckCircle, XCircle, Clock, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
+import DailyStatusCard from "@/components/DailyStatusCard";
 
 const ServiceProviderDashboard = () => {
   const { lang } = useI18n();
@@ -46,6 +47,8 @@ const ServiceProviderDashboard = () => {
       </header>
 
       <div className="px-4 py-4 space-y-4">
+        <DailyStatusCard accentBg="bg-role-service-provider" accentText="text-role-service-provider" />
+
         {/* Overview Cards */}
         <div className="grid grid-cols-2 gap-3">
           {overview.map((o, i) => (

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, Plus, Map, Users, Calendar, TrendingUp, Send, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
+import DailyStatusCard from "@/components/DailyStatusCard";
 
 const TripOrganizerDashboard = () => {
   const { lang } = useI18n();
@@ -46,6 +47,8 @@ const TripOrganizerDashboard = () => {
       </header>
 
       <div className="px-4 py-4 space-y-4">
+        <DailyStatusCard accentBg="bg-role-trip-organizer" accentText="text-role-trip-organizer" />
+
         <div className="grid grid-cols-2 gap-3">
           {overview.map((o, i) => (
             <div key={i} onClick={() => navigate(o.path)} className="bg-card rounded-xl shadow-card p-3 text-center cursor-pointer hover:shadow-md transition-shadow active:scale-[0.97]">

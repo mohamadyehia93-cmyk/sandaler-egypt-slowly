@@ -947,6 +947,39 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_statuses: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          link_url: string | null
+          status_date: string
+          text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          link_url?: string | null
+          status_date?: string
+          text: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          link_url?: string | null
+          status_date?: string
+          text?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       providers: {
         Row: {
           avatar: string | null
