@@ -178,6 +178,7 @@ const FollowingFeed = () => {
           <div className="space-y-2">
             {suggestions.map((c) => {
               const targetId = orgTargetIdFor(c);
+              if (!targetId) return null;
               return (
                 <div
                   key={c.id}
