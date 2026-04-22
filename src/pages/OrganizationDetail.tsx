@@ -111,7 +111,7 @@ const OrganizationDetail = () => {
               className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-1.5"
             >
               <Heart className="w-4 h-4" />
-              {lang === "ar" ? "ادعم الآن" : "Support Now"}
+              {lang === "ar" ? "ادعم" : "Support"}
             </button>
             <button
               onClick={() => navigate("/inbox")}
@@ -119,6 +119,20 @@ const OrganizationDetail = () => {
             >
               <Mail className="w-4 h-4" />
               {lang === "ar" ? "تواصل" : "Contact"}
+            </button>
+            <button
+              onClick={handleFollow}
+              aria-pressed={following}
+              className={`flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 border-2 ${
+                following
+                  ? "bg-primary/10 border-primary text-primary"
+                  : "border-border bg-card text-foreground"
+              }`}
+            >
+              {following ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+              {following
+                ? lang === "ar" ? "متابَع" : "Following"
+                : lang === "ar" ? "متابعة" : "Follow"}
             </button>
           </div>
         </div>
