@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Quote, Feather, BookOpen, Share2, Instagram, Twitter, UserPlus, UserCheck, MessageCircle } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cultureActors, latestPosts, regions } from "@/lib/sampleData";
+import ProviderStatusView from "@/components/ProviderStatusView";
 
 const FollowButton = ({ lang, following, onToggle }: { lang: string; following: boolean; onToggle: () => void }) => (
   <button
@@ -95,6 +96,11 @@ const CultureActorDetail = () => {
             {lang === "ar" ? "رسالة" : "Message"}
           </button>
         </div>
+      </div>
+
+      {/* Today's Status */}
+      <div className="px-4 mt-5">
+        <ProviderStatusView sampleId={actor.id} accentText="text-primary" />
       </div>
 
       {/* Quote */}

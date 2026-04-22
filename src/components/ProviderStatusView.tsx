@@ -16,24 +16,27 @@ interface DailyStatus {
 const todayUTC = () => new Date().toISOString().slice(0, 10);
 
 interface Props {
-  userId: string;
+  /** Real auth user id (for live providers). */
+  userId?: string;
+  /** Sample/demo id (e.g., culture actor "ca3") for seeded examples. */
+  sampleId?: string;
   accentText: string;
 }
 
-const ProviderStatusView = ({ userId, accentText }: Props) => {
+const ProviderStatusView = ({ userId, sampleId, accentText }: Props) => {
   const { lang } = useI18n();
   const isAr = lang === "ar";
 
   const { data: status } = useQuery({
-    queryKey: ["provider_status_view", userId, todayUTC()],
-    enabled: !!userId,
+    queryKey: ["provider_status_view", userId ?? null, sampleId ?? null, todayUTC()],
+    enabled: !!(userId || sampleId),
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("provider_statuses")
         .select("*")
-        .eq("user_id", userId)
-        .eq("status_date", todayUTC())
-        .maybeSingle();
+        .eq("status_date", todayUTC());
+      query = sampleId ? query.eq("sample_id", sampleId) : query.eq("user_id", userId!);
+      const { data, error } = await query.maybeSingle();
       if (error) throw error;
       return data as DailyStatus | null;
     },
