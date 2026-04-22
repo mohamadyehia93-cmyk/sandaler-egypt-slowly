@@ -98,6 +98,11 @@ const CultureActorDetail = () => {
         </div>
       </div>
 
+      {/* Today's Status */}
+      <div className="px-4 mt-5">
+        <ProviderStatusView sampleId={actor.id} accentText="text-primary" />
+      </div>
+
       {/* Quote */}
       <div className="px-4 mt-5">
         <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
