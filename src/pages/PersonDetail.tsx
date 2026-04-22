@@ -3,6 +3,7 @@ import { ArrowLeft, MapPin, Clock, Globe, Award, Heart, Sparkles, MessageCircle 
 import { useI18n } from "@/lib/i18n";
 import { whosWho, regions, experiences } from "@/lib/sampleData";
 import BottomNav from "@/components/BottomNav";
+import FollowButton from "@/components/FollowButton";
 
 const PersonDetail = () => {
   const { id } = useParams();
