@@ -36,9 +36,13 @@ interface Props {
   accentBg: string;
   /** Tailwind class for accent text color, e.g. "text-role-culture-actor". */
   accentText: string;
+  /** Optional sample/demo identifier (e.g. "org-c1") for seeded sample profiles
+   *  that aren't tied to a real account. When provided, the status is keyed by
+   *  this id instead of the signed-in user. */
+  sampleId?: string;
 }
 
-const DailyStatusCard = ({ accentBg, accentText }: Props) => {
+const DailyStatusCard = ({ accentBg, accentText, sampleId }: Props) => {
   const { lang } = useI18n();
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -50,16 +54,20 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
+  const queryKey = sampleId
+    ? ["provider_status", "sample", sampleId, todayUTC()]
+    : ["provider_status", user?.id, todayUTC()];
+
   const { data: status, isLoading } = useQuery({
-    queryKey: ["provider_status", user?.id, todayUTC()],
-    enabled: !!user?.id,
+    queryKey,
+    enabled: !!sampleId || !!user?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from("provider_statuses")
         .select("*")
-        .eq("user_id", user!.id)
-        .eq("status_date", todayUTC())
-        .maybeSingle();
+        .eq("status_date", todayUTC());
+      q = sampleId ? q.eq("sample_id", sampleId) : q.eq("user_id", user!.id);
+      const { data, error } = await q.maybeSingle();
       if (error) throw error;
       return data as DailyStatus | null;
     },
@@ -75,25 +83,44 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error("Not authenticated");
+      if (!sampleId && !user) throw new Error("Not authenticated");
       const parsed = statusSchema.safeParse({ text, link_url: linkUrl });
       if (!parsed.success) {
         throw new Error(parsed.error.issues[0].message);
       }
-      const payload = {
-        user_id: user.id,
+      const base = {
         status_date: todayUTC(),
         text: parsed.data.text,
         link_url: parsed.data.link_url ? parsed.data.link_url : null,
         image_url: imageUrl,
       };
-      const { error } = await supabase
-        .from("provider_statuses")
-        .upsert(payload, { onConflict: "user_id,status_date" });
-      if (error) throw error;
+
+      if (sampleId) {
+        // Demo/sample row: update existing or insert new
+        if (status) {
+          const { error } = await supabase
+            .from("provider_statuses")
+            .update(base)
+            .eq("id", status.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase
+            .from("provider_statuses")
+            .insert({ ...base, sample_id: sampleId, user_id: null });
+          if (error) throw error;
+        }
+      } else {
+        const { error } = await supabase
+          .from("provider_statuses")
+          .upsert(
+            { ...base, user_id: user!.id },
+            { onConflict: "user_id,status_date" }
+          );
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["provider_status", user?.id, todayUTC()] });
+      qc.invalidateQueries({ queryKey });
       setEditing(false);
       toast.success(lang === "ar" ? "تم تحديث الحالة" : "Status updated");
     },
@@ -102,7 +129,7 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      if (!user || !status) return;
+      if (!status) return;
       const { error } = await supabase
         .from("provider_statuses")
         .delete()
@@ -110,7 +137,7 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
       if (error) throw error;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["provider_status", user?.id, todayUTC()] });
+      qc.invalidateQueries({ queryKey });
       setText("");
       setLinkUrl("");
       setImageUrl(null);
@@ -121,7 +148,7 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
   });
 
   const handleUpload = async (file: File) => {
-    if (!user) return;
+    if (!sampleId && !user) return;
     if (file.size > 5 * 1024 * 1024) {
       toast.error(lang === "ar" ? "الحد الأقصى ٥ ميجا" : "Max 5MB");
       return;
@@ -129,7 +156,8 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
     setUploading(true);
     try {
       const ext = file.name.split(".").pop() || "jpg";
-      const path = `${user.id}/${Date.now()}.${ext}`;
+      const folder = sampleId ? `sample/${sampleId}` : user!.id;
+      const path = `${folder}/${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from("provider-status-images")
         .upload(path, file, { upsert: false });
@@ -145,7 +173,7 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
     }
   };
 
-  if (!user) return null;
+  if (!sampleId && !user) return null;
 
   const showEditor = editing || !status;
 
