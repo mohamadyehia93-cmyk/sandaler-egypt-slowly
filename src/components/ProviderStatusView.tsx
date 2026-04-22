@@ -22,6 +22,7 @@ interface Props {
 
 const ProviderStatusView = ({ userId, accentText }: Props) => {
   const { lang } = useI18n();
+  const isAr = lang === "ar";
 
   const { data: status } = useQuery({
     queryKey: ["provider_status_view", userId, todayUTC()],
@@ -41,16 +42,24 @@ const ProviderStatusView = ({ userId, accentText }: Props) => {
   if (!status) return null;
 
   return (
-    <div className="bg-card rounded-xl shadow-card p-4">
+    <div
+      dir={isAr ? "rtl" : "ltr"}
+      className="bg-card rounded-xl shadow-card p-4 text-start"
+    >
       <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
         <Sparkles className={`w-4 h-4 ${accentText}`} />
-        {lang === "ar" ? "حالة اليوم" : "Today's Status"}
+        {isAr ? "حالة اليوم" : "Today's Status"}
       </h3>
-      <p className="text-sm text-foreground whitespace-pre-wrap">{status.text}</p>
+      <p
+        dir="auto"
+        className="text-sm text-foreground whitespace-pre-wrap text-start"
+      >
+        {status.text}
+      </p>
       {status.image_url && (
         <img
           src={status.image_url}
-          alt=""
+          alt={isAr ? "صورة الحالة" : "Status image"}
           className="w-full max-h-48 object-cover rounded-lg mt-2"
         />
       )}
@@ -59,16 +68,17 @@ const ProviderStatusView = ({ userId, accentText }: Props) => {
           href={status.link_url}
           target="_blank"
           rel="noopener noreferrer"
+          dir="ltr"
           className={`inline-flex items-center gap-1 text-xs font-medium ${accentText} break-all mt-2`}
         >
           <LinkIcon className="w-3 h-3 flex-shrink-0" />
-          {status.link_url}
+          <span className="break-all">{status.link_url}</span>
         </a>
       )}
-      <p className="text-[10px] text-muted-foreground mt-2">
-        {lang === "ar" ? "اليوم" : "Today"} ·{" "}
+      <p className="text-[10px] text-muted-foreground mt-2 text-start">
+        {isAr ? "اليوم" : "Today"} ·{" "}
         {new Date(status.updated_at).toLocaleTimeString(
-          lang === "ar" ? "ar-EG" : "en-US",
+          isAr ? "ar-EG" : "en-US",
           { hour: "2-digit", minute: "2-digit" }
         )}
       </p>
