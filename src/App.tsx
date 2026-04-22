@@ -13,6 +13,7 @@ import ExperienceDetail from "./pages/ExperienceDetail.tsx";
 import TripDetail from "./pages/TripDetail.tsx";
 import AudioTourDetail from "./pages/AudioTourDetail.tsx";
 import CauseDetail from "./pages/CauseDetail.tsx";
+import OrganizationDetail from "./pages/OrganizationDetail.tsx";
 import Wishlists from "./pages/Wishlists.tsx";
 import Inbox from "./pages/Inbox.tsx";
 import Profile from "./pages/Profile.tsx";
@@ -96,6 +97,7 @@ const App = () => (
             <Route path="/audio-tour/:id" element={<AudioTourDetail />} />
             <Route path="/causes" element={<AllCauses />} />
             <Route path="/cause/:id" element={<CauseDetail />} />
+            <Route path="/organization/:id" element={<OrganizationDetail />} />
             <Route path="/cause/:id/gift" element={<CauseSupportGift />} />
             <Route path="/cause/:id/donate" element={<CauseSupportDonate />} />
             <Route path="/cause/:id/volunteer" element={<CauseSupportVolunteer />} />
