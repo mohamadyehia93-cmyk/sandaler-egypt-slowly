@@ -110,6 +110,7 @@ const Community = () => {
   const [newCategory, setNewCategory] = useState<PostCategory>("memory");
   const [newLocation, setNewLocation] = useState("");
   const [activeFilter, setActiveFilter] = useState<"all" | PostCategory>("all");
+  const [topTab, setTopTab] = useState<"feed" | "following">("feed");
   const [openComments, setOpenComments] = useState<Record<string, boolean>>({});
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
