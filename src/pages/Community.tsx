@@ -320,7 +320,12 @@ const Community = () => {
                   <Heart className="w-4 h-4" fill={post.liked ? "currentColor" : "none"} />
                   {post.likes}
                 </button>
-                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground transition-all">
+                <button
+                  onClick={() => toggleComments(post.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    openComments[post.id] ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
                   <MessageCircle className="w-4 h-4" />
                   {post.comments}
                 </button>
@@ -328,6 +333,52 @@ const Community = () => {
                   <Share2 className="w-4 h-4" />
                 </button>
               </div>
+
+              {/* Comments */}
+              {openComments[post.id] && (
+                <div className="border-t border-border bg-secondary/30 px-3 py-3 space-y-3">
+                  {(post.commentList || []).length === 0 && (
+                    <p className="text-xs text-muted-foreground text-center py-1">
+                      {lang === "ar" ? "كن أول من يعلّق" : "Be the first to comment"}
+                    </p>
+                  )}
+                  {(post.commentList || []).map((c) => (
+                    <div key={c.id} className="flex gap-2">
+                      <img src={c.avatar} alt={c.author} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="bg-background rounded-2xl px-3 py-2 border border-border">
+                          <p className="text-xs font-semibold text-foreground">{c.author}</p>
+                          <p className="text-xs text-foreground leading-relaxed mt-0.5">{c.text}</p>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-1 ms-3">{c.timeAgo}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-2 pt-1">
+                    <Input
+                      value={commentDrafts[post.id] || ""}
+                      onChange={(e) =>
+                        setCommentDrafts((prev) => ({ ...prev, [post.id]: e.target.value }))
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          handleAddComment(post.id);
+                        }
+                      }}
+                      placeholder={lang === "ar" ? "اكتب تعليقًا..." : "Write a comment..."}
+                      className="h-9 bg-background text-xs rounded-full"
+                    />
+                    <Button
+                      size="sm"
+                      onClick={() => handleAddComment(post.id)}
+                      disabled={!(commentDrafts[post.id] || "").trim()}
+                    >
+                      {lang === "ar" ? "إرسال" : "Send"}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </article>
           );
         })}
