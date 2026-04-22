@@ -149,18 +149,20 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
 
   const showEditor = editing || !status;
 
+  const isAr = lang === "ar";
+
   return (
-    <div className="bg-card rounded-xl shadow-card p-4">
+    <div dir={isAr ? "rtl" : "ltr"} className="bg-card rounded-xl shadow-card p-4 text-start">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
           <Sparkles className={`w-4 h-4 ${accentText}`} />
-          {lang === "ar" ? "حالة اليوم" : "Today's Status"}
+          {isAr ? "حالة اليوم" : "Today's Status"}
         </h3>
         {status && !editing && (
           <div className="flex items-center gap-1">
             <button
               onClick={() => setEditing(true)}
-              aria-label={lang === "ar" ? "تعديل" : "Edit"}
+              aria-label={isAr ? "تعديل" : "Edit"}
               className="p-1.5 rounded-md hover:bg-muted text-muted-foreground"
             >
               <Pencil className="w-3.5 h-3.5" />
@@ -168,7 +170,7 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
             <button
               onClick={() => deleteMutation.mutate()}
               disabled={deleteMutation.isPending}
-              aria-label={lang === "ar" ? "حذف" : "Delete"}
+              aria-label={isAr ? "حذف" : "Delete"}
               className="p-1.5 rounded-md hover:bg-muted text-muted-foreground"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -186,20 +188,20 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
+            dir="auto"
             placeholder={
-              lang === "ar"
-                ? "ماذا يحدث اليوم؟"
-                : "What's happening today?"
+              isAr ? "ماذا يحدث اليوم؟" : "What's happening today?"
             }
             maxLength={280}
             rows={3}
-            className="w-full text-sm bg-surface border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary/40"
+            className="w-full text-sm bg-surface border border-border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary/40 text-start"
           />
           <input
             type="url"
             value={linkUrl}
             onChange={(e) => setLinkUrl(e.target.value)}
-            placeholder={lang === "ar" ? "رابط (اختياري)" : "Link (optional)"}
+            dir="ltr"
+            placeholder={isAr ? "رابط (اختياري)" : "Link (optional)"}
             maxLength={500}
             className="w-full text-xs bg-surface border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
@@ -207,12 +209,12 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
             <div className="relative">
               <img
                 src={imageUrl}
-                alt=""
+                alt={isAr ? "معاينة الصورة" : "Image preview"}
                 className="w-full max-h-40 object-cover rounded-lg"
               />
               <button
                 onClick={() => setImageUrl(null)}
-                aria-label={lang === "ar" ? "إزالة الصورة" : "Remove image"}
+                aria-label={isAr ? "إزالة الصورة" : "Remove image"}
                 className="absolute top-1.5 end-1.5 bg-black/60 text-white rounded-full p-1"
               >
                 <X className="w-3 h-3" />
@@ -224,7 +226,7 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
               <button
                 onClick={() => fileRef.current?.click()}
                 disabled={uploading}
-                aria-label={lang === "ar" ? "إضافة صورة" : "Add image"}
+                aria-label={isAr ? "إضافة صورة" : "Add image"}
                 className="p-1.5 rounded-md hover:bg-muted disabled:opacity-50"
               >
                 {uploading ? (
@@ -234,7 +236,7 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
                 )}
               </button>
               <LinkIcon className="w-4 h-4 opacity-50" />
-              <span className="text-[10px] ms-1">{text.length}/280</span>
+              <span className="text-[10px] ms-1" dir="ltr">{text.length}/280</span>
             </div>
             <div className="flex items-center gap-2">
               {status && (
@@ -247,7 +249,7 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
                   }}
                   className="text-xs font-medium text-muted-foreground px-3 py-1.5"
                 >
-                  {lang === "ar" ? "إلغاء" : "Cancel"}
+                  {isAr ? "إلغاء" : "Cancel"}
                 </button>
               )}
               <button
@@ -256,10 +258,10 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
                 className={`text-xs font-semibold text-white ${accentBg} px-4 py-1.5 rounded-md disabled:opacity-50`}
               >
                 {saveMutation.isPending
-                  ? lang === "ar"
+                  ? isAr
                     ? "جارٍ الحفظ..."
                     : "Saving..."
-                  : lang === "ar"
+                  : isAr
                   ? "نشر"
                   : "Post"}
               </button>
@@ -279,13 +281,13 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
         </div>
       ) : (
         <div className="space-y-2">
-          <p className="text-sm text-foreground whitespace-pre-wrap">
+          <p dir="auto" className="text-sm text-foreground whitespace-pre-wrap text-start">
             {status!.text}
           </p>
           {status!.image_url && (
             <img
               src={status!.image_url}
-              alt=""
+              alt={isAr ? "صورة الحالة" : "Status image"}
               className="w-full max-h-48 object-cover rounded-lg"
             />
           )}
@@ -294,16 +296,17 @@ const DailyStatusCard = ({ accentBg, accentText }: Props) => {
               href={status!.link_url}
               target="_blank"
               rel="noopener noreferrer"
+              dir="ltr"
               className={`inline-flex items-center gap-1 text-xs font-medium ${accentText} break-all`}
             >
               <LinkIcon className="w-3 h-3 flex-shrink-0" />
-              {status!.link_url}
+              <span className="break-all">{status!.link_url}</span>
             </a>
           )}
-          <p className="text-[10px] text-muted-foreground">
-            {lang === "ar" ? "اليوم" : "Today"} ·{" "}
+          <p className="text-[10px] text-muted-foreground text-start">
+            {isAr ? "اليوم" : "Today"} ·{" "}
             {new Date(status!.updated_at).toLocaleTimeString(
-              lang === "ar" ? "ar-EG" : "en-US",
+              isAr ? "ar-EG" : "en-US",
               { hour: "2-digit", minute: "2-digit" }
             )}
           </p>
