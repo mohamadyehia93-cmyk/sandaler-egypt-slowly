@@ -1,19 +1,31 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
 import {
   ArrowLeft, Share2, MapPin, Users, Calendar, CheckCircle, ShieldCheck,
-  Mail, Globe, Heart, Sparkles, Target, ChevronRight,
+  Mail, Globe, Heart, Sparkles, Target, ChevronRight, UserPlus, UserCheck,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { causes, regions } from "@/lib/sampleData";
 import ProviderStatusView from "@/components/ProviderStatusView";
 import DailyStatusCard from "@/components/DailyStatusCard";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "@/hooks/use-toast";
 
 const OrganizationDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
   const { user } = useAuth();
+  const [following, setFollowing] = useState(false);
+
+  const handleFollow = () => {
+    setFollowing((f) => !f);
+    toast({
+      title: !following
+        ? lang === "ar" ? "تتابع المنظمة الآن" : "Now following"
+        : lang === "ar" ? "تم إلغاء المتابعة" : "Unfollowed",
+    });
+  };
 
   const cause = causes.find((c) => c.id === id) || causes[0];
   const region = regions.find((r) => r.id === cause.regionId);
@@ -99,7 +111,7 @@ const OrganizationDetail = () => {
               className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-1.5"
             >
               <Heart className="w-4 h-4" />
-              {lang === "ar" ? "ادعم الآن" : "Support Now"}
+              {lang === "ar" ? "ادعم" : "Support"}
             </button>
             <button
               onClick={() => navigate("/inbox")}
@@ -107,6 +119,20 @@ const OrganizationDetail = () => {
             >
               <Mail className="w-4 h-4" />
               {lang === "ar" ? "تواصل" : "Contact"}
+            </button>
+            <button
+              onClick={handleFollow}
+              aria-pressed={following}
+              className={`flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 border-2 ${
+                following
+                  ? "bg-primary/10 border-primary text-primary"
+                  : "border-border bg-card text-foreground"
+              }`}
+            >
+              {following ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+              {following
+                ? lang === "ar" ? "متابَع" : "Following"
+                : lang === "ar" ? "متابعة" : "Follow"}
             </button>
           </div>
         </div>
