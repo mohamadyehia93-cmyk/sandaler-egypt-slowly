@@ -126,13 +126,21 @@ const PersonDetail = () => {
             <MessageCircle className="w-4 h-4 text-primary" />
             <h3 className="text-sm font-semibold text-foreground">{lang === "ar" ? "تواصل" : "Contact"}</h3>
           </div>
-          <button
-            onClick={() => navigate(`/inbox?personId=${person.id}&name=${encodeURIComponent(person.name.en)}&nameAr=${encodeURIComponent(person.name.ar)}&image=${encodeURIComponent(person.image)}`)}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
-          >
-            <MessageCircle className="w-5 h-5" />
-            {lang === "ar" ? "أرسل رسالة" : "Send Message"}
-          </button>
+          <div className="flex gap-2">
+            <FollowButton
+              targetType="person"
+              targetId={person.id}
+              variant="outline"
+              className="flex-1"
+            />
+            <button
+              onClick={() => navigate(`/inbox?personId=${person.id}&name=${encodeURIComponent(person.name.en)}&nameAr=${encodeURIComponent(person.name.ar)}&image=${encodeURIComponent(person.image)}`)}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
+            >
+              <MessageCircle className="w-4 h-4" />
+              {lang === "ar" ? "رسالة" : "Message"}
+            </button>
+          </div>
         </div>
       </div>
 
