@@ -80,6 +80,25 @@
   [dir="rtl"] {
     font-family: 'Cairo', sans-serif;
   }
+
+  /* ─── Global RTL-aware image cropping defaults ───
+     Auto-applies face-safe focal points so portraits and card images
+     look good on mobile and in Arabic (RTL) layouts without per-component edits.
+  */
+  img.rounded-full,
+  img.rounded-3xl {
+    object-position: center 30%;
+  }
+
+  .relative > img.object-cover,
+  .relative > a > img.object-cover {
+    object-position: center 35%;
+  }
+
+  [dir="rtl"] .relative > img.object-cover,
+  [dir="rtl"] .relative > a > img.object-cover {
+    object-position: 55% 35%;
+  }
 }
 
 @layer utilities {
@@ -107,5 +126,35 @@
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* ─── RTL-aware image utilities ───
+     Apply to <img> for profile/card/portrait visuals.
+     - img-portrait: face-safe focal point (top quarter) so heads aren't cropped.
+     - img-card: balanced focal point for landscape card images.
+     - img-rtl-flip: horizontal focal point shifts with text direction.
+     - img-avatar: round crop with face-safe focal point.
+  */
+  .img-portrait {
+    @apply w-full h-full object-cover;
+    object-position: center 25%;
+  }
+
+  .img-card {
+    @apply w-full h-full object-cover;
+    object-position: center center;
+  }
+
+  .img-rtl-flip {
+    @apply w-full h-full object-cover;
+    object-position: 30% center;
+  }
+  [dir="rtl"] .img-rtl-flip {
+    object-position: 70% center;
+  }
+
+  .img-avatar {
+    @apply w-full h-full object-cover rounded-full;
+    object-position: center 30%;
   }
 }
