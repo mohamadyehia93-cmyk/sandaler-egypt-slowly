@@ -7,6 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import BottomNav from "@/components/BottomNav";
+import FollowButton from "@/components/FollowButton";
 
 const visitorData: Record<string, {
   name: { en: string; ar: string };
