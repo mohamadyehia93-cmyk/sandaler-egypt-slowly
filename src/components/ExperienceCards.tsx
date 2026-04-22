@@ -105,7 +105,7 @@ const ExperienceCards = () => {
             className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card text-start"
           >
             <div className="relative h-32">
-              <img src={e.image ?? ""} alt={lang === "ar" ? e.title_ar : e.title_en} className="w-full h-full object-cover" />
+              <img src={e.image || "/placeholder.svg"} alt={lang === "ar" ? e.title_ar : e.title_en} className="w-full h-full object-cover" />
               <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
                 <Heart className="w-4 h-4 text-foreground" />
               </button>

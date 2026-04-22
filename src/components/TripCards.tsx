@@ -176,7 +176,7 @@ const TripCards = () => {
         ) : filtered.map((tr) => (
           <div key={tr.id} onClick={() => navigate(`/trip/${tr.slug || tr.id}`)} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer">
             <div className="relative h-32">
-              <img src={tr.image ?? ""} alt={lang === "ar" ? tr.title_ar : tr.title_en} className="w-full h-full object-cover" />
+              <img src={tr.image || "/placeholder.svg"} alt={lang === "ar" ? tr.title_ar : tr.title_en} className="w-full h-full object-cover" />
             </div>
             <div className="p-3">
               <div className="flex items-center gap-2 mb-1">

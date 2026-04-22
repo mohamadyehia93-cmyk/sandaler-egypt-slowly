@@ -21,7 +21,7 @@ const ProductGrid = () => {
         ) : (products ?? []).map((p) => (
           <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card">
             <div className="relative h-32">
-              <img src={p.image ?? ""} alt={lang === "ar" ? p.name_ar : p.name_en} className="w-full h-full object-cover" />
+              <img src={p.image || "/placeholder.svg"} alt={lang === "ar" ? p.name_ar : p.name_en} className="w-full h-full object-cover" />
               <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
                 <Heart className="w-3.5 h-3.5 text-foreground" />
               </button>

@@ -30,7 +30,7 @@ const LatestPosts = () => {
           return (
             <div key={p.id} className="min-w-[220px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card relative cursor-pointer" onClick={() => navigate(`/post/${p.id}`)}>
               <div className="relative h-40">
-                <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
+                <img src={p.image || "/placeholder.svg"} alt={p.title[lang]} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 gradient-overlay" />
                 <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/20 backdrop-blur-sm" onClick={(e) => e.stopPropagation()}>
                   <Bookmark className="w-3.5 h-3.5 text-primary-foreground" />
