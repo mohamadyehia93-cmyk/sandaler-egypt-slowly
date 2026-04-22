@@ -139,7 +139,15 @@ const OrganizationDetail = () => {
 
       {/* Today's Status */}
       <div className="px-4 mt-4">
-        <ProviderStatusView sampleId={`org-${cause.id}`} accentText="text-primary" />
+        {user ? (
+          <DailyStatusCard
+            sampleId={`org-${cause.id}`}
+            accentBg="bg-primary"
+            accentText="text-primary"
+          />
+        ) : (
+          <ProviderStatusView sampleId={`org-${cause.id}`} accentText="text-primary" />
+        )}
       </div>
 
       {/* Mission */}
