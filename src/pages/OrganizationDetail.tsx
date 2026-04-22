@@ -1,19 +1,31 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
 import {
   ArrowLeft, Share2, MapPin, Users, Calendar, CheckCircle, ShieldCheck,
-  Mail, Globe, Heart, Sparkles, Target, ChevronRight,
+  Mail, Globe, Heart, Sparkles, Target, ChevronRight, UserPlus, UserCheck,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { causes, regions } from "@/lib/sampleData";
 import ProviderStatusView from "@/components/ProviderStatusView";
 import DailyStatusCard from "@/components/DailyStatusCard";
 import { useAuth } from "@/hooks/useAuth";
+import { toast } from "@/hooks/use-toast";
 
 const OrganizationDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
   const { user } = useAuth();
+  const [following, setFollowing] = useState(false);
+
+  const handleFollow = () => {
+    setFollowing((f) => !f);
+    toast({
+      title: !following
+        ? lang === "ar" ? "تتابع المنظمة الآن" : "Now following"
+        : lang === "ar" ? "تم إلغاء المتابعة" : "Unfollowed",
+    });
+  };
 
   const cause = causes.find((c) => c.id === id) || causes[0];
   const region = regions.find((r) => r.id === cause.regionId);
