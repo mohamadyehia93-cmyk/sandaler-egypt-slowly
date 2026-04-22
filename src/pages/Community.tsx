@@ -30,7 +30,7 @@ interface CommunityPost {
   comments: number;
   timeAgo: string;
   liked: boolean;
-  commentList: Comment[];
+  commentList?: Comment[];
 }
 
 const samplePosts: CommunityPost[] = [
