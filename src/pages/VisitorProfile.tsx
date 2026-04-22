@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, MapPin, Calendar, Heart, MessageCircle,
@@ -7,6 +7,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import BottomNav from "@/components/BottomNav";
+import FollowButton from "@/components/FollowButton";
+import { useFollowerCount } from "@/hooks/useFollows";
 
 const visitorData: Record<string, {
   name: { en: string; ar: string };
@@ -87,9 +89,9 @@ const VisitorProfile = () => {
   const { id } = useParams();
   const { lang } = useI18n();
   const navigate = useNavigate();
-  const [following, setFollowing] = useState(false);
 
   const visitor = visitorData[id || ""] || defaultVisitor;
+  const { data: extraFollowers = 0 } = useFollowerCount("visitor", id || "sarah-m");
 
   return (
     <div className="min-h-screen bg-surface pb-20">
@@ -127,15 +129,12 @@ const VisitorProfile = () => {
 
         {/* Follow & Message */}
         <div className="flex gap-2 mt-3">
-          <Button
-            onClick={() => setFollowing(!following)}
-            variant={following ? "outline" : "default"}
-            className="flex-1 h-9 text-sm font-semibold gap-1.5"
-          >
-            {following
-              ? (lang === "ar" ? "متابَع ✓" : "Following ✓")
-              : (lang === "ar" ? "متابعة" : "Follow")}
-          </Button>
+          <FollowButton
+            targetType="visitor"
+            targetId={id || "sarah-m"}
+            variant="primary"
+            className="flex-1 !py-0 !h-9 !rounded-md"
+          />
           <Button variant="outline" className="h-9 text-sm font-semibold gap-1.5" onClick={() => navigate("/inbox")}>
             <MessageCircle className="w-4 h-4" />
             {lang === "ar" ? "رسالة" : "Message"}
@@ -148,7 +147,7 @@ const VisitorProfile = () => {
         {[
           { value: visitor.stats.trips, label: lang === "ar" ? "رحلات" : "Trips" },
           { value: visitor.stats.reviews, label: lang === "ar" ? "تقييمات" : "Reviews" },
-          { value: following ? visitor.stats.followers + 1 : visitor.stats.followers, label: lang === "ar" ? "متابعون" : "Followers" },
+          { value: visitor.stats.followers + extraFollowers, label: lang === "ar" ? "متابعون" : "Followers" },
           { value: visitor.stats.following, label: lang === "ar" ? "يتابع" : "Following" },
         ].map((s, i) => (
           <div key={i} className={`flex-1 py-3 text-center ${i < 3 ? "border-r border-border" : ""}`}>
