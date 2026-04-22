@@ -112,6 +112,20 @@ const Community = () => {
   const [openComments, setOpenComments] = useState<Record<string, boolean>>({});
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
 
+  const { user } = useAuth();
+  const postKeys = useMemo(() => posts.map((p) => `community-${p.id}`), [posts]);
+  const { data: dbComments } = usePostComments(postKeys);
+  const addComment = useAddComment(postKeys);
+
+  // Group comments by post key
+  const commentsByPost = useMemo(() => {
+    const map: Record<string, typeof dbComments extends infer T ? (T extends Array<infer U> ? U[] : never) : never> = {} as any;
+    (dbComments ?? []).forEach((c) => {
+      (map[c.post_key] ||= []).push(c);
+    });
+    return map;
+  }, [dbComments]);
+
   const filteredPosts = activeFilter === "all" ? posts : posts.filter((p) => p.category === activeFilter);
 
   const handleLike = (id: string) => {
@@ -125,25 +139,33 @@ const Community = () => {
   const toggleComments = (id: string) =>
     setOpenComments((prev) => ({ ...prev, [id]: !prev[id] }));
 
-  const handleAddComment = (id: string) => {
+  const handleAddComment = async (id: string) => {
     const text = (commentDrafts[id] || "").trim();
     if (!text) return;
-    const newComment: Comment = {
-      id: Date.now().toString(),
-      author: lang === "ar" ? "أنت" : "You",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100",
-      text,
-      timeAgo: lang === "ar" ? "الآن" : "Just now",
-    };
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? { ...p, commentList: [...(p.commentList || []), newComment], comments: p.comments + 1 }
-          : p
-      )
-    );
-    setCommentDrafts((prev) => ({ ...prev, [id]: "" }));
-    setOpenComments((prev) => ({ ...prev, [id]: true }));
+    if (!user) {
+      toast.error(lang === "ar" ? "يرجى تسجيل الدخول للتعليق" : "Please sign in to comment");
+      navigate("/login");
+      return;
+    }
+    try {
+      await addComment.mutateAsync({
+        post_key: `community-${id}`,
+        text,
+        author_name:
+          (user.user_metadata as any)?.display_name ||
+          (user.user_metadata as any)?.full_name ||
+          user.email ||
+          (lang === "ar" ? "مستخدم" : "User"),
+        author_avatar:
+          (user.user_metadata as any)?.avatar_url ||
+          (user.user_metadata as any)?.picture ||
+          null,
+      });
+      setCommentDrafts((prev) => ({ ...prev, [id]: "" }));
+      setOpenComments((prev) => ({ ...prev, [id]: true }));
+    } catch (e: any) {
+      toast.error(lang === "ar" ? "فشل نشر التعليق" : "Failed to post comment");
+    }
   };
 
   const handlePost = () => {
