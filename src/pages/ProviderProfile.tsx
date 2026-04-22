@@ -224,6 +224,11 @@ const ProviderProfile = () => {
 
       {/* Info Cards */}
       <div className="px-4 mt-4 space-y-3">
+        {/* Today's Status */}
+        {provider.user_id && (
+          <ProviderStatusView userId={provider.user_id} accentText={textColor} />
+        )}
+
         {/* About */}
         {bio && (
           <div className="bg-card rounded-xl shadow-card p-4">
