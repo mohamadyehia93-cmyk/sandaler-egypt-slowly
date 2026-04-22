@@ -147,7 +147,7 @@ const VisitorProfile = () => {
         {[
           { value: visitor.stats.trips, label: lang === "ar" ? "رحلات" : "Trips" },
           { value: visitor.stats.reviews, label: lang === "ar" ? "تقييمات" : "Reviews" },
-          { value: following ? visitor.stats.followers + 1 : visitor.stats.followers, label: lang === "ar" ? "متابعون" : "Followers" },
+          { value: visitor.stats.followers + extraFollowers, label: lang === "ar" ? "متابعون" : "Followers" },
           { value: visitor.stats.following, label: lang === "ar" ? "يتابع" : "Following" },
         ].map((s, i) => (
           <div key={i} className={`flex-1 py-3 text-center ${i < 3 ? "border-r border-border" : ""}`}>
