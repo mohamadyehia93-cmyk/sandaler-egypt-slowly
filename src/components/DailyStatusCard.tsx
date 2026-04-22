@@ -173,7 +173,7 @@ const DailyStatusCard = ({ accentBg, accentText, sampleId }: Props) => {
     }
   };
 
-  if (!user) return null;
+  if (!sampleId && !user) return null;
 
   const showEditor = editing || !status;
 
