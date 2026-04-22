@@ -106,6 +106,8 @@ const Community = () => {
   const [newCategory, setNewCategory] = useState<PostCategory>("memory");
   const [newLocation, setNewLocation] = useState("");
   const [activeFilter, setActiveFilter] = useState<"all" | PostCategory>("all");
+  const [openComments, setOpenComments] = useState<Record<string, boolean>>({});
+  const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
 
   const filteredPosts = activeFilter === "all" ? posts : posts.filter((p) => p.category === activeFilter);
 
@@ -115,6 +117,30 @@ const Community = () => {
         p.id === id ? { ...p, liked: !p.liked, likes: p.liked ? p.likes - 1 : p.likes + 1 } : p
       )
     );
+  };
+
+  const toggleComments = (id: string) =>
+    setOpenComments((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  const handleAddComment = (id: string) => {
+    const text = (commentDrafts[id] || "").trim();
+    if (!text) return;
+    const newComment: Comment = {
+      id: Date.now().toString(),
+      author: lang === "ar" ? "أنت" : "You",
+      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100",
+      text,
+      timeAgo: lang === "ar" ? "الآن" : "Just now",
+    };
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === id
+          ? { ...p, commentList: [...(p.commentList || []), newComment], comments: p.comments + 1 }
+          : p
+      )
+    );
+    setCommentDrafts((prev) => ({ ...prev, [id]: "" }));
+    setOpenComments((prev) => ({ ...prev, [id]: true }));
   };
 
   const handlePost = () => {
