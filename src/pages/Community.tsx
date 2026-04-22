@@ -541,6 +541,8 @@ const Community = () => {
           );
         })}
       </div>
+      </>
+      )}
 
       <BottomNav />
     </div>
