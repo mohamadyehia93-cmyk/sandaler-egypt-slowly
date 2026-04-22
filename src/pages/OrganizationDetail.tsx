@@ -88,12 +88,21 @@ const OrganizationDetail = () => {
               <p className="text-xs text-muted-foreground mt-0.5">
                 {cause.category[lang]}
               </p>
-              {region && (
-                <div className="flex items-center gap-1 mt-1.5 text-[11px] text-muted-foreground">
-                  <MapPin className="w-3 h-3" />
-                  <span>{t(region.nameKey)}</span>
-                </div>
-              )}
+              <div className="flex items-center gap-3 mt-1.5 text-[11px] text-muted-foreground flex-wrap">
+                {region && (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-3 h-3" />
+                    {t(region.nameKey)}
+                  </span>
+                )}
+                <span className="flex items-center gap-1">
+                  <Users className="w-3 h-3" />
+                  <span className="font-semibold text-foreground tabular-nums">
+                    {formatCount(followerCount)}
+                  </span>
+                  {lang === "ar" ? "متابع" : "followers"}
+                </span>
+              </div>
             </div>
           </div>
 
