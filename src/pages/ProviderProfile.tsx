@@ -186,18 +186,12 @@ const ProviderProfile = () => {
 
       {/* Action Buttons */}
       <div className="px-4 mt-4 flex gap-2">
-        <button
-          onClick={() => setFollowing(!following)}
-          className={`flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 transition-colors ${
-            following ? "border-2 border-border text-foreground bg-card" : `${color} text-white`
-          }`}
-        >
-          {following ? (
-            <><CheckCircle className="w-4 h-4" />{lang === "ar" ? "متابَع" : "Following"}</>
-          ) : (
-            <><Heart className="w-4 h-4" />{lang === "ar" ? "متابعة" : "Follow"}</>
-          )}
-        </button>
+        <FollowButton
+          targetType="provider"
+          targetId={provider.id}
+          variant="primary"
+          className="flex-1"
+        />
         <button
           onClick={() => navigate("/inbox")}
           className="flex-1 py-2.5 rounded-xl border-2 border-border text-foreground font-semibold text-sm flex items-center justify-center gap-1.5 bg-card"
