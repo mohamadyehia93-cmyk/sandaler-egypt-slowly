@@ -661,6 +661,39 @@ export type Database = {
           },
         ]
       }
+      post_comments: {
+        Row: {
+          author_avatar: string | null
+          author_name: string
+          created_at: string
+          id: string
+          post_key: string
+          text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          author_avatar?: string | null
+          author_name: string
+          created_at?: string
+          id?: string
+          post_key: string
+          text: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          author_avatar?: string | null
+          author_name?: string
+          created_at?: string
+          id?: string
+          post_key?: string
+          text?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           author_id: string | null
