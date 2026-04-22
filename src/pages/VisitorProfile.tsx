@@ -128,15 +128,12 @@ const VisitorProfile = () => {
 
         {/* Follow & Message */}
         <div className="flex gap-2 mt-3">
-          <Button
-            onClick={() => setFollowing(!following)}
-            variant={following ? "outline" : "default"}
-            className="flex-1 h-9 text-sm font-semibold gap-1.5"
-          >
-            {following
-              ? (lang === "ar" ? "متابَع ✓" : "Following ✓")
-              : (lang === "ar" ? "متابعة" : "Follow")}
-          </Button>
+          <FollowButton
+            targetType="visitor"
+            targetId={id || "sarah-m"}
+            variant="primary"
+            className="flex-1 !py-0 !h-9 !rounded-md"
+          />
           <Button variant="outline" className="h-9 text-sm font-semibold gap-1.5" onClick={() => navigate("/inbox")}>
             <MessageCircle className="w-4 h-4" />
             {lang === "ar" ? "رسالة" : "Message"}
