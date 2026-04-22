@@ -387,7 +387,11 @@ const Community = () => {
                   }`}
                 >
                   <MessageCircle className="w-4 h-4" />
-                  {post.comments + (commentsByPost[`community-${post.id}`]?.length || 0)}
+                  {(() => {
+                    const t = threadsByPost[`community-${post.id}`];
+                    const total = t ? t.roots.length + Object.values(t.childrenByParent).reduce((a, arr) => a + arr.length, 0) : 0;
+                    return post.comments + total;
+                  })()}
                 </button>
                 <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground transition-all ml-auto">
                   <Share2 className="w-4 h-4" />
@@ -396,37 +400,85 @@ const Community = () => {
 
               {/* Comments */}
               {openComments[post.id] && (() => {
-                const list = commentsByPost[`community-${post.id}`] || [];
+                const thread = threadsByPost[`community-${post.id}`] || { roots: [], childrenByParent: {} };
+                const renderComment = (c: typeof thread.roots[number], isReply = false) => (
+                  <div key={c.id} className={`flex gap-2 ${isReply ? "ms-9" : ""}`}>
+                    {c.author_avatar ? (
+                      <img src={c.author_avatar} alt={c.author_name} className={`${isReply ? "w-6 h-6" : "w-7 h-7"} rounded-full object-cover flex-shrink-0`} />
+                    ) : (
+                      <div className={`${isReply ? "w-6 h-6" : "w-7 h-7"} rounded-full bg-primary/15 text-primary flex items-center justify-center text-[10px] font-bold flex-shrink-0`}>
+                        {c.author_name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="bg-background rounded-2xl px-3 py-2 border border-border">
+                        <p className="text-xs font-semibold text-foreground">{c.author_name}</p>
+                        <p className="text-xs text-foreground leading-relaxed mt-0.5 break-words">{c.text}</p>
+                      </div>
+                      <div className="flex items-center gap-3 mt-1 ms-3">
+                        <p className="text-[10px] text-muted-foreground">
+                          {new Date(c.created_at).toLocaleString(lang === "ar" ? "ar-EG" : "en-US", {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          })}
+                        </p>
+                        {!isReply && (
+                          <button
+                            onClick={() => {
+                              if (!user) { requireAuth(); return; }
+                              setReplyingTo((prev) => ({ ...prev, [post.id]: prev[post.id] === c.id ? null : c.id }));
+                            }}
+                            className="text-[10px] font-semibold text-primary hover:underline"
+                          >
+                            {lang === "ar" ? "رد" : "Reply"}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Render children replies */}
+                      {!isReply && (thread.childrenByParent[c.id] || []).length > 0 && (
+                        <div className="mt-2 space-y-2">
+                          {thread.childrenByParent[c.id].map((reply) => renderComment(reply, true))}
+                        </div>
+                      )}
+
+                      {/* Inline reply composer */}
+                      {!isReply && replyingTo[post.id] === c.id && (
+                        <div className="flex items-center gap-2 mt-2">
+                          <Input
+                            autoFocus
+                            value={replyDrafts[c.id] || ""}
+                            onChange={(e) => setReplyDrafts((prev) => ({ ...prev, [c.id]: e.target.value }))}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault();
+                                handleAddReply(post.id, c.id);
+                              }
+                            }}
+                            placeholder={lang === "ar" ? `الرد على ${c.author_name}...` : `Reply to ${c.author_name}...`}
+                            className="h-8 bg-background text-xs rounded-full"
+                          />
+                          <Button
+                            size="sm"
+                            onClick={() => handleAddReply(post.id, c.id)}
+                            disabled={!(replyDrafts[c.id] || "").trim() || addComment.isPending}
+                          >
+                            {lang === "ar" ? "رد" : "Reply"}
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+
                 return (
                   <div className="border-t border-border bg-secondary/30 px-3 py-3 space-y-3">
-                    {list.length === 0 && (
+                    {thread.roots.length === 0 && (
                       <p className="text-xs text-muted-foreground text-center py-1">
                         {lang === "ar" ? "كن أول من يعلّق" : "Be the first to comment"}
                       </p>
                     )}
-                    {list.map((c) => (
-                      <div key={c.id} className="flex gap-2">
-                        {c.author_avatar ? (
-                          <img src={c.author_avatar} alt={c.author_name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
-                        ) : (
-                          <div className="w-7 h-7 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[10px] font-bold flex-shrink-0">
-                            {c.author_name.charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <div className="bg-background rounded-2xl px-3 py-2 border border-border">
-                            <p className="text-xs font-semibold text-foreground">{c.author_name}</p>
-                            <p className="text-xs text-foreground leading-relaxed mt-0.5 break-words">{c.text}</p>
-                          </div>
-                          <p className="text-[10px] text-muted-foreground mt-1 ms-3">
-                            {new Date(c.created_at).toLocaleString(lang === "ar" ? "ar-EG" : "en-US", {
-                              dateStyle: "medium",
-                              timeStyle: "short",
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
+                    {thread.roots.map((c) => renderComment(c))}
                     <div className="flex items-center gap-2 pt-1">
                       <Input
                         value={commentDrafts[post.id] || ""}
