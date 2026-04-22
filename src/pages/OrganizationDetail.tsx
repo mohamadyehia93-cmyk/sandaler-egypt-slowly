@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useState } from "react";
 import {
   ArrowLeft, Share2, MapPin, Users, Calendar, CheckCircle, ShieldCheck,
   Mail, Globe, Heart, Sparkles, Target, ChevronRight, UserPlus, UserCheck,
@@ -10,22 +9,17 @@ import ProviderStatusView from "@/components/ProviderStatusView";
 import DailyStatusCard from "@/components/DailyStatusCard";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import {
+  useIsFollowing,
+  useToggleFollow,
+  useFollowerCount,
+} from "@/hooks/useFollows";
 
 const OrganizationDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
   const { user } = useAuth();
-  const [following, setFollowing] = useState(false);
-
-  const handleFollow = () => {
-    setFollowing((f) => !f);
-    toast({
-      title: !following
-        ? lang === "ar" ? "تتابع المنظمة الآن" : "Now following"
-        : lang === "ar" ? "تم إلغاء المتابعة" : "Unfollowed",
-    });
-  };
 
   const cause = causes.find((c) => c.id === id) || causes[0];
   const region = regions.find((r) => r.id === cause.regionId);
@@ -37,12 +31,48 @@ const OrganizationDetail = () => {
   );
   const allPrograms = [cause, ...otherPrograms];
 
+  // Stable org id = first program id of this org (causes list is stable)
+  const orgTargetId = `org-${[...allPrograms].sort((a, b) =>
+    a.id.localeCompare(b.id)
+  )[0].id}`;
+
+  const following = useIsFollowing("organization", orgTargetId);
+  const toggleFollow = useToggleFollow();
+  const { data: followerExtra = 0 } = useFollowerCount("organization", orgTargetId);
+
+  const handleFollow = () => {
+    if (!user) {
+      toast({
+        title: lang === "ar" ? "سجّل الدخول للمتابعة" : "Sign in to follow",
+      });
+      navigate("/login");
+      return;
+    }
+    toggleFollow.mutate(
+      { targetType: "organization", targetId: orgTargetId, currentlyFollowing: following },
+      {
+        onSuccess: ({ followed }) => {
+          toast({
+            title: followed
+              ? lang === "ar" ? "تتابع المنظمة الآن" : "Now following"
+              : lang === "ar" ? "تم إلغاء المتابعة" : "Unfollowed",
+          });
+        },
+        onError: () => {
+          toast({
+            title: lang === "ar" ? "تعذّر تحديث المتابعة" : "Couldn't update follow",
+          });
+        },
+      }
+    );
+  };
+
   const totalRaised = allPrograms.reduce((s, c) => s + c.raised, 0);
   const totalGoal = allPrograms.reduce((s, c) => s + c.goal, 0);
   const totalSupporters = allPrograms.reduce((s, c) => s + c.supporters, 0);
   const fundedPct = totalGoal ? Math.round((totalRaised / totalGoal) * 100) : 0;
   const baseFollowers = Math.max(120, Math.round(totalSupporters * 1.4));
-  const followerCount = baseFollowers + (following ? 1 : 0);
+  const followerCount = baseFollowers + followerExtra;
   const formatCount = (n: number) =>
     n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : n.toLocaleString();
 
