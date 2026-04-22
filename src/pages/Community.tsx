@@ -9,6 +9,7 @@ import BottomNav from "@/components/BottomNav";
 import { useAuth } from "@/hooks/useAuth";
 import { usePostComments, useAddComment } from "@/hooks/usePostComments";
 import { toast } from "sonner";
+import FollowingFeed from "@/components/FollowingFeed";
 
 type PostCategory = "memory" | "tip" | "question";
 
