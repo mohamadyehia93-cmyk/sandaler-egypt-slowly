@@ -88,7 +88,6 @@ const VisitorProfile = () => {
   const { id } = useParams();
   const { lang } = useI18n();
   const navigate = useNavigate();
-  const [following, setFollowing] = useState(false);
 
   const visitor = visitorData[id || ""] || defaultVisitor;
 
