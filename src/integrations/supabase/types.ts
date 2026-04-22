@@ -953,30 +953,33 @@ export type Database = {
           id: string
           image_url: string | null
           link_url: string | null
+          sample_id: string | null
           status_date: string
           text: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           image_url?: string | null
           link_url?: string | null
+          sample_id?: string | null
           status_date?: string
           text: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           image_url?: string | null
           link_url?: string | null
+          sample_id?: string | null
           status_date?: string
           text?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
