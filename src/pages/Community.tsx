@@ -9,6 +9,14 @@ import BottomNav from "@/components/BottomNav";
 
 type PostCategory = "memory" | "tip" | "question";
 
+interface Comment {
+  id: string;
+  author: string;
+  avatar: string;
+  text: string;
+  timeAgo: string;
+}
+
 interface CommunityPost {
   id: string;
   author: string;
@@ -22,6 +30,7 @@ interface CommunityPost {
   comments: number;
   timeAgo: string;
   liked: boolean;
+  commentList: Comment[];
 }
 
 const samplePosts: CommunityPost[] = [
