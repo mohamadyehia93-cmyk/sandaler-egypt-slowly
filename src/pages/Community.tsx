@@ -9,6 +9,7 @@ import BottomNav from "@/components/BottomNav";
 import { useAuth } from "@/hooks/useAuth";
 import { usePostComments, useAddComment } from "@/hooks/usePostComments";
 import { toast } from "sonner";
+import FollowingFeed from "@/components/FollowingFeed";
 
 type PostCategory = "memory" | "tip" | "question";
 
@@ -109,6 +110,7 @@ const Community = () => {
   const [newCategory, setNewCategory] = useState<PostCategory>("memory");
   const [newLocation, setNewLocation] = useState("");
   const [activeFilter, setActiveFilter] = useState<"all" | PostCategory>("all");
+  const [topTab, setTopTab] = useState<"feed" | "following">("feed");
   const [openComments, setOpenComments] = useState<Record<string, boolean>>({});
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
@@ -307,6 +309,32 @@ const Community = () => {
         </div>
       )}
 
+      {/* Top tabs: Feed vs Following */}
+      <div className="flex gap-2 px-4 pt-3">
+        {([
+          { key: "feed", label: { en: "Feed", ar: "الموجز" } },
+          { key: "following", label: { en: "Following", ar: "أتابع" } },
+        ] as const).map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setTopTab(tab.key)}
+            className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-all ${
+              topTab === tab.key
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground"
+            }`}
+          >
+            {tab.label[lang]}
+          </button>
+        ))}
+      </div>
+
+      {topTab === "following" ? (
+        <div className="pt-3">
+          <FollowingFeed />
+        </div>
+      ) : (
+      <>
       {/* Filters */}
       <div className="flex gap-2 px-4 py-3 overflow-x-auto hide-scrollbar">
         {filters.map((f) => (
@@ -513,6 +541,8 @@ const Community = () => {
           );
         })}
       </div>
+      </>
+      )}
 
       <BottomNav />
     </div>
