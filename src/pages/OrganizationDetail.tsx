@@ -41,6 +41,10 @@ const OrganizationDetail = () => {
   const totalGoal = allPrograms.reduce((s, c) => s + c.goal, 0);
   const totalSupporters = allPrograms.reduce((s, c) => s + c.supporters, 0);
   const fundedPct = totalGoal ? Math.round((totalRaised / totalGoal) * 100) : 0;
+  const baseFollowers = Math.max(120, Math.round(totalSupporters * 1.4));
+  const followerCount = baseFollowers + (following ? 1 : 0);
+  const formatCount = (n: number) =>
+    n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : n.toLocaleString();
 
   return (
     <div className="min-h-screen bg-background pb-20">
