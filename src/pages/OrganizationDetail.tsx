@@ -6,11 +6,14 @@ import {
 import { useI18n } from "@/lib/i18n";
 import { causes, regions } from "@/lib/sampleData";
 import ProviderStatusView from "@/components/ProviderStatusView";
+import DailyStatusCard from "@/components/DailyStatusCard";
+import { useAuth } from "@/hooks/useAuth";
 
 const OrganizationDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
+  const { user } = useAuth();
 
   const cause = causes.find((c) => c.id === id) || causes[0];
   const region = regions.find((r) => r.id === cause.regionId);
