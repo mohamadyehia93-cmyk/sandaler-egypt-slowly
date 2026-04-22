@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { Skeleton } from "@/components/ui/skeleton";
 import ProviderStatusView from "@/components/ProviderStatusView";
+import FollowButton from "@/components/FollowButton";
 import {
   ArrowLeft, Share2, MapPin, Star, CheckCircle, MessageSquare,
   Heart, Globe, Clock, ChevronRight, Users
