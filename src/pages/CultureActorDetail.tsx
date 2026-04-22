@@ -9,7 +9,7 @@ const CultureActorDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang } = useI18n();
-  const [following, setFollowing] = useState(false);
+  
 
   const actor = cultureActors.find((a) => a.id === id);
   if (!actor) return <div className="p-8 text-center text-muted-foreground">Culture Actor not found</div>;
