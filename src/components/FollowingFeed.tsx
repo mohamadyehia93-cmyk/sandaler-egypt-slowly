@@ -14,11 +14,12 @@ import { toast } from "sonner";
 type Cause = (typeof causes)[number];
 
 /** Stable org target id matches OrganizationDetail logic. */
-function orgTargetIdFor(c: Cause): string {
+function orgTargetIdFor(c: Cause): string | null {
+  if (!c?.org?.name?.en) return null;
   const programs = causes
-    .filter((x) => x.org.name.en === c.org.name.en)
+    .filter((x) => x?.org?.name?.en === c.org.name.en)
     .sort((a, b) => a.id.localeCompare(b.id));
-  return `org-${programs[0].id}`;
+  return programs[0] ? `org-${programs[0].id}` : null;
 }
 
 const FollowingFeed = () => {
@@ -40,19 +41,26 @@ const FollowingFeed = () => {
 
   // "Posts" = programs/causes from followed organizations.
   const feed = useMemo(() => {
-    return causes.filter((c) => followedOrgIds.has(orgTargetIdFor(c)));
+    return causes.filter((c) => {
+      const id = orgTargetIdFor(c);
+      return id ? followedOrgIds.has(id) : false;
+    });
   }, [followedOrgIds]);
 
-  // Suggested orgs: dedupe by org name, pick up to 5 with the most supporters.
+  // Suggested orgs: dedupe by org name, pick up to 6 with the most supporters.
   const suggestions = useMemo(() => {
     const byOrg = new Map<string, Cause>();
     for (const c of causes) {
-      const key = c.org.name.en;
+      const key = c?.org?.name?.en;
+      if (!key) continue;
       const cur = byOrg.get(key);
       if (!cur || c.supporters > cur.supporters) byOrg.set(key, c);
     }
     return Array.from(byOrg.values())
-      .filter((c) => !followedOrgIds.has(orgTargetIdFor(c)))
+      .filter((c) => {
+        const id = orgTargetIdFor(c);
+        return id ? !followedOrgIds.has(id) : false;
+      })
       .sort((a, b) => b.supporters - a.supporters)
       .slice(0, 6);
   }, [followedOrgIds]);
