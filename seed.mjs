@@ -15,8 +15,16 @@ const partnersData = clean(data.partnersData);
 const latestPosts = clean(data.latestPosts);
 const products = clean(data.products);
 
-const slug = (s) => (s || '').toString().toLowerCase()
-  .replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-').slice(0, 80);
+
+const { data: cityRows } = await supabase.from('cities').select('id');
+const validCities = new Set((cityRows ?? []).map((c) => c.id));
+const cityOk = (id) => (id && validCities.has(id) ? id : null);
+
+const dedupeBySlug = (rows) => {
+  const seen = new Set(); const out = [];
+  for (const r of rows) { if (!seen.has(r.slug)) { seen.add(r.slug); out.push(r); } }
+  return out;
+};
 
 async function ins(table, rows) {
   if (!rows.length) return;
