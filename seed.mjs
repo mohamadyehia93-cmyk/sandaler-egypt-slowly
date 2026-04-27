@@ -133,7 +133,7 @@ for (const c of causes) {
   if (!key || seen.has(key)) continue;
   seen.add(key);
   orgs.push({
-    slug: slug(key),
+    slug: (key||'').toLowerCase().replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'-').slice(0,80),
     name_en: c.org.name.en, name_ar: c.org.name.ar,
     org_type: 'community', logo: c.org.logo,
     region_id: c.regionId, city_id: cityOk(c.cityId),
