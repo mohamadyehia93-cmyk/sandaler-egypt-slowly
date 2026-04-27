@@ -74,7 +74,7 @@ const Index = () => {
     });
 
     return results.slice(0, 8);
-  }, [searchQuery, lang, dbTransport]);
+  }, [searchQuery, lang, dbTransport, dbExperiences, dbAudioTours, dbAccommodations, dbProducts, dbWhosWho]);
 
   const headerTextClass = scrolled ? "text-foreground" : "text-primary-foreground";
 
