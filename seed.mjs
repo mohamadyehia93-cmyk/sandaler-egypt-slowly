@@ -6,10 +6,14 @@ const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(URL, KEY, { auth: { persistSession: false } });
 
 const data = await import('/dev-server/src/lib/sampleData.ts');
-const {
-  heroSlides, causes, whosWho, cultureActors, partnersData,
-  latestPosts, products, hosts,
-} = data;
+const clean = (a) => (a || []).filter(Boolean);
+const heroSlides = clean(data.heroSlides);
+const causes = clean(data.causes);
+const whosWho = clean(data.whosWho);
+const cultureActors = clean(data.cultureActors);
+const partnersData = clean(data.partnersData);
+const latestPosts = clean(data.latestPosts);
+const products = clean(data.products);
 
 const slug = (s) => (s || '').toString().toLowerCase()
   .replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-').slice(0, 80);
