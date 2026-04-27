@@ -221,6 +221,7 @@ const FollowingFeed = () => {
               icon={UsersIcon}
               title={lang === "ar" ? "من الأشخاص الذين تتابعهم" : "From People You Follow"}
               count={peoplePosts.length}
+              lang={lang}
             />
           )}
           {peoplePosts.map((p) => (
