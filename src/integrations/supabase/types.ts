@@ -202,6 +202,90 @@ export type Database = {
           },
         ]
       }
+      causes: {
+        Row: {
+          category_ar: string | null
+          category_en: string | null
+          city_id: string | null
+          created_at: string
+          description_ar: string | null
+          description_en: string | null
+          goal: number | null
+          id: string
+          image: string | null
+          org_founded: string | null
+          org_logo: string | null
+          org_members: number | null
+          org_name_ar: string | null
+          org_name_en: string | null
+          owner_id: string | null
+          raised: number | null
+          region_id: string | null
+          slug: string | null
+          status: string | null
+          summary_ar: string | null
+          summary_en: string | null
+          supporters: number | null
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          category_ar?: string | null
+          category_en?: string | null
+          city_id?: string | null
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          goal?: number | null
+          id?: string
+          image?: string | null
+          org_founded?: string | null
+          org_logo?: string | null
+          org_members?: number | null
+          org_name_ar?: string | null
+          org_name_en?: string | null
+          owner_id?: string | null
+          raised?: number | null
+          region_id?: string | null
+          slug?: string | null
+          status?: string | null
+          summary_ar?: string | null
+          summary_en?: string | null
+          supporters?: number | null
+          title_ar: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          category_ar?: string | null
+          category_en?: string | null
+          city_id?: string | null
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          goal?: number | null
+          id?: string
+          image?: string | null
+          org_founded?: string | null
+          org_logo?: string | null
+          org_members?: number | null
+          org_name_ar?: string | null
+          org_name_en?: string | null
+          owner_id?: string | null
+          raised?: number | null
+          region_id?: string | null
+          slug?: string | null
+          status?: string | null
+          summary_ar?: string | null
+          summary_en?: string | null
+          supporters?: number | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cities: {
         Row: {
           best_time_ar: string | null
@@ -315,6 +399,72 @@ export type Database = {
           participant_1?: string
           participant_2?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      culture_actors: {
+        Row: {
+          bio_ar: string | null
+          bio_en: string | null
+          created_at: string
+          expertise_ar: string[] | null
+          expertise_en: string[] | null
+          id: string
+          image: string | null
+          name_ar: string
+          name_en: string
+          quote_ar: string | null
+          quote_en: string | null
+          region_id: string | null
+          slug: string | null
+          social_links: Json | null
+          status: string | null
+          title_ar: string | null
+          title_en: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          bio_ar?: string | null
+          bio_en?: string | null
+          created_at?: string
+          expertise_ar?: string[] | null
+          expertise_en?: string[] | null
+          id?: string
+          image?: string | null
+          name_ar: string
+          name_en: string
+          quote_ar?: string | null
+          quote_en?: string | null
+          region_id?: string | null
+          slug?: string | null
+          social_links?: Json | null
+          status?: string | null
+          title_ar?: string | null
+          title_en?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          bio_ar?: string | null
+          bio_en?: string | null
+          created_at?: string
+          expertise_ar?: string[] | null
+          expertise_en?: string[] | null
+          id?: string
+          image?: string | null
+          name_ar?: string
+          name_en?: string
+          quote_ar?: string | null
+          quote_en?: string | null
+          region_id?: string | null
+          slug?: string | null
+          social_links?: Json | null
+          status?: string | null
+          title_ar?: string | null
+          title_en?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -544,6 +694,114 @@ export type Database = {
         }
         Relationships: []
       }
+      hero_slides: {
+        Row: {
+          created_at: string
+          id: string
+          image: string | null
+          link: string | null
+          position: number
+          status: string | null
+          subtitle_ar: string | null
+          subtitle_en: string | null
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image?: string | null
+          link?: string | null
+          position?: number
+          status?: string | null
+          subtitle_ar?: string | null
+          subtitle_en?: string | null
+          title_ar: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image?: string | null
+          link?: string | null
+          position?: number
+          status?: string | null
+          subtitle_ar?: string | null
+          subtitle_en?: string | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      meetups: {
+        Row: {
+          attendees_count: number | null
+          capacity: number | null
+          city_id: string | null
+          created_at: string
+          description_ar: string | null
+          description_en: string | null
+          id: string
+          image: string | null
+          location_ar: string | null
+          location_en: string | null
+          meetup_date: string | null
+          meetup_time: string | null
+          organizer_id: string | null
+          region_id: string | null
+          slug: string | null
+          status: string | null
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          attendees_count?: number | null
+          capacity?: number | null
+          city_id?: string | null
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          id?: string
+          image?: string | null
+          location_ar?: string | null
+          location_en?: string | null
+          meetup_date?: string | null
+          meetup_time?: string | null
+          organizer_id?: string | null
+          region_id?: string | null
+          slug?: string | null
+          status?: string | null
+          title_ar: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          attendees_count?: number | null
+          capacity?: number | null
+          city_id?: string | null
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          id?: string
+          image?: string | null
+          location_ar?: string | null
+          location_en?: string | null
+          meetup_date?: string | null
+          meetup_time?: string | null
+          organizer_id?: string | null
+          region_id?: string | null
+          slug?: string | null
+          status?: string | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           booking_meta: Json | null
@@ -684,6 +942,93 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      partners: {
+        Row: {
+          about_ar: string | null
+          about_en: string | null
+          color: string | null
+          contributions_ar: string[] | null
+          contributions_en: string[] | null
+          created_at: string
+          focus_areas_ar: string[] | null
+          focus_areas_en: string[] | null
+          id: string
+          impact_label_ar: string | null
+          impact_label_en: string | null
+          impact_number: string | null
+          location_ar: string | null
+          location_en: string | null
+          logo: string | null
+          mission_ar: string | null
+          mission_en: string | null
+          name_ar: string
+          name_en: string
+          projects: number | null
+          since: number | null
+          slug: string | null
+          status: string | null
+          type_ar: string | null
+          type_en: string | null
+          updated_at: string
+        }
+        Insert: {
+          about_ar?: string | null
+          about_en?: string | null
+          color?: string | null
+          contributions_ar?: string[] | null
+          contributions_en?: string[] | null
+          created_at?: string
+          focus_areas_ar?: string[] | null
+          focus_areas_en?: string[] | null
+          id?: string
+          impact_label_ar?: string | null
+          impact_label_en?: string | null
+          impact_number?: string | null
+          location_ar?: string | null
+          location_en?: string | null
+          logo?: string | null
+          mission_ar?: string | null
+          mission_en?: string | null
+          name_ar: string
+          name_en: string
+          projects?: number | null
+          since?: number | null
+          slug?: string | null
+          status?: string | null
+          type_ar?: string | null
+          type_en?: string | null
+          updated_at?: string
+        }
+        Update: {
+          about_ar?: string | null
+          about_en?: string | null
+          color?: string | null
+          contributions_ar?: string[] | null
+          contributions_en?: string[] | null
+          created_at?: string
+          focus_areas_ar?: string[] | null
+          focus_areas_en?: string[] | null
+          id?: string
+          impact_label_ar?: string | null
+          impact_label_en?: string | null
+          impact_number?: string | null
+          location_ar?: string | null
+          location_en?: string | null
+          logo?: string | null
+          mission_ar?: string | null
+          mission_en?: string | null
+          name_ar?: string
+          name_en?: string
+          projects?: number | null
+          since?: number | null
+          slug?: string | null
+          status?: string | null
+          type_ar?: string | null
+          type_en?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       post_comments: {
         Row: {
@@ -1417,6 +1762,87 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      whos_who: {
+        Row: {
+          bio_ar: string | null
+          bio_en: string | null
+          city_id: string | null
+          created_at: string
+          favorite_places_ar: string[] | null
+          favorite_places_en: string[] | null
+          id: string
+          image: string | null
+          interests_ar: string[] | null
+          interests_en: string[] | null
+          languages_ar: string[] | null
+          languages_en: string[] | null
+          meeting_times_ar: string | null
+          meeting_times_en: string | null
+          name_ar: string
+          name_en: string
+          region_id: string | null
+          role_ar: string | null
+          role_en: string | null
+          slug: string | null
+          status: string | null
+          updated_at: string
+          user_id: string | null
+          years_active: number | null
+        }
+        Insert: {
+          bio_ar?: string | null
+          bio_en?: string | null
+          city_id?: string | null
+          created_at?: string
+          favorite_places_ar?: string[] | null
+          favorite_places_en?: string[] | null
+          id?: string
+          image?: string | null
+          interests_ar?: string[] | null
+          interests_en?: string[] | null
+          languages_ar?: string[] | null
+          languages_en?: string[] | null
+          meeting_times_ar?: string | null
+          meeting_times_en?: string | null
+          name_ar: string
+          name_en: string
+          region_id?: string | null
+          role_ar?: string | null
+          role_en?: string | null
+          slug?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+          years_active?: number | null
+        }
+        Update: {
+          bio_ar?: string | null
+          bio_en?: string | null
+          city_id?: string | null
+          created_at?: string
+          favorite_places_ar?: string[] | null
+          favorite_places_en?: string[] | null
+          id?: string
+          image?: string | null
+          interests_ar?: string[] | null
+          interests_en?: string[] | null
+          languages_ar?: string[] | null
+          languages_en?: string[] | null
+          meeting_times_ar?: string | null
+          meeting_times_en?: string | null
+          name_ar?: string
+          name_en?: string
+          region_id?: string | null
+          role_ar?: string | null
+          role_en?: string | null
+          slug?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+          years_active?: number | null
         }
         Relationships: []
       }
