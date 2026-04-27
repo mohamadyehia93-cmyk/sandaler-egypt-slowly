@@ -336,7 +336,7 @@ const EmptySuggestions = ({
       {/* Orgs */}
       {suggestions.orgs.length > 0 && (
         <div>
-          <SectionHeader icon={Building2} title={lang === "ar" ? "منظمات" : "Organizations"} count={suggestions.orgs.length} />
+          <SectionHeader icon={Building2} title={lang === "ar" ? "منظمات" : "Organizations"} count={suggestions.orgs.length} lang={lang} />
           <div className="space-y-2 mt-2">
             {suggestions.orgs.map((c) => {
               const targetId = orgTargetIdFor(c);
@@ -360,7 +360,7 @@ const EmptySuggestions = ({
       {/* Culture actors */}
       {suggestions.actors.length > 0 && (
         <div>
-          <SectionHeader icon={Feather} title={lang === "ar" ? "فاعلون ثقافيون" : "Culture Actors"} count={suggestions.actors.length} />
+          <SectionHeader icon={Feather} title={lang === "ar" ? "فاعلون ثقافيون" : "Culture Actors"} count={suggestions.actors.length} lang={lang} />
           <div className="space-y-2 mt-2">
             {suggestions.actors.map((a) => (
               <SuggestionRow
@@ -380,7 +380,7 @@ const EmptySuggestions = ({
       {/* Who's Who experts */}
       {suggestions.people.length > 0 && (
         <div>
-          <SectionHeader icon={UsersIcon} title={lang === "ar" ? "خبراء محليون" : "Local Experts"} count={suggestions.people.length} />
+          <SectionHeader icon={UsersIcon} title={lang === "ar" ? "خبراء محليون" : "Local Experts"} count={suggestions.people.length} lang={lang} />
           <div className="space-y-2 mt-2">
             {suggestions.people.map((p) => (
               <SuggestionRow
@@ -400,7 +400,7 @@ const EmptySuggestions = ({
       {/* Visitors */}
       {suggestions.visitors.length > 0 && (
         <div>
-          <SectionHeader icon={UserIcon} title={lang === "ar" ? "مسافرون" : "Travelers"} count={suggestions.visitors.length} />
+          <SectionHeader icon={UserIcon} title={lang === "ar" ? "مسافرون" : "Travelers"} count={suggestions.visitors.length} lang={lang} />
           <div className="space-y-2 mt-2">
             {suggestions.visitors.map((v) => (
               <SuggestionRow
