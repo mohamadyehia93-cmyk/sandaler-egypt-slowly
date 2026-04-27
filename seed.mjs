@@ -134,7 +134,7 @@ for (const c of causes) {
   orgs.push({
     slug: slug(key),
     name_en: c.org.name.en, name_ar: c.org.name.ar,
-    org_type: 'foundation', logo: c.org.logo,
+    org_type: 'community', logo: c.org.logo,
     region_id: c.regionId, city_id: cityOk(c.cityId),
     description_en: c.summary?.en, description_ar: c.summary?.ar,
     image: c.image,
