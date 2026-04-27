@@ -98,7 +98,7 @@ await ins('partners', dedupeBySlug(partnersData.map((p) => ({
 }))));
 
 // posts (from latestPosts)
-await ins('posts', latestPosts.map((p) => ({
+await ins('posts', dedupeBySlug(latestPosts.map((p) => ({
   slug: p.id,
   title_en: p.title.en, title_ar: p.title.ar,
   excerpt_en: p.excerpt?.en, excerpt_ar: p.excerpt?.ar,
@@ -109,10 +109,10 @@ await ins('posts', latestPosts.map((p) => ({
   author_image: p.authorImage, author_role: p.authorRole,
   read_time_minutes: p.readTime ?? 5,
   tags: p.tags ?? [],
-})));
+}))));
 
 // products
-await ins('products', products.map((p) => ({
+await ins('products', dedupeBySlug(products.map((p) => ({
   slug: p.id,
   name_en: p.title.en, name_ar: p.title.ar,
   description_en: p.description?.en, description_ar: p.description?.ar,
@@ -123,7 +123,7 @@ await ins('products', products.map((p) => ({
   region_id: p.regionId, city_id: cityOk(p.cityId),
   seller_name_en: p.artisan?.en, seller_name_ar: p.artisan?.ar,
   seller_village_en: p.village?.en, seller_village_ar: p.village?.ar,
-})));
+}))));
 
 // organizations - build a few from hosts + causes orgs
 const orgs = [];
