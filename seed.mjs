@@ -81,7 +81,7 @@ await ins('culture_actors', dedupeBySlug(cultureActors.map((c) => ({
 }))));
 
 // partners
-await ins('partners', partnersData.map((p) => ({
+await ins('partners', dedupeBySlug(partnersData.map((p) => ({
   slug: p.id,
   name_en: p.name.en, name_ar: p.name.ar,
   type_en: p.type?.en, type_ar: p.type?.ar,
@@ -95,7 +95,7 @@ await ins('partners', partnersData.map((p) => ({
   mission_en: p.mission?.en, mission_ar: p.mission?.ar,
   focus_areas_en: p.focusAreas?.en ?? [], focus_areas_ar: p.focusAreas?.ar ?? [],
   contributions_en: p.contributions?.en ?? [], contributions_ar: p.contributions?.ar ?? [],
-})));
+}))));
 
 // posts (from latestPosts)
 await ins('posts', latestPosts.map((p) => ({
