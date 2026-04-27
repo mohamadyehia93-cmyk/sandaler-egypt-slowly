@@ -1,7 +1,10 @@
 import { ArrowLeft, Heart, Share2, Users, Calendar, MapPin, ExternalLink, Gift, HandHeart, UserCheck, MessageCircle } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { causes, regions } from "@/lib/sampleData";
+import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
+import { dbToLegacyCause } from "@/lib/dbAdapters";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import DetailTestimonials from "@/components/DetailTestimonials";
 
@@ -17,7 +20,13 @@ const CauseDetail = () => {
   const navigate = useNavigate();
   const { lang, t } = useI18n();
 
-  const cause = causes.find((c) => c.id === id) || causes[0];
+  const { data: dbCause } = useQuery({
+    queryKey: ["cause", id],
+    queryFn: () => fetchByIdOrSlug("causes", id!),
+    enabled: !!id,
+  });
+
+  const cause = dbToLegacyCause(dbCause) || causes.find((c) => c.id === id) || causes[0];
   const region = regions.find((r) => r.id === cause.regionId);
   const progress = Math.round((cause.raised / cause.goal) * 100);
 
