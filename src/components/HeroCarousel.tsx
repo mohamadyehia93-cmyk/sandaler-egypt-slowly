@@ -20,17 +20,16 @@ const HeroCarousel = () => {
 
   return (
     <div
-      className="relative w-full h-52 overflow-hidden rounded-xl mx-4 mb-6 cursor-pointer"
-      style={{ width: "calc(100% - 2rem)" }}
+      className="relative w-full h-[60vh] min-h-[420px] overflow-hidden mb-8 cursor-pointer"
       onClick={() => navigate(slide.link)}
     >
       <AnimatePresence mode="wait">
         <motion.div
           key={slide.id}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8 }}
           className="absolute inset-0"
         >
           <img
@@ -38,24 +37,24 @@ const HeroCarousel = () => {
             alt={slide.title[lang]}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 gradient-overlay" />
-          <div className="absolute bottom-4 left-4 right-4">
-            <h2 className="text-xl font-bold text-primary-foreground mb-1">
+          <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-foreground/40" />
+          <div className="absolute bottom-12 left-5 right-5">
+            <h2 className="text-3xl font-bold text-primary-foreground mb-2 leading-tight drop-shadow-lg">
               {slide.title[lang]}
             </h2>
-            <p className="text-sm text-primary-foreground/80">
+            <p className="text-base text-primary-foreground/90 drop-shadow">
               {slide.subtitle[lang]}
             </p>
           </div>
         </motion.div>
       </AnimatePresence>
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-1.5">
         {heroSlides.map((_, i) => (
           <button
             key={i}
-            onClick={() => setCurrent(i)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              i === current ? "bg-primary-foreground w-5" : "bg-primary-foreground/40"
+            onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
+            className={`h-1.5 rounded-full transition-all ${
+              i === current ? "bg-primary-foreground w-6" : "bg-primary-foreground/50 w-1.5"
             }`}
           />
         ))}
