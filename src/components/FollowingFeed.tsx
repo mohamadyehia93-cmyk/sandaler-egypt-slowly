@@ -281,14 +281,20 @@ const SectionHeader = ({
   icon: Icon,
   title,
   count,
+  lang = "en",
 }: {
   icon: typeof Building2;
   title: string;
   count: number;
+  lang?: "en" | "ar";
 }) => (
   <div className="flex items-center gap-2 pt-1">
-    <Icon className="w-4 h-4 text-primary" />
-    <h3 className="text-xs font-bold text-foreground uppercase tracking-wide">
+    <Icon className="w-4 h-4 text-primary shrink-0" />
+    <h3
+      className={`text-xs font-bold text-foreground ${
+        lang === "ar" ? "" : "uppercase tracking-wide"
+      }`}
+    >
       {title}
     </h3>
     <span className="text-[10px] text-muted-foreground">({count})</span>
