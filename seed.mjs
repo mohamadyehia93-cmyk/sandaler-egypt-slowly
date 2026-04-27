@@ -41,7 +41,7 @@ await ins('hero_slides', heroSlides.map((h, i) => ({
 })));
 
 // causes
-await ins('causes', causes.map((c) => ({
+await ins('causes', dedupeBySlug(causes.map((c) => ({
   slug: c.id,
   title_en: c.title.en, title_ar: c.title.ar,
   summary_en: c.summary?.en, summary_ar: c.summary?.ar,
@@ -51,7 +51,7 @@ await ins('causes', causes.map((c) => ({
   image: c.image, region_id: c.regionId, city_id: cityOk(c.cityId),
   raised: c.raised ?? 0, goal: c.goal ?? 0, supporters: c.supporters ?? 0,
   category_en: c.category?.en, category_ar: c.category?.ar,
-})));
+}))));
 
 // whos_who
 await ins('whos_who', whosWho.map((w) => ({
