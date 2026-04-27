@@ -109,6 +109,7 @@ const CityDetail = () => {
   const { cityId } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
+  const { data: dbTransport = [] } = useTransport();
 
   const city = cityData[cityId || ""];
   if (!city) return <div className="p-8 text-center text-muted-foreground">City not found</div>;
@@ -120,7 +121,7 @@ const CityDetail = () => {
   const cityPeople = whosWho.filter((w) => w.cityId === cityId);
   const cityCauses = causes.filter((c) => c.cityId === cityId);
   const cityPosts = latestPosts.filter((p) => (p as any).cityId === cityId);
-  const cityTransport = transport.filter((tr) => tr.cityId === cityId);
+  const cityTransport = dbTransport.filter((tr) => tr.city_id === cityId);
   const cityTrips = trips.filter((tr) => tr.cityId === cityId);
 
   return (
@@ -353,9 +354,9 @@ const CityDetail = () => {
           <SectionHeader titleKey="section.gettingAround" onSeeAll={() => {}}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityTransport.map((tr) => (
-                <div key={tr.id} className="min-w-[140px] rounded-lg shadow-card bg-card p-4 flex flex-col items-center gap-2 cursor-pointer" onClick={() => navigate(`/transport/${(tr as any).slug || tr.id}`)}>
-                  <span className="text-3xl">{tr.icon}</span>
-                  <h3 className="text-xs font-semibold text-foreground text-center line-clamp-2">{tr.title[lang]}</h3>
+                <div key={tr.id} className="min-w-[140px] rounded-lg shadow-card bg-card p-4 flex flex-col items-center gap-2 cursor-pointer" onClick={() => navigate(`/transport/${tr.slug || tr.id}`)}>
+                  {tr.image ? <img src={tr.image} alt="" className="w-10 h-10 rounded-full object-cover" /> : <span className="text-3xl">🚐</span>}
+                  <h3 className="text-xs font-semibold text-foreground text-center line-clamp-2">{lang === "ar" ? tr.name_ar : tr.name_en}</h3>
                   <span className="text-sm font-bold text-primary-dark">{tr.price} {t("common.egp")}</span>
                 </div>
               ))}

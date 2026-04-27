@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Bell, Calendar, Search, X, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n";
-import { experiences, audioTours, accommodation, whosWho, products, transport } from "@/lib/sampleData";
+import { experiences, audioTours, accommodation, whosWho, products } from "@/lib/sampleData";
+import { useTransport } from "@/hooks/useListings";
 import BottomNav from "@/components/BottomNav";
 import TopTabs from "@/components/TopTabs";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -29,6 +30,7 @@ const Index = () => {
   const [scrolled, setScrolled] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const navigate = useNavigate();
+  const { data: dbTransport = [] } = useTransport();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -61,13 +63,13 @@ const Index = () => {
       const title = p.title[lang];
       if (title.toLowerCase().includes(q)) results.push({ id: p.id, title, type: lang === "ar" ? "منتج" : "Product", route: `/product/${p.id}` });
     });
-    transport.forEach((tr) => {
-      const title = tr.title[lang];
-      if (title.toLowerCase().includes(q)) results.push({ id: tr.id, title, type: lang === "ar" ? "مواصلات" : "Transport", route: `/transport/${tr.id}` });
+    dbTransport.forEach((tr) => {
+      const title = lang === "ar" ? tr.name_ar : tr.name_en;
+      if (title?.toLowerCase().includes(q)) results.push({ id: tr.id, title, type: lang === "ar" ? "مواصلات" : "Transport", route: `/transport/${tr.slug || tr.id}` });
     });
 
     return results.slice(0, 8);
-  }, [searchQuery, lang]);
+  }, [searchQuery, lang, dbTransport]);
 
   const headerTextClass = scrolled ? "text-foreground" : "text-primary-foreground";
 
