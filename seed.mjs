@@ -65,8 +65,8 @@ await ins('whos_who', dedupeBySlug(whosWho.map((w) => ({
   meeting_times_en: w.meetingTimes?.en, meeting_times_ar: w.meetingTimes?.ar,
   languages_en: w.languages?.en ?? [], languages_ar: w.languages?.ar ?? [],
   years_active: w.yearsActive ?? 0,
-})))); 
-})));
+}))));
+
 
 // culture_actors
 await ins('culture_actors', cultureActors.map((c) => ({
