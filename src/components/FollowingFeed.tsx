@@ -163,6 +163,7 @@ const FollowingFeed = () => {
               icon={Building2}
               title={lang === "ar" ? "من المنظمات" : "From Organizations"}
               count={orgPosts.length}
+              lang={lang}
             />
           )}
           {orgPosts.map((c) => (
