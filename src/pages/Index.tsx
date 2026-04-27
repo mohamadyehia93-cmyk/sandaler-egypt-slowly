@@ -30,6 +30,11 @@ const Index = () => {
   const [whyOpen, setWhyOpen] = useState(false);
   const navigate = useNavigate();
   const { data: dbTransport = [] } = useTransport();
+  const { data: dbExperiences = [] } = useExperiences();
+  const { data: dbAudioTours = [] } = useAudioTours();
+  const { data: dbAccommodations = [] } = useAccommodations();
+  const { data: dbProducts = [] } = useProducts();
+  const { data: dbWhosWho = [] } = useWhosWho();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -41,30 +46,31 @@ const Index = () => {
     if (!searchQuery.trim()) return [];
     const q = searchQuery.toLowerCase();
     const results: { id: string; title: string; type: string; route: string }[] = [];
+    const pick = (en: string, ar: string) => (lang === "ar" ? ar : en);
 
-    experiences.forEach((e) => {
-      const title = e.title[lang];
-      if (title.toLowerCase().includes(q)) results.push({ id: e.id, title, type: lang === "ar" ? "تجربة" : "Experience", route: `/experience/${e.id}` });
+    dbExperiences.forEach((e: any) => {
+      const title = pick(e.title_en, e.title_ar);
+      if (title?.toLowerCase().includes(q)) results.push({ id: e.id, title, type: pick("Experience", "تجربة"), route: `/experience/${e.slug || e.id}` });
     });
-    audioTours.forEach((a) => {
-      const title = a.title[lang];
-      if (title.toLowerCase().includes(q)) results.push({ id: a.id, title, type: lang === "ar" ? "جولة صوتية" : "Audio Tour", route: `/audio-tour/${a.id}` });
+    dbAudioTours.forEach((a: any) => {
+      const title = pick(a.title_en, a.title_ar);
+      if (title?.toLowerCase().includes(q)) results.push({ id: a.id, title, type: pick("Audio Tour", "جولة صوتية"), route: `/audio-tour/${a.slug || a.id}` });
     });
-    accommodation.forEach((ac) => {
-      const title = ac.title[lang];
-      if (title.toLowerCase().includes(q)) results.push({ id: ac.id, title, type: lang === "ar" ? "إقامة" : "Stay", route: `/stay/${ac.id}` });
+    dbAccommodations.forEach((ac: any) => {
+      const title = pick(ac.name_en, ac.name_ar);
+      if (title?.toLowerCase().includes(q)) results.push({ id: ac.id, title, type: pick("Stay", "إقامة"), route: `/stay/${ac.slug || ac.id}` });
     });
-    whosWho.forEach((w) => {
-      const name = w.name[lang];
-      if (name.toLowerCase().includes(q)) results.push({ id: w.id, title: name, type: lang === "ar" ? "شخصية" : "Person", route: `/person/${w.id}` });
+    dbWhosWho.forEach((w: any) => {
+      const title = pick(w.name_en, w.name_ar);
+      if (title?.toLowerCase().includes(q)) results.push({ id: w.id, title, type: pick("Person", "شخصية"), route: `/person/${w.slug || w.id}` });
     });
-    products.forEach((p) => {
-      const title = p.title[lang];
-      if (title.toLowerCase().includes(q)) results.push({ id: p.id, title, type: lang === "ar" ? "منتج" : "Product", route: `/product/${p.id}` });
+    dbProducts.forEach((p: any) => {
+      const title = pick(p.name_en, p.name_ar);
+      if (title?.toLowerCase().includes(q)) results.push({ id: p.id, title, type: pick("Product", "منتج"), route: `/product/${p.slug || p.id}` });
     });
-    dbTransport.forEach((tr) => {
-      const title = lang === "ar" ? tr.name_ar : tr.name_en;
-      if (title?.toLowerCase().includes(q)) results.push({ id: tr.id, title, type: lang === "ar" ? "مواصلات" : "Transport", route: `/transport/${tr.slug || tr.id}` });
+    dbTransport.forEach((tr: any) => {
+      const title = pick(tr.name_en, tr.name_ar);
+      if (title?.toLowerCase().includes(q)) results.push({ id: tr.id, title, type: pick("Transport", "مواصلات"), route: `/transport/${tr.slug || tr.id}` });
     });
 
     return results.slice(0, 8);
