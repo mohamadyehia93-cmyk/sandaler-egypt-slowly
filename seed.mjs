@@ -54,7 +54,7 @@ await ins('causes', dedupeBySlug(causes.map((c) => ({
 }))));
 
 // whos_who
-await ins('whos_who', whosWho.map((w) => ({
+await ins('whos_who', dedupeBySlug(whosWho.map((w) => ({
   slug: w.id,
   name_en: w.name.en, name_ar: w.name.ar,
   role_en: w.role?.en, role_ar: w.role?.ar,
@@ -65,6 +65,7 @@ await ins('whos_who', whosWho.map((w) => ({
   meeting_times_en: w.meetingTimes?.en, meeting_times_ar: w.meetingTimes?.ar,
   languages_en: w.languages?.en ?? [], languages_ar: w.languages?.ar ?? [],
   years_active: w.yearsActive ?? 0,
+})))); 
 })));
 
 // culture_actors
