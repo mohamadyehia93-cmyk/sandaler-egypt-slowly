@@ -35,12 +35,13 @@ const BottomNav = () => {
             <button
               key={key}
               onClick={() => navigate(path)}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 transition-all ${
-                active ? "text-primary-foreground scale-105" : "text-primary-foreground/60"
+              aria-label={lang === "ar" ? labelAr : labelEn}
+              className={`flex flex-col items-center gap-1 px-4 py-2 transition-all ${
+                active ? "text-primary-foreground scale-110" : "text-primary-foreground/60"
               }`}
             >
-              <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 1.8} />
-              <span className="text-[10px] font-medium">{lang === "ar" ? labelAr : labelEn}</span>
+              <Icon className="w-6 h-6" strokeWidth={active ? 2.5 : 1.8} />
+              <span className={`w-1 h-1 rounded-full bg-primary-foreground transition-opacity ${active ? "opacity-100" : "opacity-0"}`} />
             </button>
           );
         })}

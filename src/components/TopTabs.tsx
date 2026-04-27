@@ -15,19 +15,18 @@ const TopTabs = ({ activeTab, onTabChange }: TopTabsProps) => {
   const { t } = useI18n();
 
   return (
-    <div className="flex border-b border-border bg-background sticky top-0 z-40">
+    <div className="flex justify-center gap-1 px-4 py-3 bg-transparent">
       {tabs.map(({ key, labelKey }) => (
         <button
           key={key}
           onClick={() => onTabChange(key)}
-          className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${
-            activeTab === key ? "text-primary-dark" : "text-muted-foreground"
+          className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-all ${
+            activeTab === key
+              ? "bg-primary-dark text-primary-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
           {t(labelKey)}
-          {activeTab === key && (
-            <span className="absolute bottom-0 left-1/4 right-1/4 h-[3px] bg-primary rounded-t-full" />
-          )}
         </button>
       ))}
     </div>
