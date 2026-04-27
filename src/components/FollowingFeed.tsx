@@ -163,6 +163,7 @@ const FollowingFeed = () => {
               icon={Building2}
               title={lang === "ar" ? "من المنظمات" : "From Organizations"}
               count={orgPosts.length}
+              lang={lang}
             />
           )}
           {orgPosts.map((c) => (
@@ -220,6 +221,7 @@ const FollowingFeed = () => {
               icon={UsersIcon}
               title={lang === "ar" ? "من الأشخاص الذين تتابعهم" : "From People You Follow"}
               count={peoplePosts.length}
+              lang={lang}
             />
           )}
           {peoplePosts.map((p) => (
@@ -280,14 +282,20 @@ const SectionHeader = ({
   icon: Icon,
   title,
   count,
+  lang = "en",
 }: {
   icon: typeof Building2;
   title: string;
   count: number;
+  lang?: "en" | "ar";
 }) => (
   <div className="flex items-center gap-2 pt-1">
-    <Icon className="w-4 h-4 text-primary" />
-    <h3 className="text-xs font-bold text-foreground uppercase tracking-wide">
+    <Icon className="w-4 h-4 text-primary shrink-0" />
+    <h3
+      className={`text-xs font-bold text-foreground ${
+        lang === "ar" ? "" : "uppercase tracking-wide"
+      }`}
+    >
       {title}
     </h3>
     <span className="text-[10px] text-muted-foreground">({count})</span>
@@ -329,7 +337,7 @@ const EmptySuggestions = ({
       {/* Orgs */}
       {suggestions.orgs.length > 0 && (
         <div>
-          <SectionHeader icon={Building2} title={lang === "ar" ? "منظمات" : "Organizations"} count={suggestions.orgs.length} />
+          <SectionHeader icon={Building2} title={lang === "ar" ? "منظمات" : "Organizations"} count={suggestions.orgs.length} lang={lang} />
           <div className="space-y-2 mt-2">
             {suggestions.orgs.map((c) => {
               const targetId = orgTargetIdFor(c);
@@ -353,7 +361,7 @@ const EmptySuggestions = ({
       {/* Culture actors */}
       {suggestions.actors.length > 0 && (
         <div>
-          <SectionHeader icon={Feather} title={lang === "ar" ? "فاعلون ثقافيون" : "Culture Actors"} count={suggestions.actors.length} />
+          <SectionHeader icon={Feather} title={lang === "ar" ? "فاعلون ثقافيون" : "Culture Actors"} count={suggestions.actors.length} lang={lang} />
           <div className="space-y-2 mt-2">
             {suggestions.actors.map((a) => (
               <SuggestionRow
@@ -373,7 +381,7 @@ const EmptySuggestions = ({
       {/* Who's Who experts */}
       {suggestions.people.length > 0 && (
         <div>
-          <SectionHeader icon={UsersIcon} title={lang === "ar" ? "خبراء محليون" : "Local Experts"} count={suggestions.people.length} />
+          <SectionHeader icon={UsersIcon} title={lang === "ar" ? "خبراء محليون" : "Local Experts"} count={suggestions.people.length} lang={lang} />
           <div className="space-y-2 mt-2">
             {suggestions.people.map((p) => (
               <SuggestionRow
@@ -393,7 +401,7 @@ const EmptySuggestions = ({
       {/* Visitors */}
       {suggestions.visitors.length > 0 && (
         <div>
-          <SectionHeader icon={UserIcon} title={lang === "ar" ? "مسافرون" : "Travelers"} count={suggestions.visitors.length} />
+          <SectionHeader icon={UserIcon} title={lang === "ar" ? "مسافرون" : "Travelers"} count={suggestions.visitors.length} lang={lang} />
           <div className="space-y-2 mt-2">
             {suggestions.visitors.map((v) => (
               <SuggestionRow
