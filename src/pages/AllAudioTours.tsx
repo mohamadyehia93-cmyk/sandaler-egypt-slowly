@@ -1,7 +1,7 @@
 import { ArrowLeft, Headphones, Play, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { audioTours } from "@/lib/sampleData";
+import { audioTours, regions } from "@/lib/sampleData";
 import CityBadge from "@/components/CityBadge";
 import { useState, useMemo } from "react";
 
@@ -28,16 +28,17 @@ const AllAudioTours = () => {
   const { lang, t } = useI18n();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [activeTheme, setActiveTheme] = useState<ThemeKey | null>(null);
+  const [activeRegion, setActiveRegion] = useState<string | null>(null);
 
   const filtered = useMemo(
     () =>
       audioTours.filter((a) => {
+        if (activeRegion && a.regionId !== activeRegion) return false;
         if (!search.trim()) return true;
         const q = search.toLowerCase();
         return a.title.en.toLowerCase().includes(q) || a.title.ar.includes(q);
       }),
-    [search]
+    [search, activeRegion]
   );
 
   const grouped = useMemo(() => {
@@ -46,7 +47,13 @@ const AllAudioTours = () => {
     return g;
   }, [filtered]);
 
-  const visibleThemes = activeTheme ? [activeTheme] : THEME_ORDER;
+  const regionCounts = useMemo(() => {
+    const c: Record<string, number> = {};
+    audioTours.forEach((a) => {
+      c[a.regionId] = (c[a.regionId] || 0) + 1;
+    });
+    return c;
+  }, []);
 
   return (
     <div className="min-h-screen bg-surface pb-8">
@@ -76,29 +83,28 @@ const AllAudioTours = () => {
           </div>
         </div>
 
-        {/* Theme tabs */}
+        {/* Region filter chips */}
         <div className="flex gap-2 px-4 pb-3 overflow-x-auto hide-scrollbar">
           <button
-            onClick={() => setActiveTheme(null)}
+            onClick={() => setActiveRegion(null)}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-colors ${
-              !activeTheme ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
+              !activeRegion ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
             }`}
           >
-            {lang === "ar" ? "كل المواضيع" : "All Themes"}
+            {lang === "ar" ? "كل المناطق" : "All Regions"}
           </button>
-          {THEME_ORDER.map((k) => {
-            const count = grouped[k].length;
+          {regions.map((r) => {
+            const count = regionCounts[r.id] || 0;
             if (count === 0) return null;
-            const meta = THEME_META[k];
             return (
               <button
-                key={k}
-                onClick={() => setActiveTheme(activeTheme === k ? null : k)}
+                key={r.id}
+                onClick={() => setActiveRegion(activeRegion === r.id ? null : r.id)}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-colors flex items-center gap-1.5 ${
-                  activeTheme === k ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
+                  activeRegion === r.id ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
                 }`}
               >
-                {meta.emoji} {lang === "ar" ? meta.ar : meta.en}
+                {r.emoji} {t(r.nameKey)}
                 <span className="opacity-60">({count})</span>
               </button>
             );
@@ -107,7 +113,7 @@ const AllAudioTours = () => {
       </header>
 
       <div className="pt-4">
-        {visibleThemes.map((themeKey) => {
+        {THEME_ORDER.map((themeKey) => {
           const tours = grouped[themeKey];
           if (!tours || tours.length === 0) return null;
           const meta = THEME_META[themeKey];
