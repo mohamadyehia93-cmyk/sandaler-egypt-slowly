@@ -167,12 +167,28 @@ const AllCauses = () => {
                             style={{ width: `${Math.min(progress, 100)}%` }}
                           />
                         </div>
-                        <div className="flex items-center justify-between text-[10px]">
+                        <div className="flex items-center justify-between text-[10px] mb-2">
                           <span className="text-primary font-semibold">{progress}%</span>
                           <span className="flex items-center gap-0.5 text-muted-foreground">
                             <Users className="w-3 h-3" /> {cause.supporters}
                           </span>
                         </div>
+                        {(() => {
+                          const r = regions.find((x) => x.id === cause.regionId);
+                          if (!r) return null;
+                          return (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/region/${cause.regionId}`);
+                              }}
+                              className="w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-md bg-secondary text-secondary-foreground text-[10px] font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
+                            >
+                              <MapPin className="w-3 h-3" />
+                              {r.emoji} {t(r.nameKey)}
+                            </button>
+                          );
+                        })()}
                       </div>
                     </div>
                   );
