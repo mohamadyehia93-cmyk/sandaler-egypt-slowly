@@ -124,6 +124,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/community" element={<Community />} />
+            <Route path="/statuses" element={<StatusesFeed />} />
             <Route path="/visitor/:id" element={<VisitorProfile />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/wishlists" element={<Wishlists />} />
