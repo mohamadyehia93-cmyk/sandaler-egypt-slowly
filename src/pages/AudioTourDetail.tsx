@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import DetailTestimonials from "@/components/DetailTestimonials";
 import TourStopsMap from "@/components/TourStopsMap";
+import TurnByTurnGuidance from "@/components/TurnByTurnGuidance";
 import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUserLocation, distanceMeters, formatDistance } from "@/hooks/useUserLocation";
