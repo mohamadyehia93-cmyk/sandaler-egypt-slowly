@@ -69,6 +69,7 @@ import AllPosts from "./pages/AllPosts.tsx";
 import AllAudioTours from "./pages/AllAudioTours.tsx";
 import AllCauses from "./pages/AllCauses.tsx";
 import VisitorProfile from "./pages/VisitorProfile.tsx";
+import StatusesFeed from "./pages/StatusesFeed.tsx";
 // Provider Management Pages
 import MyContent from "./pages/dashboards/MyContent.tsx";
 import MyListings from "./pages/dashboards/MyListings.tsx";
@@ -123,6 +124,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/community" element={<Community />} />
+            <Route path="/statuses" element={<StatusesFeed />} />
             <Route path="/visitor/:id" element={<VisitorProfile />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/wishlists" element={<Wishlists />} />

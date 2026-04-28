@@ -167,6 +167,20 @@ const Index = () => {
           {activeTab === "explore" && (
             <>
               <RegionScroll />
+              <section className="px-4 pt-2">
+                <button
+                  onClick={() => navigate("/statuses")}
+                  className="w-full flex items-center justify-between gap-3 bg-card border border-border rounded-xl px-4 py-3 shadow-card hover:bg-secondary/40 transition"
+                >
+                  <span className="flex items-center gap-2 text-sm font-bold text-foreground">
+                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    {lang === "ar" ? "حالات اليوم من المضيفين" : "Today's Statuses from Hosts"}
+                  </span>
+                  <span className="text-xs font-semibold text-primary">
+                    {lang === "ar" ? "عرض الكل ←" : "View all →"}
+                  </span>
+                </button>
+              </section>
               <LatestPosts />
               <AudioTourCards />
               <HomeCausesSection />
