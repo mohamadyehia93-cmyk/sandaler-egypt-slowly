@@ -10,27 +10,30 @@ const certifications = [
   { id: "c4", name: { en: "Safety & Insurance", ar: "الأمان والتأمين" }, description: { en: "All trips include liability coverage and safety protocols", ar: "جميع الرحلات تشمل تغطية تأمينية وبروتوكولات أمان" }, icon: "🛡️" },
 ];
 
-const Certifications = () => {
+const Certifications = forwardRef<HTMLDivElement>((_props, ref) => {
   const { lang } = useI18n();
 
   return (
-    <SectionHeader titleKey="section.certifications" onSeeAll={() => {}}>
-      <div className="space-y-3 px-4">
-        {certifications.map((c) => (
-          <div key={c.id} className="flex items-start gap-3 bg-card rounded-xl p-4 shadow-card border border-border">
-            <span className="text-2xl shrink-0">{c.icon}</span>
-            <div className="flex-1">
-              <div className="flex items-center gap-1.5 mb-1">
-                <h3 className="text-sm font-semibold text-foreground">{c.name[lang]}</h3>
-                <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
+    <div ref={ref}>
+      <SectionHeader titleKey="section.certifications" onSeeAll={() => {}}>
+        <div className="space-y-3 px-4">
+          {certifications.map((c) => (
+            <div key={c.id} className="flex items-start gap-3 bg-card rounded-xl p-4 shadow-card border border-border">
+              <span className="text-2xl shrink-0">{c.icon}</span>
+              <div className="flex-1">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <h3 className="text-sm font-semibold text-foreground">{c.name[lang]}</h3>
+                  <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">{c.description[lang]}</p>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">{c.description[lang]}</p>
             </div>
-          </div>
-        ))}
-      </div>
-    </SectionHeader>
+          ))}
+        </div>
+      </SectionHeader>
+    </div>
   );
-};
+});
+Certifications.displayName = "Certifications";
 
 export default Certifications;
