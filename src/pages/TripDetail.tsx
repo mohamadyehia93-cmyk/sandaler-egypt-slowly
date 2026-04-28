@@ -175,6 +175,197 @@ const TripDetail = () => {
           </>
         )}
 
+        {/* Highlights */}
+        <h2 className="text-base font-bold text-primary-dark mb-3 flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-primary" />
+          {lang === "ar" ? "أبرز ما في الرحلة" : "Trip Highlights"}
+        </h2>
+        <div className="space-y-2 mb-6">
+          {(lang === "ar"
+            ? [
+                "تجربة محلية أصيلة بعيداً عن المسارات السياحية المعتادة",
+                "مرشد محلي يعرف القصص والأسرار التي لا توجد في الكتب",
+                "وقت كافٍ للاستمتاع والتصوير وعدم التسرع",
+                "وجبات من المطبخ المحلي وتجارب طعام لا تُنسى",
+              ]
+            : [
+                "An authentic local experience away from the usual tourist trail",
+                "A local guide who shares stories and secrets you won't find in books",
+                "Plenty of time to enjoy, photograph, and travel without rushing",
+                "Meals from the local kitchen and food experiences you'll remember",
+              ]
+          ).map((h, i) => (
+            <div key={i} className="flex gap-2 items-start p-3 rounded-xl bg-primary/5 border border-primary/10">
+              <span className="w-6 h-6 rounded-full bg-primary/15 text-primary text-[11px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+              <p className="text-xs text-foreground leading-relaxed">{h}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Trip Details Grid */}
+        <h2 className="text-base font-bold text-primary-dark mb-3">
+          {lang === "ar" ? "تفاصيل الرحلة" : "Trip Details"}
+        </h2>
+        <div className="grid grid-cols-2 gap-2 mb-6">
+          {[
+            { icon: Mountain, label: lang === "ar" ? "المستوى" : "Difficulty", value: lang === "ar" ? "متوسط" : "Moderate" },
+            { icon: Languages, label: lang === "ar" ? "اللغات" : "Languages", value: lang === "ar" ? "العربية، الإنجليزية" : "Arabic, English" },
+            { icon: Users, label: lang === "ar" ? "السن المناسب" : "Age suitability", value: lang === "ar" ? "10+ سنة" : "10+ years" },
+            { icon: Award, label: lang === "ar" ? "النوع" : "Type", value: trip.trip_type === "multi-day" ? (lang === "ar" ? "متعددة الأيام" : "Multi-day") : (lang === "ar" ? "يوم واحد" : "Single day") },
+          ].map((d, i) => (
+            <div key={i} className="p-3 rounded-xl bg-surface border border-border">
+              <div className="flex items-center gap-1.5 mb-1">
+                <d.icon className="w-3.5 h-3.5 text-primary" />
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wide">{d.label}</span>
+              </div>
+              <p className="text-sm font-semibold text-foreground">{d.value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* What to Bring */}
+        <h2 className="text-base font-bold text-primary-dark mb-3 flex items-center gap-2">
+          <Backpack className="w-4 h-4 text-primary" />
+          {lang === "ar" ? "ماذا تحضر معك" : "What to Bring"}
+        </h2>
+        <div className="grid grid-cols-2 gap-2 mb-6">
+          {(lang === "ar"
+            ? ["حذاء مريح للمشي", "ماء وقبعة", "كاميرا", "كريم واقٍ من الشمس", "ملابس قطنية خفيفة", "بطاقة هوية"]
+            : ["Comfortable walking shoes", "Water & a hat", "Camera", "Sunscreen", "Light cotton clothes", "ID card"]
+          ).map((item, i) => (
+            <div key={i} className="flex items-center gap-2 p-2.5 rounded-lg bg-surface border border-border">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+              <span className="text-xs text-foreground">{item}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Meeting Point */}
+        <h2 className="text-base font-bold text-primary-dark mb-3 flex items-center gap-2">
+          <Navigation2 className="w-4 h-4 text-primary" />
+          {lang === "ar" ? "نقطة اللقاء" : "Meeting Point"}
+        </h2>
+        <div className="rounded-xl bg-surface border border-border p-3 mb-6">
+          <p className="text-sm font-semibold text-foreground mb-1">
+            {route || (lang === "ar" ? "سيتم التواصل معك بالموقع الدقيق بعد الحجز" : "Exact location shared after booking")}
+          </p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {lang === "ar"
+              ? "ستصلك رسالة بالتفاصيل الدقيقة وموعد اللقاء قبل بدء الرحلة بـ 24 ساعة. يرجى الحضور قبل 15 دقيقة من الموعد."
+              : "You'll receive a message with the exact details and pickup time 24 hours before the trip. Please arrive 15 minutes early."}
+          </p>
+        </div>
+
+        {/* Cancellation Policy */}
+        <h2 className="text-base font-bold text-primary-dark mb-3 flex items-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-primary" />
+          {lang === "ar" ? "سياسة الإلغاء" : "Cancellation Policy"}
+        </h2>
+        <div className="rounded-xl border border-border bg-surface p-3 mb-6 space-y-2">
+          {[
+            { color: "success", title: lang === "ar" ? "قبل 7 أيام أو أكثر" : "7+ days before", desc: lang === "ar" ? "استرداد كامل 100%" : "Full 100% refund" },
+            { color: "amber", title: lang === "ar" ? "قبل 3-7 أيام" : "3–7 days before", desc: lang === "ar" ? "استرداد 50%" : "50% refund" },
+            { color: "danger", title: lang === "ar" ? "أقل من 48 ساعة" : "Under 48 hours", desc: lang === "ar" ? "لا يوجد استرداد" : "No refund" },
+          ].map((p, i) => (
+            <div key={i} className="flex items-start gap-3">
+              <span
+                className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
+                  p.color === "success" ? "bg-success" : p.color === "amber" ? "bg-amber" : "bg-destructive"
+                }`}
+              />
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-foreground">{p.title}</p>
+                <p className="text-[11px] text-muted-foreground">{p.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Important Info */}
+        <div className="rounded-xl bg-amber/10 border border-amber/30 p-3 mb-6 flex gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber shrink-0 mt-0.5" />
+          <div>
+            <p className="text-xs font-semibold text-foreground mb-1">
+              {lang === "ar" ? "معلومات مهمة" : "Important to know"}
+            </p>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              {lang === "ar"
+                ? "الرحلة قد تتأثر بالأحوال الجوية. سيتم إعلامك بأي تعديلات في وقتها. التأمين الشخصي مسؤولية المسافر."
+                : "The trip may be affected by weather conditions. You'll be notified of any changes. Personal travel insurance is the traveler's responsibility."}
+            </p>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <h2 className="text-base font-bold text-primary-dark mb-3 flex items-center gap-2">
+          <HelpCircle className="w-4 h-4 text-primary" />
+          {lang === "ar" ? "أسئلة شائعة" : "Frequently Asked Questions"}
+        </h2>
+        <div className="space-y-2 mb-6">
+          {(lang === "ar"
+            ? [
+                { q: "هل الرحلة مناسبة للأطفال؟", a: "نعم، مناسبة للأطفال من سن 10 سنوات بصحبة ولي الأمر." },
+                { q: "ماذا يحدث في حالة المطر؟", a: "في حالة سوء الأحوال الجوية الشديدة، يتم تأجيل الرحلة لتاريخ آخر أو استرداد المبلغ كاملاً." },
+                { q: "هل توفرون نقل من الفندق؟", a: "نوفر نقطة لقاء مركزية. يمكن ترتيب نقل خاص بتكلفة إضافية." },
+                { q: "هل أحتاج لمستوى لياقة معين؟", a: "مستوى لياقة متوسط يكفي. سنخبرك مسبقاً بأي مشي طويل." },
+              ]
+            : [
+                { q: "Is this trip suitable for children?", a: "Yes, suitable for children 10+ accompanied by a parent or guardian." },
+                { q: "What happens if it rains?", a: "In case of severe weather, the trip is rescheduled or fully refunded." },
+                { q: "Do you offer hotel pickup?", a: "We provide a central meeting point. Private pickup can be arranged for an additional fee." },
+                { q: "Do I need a certain fitness level?", a: "A moderate fitness level is enough. We'll let you know in advance about any long walks." },
+              ]
+          ).map((f, i) => {
+            const open = openFaq === i;
+            return (
+              <button
+                key={i}
+                onClick={() => setOpenFaq(open ? null : i)}
+                className="w-full text-start rounded-xl border border-border bg-surface overflow-hidden"
+              >
+                <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+                  <span className="text-xs font-semibold text-foreground flex-1">{f.q}</span>
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform shrink-0 ${open ? "rotate-180" : ""}`} />
+                </div>
+                {open && (
+                  <p className="px-3 pb-3 text-[11px] text-muted-foreground leading-relaxed">{f.a}</p>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Similar Trips */}
+        {similar.length > 0 && (
+          <>
+            <h2 className="text-base font-bold text-primary-dark mb-3">
+              {lang === "ar" ? "رحلات مشابهة" : "Similar Trips"}
+            </h2>
+            <div className="flex gap-3 overflow-x-auto pb-3 -mx-4 px-4 mb-6 snap-x snap-mandatory">
+              {similar.map((s: any) => (
+                <button
+                  key={s.id}
+                  onClick={() => navigate(`/trip/${s.slug || s.id}`)}
+                  className="snap-start shrink-0 w-44 text-start rounded-xl overflow-hidden bg-surface border border-border"
+                >
+                  <img src={s.image || "/placeholder.svg"} alt={lang === "ar" ? s.title_ar : s.title_en} className="w-full h-24 object-cover" />
+                  <div className="p-2">
+                    <p className="text-xs font-semibold text-foreground line-clamp-2 mb-1">
+                      {lang === "ar" ? s.title_ar : s.title_en}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-muted-foreground">
+                        {s.duration_days === 1 ? (lang === "ar" ? "يوم" : "1 day") : `${s.duration_days} ${lang === "ar" ? "أيام" : "days"}`}
+                      </span>
+                      <span className="text-xs font-bold text-primary">{s.price} {t("common.egp")}</span>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
         <DetailTestimonials />
       </div>
 
