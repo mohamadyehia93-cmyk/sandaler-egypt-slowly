@@ -197,6 +197,88 @@ const AudioTourDetail = () => {
           <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {stopsCount} {lang === "ar" ? "محطات" : "stops"}</span>
         </div>
 
+        {/* Offline banner */}
+        {!isOnline && (
+          <div className="mb-3 flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-amber-900">
+            <WifiOff className="w-4 h-4 mt-0.5 shrink-0" />
+            <p className="text-xs leading-snug">
+              {lang === "ar"
+                ? offline.downloaded
+                  ? "أنت غير متصل بالإنترنت — يتم تشغيل النسخة المحفوظة من الجولة."
+                  : "أنت غير متصل بالإنترنت. حمّل الجولة مسبقاً لتشغيلها بدون إنترنت."
+                : offline.downloaded
+                ? "You're offline — playing the saved copy of this tour."
+                : "You're offline. Download the tour ahead of time to use it without internet."}
+            </p>
+          </div>
+        )}
+
+        {/* GPS unavailable banner */}
+        {geoUnavailable && (
+          <div className="mb-3 flex items-start gap-2 rounded-xl bg-destructive/10 border border-destructive/30 px-3 py-2 text-destructive">
+            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+            <p className="text-xs leading-snug">
+              {lang === "ar"
+                ? "GPS غير متاح. ستعمل الجولة بترتيب المحطات بدون التتبع التلقائي."
+                : "GPS unavailable. The tour will play in stop order without auto-following your location."}
+            </p>
+          </div>
+        )}
+
+        {/* Download for offline */}
+        {mapStops.length > 0 && (
+          <div className="mb-4">
+            {offline.downloaded ? (
+              <div className="flex items-center justify-between gap-2 rounded-xl bg-success/10 border border-success/30 px-3 py-2">
+                <div className="flex items-center gap-2 text-success">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="text-xs font-semibold">
+                    {lang === "ar" ? "متاحة بدون إنترنت" : "Available offline"}
+                  </span>
+                </div>
+                <button
+                  onClick={async () => {
+                    await offline.remove();
+                    toast.success(lang === "ar" ? "تم حذف النسخة المحفوظة" : "Offline copy removed");
+                  }}
+                  className="text-xs text-muted-foreground flex items-center gap-1"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  {lang === "ar" ? "حذف" : "Remove"}
+                </button>
+              </div>
+            ) : offline.downloading ? (
+              <div className="rounded-xl bg-primary/10 border border-primary/30 px-3 py-2">
+                <div className="flex items-center gap-2 text-primary mb-1">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-xs font-semibold">
+                    {lang === "ar" ? `جارٍ التحميل... ${offline.progress}%` : `Downloading... ${offline.progress}%`}
+                  </span>
+                </div>
+                <div className="h-1.5 bg-primary/20 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary transition-all"
+                    style={{ width: `${offline.progress}%` }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={async () => {
+                  toast.info(lang === "ar" ? "بدء تحميل الجولة..." : "Starting download...");
+                  await offline.download(SAMPLE_AUDIO_URL, mapStops.map((s) => ({ lat: s.lat, lng: s.lng })));
+                  toast.success(lang === "ar" ? "الجولة متاحة الآن بدون إنترنت" : "Tour saved for offline use");
+                }}
+                disabled={!isOnline}
+                className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Download className="w-4 h-4" />
+                {lang === "ar" ? "تحميل للاستخدام بدون إنترنت" : "Download for offline use"}
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Narrator */}
         {narratorName && (
           <div className="flex items-center gap-3 p-3 rounded-xl bg-surface mb-6">
