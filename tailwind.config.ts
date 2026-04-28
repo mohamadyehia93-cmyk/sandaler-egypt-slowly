@@ -74,6 +74,7 @@ export default {
           "product-seller": "hsl(var(--role-product-seller))",
           "trip-organizer": "hsl(var(--role-trip-organizer))",
           "subject-expert": "hsl(var(--role-subject-expert))",
+          narrator: "hsl(var(--role-narrator))",
         },
         warning: {
           DEFAULT: "hsl(var(--warning))",
