@@ -1,31 +1,52 @@
-import { ArrowLeft, Headphones, Play, Download, Search, MapPin } from "lucide-react";
+import { ArrowLeft, Headphones, Play, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { audioTours, regions } from "@/lib/sampleData";
+import { audioTours } from "@/lib/sampleData";
 import CityBadge from "@/components/CityBadge";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+
+type ThemeKey = "history" | "nature" | "culture" | "coast";
+
+const THEME_META: Record<ThemeKey, { en: string; ar: string; emoji: string }> = {
+  history: { en: "History & Temples", ar: "التاريخ والمعابد", emoji: "🏛️" },
+  culture: { en: "Culture & Heritage", ar: "الثقافة والتراث", emoji: "🎭" },
+  nature: { en: "Nature & Wildlife", ar: "الطبيعة والحياة البرية", emoji: "🌿" },
+  coast: { en: "Coast & Sea", ar: "الساحل والبحر", emoji: "🌊" },
+};
+
+const THEME_ORDER: ThemeKey[] = ["history", "culture", "nature", "coast"];
+
+const classifyTour = (t: any): ThemeKey => {
+  const txt = `${t.title?.en ?? ""} ${t.title?.ar ?? ""}`.toLowerCase();
+  if (/(temple|tomb|pharaoh|oracle|akhenaten|edfu|luxor|aswan|nubian|hathor|christianity|fortress|ancient|gateway|resistance)/.test(txt)) return "history";
+  if (/(birds|whales|reef|blue hole|oasis|nature|palm|wildlife|lake)/.test(txt)) return "nature";
+  if (/(sea|port|beach|red sea|gulf|hurghada|matrouh|marsa|dahab|quseir|coast)/.test(txt)) return "coast";
+  return "culture";
+};
 
 const AllAudioTours = () => {
   const { lang, t } = useI18n();
   const navigate = useNavigate();
-  const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [activeTheme, setActiveTheme] = useState<ThemeKey | null>(null);
 
-  const filtered = audioTours.filter((a) => {
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      return a.title.en.toLowerCase().includes(q) || a.title.ar.includes(q);
-    }
-    return true;
-  });
+  const filtered = useMemo(
+    () =>
+      audioTours.filter((a) => {
+        if (!search.trim()) return true;
+        const q = search.toLowerCase();
+        return a.title.en.toLowerCase().includes(q) || a.title.ar.includes(q);
+      }),
+    [search]
+  );
 
-  const regionIds = [...new Set(audioTours.map((a) => a.regionId))];
-  const regionList = regionIds.map((rid) => {
-    const r = regions.find((reg) => reg.id === rid);
-    return { id: rid, name: r ? t(r.nameKey) : rid, emoji: r?.emoji || "📍" };
-  });
+  const grouped = useMemo(() => {
+    const g: Record<ThemeKey, any[]> = { history: [], culture: [], nature: [], coast: [] };
+    filtered.forEach((a) => g[classifyTour(a)].push(a));
+    return g;
+  }, [filtered]);
 
-  const visibleRegions = activeRegion ? [activeRegion] : regionIds;
+  const visibleThemes = activeTheme ? [activeTheme] : THEME_ORDER;
 
   return (
     <div className="min-h-screen bg-surface pb-8">
@@ -37,7 +58,9 @@ const AllAudioTours = () => {
           <h1 className="text-lg font-bold text-foreground">
             {lang === "ar" ? "جميع الجولات الصوتية" : "All Audio Tours"}
           </h1>
-          <span className="text-xs text-muted-foreground ms-auto">{filtered.length} {lang === "ar" ? "جولة" : "tours"}</span>
+          <span className="text-xs text-muted-foreground ms-auto">
+            {filtered.length} {lang === "ar" ? "جولة" : "tours"}
+          </span>
         </div>
 
         {/* Search */}
@@ -53,28 +76,29 @@ const AllAudioTours = () => {
           </div>
         </div>
 
-        {/* Region Tabs */}
+        {/* Theme tabs */}
         <div className="flex gap-2 px-4 pb-3 overflow-x-auto hide-scrollbar">
           <button
-            onClick={() => setActiveRegion(null)}
+            onClick={() => setActiveTheme(null)}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-colors ${
-              !activeRegion ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
+              !activeTheme ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
             }`}
           >
-            {lang === "ar" ? "كل المناطق" : "All Regions"}
+            {lang === "ar" ? "كل المواضيع" : "All Themes"}
           </button>
-          {regionList.map((r) => {
-            const count = filtered.filter((a) => a.regionId === r.id).length;
+          {THEME_ORDER.map((k) => {
+            const count = grouped[k].length;
             if (count === 0) return null;
+            const meta = THEME_META[k];
             return (
               <button
-                key={r.id}
-                onClick={() => setActiveRegion(activeRegion === r.id ? null : r.id)}
+                key={k}
+                onClick={() => setActiveTheme(activeTheme === k ? null : k)}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-colors flex items-center gap-1.5 ${
-                  activeRegion === r.id ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
+                  activeTheme === k ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
                 }`}
               >
-                {r.emoji} {r.name}
+                {meta.emoji} {lang === "ar" ? meta.ar : meta.en}
                 <span className="opacity-60">({count})</span>
               </button>
             );
@@ -82,70 +106,60 @@ const AllAudioTours = () => {
         </div>
       </header>
 
-      <div className="px-4 pt-4">
-        {visibleRegions.map((regionId) => {
-          const tours = filtered.filter((a) => a.regionId === regionId);
-          if (tours.length === 0) return null;
-          const region = regions.find((r) => r.id === regionId);
-          const regionName = region ? t(region.nameKey) : regionId;
-          const regionEmoji = region?.emoji || "📍";
+      <div className="pt-4">
+        {visibleThemes.map((themeKey) => {
+          const tours = grouped[themeKey];
+          if (!tours || tours.length === 0) return null;
+          const meta = THEME_META[themeKey];
 
           return (
-            <div key={regionId} className="mb-8">
-              {/* Region Header */}
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">{regionEmoji}</span>
-                <h2 className="text-base font-bold text-foreground">{regionName}</h2>
-                <span className="text-xs text-muted-foreground">({tours.length})</span>
-                <button
-                  onClick={() => navigate(`/region/${regionId}`)}
-                  className="ms-auto text-[10px] text-primary font-semibold flex items-center gap-0.5"
-                >
-                  <MapPin className="w-3 h-3" />
-                  {lang === "ar" ? "زيارة المنطقة" : "Visit Region"}
-                </button>
+            <section key={themeKey} className="mb-8">
+              <div className="flex items-end justify-between px-4 mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">{meta.emoji}</span>
+                  <h2 className="text-base font-bold text-foreground">
+                    {lang === "ar" ? meta.ar : meta.en}
+                  </h2>
+                  <span className="text-xs text-muted-foreground">({tours.length})</span>
+                </div>
               </div>
 
-              {/* Tours Grid */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
                 {tours.map((a) => (
                   <div
                     key={a.id}
                     onClick={() => navigate(`/audio-tour/${a.id}`)}
-                    className="rounded-xl overflow-hidden bg-card shadow-card border border-border cursor-pointer active:scale-[0.97] transition-transform"
+                    className="min-w-[260px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card cursor-pointer active:scale-[0.98] transition-transform"
                   >
-                    <div className="relative h-28">
+                    <div className="relative h-36">
                       <img src={a.image} alt={a.title[lang]} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                      <div className="absolute top-1.5 left-1.5 flex items-center gap-1 bg-primary/90 text-primary-foreground px-1.5 py-0.5 rounded-full text-[9px] font-medium">
-                        <Headphones className="w-2.5 h-2.5" />
-                        {a.duration} {t("common.min")}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute top-2 left-2 flex items-center gap-1 bg-primary/90 text-primary-foreground px-2 py-0.5 rounded-full text-[10px] font-medium">
+                        <Headphones className="w-3 h-3" />
+                        {a.duration} {t("common.min")} · {a.stops} {t("common.stops")}
                       </div>
                       <button
-                        className="absolute top-1.5 right-1.5 p-1 rounded-full bg-primary text-primary-foreground"
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-primary text-primary-foreground"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <Play className="w-3 h-3" />
+                        <Play className="w-3.5 h-3.5" />
                       </button>
-                      <div className="absolute bottom-1.5 left-1.5 right-1.5">
-                        <h3 className="text-[11px] font-bold text-white line-clamp-2 leading-tight">{a.title[lang]}</h3>
+                      <div className="absolute bottom-2 left-2 right-2">
+                        <h3 className="text-sm font-bold text-primary-foreground line-clamp-2 leading-tight">
+                          {a.title[lang]}
+                        </h3>
                       </div>
                     </div>
-                    <div className="p-2.5 flex items-center justify-between">
-                      <div>
-                        <CityBadge cityId={a.cityId} />
-                        <p className="text-[10px] text-muted-foreground mt-0.5">
-                          {a.stops} {t("common.stops")}
-                        </p>
-                      </div>
-                      <span className="text-xs font-bold text-primary">
+                    <div className="p-3 flex items-center justify-between">
+                      <CityBadge cityId={a.cityId} />
+                      <span className="text-sm font-bold text-primary-dark">
                         {a.price === 0 ? t("common.free") : `${a.price} ${t("common.egp")}`}
                       </span>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           );
         })}
 
