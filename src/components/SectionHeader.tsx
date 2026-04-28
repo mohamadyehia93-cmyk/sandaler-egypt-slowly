@@ -36,6 +36,7 @@ const SectionHeader = forwardRef<HTMLElement, SectionHeaderProps>(({ titleKey, o
       {children}
     </section>
   );
-};
+});
+SectionHeader.displayName = "SectionHeader";
 
 export default SectionHeader;
