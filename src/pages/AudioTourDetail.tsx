@@ -337,6 +337,15 @@ const AudioTourDetail = () => {
           </div>
         )}
 
+        {/* Turn-by-turn guidance to the next stop */}
+        {dbStops.length > 0 && (
+          <TurnByTurnGuidance
+            stops={dbStops}
+            activeStopIndex={activeStopIndex}
+            userCoords={userLoc.coords ? { lat: userLoc.coords.lat, lng: userLoc.coords.lng } : null}
+          />
+        )}
+
         {/* Route Map */}
         {mapStops.length > 0 && (
           <>
