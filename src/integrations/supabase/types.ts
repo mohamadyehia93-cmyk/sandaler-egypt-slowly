@@ -129,6 +129,7 @@ export type Database = {
           region_id: string | null
           slug: string | null
           status: string | null
+          stops: Json | null
           stops_count: number
           title_ar: string
           title_en: string
@@ -151,6 +152,7 @@ export type Database = {
           region_id?: string | null
           slug?: string | null
           status?: string | null
+          stops?: Json | null
           stops_count?: number
           title_ar: string
           title_en: string
@@ -173,6 +175,7 @@ export type Database = {
           region_id?: string | null
           slug?: string | null
           status?: string | null
+          stops?: Json | null
           stops_count?: number
           title_ar?: string
           title_en?: string
