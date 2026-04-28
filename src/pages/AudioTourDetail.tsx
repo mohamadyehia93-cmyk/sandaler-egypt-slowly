@@ -50,7 +50,7 @@ const AudioTourDetail = () => {
     enabled: !!id,
   });
 
-  const dbStops = (tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number }> | undefined) || [];
+  const dbStops = (tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string }> | undefined) || [];
   const stopsCount = dbStops.length || tour?.stops_count || 5;
   const mapStops = dbStops.map((s) => ({
     label: { en: s.label_en, ar: s.label_ar },
