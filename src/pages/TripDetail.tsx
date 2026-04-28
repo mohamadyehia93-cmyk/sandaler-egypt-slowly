@@ -14,11 +14,27 @@ const TripDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const { data: trip, isLoading } = useQuery({
     queryKey: ["trip", id],
     queryFn: () => fetchByIdOrSlug("trips", id!),
     enabled: !!id,
+  });
+
+  const { data: similar = [] } = useQuery({
+    queryKey: ["trip-similar", trip?.id, trip?.region_id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("trips")
+        .select("id, slug, title_en, title_ar, image, price, duration_days, route_en, route_ar")
+        .eq("status", "published")
+        .eq("region_id", trip!.region_id)
+        .neq("id", trip!.id)
+        .limit(6);
+      return data || [];
+    },
+    enabled: !!trip?.id && !!trip?.region_id,
   });
 
   if (isLoading) {
