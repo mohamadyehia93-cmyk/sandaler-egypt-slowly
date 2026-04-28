@@ -216,11 +216,49 @@ const AudioTourDetail = () => {
           </>
         )}
 
+        {/* Geo CTA / status */}
+        {mapStops.length > 0 && (
+          <div className="mb-3">
+            {!geoEnabled ? (
+              <button
+                onClick={enableGeo}
+                className="w-full flex items-center justify-center gap-2 bg-primary/10 text-primary border border-primary/30 rounded-xl py-2.5 text-sm font-semibold"
+              >
+                <Navigation className="w-4 h-4" /> {lang === "ar" ? "ابدأ الجولة بالموقع" : "Start tour with my location"}
+              </button>
+            ) : userLoc.loading && !userLoc.coords ? (
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" /> {lang === "ar" ? "جارٍ تحديد موقعك..." : "Locating you..."}
+              </div>
+            ) : userLoc.error ? (
+              <div className="text-xs text-destructive bg-destructive/10 rounded-lg px-3 py-2">
+                {lang === "ar" ? "تعذّر الوصول للموقع. فعّل الإذن في المتصفح." : "Couldn't access location. Enable permission in your browser."}
+              </div>
+            ) : (
+              <button
+                onClick={() => setFollowGeo((v) => !v)}
+                className={`w-full flex items-center justify-center gap-2 rounded-xl py-2 text-xs font-semibold ${
+                  followGeo ? "bg-primary text-primary-foreground" : "bg-surface text-foreground border border-border"
+                }`}
+              >
+                <Navigation className="w-3.5 h-3.5" />
+                {followGeo
+                  ? (lang === "ar" ? "يتبع موقعك ✓" : "Following your location ✓")
+                  : (lang === "ar" ? "تشغيل تتبع الموقع" : "Resume location tracking")}
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Route Map */}
         {mapStops.length > 0 && (
           <>
             <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "خريطة المسار" : "Route Map"}</h2>
-            <TourStopsMap stops={mapStops} />
+            <TourStopsMap
+              stops={mapStops}
+              userLocation={userLoc.coords ? { lat: userLoc.coords.lat, lng: userLoc.coords.lng } : null}
+              activeStopIndex={activeStopIndex}
+            />
           </>
         )}
 
@@ -230,6 +268,8 @@ const AudioTourDetail = () => {
           {Array.from({ length: stopsCount }).map((_, i) => {
             const stop = dbStops[i];
             const stopLabel = stop ? (lang === "ar" ? stop.label_ar : stop.label_en) : (lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`);
+            const dist = stopDistances[i];
+            const isNear = dist != null && dist <= NEAR_THRESHOLD_M;
             return (
               <div key={i} className="flex gap-3 pb-3">
                 <div className="flex flex-col items-center">
@@ -238,7 +278,21 @@ const AudioTourDetail = () => {
                   }`}>{i + 1}</div>
                   {i < stopsCount - 1 && <div className="w-0.5 flex-1 bg-primary/20 mt-1" />}
                 </div>
-                <p className="text-sm text-foreground pt-1">{stopLabel}</p>
+                <div className="flex-1 pt-1">
+                  <p className="text-sm text-foreground">{stopLabel}</p>
+                  {dist != null && (
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[11px] text-muted-foreground flex items-center gap-0.5">
+                        <Navigation className="w-3 h-3" /> {formatDistance(dist, lang)}
+                      </span>
+                      {isNear && (
+                        <span className="text-[10px] font-semibold text-success bg-success/10 px-1.5 py-0.5 rounded-full">
+                          {lang === "ar" ? "بجوارك" : "Near you"}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}
