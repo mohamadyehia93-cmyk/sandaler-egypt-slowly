@@ -48,6 +48,9 @@ import AmbassadorDashboard from "./pages/dashboards/AmbassadorDashboard.tsx";
 import ProductSellerDashboard from "./pages/dashboards/ProductSellerDashboard.tsx";
 import TripOrganizerDashboard from "./pages/dashboards/TripOrganizerDashboard.tsx";
 import SubjectExpertDashboard from "./pages/dashboards/SubjectExpertDashboard.tsx";
+import NarratorDashboard from "./pages/dashboards/NarratorDashboard.tsx";
+import MyAudioTours from "./pages/dashboards/MyAudioTours.tsx";
+import NewAudioTour from "./pages/dashboards/NewAudioTour.tsx";
 import NewExperience from "./pages/dashboards/NewExperience.tsx";
 import NewArticle from "./pages/dashboards/NewArticle.tsx";
 import NewProduct from "./pages/dashboards/NewProduct.tsx";
@@ -153,6 +156,9 @@ const App = () => (
             <Route path="/dashboard/subject-expert/new-collection" element={<NewCollection />} />
             <Route path="/dashboard/subject-expert/my-collections" element={<MyCollections />} />
             <Route path="/dashboard/subject-expert" element={<SubjectExpertDashboard />} />
+            <Route path="/dashboard/narrator/new-tour" element={<NewAudioTour />} />
+            <Route path="/dashboard/narrator/my-tours" element={<MyAudioTours />} />
+            <Route path="/dashboard/narrator" element={<NarratorDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           </RouteGuard>
