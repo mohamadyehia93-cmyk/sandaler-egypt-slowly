@@ -1,5 +1,5 @@
-import { ArrowLeft, Share2, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock } from "lucide-react";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { ArrowLeft, Share2, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2 } from "lucide-react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
@@ -9,6 +9,10 @@ import DetailTestimonials from "@/components/DetailTestimonials";
 import TourStopsMap from "@/components/TourStopsMap";
 import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUserLocation, distanceMeters, formatDistance } from "@/hooks/useUserLocation";
+import { toast } from "sonner";
+
+const NEAR_THRESHOLD_M = 50; // when within 50m, mark stop as "near you"
 
 const SAMPLE_AUDIO_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
 
@@ -31,6 +35,9 @@ const AudioTourDetail = () => {
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [geoEnabled, setGeoEnabled] = useState(false);
+  const [followGeo, setFollowGeo] = useState(true);
+  const userLoc = useUserLocation(geoEnabled);
 
   const { data: tour, isLoading } = useQuery({
     queryKey: ["audio_tour", id],
@@ -68,12 +75,43 @@ const AudioTourDetail = () => {
     };
   }, [tour?.id]);
 
+  // Distances from user to each stop (with valid lat/lng)
+  const stopDistances = useMemo(() => {
+    if (!userLoc.coords) return [] as (number | null)[];
+    return dbStops.map((s) =>
+      typeof s.lat === "number" && typeof s.lng === "number"
+        ? distanceMeters(userLoc.coords!, { lat: s.lat, lng: s.lng })
+        : null
+    );
+  }, [userLoc.coords, dbStops]);
+
+  const nearestStopIndex = useMemo(() => {
+    if (stopDistances.length === 0) return -1;
+    let best = -1;
+    let bestD = Infinity;
+    stopDistances.forEach((d, i) => {
+      if (d != null && d < bestD) { bestD = d; best = i; }
+    });
+    return best;
+  }, [stopDistances]);
+
+  // Sync active stop with audio progress, OR with nearest stop when geo-following
   useEffect(() => {
+    if (followGeo && geoEnabled && nearestStopIndex >= 0) {
+      setActiveStopIndex(nearestStopIndex);
+      return;
+    }
     if (duration > 0) {
       const progress = currentTime / duration;
       setActiveStopIndex(Math.min(Math.floor(progress * stopsCount), stopsCount - 1));
     }
-  }, [currentTime, duration, stopsCount]);
+  }, [currentTime, duration, stopsCount, followGeo, geoEnabled, nearestStopIndex]);
+
+  const enableGeo = useCallback(() => {
+    setGeoEnabled(true);
+    setFollowGeo(true);
+    toast.success(lang === "ar" ? "تم تفعيل الموقع - الجولة ستتبع تحركك" : "Location on — the tour will follow your steps");
+  }, [lang]);
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
@@ -178,11 +216,49 @@ const AudioTourDetail = () => {
           </>
         )}
 
+        {/* Geo CTA / status */}
+        {mapStops.length > 0 && (
+          <div className="mb-3">
+            {!geoEnabled ? (
+              <button
+                onClick={enableGeo}
+                className="w-full flex items-center justify-center gap-2 bg-primary/10 text-primary border border-primary/30 rounded-xl py-2.5 text-sm font-semibold"
+              >
+                <Navigation className="w-4 h-4" /> {lang === "ar" ? "ابدأ الجولة بالموقع" : "Start tour with my location"}
+              </button>
+            ) : userLoc.loading && !userLoc.coords ? (
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" /> {lang === "ar" ? "جارٍ تحديد موقعك..." : "Locating you..."}
+              </div>
+            ) : userLoc.error ? (
+              <div className="text-xs text-destructive bg-destructive/10 rounded-lg px-3 py-2">
+                {lang === "ar" ? "تعذّر الوصول للموقع. فعّل الإذن في المتصفح." : "Couldn't access location. Enable permission in your browser."}
+              </div>
+            ) : (
+              <button
+                onClick={() => setFollowGeo((v) => !v)}
+                className={`w-full flex items-center justify-center gap-2 rounded-xl py-2 text-xs font-semibold ${
+                  followGeo ? "bg-primary text-primary-foreground" : "bg-surface text-foreground border border-border"
+                }`}
+              >
+                <Navigation className="w-3.5 h-3.5" />
+                {followGeo
+                  ? (lang === "ar" ? "يتبع موقعك ✓" : "Following your location ✓")
+                  : (lang === "ar" ? "تشغيل تتبع الموقع" : "Resume location tracking")}
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Route Map */}
         {mapStops.length > 0 && (
           <>
             <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "خريطة المسار" : "Route Map"}</h2>
-            <TourStopsMap stops={mapStops} />
+            <TourStopsMap
+              stops={mapStops}
+              userLocation={userLoc.coords ? { lat: userLoc.coords.lat, lng: userLoc.coords.lng } : null}
+              activeStopIndex={activeStopIndex}
+            />
           </>
         )}
 
@@ -192,6 +268,8 @@ const AudioTourDetail = () => {
           {Array.from({ length: stopsCount }).map((_, i) => {
             const stop = dbStops[i];
             const stopLabel = stop ? (lang === "ar" ? stop.label_ar : stop.label_en) : (lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`);
+            const dist = stopDistances[i];
+            const isNear = dist != null && dist <= NEAR_THRESHOLD_M;
             return (
               <div key={i} className="flex gap-3 pb-3">
                 <div className="flex flex-col items-center">
@@ -200,7 +278,21 @@ const AudioTourDetail = () => {
                   }`}>{i + 1}</div>
                   {i < stopsCount - 1 && <div className="w-0.5 flex-1 bg-primary/20 mt-1" />}
                 </div>
-                <p className="text-sm text-foreground pt-1">{stopLabel}</p>
+                <div className="flex-1 pt-1">
+                  <p className="text-sm text-foreground">{stopLabel}</p>
+                  {dist != null && (
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[11px] text-muted-foreground flex items-center gap-0.5">
+                        <Navigation className="w-3 h-3" /> {formatDistance(dist, lang)}
+                      </span>
+                      {isNear && (
+                        <span className="text-[10px] font-semibold text-success bg-success/10 px-1.5 py-0.5 rounded-full">
+                          {lang === "ar" ? "بجوارك" : "Near you"}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}
