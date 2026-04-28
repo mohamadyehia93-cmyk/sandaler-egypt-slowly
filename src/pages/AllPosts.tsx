@@ -1,10 +1,10 @@
 import { ArrowLeft, Bookmark, Mic, Film, Camera, MessageSquare, ChefHat, ClipboardList, Map, FileText, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { latestPosts } from "@/lib/sampleData";
+import { latestPosts, regions } from "@/lib/sampleData";
 import { contentTypeConfig } from "@/components/LatestPosts";
 import CityBadge from "@/components/CityBadge";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 type ContentSection = {
   id: string;
@@ -26,22 +26,29 @@ const sections: ContentSection[] = [
 ];
 
 const AllPosts = () => {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
-  const filteredPosts = latestPosts.filter((p) => {
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      return p.title.en.toLowerCase().includes(q) || p.title.ar.includes(q);
-    }
-    return true;
-  });
+  const filteredPosts = useMemo(
+    () =>
+      latestPosts.filter((p: any) => {
+        if (activeRegion && p.regionId !== activeRegion) return false;
+        if (!search.trim()) return true;
+        const q = search.toLowerCase();
+        return p.title.en.toLowerCase().includes(q) || p.title.ar.includes(q);
+      }),
+    [search, activeRegion]
+  );
 
-  const visibleSections = activeSection
-    ? sections.filter((s) => s.id === activeSection)
-    : sections;
+  const regionCounts = useMemo(() => {
+    const c: Record<string, number> = {};
+    latestPosts.forEach((p: any) => {
+      if (p.regionId) c[p.regionId] = (c[p.regionId] || 0) + 1;
+    });
+    return c;
+  }, []);
 
   return (
     <div className="min-h-screen bg-surface pb-8">
@@ -51,8 +58,11 @@ const AllPosts = () => {
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="text-lg font-bold text-foreground">
-            {lang === "ar" ? "جميع المنشورات" : "All Posts"}
+            {lang === "ar" ? "المنشورات" : "Posts"}
           </h1>
+          <span className="text-xs text-muted-foreground ms-auto">
+            {filteredPosts.length} {lang === "ar" ? "منشور" : "posts"}
+          </span>
         </div>
 
         {/* Search */}
@@ -68,90 +78,88 @@ const AllPosts = () => {
           </div>
         </div>
 
-        {/* Section Tabs */}
-        <div className="flex gap-2 px-4 pb-3 overflow-x-auto hide-scrollbar">
-          <button
-            onClick={() => setActiveSection(null)}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-colors ${
-              !activeSection ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
-            }`}
+        {/* Region filter dropdown */}
+        <div className="px-4 pb-3 flex">
+          <select
+            value={activeRegion ?? ""}
+            onChange={(e) => setActiveRegion(e.target.value || null)}
+            className="w-auto px-4 py-2 rounded-full bg-primary text-primary-foreground border border-primary text-xs font-semibold outline-none cursor-pointer appearance-none bg-no-repeat bg-[right_0.75rem_center] pe-8"
+            style={{
+              backgroundImage:
+                "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")",
+            }}
           >
-            {lang === "ar" ? "الكل" : "All"}
-          </button>
-          {sections.map((s) => {
-            const count = filteredPosts.filter(s.filter).length;
-            if (count === 0) return null;
-            const SIcon = s.icon;
-            return (
-              <button
-                key={s.id}
-                onClick={() => setActiveSection(activeSection === s.id ? null : s.id)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-colors flex items-center gap-1.5 ${
-                  activeSection === s.id ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
-                }`}
-              >
-                <SIcon className="w-3 h-3" />
-                {s.label[lang]}
-                <span className="opacity-60">({count})</span>
-              </button>
-            );
-          })}
+            <option value="" className="bg-card text-foreground">
+              {lang === "ar" ? "كل المناطق" : "All Regions"}
+            </option>
+            {regions.map((r) => {
+              const count = regionCounts[r.id] || 0;
+              if (count === 0) return null;
+              return (
+                <option key={r.id} value={r.id} className="bg-card text-foreground">
+                  {r.emoji} {t(r.nameKey)}
+                </option>
+              );
+            })}
+          </select>
         </div>
       </header>
 
-      <div className="px-4 pt-4">
-        {visibleSections.map((section) => {
+      <div className="pt-4">
+        {sections.map((section) => {
           const posts = filteredPosts.filter(section.filter);
           if (posts.length === 0) return null;
           const SIcon = section.icon;
 
           return (
-            <div key={section.id} className="mb-8">
-              {/* Section Header */}
-              <div className="flex items-center gap-2 mb-3">
-                <div className={`w-7 h-7 rounded-lg ${section.color} flex items-center justify-center`}>
-                  <SIcon className="w-4 h-4 text-white" />
+            <section key={section.id} className="mb-8">
+              <div className="flex items-end justify-between px-4 mb-3">
+                <div className="flex items-center gap-2">
+                  <div className={`w-7 h-7 rounded-lg ${section.color} flex items-center justify-center`}>
+                    <SIcon className="w-4 h-4 text-white" />
+                  </div>
+                  <h2 className="text-base font-bold text-foreground">{section.label[lang]}</h2>
+                  <span className="text-xs text-muted-foreground">({posts.length})</span>
                 </div>
-                <h2 className="text-base font-bold text-foreground">{section.label[lang]}</h2>
-                <span className="text-xs text-muted-foreground">({posts.length})</span>
               </div>
 
-              {/* Posts Grid */}
-              <div className="grid grid-cols-2 gap-3">
-                {posts.map((p) => {
-                  const ct = (p as any).contentType ? contentTypeConfig[(p as any).contentType] : null;
+              <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+                {posts.map((p: any) => {
+                  const ct = p.contentType ? contentTypeConfig[p.contentType] : null;
                   const CtIcon = ct?.icon;
                   return (
                     <div
                       key={p.id}
                       onClick={() => navigate(`/post/${p.id}`)}
-                      className="rounded-xl overflow-hidden bg-card shadow-card border border-border cursor-pointer active:scale-[0.97] transition-transform"
+                      className="min-w-[240px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card cursor-pointer active:scale-[0.98] transition-transform"
                     >
-                      <div className="relative h-28">
+                      <div className="relative h-32">
                         <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                         <button
-                          className="absolute top-1.5 right-1.5 p-1 rounded-full bg-background/20 backdrop-blur-sm"
+                          className="absolute top-2 right-2 p-1.5 rounded-full bg-background/30 backdrop-blur-sm"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <Bookmark className="w-3 h-3 text-white" />
+                          <Bookmark className="w-3.5 h-3.5 text-white" />
                         </button>
                         {ct && CtIcon && (
-                          <span className={`absolute top-1.5 left-1.5 inline-flex items-center gap-0.5 ${ct.color} text-white text-[8px] font-semibold px-1.5 py-0.5 rounded`}>
-                            <CtIcon className="w-2.5 h-2.5" />
+                          <span className={`absolute top-2 left-2 inline-flex items-center gap-0.5 ${ct.color} text-white text-[10px] font-semibold px-1.5 py-0.5 rounded`}>
+                            <CtIcon className="w-3 h-3" />
                             {ct.label[lang]}
                           </span>
                         )}
-                        <div className="absolute bottom-1.5 left-1.5 right-1.5">
-                          <span className="inline-block bg-primary text-primary-foreground text-[8px] font-semibold px-1.5 py-0.5 rounded mb-0.5">
+                        <div className="absolute bottom-2 left-2 right-2">
+                          <span className="inline-block bg-primary text-primary-foreground text-[10px] font-semibold px-1.5 py-0.5 rounded mb-0.5">
                             {p.category[lang]}
                           </span>
                           {p.cityId && <CityBadge cityId={p.cityId} variant="overlay" />}
                         </div>
                       </div>
-                      <div className="p-2.5">
-                        <h3 className="text-xs font-bold text-foreground line-clamp-2 leading-tight">{p.title[lang]}</h3>
-                        <p className="text-[10px] text-muted-foreground mt-1">
+                      <div className="p-3">
+                        <h3 className="text-sm font-bold text-foreground line-clamp-2 leading-tight">
+                          {p.title[lang]}
+                        </h3>
+                        <p className="text-[11px] text-muted-foreground mt-1">
                           {p.author[lang]} · {p.readTime} {lang === "ar" ? "د" : "min"}
                         </p>
                       </div>
@@ -159,7 +167,7 @@ const AllPosts = () => {
                   );
                 })}
               </div>
-            </div>
+            </section>
           );
         })}
 
