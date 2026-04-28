@@ -1,5 +1,5 @@
-import { ArrowLeft, Share2, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock } from "lucide-react";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { ArrowLeft, Share2, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2 } from "lucide-react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
@@ -9,6 +9,10 @@ import DetailTestimonials from "@/components/DetailTestimonials";
 import TourStopsMap from "@/components/TourStopsMap";
 import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUserLocation, distanceMeters, formatDistance } from "@/hooks/useUserLocation";
+import { toast } from "sonner";
+
+const NEAR_THRESHOLD_M = 50; // when within 50m, mark stop as "near you"
 
 const SAMPLE_AUDIO_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
 
@@ -31,6 +35,9 @@ const AudioTourDetail = () => {
   const [playbackRate, setPlaybackRate] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [geoEnabled, setGeoEnabled] = useState(false);
+  const [followGeo, setFollowGeo] = useState(true);
+  const userLoc = useUserLocation(geoEnabled);
 
   const { data: tour, isLoading } = useQuery({
     queryKey: ["audio_tour", id],
@@ -68,12 +75,43 @@ const AudioTourDetail = () => {
     };
   }, [tour?.id]);
 
+  // Distances from user to each stop (with valid lat/lng)
+  const stopDistances = useMemo(() => {
+    if (!userLoc.coords) return [] as (number | null)[];
+    return dbStops.map((s) =>
+      typeof s.lat === "number" && typeof s.lng === "number"
+        ? distanceMeters(userLoc.coords!, { lat: s.lat, lng: s.lng })
+        : null
+    );
+  }, [userLoc.coords, dbStops]);
+
+  const nearestStopIndex = useMemo(() => {
+    if (stopDistances.length === 0) return -1;
+    let best = -1;
+    let bestD = Infinity;
+    stopDistances.forEach((d, i) => {
+      if (d != null && d < bestD) { bestD = d; best = i; }
+    });
+    return best;
+  }, [stopDistances]);
+
+  // Sync active stop with audio progress, OR with nearest stop when geo-following
   useEffect(() => {
+    if (followGeo && geoEnabled && nearestStopIndex >= 0) {
+      setActiveStopIndex(nearestStopIndex);
+      return;
+    }
     if (duration > 0) {
       const progress = currentTime / duration;
       setActiveStopIndex(Math.min(Math.floor(progress * stopsCount), stopsCount - 1));
     }
-  }, [currentTime, duration, stopsCount]);
+  }, [currentTime, duration, stopsCount, followGeo, geoEnabled, nearestStopIndex]);
+
+  const enableGeo = useCallback(() => {
+    setGeoEnabled(true);
+    setFollowGeo(true);
+    toast.success(lang === "ar" ? "تم تفعيل الموقع - الجولة ستتبع تحركك" : "Location on — the tour will follow your steps");
+  }, [lang]);
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
