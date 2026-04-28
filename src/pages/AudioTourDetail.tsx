@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import DetailTestimonials from "@/components/DetailTestimonials";
+import TourStopsMap from "@/components/TourStopsMap";
 import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -37,7 +38,13 @@ const AudioTourDetail = () => {
     enabled: !!id,
   });
 
-  const stopsCount = tour?.stops_count || 5;
+  const dbStops = (tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number }> | undefined) || [];
+  const stopsCount = dbStops.length || tour?.stops_count || 5;
+  const mapStops = dbStops.map((s) => ({
+    label: { en: s.label_en, ar: s.label_ar },
+    lat: s.lat,
+    lng: s.lng,
+  }));
 
   useEffect(() => {
     const audio = new Audio(SAMPLE_AUDIO_URL);
@@ -171,20 +178,32 @@ const AudioTourDetail = () => {
           </>
         )}
 
+        {/* Route Map */}
+        {mapStops.length > 0 && (
+          <>
+            <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "خريطة المسار" : "Route Map"}</h2>
+            <TourStopsMap stops={mapStops} />
+          </>
+        )}
+
         {/* Stops */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "المحطات" : "Tour Stops"}</h2>
         <div className="mb-6">
-          {Array.from({ length: stopsCount }).map((_, i) => (
-            <div key={i} className="flex gap-3 pb-3">
-              <div className="flex flex-col items-center">
-                <div className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center ${
-                  i === activeStopIndex ? "bg-primary text-primary-foreground" : i < activeStopIndex ? "bg-primary/30 text-primary" : "bg-muted text-muted-foreground"
-                }`}>{i + 1}</div>
-                {i < stopsCount - 1 && <div className="w-0.5 flex-1 bg-primary/20 mt-1" />}
+          {Array.from({ length: stopsCount }).map((_, i) => {
+            const stop = dbStops[i];
+            const stopLabel = stop ? (lang === "ar" ? stop.label_ar : stop.label_en) : (lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`);
+            return (
+              <div key={i} className="flex gap-3 pb-3">
+                <div className="flex flex-col items-center">
+                  <div className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center ${
+                    i === activeStopIndex ? "bg-primary text-primary-foreground" : i < activeStopIndex ? "bg-primary/30 text-primary" : "bg-muted text-muted-foreground"
+                  }`}>{i + 1}</div>
+                  {i < stopsCount - 1 && <div className="w-0.5 flex-1 bg-primary/20 mt-1" />}
+                </div>
+                <p className="text-sm text-foreground pt-1">{stopLabel}</p>
               </div>
-              <p className="text-sm text-foreground pt-1">{lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <DetailTestimonials />
