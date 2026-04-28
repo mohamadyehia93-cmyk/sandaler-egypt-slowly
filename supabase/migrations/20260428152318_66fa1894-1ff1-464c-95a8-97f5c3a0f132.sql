@@ -1,0 +1,1 @@
+ALTER TABLE public.hero_slides ADD COLUMN IF NOT EXISTS image_alts text[] NOT NULL DEFAULT '{}';
