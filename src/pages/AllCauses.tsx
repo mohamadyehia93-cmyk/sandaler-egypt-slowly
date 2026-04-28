@@ -84,7 +84,7 @@ const AllCauses = () => {
         </div>
 
         {/* Region filter dropdown */}
-        <div className="px-4 pb-3">
+        <div className="px-4 pb-3 flex">
           <select
             value={activeRegion ?? ""}
             onChange={(e) => setActiveRegion(e.target.value || null)}
