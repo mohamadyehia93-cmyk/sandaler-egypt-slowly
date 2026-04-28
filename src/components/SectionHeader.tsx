@@ -8,7 +8,7 @@ type SectionHeaderProps = {
   children: ReactNode;
 };
 
-const SectionHeader = forwardRef<HTMLElement, SectionHeaderProps>(({ titleKey, onSeeAll, children }, ref) => {
+const SectionHeader = forwardRef(({ titleKey, onSeeAll, children }: SectionHeaderProps, ref: React.Ref<HTMLElement>) => {
   const { t, lang } = useI18n();
   const Arrow = lang === "ar" ? ChevronLeft : ChevronRight;
   const isAr = lang === "ar";
