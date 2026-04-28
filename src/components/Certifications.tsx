@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import React, { forwardRef } from "react";
 import { ShieldCheck } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import SectionHeader from "./SectionHeader";

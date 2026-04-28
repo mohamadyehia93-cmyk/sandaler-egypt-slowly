@@ -1,4 +1,4 @@
-import { ReactNode, forwardRef } from "react";
+import React, { ReactNode, forwardRef } from "react";
 import { useI18n } from "@/lib/i18n";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
