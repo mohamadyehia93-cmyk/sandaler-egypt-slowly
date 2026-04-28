@@ -28,8 +28,8 @@ const NewAudioTour = () => {
     coverImage: "",
   });
 
-  const [stops, setStops] = useState<{ name: string; description: string }[]>([
-    { name: "", description: "" },
+  const [stops, setStops] = useState<{ name: string; desc_en: string; desc_ar: string }[]>([
+    { name: "", desc_en: "", desc_ar: "" },
   ]);
 
   const set = (key: string, value: string | string[]) => setForm((p) => ({ ...p, [key]: value }));
@@ -41,9 +41,9 @@ const NewAudioTour = () => {
     }));
   };
 
-  const addStop = () => setStops((s) => [...s, { name: "", description: "" }]);
+  const addStop = () => setStops((s) => [...s, { name: "", desc_en: "", desc_ar: "" }]);
   const removeStop = (i: number) => setStops((s) => s.filter((_, idx) => idx !== i));
-  const updateStop = (i: number, key: "name" | "description", v: string) =>
+  const updateStop = (i: number, key: "name" | "desc_en" | "desc_ar", v: string) =>
     setStops((s) => s.map((stop, idx) => (idx === i ? { ...stop, [key]: v } : stop)));
 
   const handleSubmit = () => {
