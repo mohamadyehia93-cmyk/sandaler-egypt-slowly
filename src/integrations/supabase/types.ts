@@ -1638,6 +1638,8 @@ export type Database = {
           images: string[] | null
           inclusions_ar: string[] | null
           inclusions_en: string[] | null
+          itinerary_ar: Json | null
+          itinerary_en: Json | null
           organizer_id: string | null
           organizer_image: string | null
           organizer_name_ar: string | null
@@ -1672,6 +1674,8 @@ export type Database = {
           images?: string[] | null
           inclusions_ar?: string[] | null
           inclusions_en?: string[] | null
+          itinerary_ar?: Json | null
+          itinerary_en?: Json | null
           organizer_id?: string | null
           organizer_image?: string | null
           organizer_name_ar?: string | null
@@ -1706,6 +1710,8 @@ export type Database = {
           images?: string[] | null
           inclusions_ar?: string[] | null
           inclusions_en?: string[] | null
+          itinerary_ar?: Json | null
+          itinerary_en?: Json | null
           organizer_id?: string | null
           organizer_image?: string | null
           organizer_name_ar?: string | null
