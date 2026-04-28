@@ -1,4 +1,4 @@
-import { ArrowLeft, Share2, MapPin, Clock, Users, Calendar } from "lucide-react";
+import { ArrowLeft, Share2, MapPin, Clock, Users, Calendar, MapPinned } from "lucide-react";
 import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
@@ -85,6 +85,48 @@ const TripDetail = () => {
 
         {/* Organizer Bio */}
         {trip.organizer_id && <ProviderBioCard providerId={trip.organizer_id} roleLabel={{ en: "Trip Organizer", ar: "منظم الرحلة" }} />}
+
+        {/* Itinerary */}
+        {(() => {
+          const itinerary = (lang === "ar" ? trip.itinerary_ar : trip.itinerary_en) as
+            | Array<{ day: number; title: string; stops: Array<{ time: string; title: string; desc?: string }> }>
+            | null;
+          if (!itinerary || itinerary.length === 0) return null;
+          return (
+            <div className="mt-6">
+              <h2 className="text-base font-bold text-primary-dark mb-3 flex items-center gap-2">
+                <MapPinned className="w-4 h-4 text-primary" />
+                {lang === "ar" ? "البرنامج اليومي" : "Day-by-Day Itinerary"}
+              </h2>
+              <div className="space-y-4 mb-6">
+                {itinerary.map((day) => (
+                  <div key={day.day} className="rounded-xl bg-surface border border-border overflow-hidden">
+                    <div className="px-3 py-2 bg-primary/10 flex items-center gap-2">
+                      <span className="w-7 h-7 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shrink-0">
+                        {lang === "ar" ? `${day.day}` : `D${day.day}`}
+                      </span>
+                      <span className="text-sm font-bold text-primary-dark">{day.title}</span>
+                    </div>
+                    <ol className="relative px-3 py-3 space-y-3">
+                      {day.stops?.map((stop, i) => (
+                        <li key={i} className="flex gap-3">
+                          <div className="flex flex-col items-center">
+                            <span className="text-[11px] font-bold text-primary tabular-nums">{stop.time}</span>
+                            {i < day.stops.length - 1 && <span className="w-px flex-1 bg-border mt-1" />}
+                          </div>
+                          <div className="flex-1 pb-1">
+                            <p className="text-sm font-semibold text-foreground leading-tight">{stop.title}</p>
+                            {stop.desc && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{stop.desc}</p>}
+                          </div>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* What's Included */}
         {inclusions.length > 0 && (
