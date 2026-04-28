@@ -364,10 +364,11 @@ const AudioTourDetail = () => {
           {Array.from({ length: stopsCount }).map((_, i) => {
             const stop = dbStops[i];
             const stopLabel = stop ? (lang === "ar" ? stop.label_ar : stop.label_en) : (lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`);
+            const stopDesc = stop ? (lang === "ar" ? stop.desc_ar : stop.desc_en) : "";
             const dist = stopDistances[i];
             const isNear = dist != null && dist <= NEAR_THRESHOLD_M;
             return (
-              <div key={i} className="flex gap-3 pb-3">
+              <div key={i} className="flex gap-3 pb-4">
                 <div className="flex flex-col items-center">
                   <div className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center ${
                     i === activeStopIndex ? "bg-primary text-primary-foreground" : i < activeStopIndex ? "bg-primary/30 text-primary" : "bg-muted text-muted-foreground"
@@ -375,9 +376,14 @@ const AudioTourDetail = () => {
                   {i < stopsCount - 1 && <div className="w-0.5 flex-1 bg-primary/20 mt-1" />}
                 </div>
                 <div className="flex-1 pt-1">
-                  <p className="text-sm text-foreground">{stopLabel}</p>
+                  <p className="text-sm font-semibold text-foreground">{stopLabel}</p>
+                  {stopDesc && (
+                    <p dir="auto" className="text-[12px] text-muted-foreground leading-relaxed mt-1 text-start">
+                      {stopDesc}
+                    </p>
+                  )}
                   {dist != null && (
-                    <div className="flex items-center gap-2 mt-0.5">
+                    <div className="flex items-center gap-2 mt-1.5">
                       <span className="text-[11px] text-muted-foreground flex items-center gap-0.5">
                         <Navigation className="w-3 h-3" /> {formatDistance(dist, lang)}
                       </span>
