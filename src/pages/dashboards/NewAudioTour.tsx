@@ -142,7 +142,8 @@ const NewAudioTour = () => {
                   )}
                 </div>
                 <input className={inputClass} placeholder={lang === "ar" ? "اسم المكان" : "Place name"} value={s.name} onChange={(e) => updateStop(i, "name", e.target.value)} />
-                <textarea className={`${inputClass} min-h-[60px] resize-none`} placeholder={lang === "ar" ? "ما سيقال هنا..." : "What's narrated here..."} value={s.description} onChange={(e) => updateStop(i, "description", e.target.value)} maxLength={300} />
+                <textarea dir="ltr" className={`${inputClass} min-h-[56px] resize-none`} placeholder="Short description (English) — what the visitor sees/hears here" value={s.desc_en} onChange={(e) => updateStop(i, "desc_en", e.target.value)} maxLength={200} />
+                <textarea dir="rtl" className={`${inputClass} min-h-[56px] resize-none text-right`} placeholder="وصف مختصر (عربي) — ما يراه الزائر ويسمعه هنا" value={s.desc_ar} onChange={(e) => updateStop(i, "desc_ar", e.target.value)} maxLength={200} />
                 <button className="w-full text-[10px] font-semibold text-role-narrator border border-dashed border-role-narrator/40 rounded-lg py-2 flex items-center justify-center gap-1">
                   <Mic className="w-3 h-3" /> {lang === "ar" ? "رفع تسجيل صوتي" : "Upload audio recording"}
                 </button>
