@@ -1,4 +1,3 @@
-UPDATE organizations SET image='https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=800&q=80' WHERE id='8cee9b11-66b8-478e-bcfe-1ceb2772dfe5';
 UPDATE organizations SET image='https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=800&q=80' WHERE id='d487bd36-10e3-4823-9ab0-9bf091ed6797';
 UPDATE organizations SET image='https://images.unsplash.com/photo-1591801074660-0a2f4f4b1c1c?auto=format&fit=crop&w=800&q=80' WHERE id='62f9cf7b-c1ff-4a87-86ac-3b380f31b662';
 UPDATE organizations SET image='https://images.unsplash.com/photo-1572252009286-268acec5ca0a?auto=format&fit=crop&w=800&q=80' WHERE id='007d2a90-7a3c-4523-833f-6afb0e69331f';

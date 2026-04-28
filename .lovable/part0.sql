@@ -35,7 +35,8 @@ UPDATE partners SET logo='https://images.unsplash.com/photo-1564769662533-4f00a8
 UPDATE partners SET logo='https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=400&q=80' WHERE name_en='EcoTravel Egypt';
 UPDATE partners SET logo='https://images.unsplash.com/photo-1596207498818-c84a1afe1bb6?auto=format&fit=crop&w=400&q=80' WHERE name_en='Artisan Collective';
 UPDATE partners SET logo='https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=400&q=80' WHERE name_en='National Geographic Arabia';
-UPDATE partners SET logo='https://images.unsplash.com/photo-1564399263809-d6a5a3a8a6d2?auto=format&fit=crop&w=400&q=80' WHERE name_en='Cairo University';UPDATE experiences SET image='https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=800&q=80' WHERE id='593022ac-7f32-4e83-a7d7-b3088d318d60';
+UPDATE partners SET logo='https://images.unsplash.com/photo-1564399263809-d6a5a3a8a6d2?auto=format&fit=crop&w=400&q=80' WHERE name_en='Cairo University';
+UPDATE experiences SET image='https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=800&q=80' WHERE id='593022ac-7f32-4e83-a7d7-b3088d318d60';
 UPDATE experiences SET image='https://images.unsplash.com/photo-1568322445389-f64c5bb0df1d?auto=format&fit=crop&w=800&q=80' WHERE id='d7c1a2ab-c5a5-4dcc-a420-a73514146e66';
 UPDATE experiences SET image='https://images.unsplash.com/photo-1509023464722-18d996393ca8?auto=format&fit=crop&w=800&q=80' WHERE id='5c130cef-c768-4bf0-ab36-7741e374fae1';
 UPDATE experiences SET image='https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=800&q=80' WHERE id='5a8fcac7-7e22-4741-a52d-277a16c837da';
