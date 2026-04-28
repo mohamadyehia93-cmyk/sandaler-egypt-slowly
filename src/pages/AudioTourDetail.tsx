@@ -1,4 +1,4 @@
-import { ArrowLeft, Share2, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2 } from "lucide-react";
+import { ArrowLeft, Share2, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle } from "lucide-react";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
@@ -10,6 +10,7 @@ import TourStopsMap from "@/components/TourStopsMap";
 import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUserLocation, distanceMeters, formatDistance } from "@/hooks/useUserLocation";
+import { useOfflineTour, useOnlineStatus } from "@/hooks/useOfflineTour";
 import { toast } from "sonner";
 
 const NEAR_THRESHOLD_M = 50; // when within 50m, mark stop as "near you"
@@ -38,6 +39,9 @@ const AudioTourDetail = () => {
   const [geoEnabled, setGeoEnabled] = useState(false);
   const [followGeo, setFollowGeo] = useState(true);
   const userLoc = useUserLocation(geoEnabled);
+  const isOnline = useOnlineStatus();
+  const offline = useOfflineTour(id);
+  const geoUnavailable = geoEnabled && !userLoc.loading && !userLoc.coords && !!userLoc.error;
 
   const { data: tour, isLoading } = useQuery({
     queryKey: ["audio_tour", id],
