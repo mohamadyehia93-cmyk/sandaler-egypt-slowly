@@ -83,32 +83,26 @@ const AllCauses = () => {
           </div>
         </div>
 
-        {/* Region filter chips */}
-        <div className="flex gap-2 px-4 pb-3 overflow-x-auto hide-scrollbar">
-          <button
-            onClick={() => setActiveRegion(null)}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-colors ${
-              !activeRegion ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
-            }`}
+        {/* Region filter dropdown */}
+        <div className="px-4 pb-3">
+          <select
+            value={activeRegion ?? ""}
+            onChange={(e) => setActiveRegion(e.target.value || null)}
+            className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm font-semibold text-foreground outline-none focus:border-primary"
           >
-            {lang === "ar" ? "كل المناطق" : "All Regions"}
-          </button>
-          {regions.map((r) => {
-            const count = regionCounts[r.id] || 0;
-            if (count === 0) return null;
-            return (
-              <button
-                key={r.id}
-                onClick={() => setActiveRegion(activeRegion === r.id ? null : r.id)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-colors flex items-center gap-1.5 ${
-                  activeRegion === r.id ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
-                }`}
-              >
-                {r.emoji} {t(r.nameKey)}
-                <span className="opacity-60">({count})</span>
-              </button>
-            );
-          })}
+            <option value="">
+              {lang === "ar" ? "كل المناطق" : "All Regions"} ({causes.length})
+            </option>
+            {regions.map((r) => {
+              const count = regionCounts[r.id] || 0;
+              if (count === 0) return null;
+              return (
+                <option key={r.id} value={r.id}>
+                  {r.emoji} {t(r.nameKey)} ({count})
+                </option>
+              );
+            })}
+          </select>
         </div>
       </header>
 
