@@ -702,6 +702,7 @@ export type Database = {
           created_at: string
           id: string
           image: string | null
+          image_alts: string[]
           link: string | null
           position: number
           status: string | null
@@ -715,6 +716,7 @@ export type Database = {
           created_at?: string
           id?: string
           image?: string | null
+          image_alts?: string[]
           link?: string | null
           position?: number
           status?: string | null
@@ -728,6 +730,7 @@ export type Database = {
           created_at?: string
           id?: string
           image?: string | null
+          image_alts?: string[]
           link?: string | null
           position?: number
           status?: string | null
