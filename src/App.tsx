@@ -69,6 +69,7 @@ import AllPosts from "./pages/AllPosts.tsx";
 import AllAudioTours from "./pages/AllAudioTours.tsx";
 import AllCauses from "./pages/AllCauses.tsx";
 import VisitorProfile from "./pages/VisitorProfile.tsx";
+import StatusesFeed from "./pages/StatusesFeed.tsx";
 // Provider Management Pages
 import MyContent from "./pages/dashboards/MyContent.tsx";
 import MyListings from "./pages/dashboards/MyListings.tsx";
