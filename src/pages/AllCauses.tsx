@@ -63,7 +63,7 @@ const AllCauses = () => {
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="text-lg font-bold text-foreground">
-            {lang === "ar" ? "جميع القضايا المحلية" : "All Local Causes"}
+            {lang === "ar" ? "القضايا" : "Causes"}
           </h1>
           <span className="text-xs text-muted-foreground ms-auto">
             {filtered.length} {lang === "ar" ? "قضية" : "causes"}
