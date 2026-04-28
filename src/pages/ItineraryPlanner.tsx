@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo, useCallback, Fragment } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback, Fragment, type AnchorHTMLAttributes, type HTMLAttributes, type ReactNode } from "react";
 import { ArrowLeft, Send, Sparkles, MapPin, Calendar, Users, Loader2, Save, Check } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { toast } from "sonner";
 import { experiences, audioTours, accommodation, trips } from "@/lib/sampleData";
 import BottomNav from "@/components/BottomNav";
@@ -136,13 +137,13 @@ const MarkdownLink = ({ href, children }: { href?: string; children?: React.Reac
 };
 
 const mdComponents = {
-  a: ({ href, children }: any) => <MarkdownLink href={href}>{children}</MarkdownLink>,
-  h1: ({ children }: any) => <h3 className="text-base font-bold mt-3 mb-1 text-foreground">{children}</h3>,
-  h2: ({ children }: any) => <h4 className="text-sm font-bold mt-3 mb-1 text-foreground">{children}</h4>,
-  h3: ({ children }: any) => <h5 className="text-sm font-semibold mt-2 mb-1 text-foreground">{children}</h5>,
-  p: ({ children }: any) => <p className="mb-2 text-foreground">{children}</p>,
-  ul: ({ children }: any) => <ul className="mb-2 space-y-1 list-none pl-0">{children}</ul>,
-  li: ({ children }: any) => <li className="text-foreground flex gap-1.5"><span className="shrink-0">•</span><span>{children}</span></li>,
+  a: ({ href, children }: AnchorHTMLAttributes<HTMLAnchorElement>) => <MarkdownLink href={href}>{children}</MarkdownLink>,
+  h1: ({ children }: HTMLAttributes<HTMLHeadingElement>) => <h3 className="text-base font-bold mt-3 mb-1 text-foreground">{children}</h3>,
+  h2: ({ children }: HTMLAttributes<HTMLHeadingElement>) => <h4 className="text-sm font-bold mt-3 mb-1 text-foreground">{children}</h4>,
+  h3: ({ children }: HTMLAttributes<HTMLHeadingElement>) => <h5 className="text-sm font-semibold mt-2 mb-1 text-foreground">{children}</h5>,
+  p: ({ children }: HTMLAttributes<HTMLParagraphElement>) => <p className="mb-2 text-foreground">{children}</p>,
+  ul: ({ children }: HTMLAttributes<HTMLUListElement>) => <ul className="mb-2 space-y-1 list-none pl-0">{children}</ul>,
+  li: ({ children }: HTMLAttributes<HTMLLIElement>) => <li className="text-foreground flex gap-1.5"><span className="shrink-0">•</span><span>{children}</span></li>,
   hr: () => <hr className="my-3 border-border" />,
 };
 
@@ -307,11 +308,11 @@ const ItineraryPlanner = () => {
     }
     setSaving(true);
     const title = messages[0]?.content.slice(0, 60) || "My Itinerary";
-    const payload = { user_id: user.id, title, messages: messages as any, destination: null, duration_days: null };
+    const payload = { user_id: user.id, title, messages: messages as unknown as Json, destination: null, duration_days: null };
 
     let result;
     if (savedId) {
-      result = await supabase.from("saved_itineraries").update({ messages: messages as any, title }).eq("id", savedId);
+      result = await supabase.from("saved_itineraries").update({ messages: messages as unknown as Json, title }).eq("id", savedId);
     } else {
       result = await supabase.from("saved_itineraries").insert(payload).select("id").single();
       if (result.data) setSavedId(result.data.id);

@@ -19,7 +19,7 @@ type OnboardingStep =
 type RoleQuestion = {
   title: { en: string; ar: string };
   subtitle: { en: string; ar: string };
-  options: { key: string; icon: any; label: { en: string; ar: string } }[];
+  options: { key: string; icon: React.ElementType; label: { en: string; ar: string } }[];
   multi?: boolean;
 };
 
@@ -307,7 +307,7 @@ const SplashPage = () => {
 
   // Progress indicator for visitor quiz
   const visitorSteps = ["interests", "travelStyle", "budget"] as const;
-  const currentVisitorStep = visitorSteps.indexOf(step as any);
+  const currentVisitorStep = visitorSteps.indexOf(step as (typeof visitorSteps)[number]);
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">

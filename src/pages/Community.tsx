@@ -149,17 +149,13 @@ const Community = () => {
   const toggleComments = (id: string) =>
     setOpenComments((prev) => ({ ...prev, [id]: !prev[id] }));
 
-  const buildAuthorPayload = () => ({
-    author_name:
-      (user!.user_metadata as any)?.display_name ||
-      (user!.user_metadata as any)?.full_name ||
-      user!.email ||
-      (lang === "ar" ? "مستخدم" : "User"),
-    author_avatar:
-      (user!.user_metadata as any)?.avatar_url ||
-      (user!.user_metadata as any)?.picture ||
-      null,
-  });
+  const buildAuthorPayload = () => {
+    const meta = user!.user_metadata as { display_name?: string; full_name?: string; avatar_url?: string; picture?: string };
+    return {
+      author_name: meta.display_name || meta.full_name || user!.email || (lang === "ar" ? "مستخدم" : "User"),
+      author_avatar: meta.avatar_url || meta.picture || null,
+    };
+  };
 
   const requireAuth = () => {
     if (!user) {

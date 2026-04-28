@@ -33,14 +33,14 @@ const Profile = () => {
       .select("display_name, avatar_url")
       .eq("user_id", user.id)
       .single()
-      .then(({ data }) => setProfile(data));
+      .then(({ data, error }) => { if (!error) setProfile(data); });
 
     supabase
       .from("saved_itineraries")
       .select("id, title, destination, duration_days, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .then(({ data }) => setItineraries(data || []));
+      .then(({ data, error }) => { if (!error) setItineraries(data || []); });
   }, [user]);
 
   const handleLogout = async () => {

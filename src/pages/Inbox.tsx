@@ -21,9 +21,9 @@ const Inbox = () => {
   useEffect(() => {
     const personId = searchParams.get("personId");
     if (personId && user) {
-      findOrCreateConversation(personId).then((convoId) => {
-        if (convoId) setActiveId(convoId);
-      });
+      findOrCreateConversation(personId)
+        .then((convoId) => { if (convoId) setActiveId(convoId); })
+        .catch(() => {});
       setSearchParams({}, { replace: true });
     }
   }, [searchParams, user]);

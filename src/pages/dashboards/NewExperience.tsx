@@ -100,8 +100,8 @@ const NewExperience = () => {
       if (error) throw error;
       toast.success(lang === "ar" ? "تم نشر التجربة بنجاح!" : "Experience published successfully!");
       navigate("/dashboard/service-provider");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to create experience");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to create experience");
     } finally {
       setSubmitting(false);
     }

@@ -28,7 +28,7 @@ const ProviderBioCard = ({ providerId, roleLabel }: ProviderBioCardProps) => {
   const { data: provider, isLoading } = useQuery({
     queryKey: ["provider", providerId],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("providers")
         .select("*")
         .eq("id", providerId)

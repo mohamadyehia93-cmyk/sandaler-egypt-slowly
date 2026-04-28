@@ -56,7 +56,9 @@ const FollowButton = ({
   };
 
   const Icon = following ? UserCheck : UserPlus;
-  const label = following
+  const label = toggle.isPending
+    ? "…"
+    : following
     ? lang === "ar" ? "متابَع" : "Following"
     : lang === "ar" ? "متابعة" : "Follow";
 

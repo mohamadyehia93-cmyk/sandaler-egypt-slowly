@@ -30,7 +30,7 @@ const LatestPosts = () => {
           ? Array.from({ length: 3 }).map((_, i) => (
               <Skeleton key={i} className="min-w-[220px] h-40 rounded-lg" />
             ))
-          : (posts ?? []).slice(0, 12).map((p: any) => {
+          : (posts ?? []).slice(0, 12).map((p) => {
               const ct = p.content_type ? contentTypeConfig[p.content_type] : null;
               const CtIcon = ct?.icon;
               const title = lang === "ar" ? p.title_ar : p.title_en;

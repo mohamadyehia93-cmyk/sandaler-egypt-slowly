@@ -17,7 +17,7 @@ const MeetUpSection = () => {
           ? Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="min-w-[150px] h-[180px] rounded-lg" />
             ))
-          : (people ?? []).slice(0, 6).map((person: any) => (
+          : (people ?? []).slice(0, 6).map((person) => (
               <div
                 key={person.id}
                 onClick={() => navigate(`/person/${person.slug || person.id}`)}

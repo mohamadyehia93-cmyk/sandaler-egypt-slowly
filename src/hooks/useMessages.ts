@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import type { Tables } from "@/integrations/supabase/types";
+import type { Json, Tables } from "@/integrations/supabase/types";
 
 type DbConversation = Tables<"conversations">;
 type DbMessage = Tables<"messages">;
@@ -129,7 +129,7 @@ export const useMessages = (conversationId: string | null) => {
       sender_id: user.id,
       text,
       message_type: messageType,
-      booking_meta: (bookingMeta ?? null) as any,
+      booking_meta: (bookingMeta ?? null) as Json | null,
     }]);
     // Update conversation preview
     await supabase.from("conversations").update({

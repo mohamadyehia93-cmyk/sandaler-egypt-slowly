@@ -24,7 +24,7 @@ const ChatView = ({ conversationId, otherName, otherAvatar, onBack }: ChatViewPr
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, otherTyping]);
+  }, [messages]);
 
   const handleSend = useCallback(async () => {
     if (!draft.trim()) return;

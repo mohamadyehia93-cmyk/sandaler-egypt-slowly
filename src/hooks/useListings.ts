@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type PublicTable = keyof Database["public"]["Tables"];
 
 export const useExperiences = () =>
   useQuery({
@@ -105,14 +108,14 @@ export const useCities = () =>
     },
   });
 
-const publishedList = (table: string) => async () => {
+const publishedList = (table: PublicTable) => async () => {
   const { data, error } = await supabase
-    .from(table as any)
+    .from(table)
     .select("*")
     .eq("status", "published")
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return data as any[];
+  return data;
 };
 
 export const useHeroSlides = () =>

@@ -4,6 +4,9 @@ import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
+import type { Database } from "@/integrations/supabase/types";
+
+type PublicTable = keyof Database["public"]["Tables"];
 import { Skeleton } from "@/components/ui/skeleton";
 import ProviderStatusView from "@/components/ProviderStatusView";
 import FollowButton from "@/components/FollowButton";
@@ -73,7 +76,7 @@ const listingSectionLabels: Record<string, { en: string; ar: string }> = {
 };
 
 // Map role to the table + column that links listings back
-const listingSource: Record<string, { table: string; column: string; titleEn: string; titleAr: string; imageCol: string; ratingCol?: string; priceCol?: string }> = {
+const listingSource: Record<string, { table: PublicTable; column: string; titleEn: string; titleAr: string; imageCol: string; ratingCol?: string; priceCol?: string }> = {
   "service-provider": { table: "experiences", column: "provider_id", titleEn: "title_en", titleAr: "title_ar", imageCol: "image", ratingCol: "rating", priceCol: "price" },
   "accommodation-host": { table: "accommodations", column: "host_id", titleEn: "name_en", titleAr: "name_ar", imageCol: "image", ratingCol: "rating", priceCol: "price_per_night" },
   "transport-provider": { table: "transport", column: "provider_id", titleEn: "name_en", titleAr: "name_ar", imageCol: "image", ratingCol: "rating", priceCol: "price" },
@@ -93,7 +96,7 @@ const ProviderProfile = () => {
       // Try UUID first, then slug
       const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       const col = UUID_RE.test(id!) ? "id" : "slug";
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("providers")
         .select("*")
         .eq(col, id)
@@ -110,7 +113,7 @@ const ProviderProfile = () => {
     queryKey: ["provider-listings", provider?.id, provider?.role],
     queryFn: async () => {
       if (!source || !provider) return [];
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from(source.table)
         .select("*")
         .eq(source.column, provider.id)
@@ -296,7 +299,7 @@ const ProviderProfile = () => {
               {(listingSectionLabels[provider.role] || { en: "Listings", ar: "العروض" })[lang]}
             </h3>
             <div className="space-y-3">
-              {listings.map((listing: any) => (
+              {listings.map((listing) => (
                 <button
                   key={listing.id}
                   onClick={() => navigate(`${listingRoutes[provider.role] || "/experience"}/${listing.slug || listing.id}`)}

@@ -189,9 +189,10 @@ const PostDetail = () => {
   const post = latestPosts.find((p) => p?.id === id);
   if (!post) return <div className="p-8 text-center text-muted-foreground">Post not found</div>;
 
-  const ct = (post as any).contentType ? contentTypeConfig[(post as any).contentType] : null;
+  const postMeta = post as { contentType?: string; cityId?: string };
+  const ct = postMeta.contentType ? contentTypeConfig[postMeta.contentType] : null;
   const CtIcon = ct?.icon;
-  const contentType = (post as any).contentType as string | undefined;
+  const contentType = postMeta.contentType;
 
   const relatedPosts = latestPosts.filter((p) => p && p.id !== id && p.regionId === post.regionId).slice(0, 3);
   const formattedDate = new Date(post.date).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US", {
@@ -232,13 +233,13 @@ const PostDetail = () => {
             <span className="inline-block bg-primary text-primary-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full">
               {post.category[lang]}
             </span>
-            {(post as any).cityId && cityData[(post as any).cityId] && (
+            {postMeta.cityId && cityData[postMeta.cityId] && (
               <span
-                onClick={(e) => { e.stopPropagation(); navigate(`/city/${(post as any).cityId}`); }}
+                onClick={(e) => { e.stopPropagation(); navigate(`/city/${postMeta.cityId}`); }}
                 className="inline-flex items-center gap-1 bg-background/80 backdrop-blur-sm text-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full cursor-pointer hover:bg-background/90 transition-colors"
               >
                 <MapPin className="w-3 h-3" />
-                {cityData[(post as any).cityId].name[lang]}
+                {cityData[postMeta.cityId!].name[lang]}
               </span>
             )}
           </div>
@@ -351,7 +352,8 @@ const PostDetail = () => {
           </h2>
           <div className="space-y-3">
             {relatedPosts.map((rp) => {
-              const rpCt = (rp as any).contentType ? contentTypeConfig[(rp as any).contentType] : null;
+              const rpMeta = rp as { contentType?: string };
+              const rpCt = rpMeta.contentType ? contentTypeConfig[rpMeta.contentType] : null;
               const RpIcon = rpCt?.icon;
               return (
                 <div

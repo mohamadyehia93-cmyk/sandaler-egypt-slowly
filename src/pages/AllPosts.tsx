@@ -11,7 +11,7 @@ type ContentSection = {
   label: { en: string; ar: string };
   icon: React.ElementType;
   color: string;
-  filter: (p: any) => boolean;
+  filter: (p: { contentType?: string }) => boolean;
 };
 
 const sections: ContentSection[] = [
@@ -119,7 +119,8 @@ const AllPosts = () => {
               {/* Posts Grid */}
               <div className="grid grid-cols-2 gap-3">
                 {posts.map((p) => {
-                  const ct = (p as any).contentType ? contentTypeConfig[(p as any).contentType] : null;
+                  const pMeta = p as { contentType?: string };
+                  const ct = pMeta.contentType ? contentTypeConfig[pMeta.contentType] : null;
                   const CtIcon = ct?.icon;
                   return (
                     <div

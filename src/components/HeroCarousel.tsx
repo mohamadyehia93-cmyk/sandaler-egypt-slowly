@@ -22,7 +22,7 @@ const HeroCarousel = () => {
     return <div className="relative w-full h-[60vh] min-h-[420px] mb-8 bg-muted animate-pulse" />;
   }
 
-  const slide: any = slides[current % slides.length];
+  const slide = slides[current % slides.length];
   const title = lang === "ar" ? slide.title_ar : slide.title_en;
   const subtitle = lang === "ar" ? slide.subtitle_ar : slide.subtitle_en;
 

@@ -1,5 +1,5 @@
 // Shim DB rows back into the legacy bilingual shape used by sample-data pages
-export const dbToLegacyCause = (r: any) => r && ({
+export const dbToLegacyCause = (r: Record<string, unknown>) => r && ({
   id: r.slug || r.id,
   title: { en: r.title_en, ar: r.title_ar },
   summary: { en: r.summary_en, ar: r.summary_ar },
@@ -19,7 +19,7 @@ export const dbToLegacyCause = (r: any) => r && ({
   category: { en: r.category_en, ar: r.category_ar },
 });
 
-export const dbToLegacyPerson = (r: any) => r && ({
+export const dbToLegacyPerson = (r: Record<string, unknown>) => r && ({
   id: r.slug || r.id,
   name: { en: r.name_en, ar: r.name_ar },
   role: { en: r.role_en, ar: r.role_ar },
@@ -34,7 +34,7 @@ export const dbToLegacyPerson = (r: any) => r && ({
   yearsActive: r.years_active,
 });
 
-export const dbToLegacyPartner = (r: any) => r && ({
+export const dbToLegacyPartner = (r: Record<string, unknown>) => r && ({
   id: r.slug || r.id,
   name: { en: r.name_en, ar: r.name_ar },
   type: { en: r.type_en, ar: r.type_ar },
@@ -53,7 +53,7 @@ export const dbToLegacyPartner = (r: any) => r && ({
   contributions: { en: r.contributions_en ?? [], ar: r.contributions_ar ?? [] },
 });
 
-export const dbToLegacyPost = (r: any) => r && ({
+export const dbToLegacyPost = (r: Record<string, unknown>) => r && ({
   id: r.slug || r.id,
   title: { en: r.title_en, ar: r.title_ar },
   excerpt: { en: r.excerpt_en, ar: r.excerpt_ar },

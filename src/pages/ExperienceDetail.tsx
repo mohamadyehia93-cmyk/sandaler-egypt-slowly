@@ -92,9 +92,9 @@ const ExperienceDetail = () => {
   const { data: dbReviews } = useQuery({
     queryKey: ["experience-reviews", expId],
     queryFn: async () => {
-      const { data, error } = await (supabase as any).from("experience_reviews").select("*").eq("experience_id", expId).order("created_at", { ascending: false }).limit(10);
+      const { data, error } = await supabase.from("experience_reviews").select("*").eq("experience_id", expId).order("created_at", { ascending: false }).limit(10);
       if (error) throw error;
-      return data as any[];
+      return data;
     },
     enabled: !!expId,
   });
@@ -103,9 +103,9 @@ const ExperienceDetail = () => {
   const { data: dbSlots } = useQuery({
     queryKey: ["experience-slots", expId],
     queryFn: async () => {
-      const { data, error } = await (supabase as any).from("experience_slots").select("*").eq("experience_id", expId).order("slot_date", { ascending: true }).order("start_time", { ascending: true });
+      const { data, error } = await supabase.from("experience_slots").select("*").eq("experience_id", expId).order("slot_date", { ascending: true }).order("start_time", { ascending: true });
       if (error) throw error;
-      return data as any[];
+      return data;
     },
     enabled: !!expId,
   });
@@ -136,7 +136,7 @@ const ExperienceDetail = () => {
   const { data: region } = useQuery({
     queryKey: ["region", exp?.region_id],
     queryFn: async () => {
-      const { data, error } = await (supabase as any).from("regions").select("name_en, name_ar").eq("id", exp!.region_id).maybeSingle();
+      const { data, error } = await supabase.from("regions").select("name_en, name_ar").eq("id", exp!.region_id).maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -147,13 +147,13 @@ const ExperienceDetail = () => {
   const title = exp ? (lang === "ar" ? exp.title_ar : exp.title_en) : "";
   const description = exp ? (lang === "ar" ? (exp.description_ar || exp.description_en) : exp.description_en) : "";
   const hostName = provider
-    ? (lang === "ar" ? provider.name_ar : provider.name_en)
-    : exp ? (lang === "ar" ? (exp.host_name_ar || exp.host_name_en) : exp.host_name_en) : "";
+    ? (lang === "ar" ? provider.name_ar : provider.name_en) ?? ""
+    : exp ? (lang === "ar" ? (exp.host_name_ar || exp.host_name_en) : exp.host_name_en) ?? "" : "";
   const regionName = region ? (lang === "ar" ? region.name_ar : region.name_en) : "Nile Delta";
 
   const slots = useMemo(() => {
     if (dbSlots && dbSlots.length > 0) {
-      return dbSlots.map((s: any) => ({
+      return dbSlots.map((s) => ({
         date: formatSlotDate(s.slot_date),
         time: `${formatTime(s.start_time)} – ${formatTime(s.end_time)}`,
         price: s.price,
@@ -174,19 +174,18 @@ const ExperienceDetail = () => {
 
   const reviews = useMemo(() => {
     if (dbReviews && dbReviews.length > 0) {
-      return dbReviews.map((r: any) => ({
+      return dbReviews.map((r) => ({
         initials: r.reviewer_initials || r.reviewer_name?.slice(0, 2)?.toUpperCase() || "??",
         name: r.reviewer_name,
         city: r.reviewer_city || "",
         rating: r.rating,
         text: r.review_text || "",
-        bg: `bg-[${r.reviewer_avatar_bg || "#9FE1CB"}]`,
         verified: r.verified_attendee,
       }));
     }
     return [
-      { initials: "SH", name: "Sharif", city: "Cairo · solo", rating: 4, text: "Fun way to connect with nature and hear real local stories about the lake...", bg: "bg-[#9FE1CB]", verified: true },
-      { initials: "NA", name: "Nadia", city: "Alexandria · family", rating: 5, text: "Hassan was incredibly patient with our kids. The flamingos were breathtaking...", bg: "bg-[#B5D4F4]", verified: true },
+      { initials: "SH", name: "Sharif", city: "Cairo · solo", rating: 4, text: "Fun way to connect with nature and hear real local stories about the lake...", verified: true },
+      { initials: "NA", name: "Nadia", city: "Alexandria · family", rating: 5, text: "Hassan was incredibly patient with our kids. The flamingos were breathtaking...", verified: true },
     ];
   }, [dbReviews]);
 
@@ -204,7 +203,7 @@ const ExperienceDetail = () => {
         provider.languages ? `Speaks: ${provider.languages}` : null,
         `On Sandal since ${new Date(provider.created_at).getFullYear()} · ${provider.review_count || 0} reviews`,
         provider.specialties && Array.isArray(provider.specialties)
-          ? `Specializes in: ${(provider.specialties as any[]).map((s: any) => s.en || s).join(", ")}`
+          ? `Specializes in: ${(provider.specialties as unknown as { en?: string }[]).map((s) => s.en || "").join(", ")}`
           : null,
       ].filter(Boolean) as string[]
     : [
@@ -237,16 +236,18 @@ const ExperienceDetail = () => {
     return result;
   }, [exp]);
 
+  type SlotEntry = (typeof slots)[number] & { _idx: number };
+
   // Group sheet slots by date for the bottom sheet
   const sheetSlotGroups = useMemo(() => {
-    const groups: { label: string; slots: typeof slots }[] = [];
+    const groups: { label: string; slots: SlotEntry[] }[] = [];
     slots.forEach((s, i) => {
       const dateLabel = s.date;
       const lastGroup = groups[groups.length - 1];
       if (lastGroup && lastGroup.label === dateLabel) {
-        lastGroup.slots.push({ ...s, _idx: i } as any);
+        lastGroup.slots.push({ ...s, _idx: i });
       } else {
-        groups.push({ label: dateLabel, slots: [{ ...s, _idx: i } as any] });
+        groups.push({ label: dateLabel, slots: [{ ...s, _idx: i }] });
       }
     });
     return groups;
@@ -692,7 +693,7 @@ const ExperienceDetail = () => {
           {sheetSlotGroups.map((group, gi) => (
             <div key={gi} className="px-4">
               <p className="text-sm font-bold text-[#1A1A1A] pt-2.5 pb-1.5">{group.label}</p>
-              {group.slots.map((s: any) => (
+              {group.slots.map((s) => (
                 <button
                   key={s._idx}
                   onClick={() => setSheetSlot(s._idx)}

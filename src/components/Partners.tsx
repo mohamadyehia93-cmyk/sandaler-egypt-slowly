@@ -16,7 +16,7 @@ const Partners = () => {
           ? Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} className="h-[80px] rounded-xl" />
             ))
-          : (partners ?? []).map((p: any) => (
+          : (partners ?? []).map((p) => (
               <div
                 key={p.id}
                 onClick={() => navigate(`/partner/${p.slug || p.id}`)}

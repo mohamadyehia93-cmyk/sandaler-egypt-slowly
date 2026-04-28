@@ -45,11 +45,11 @@ const FollowingFeed = () => {
     return out;
   }, [follows]);
 
-  const followsOrg = followedIdsByType["organization"] ?? new Set<string>();
-  const followsCultureActor = followedIdsByType["culture_actor"] ?? new Set<string>();
-  const followsPerson = followedIdsByType["person"] ?? new Set<string>();
-  const followsVisitor = followedIdsByType["visitor"] ?? new Set<string>();
-  const followsProvider = followedIdsByType["provider"] ?? new Set<string>();
+  const followsOrg = useMemo(() => followedIdsByType["organization"] ?? new Set<string>(), [followedIdsByType]);
+  const followsCultureActor = useMemo(() => followedIdsByType["culture_actor"] ?? new Set<string>(), [followedIdsByType]);
+  const followsPerson = useMemo(() => followedIdsByType["person"] ?? new Set<string>(), [followedIdsByType]);
+  const followsVisitor = useMemo(() => followedIdsByType["visitor"] ?? new Set<string>(), [followedIdsByType]);
+  const followsProvider = useMemo(() => followedIdsByType["provider"] ?? new Set<string>(), [followedIdsByType]);
 
   // ----- Build feed sections -----
 
