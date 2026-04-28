@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import React, { forwardRef } from "react";
 import { ShieldCheck } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import SectionHeader from "./SectionHeader";
@@ -10,7 +10,7 @@ const certifications = [
   { id: "c4", name: { en: "Safety & Insurance", ar: "الأمان والتأمين" }, description: { en: "All trips include liability coverage and safety protocols", ar: "جميع الرحلات تشمل تغطية تأمينية وبروتوكولات أمان" }, icon: "🛡️" },
 ];
 
-const Certifications = forwardRef<HTMLDivElement>((_props, ref) => {
+const Certifications = forwardRef((_props: {}, ref: React.Ref<HTMLDivElement>) => {
   const { lang } = useI18n();
 
   return (
