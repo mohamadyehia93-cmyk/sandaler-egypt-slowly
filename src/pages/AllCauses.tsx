@@ -88,17 +88,21 @@ const AllCauses = () => {
           <select
             value={activeRegion ?? ""}
             onChange={(e) => setActiveRegion(e.target.value || null)}
-            className="w-full px-3 py-2 rounded-xl bg-card border border-border text-sm font-semibold text-foreground outline-none focus:border-primary"
+            className="w-full px-4 py-2.5 rounded-full bg-primary text-primary-foreground border border-primary text-sm font-semibold outline-none cursor-pointer appearance-none bg-no-repeat bg-[right_1rem_center] pe-10"
+            style={{
+              backgroundImage:
+                "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")",
+            }}
           >
-            <option value="">
-              {lang === "ar" ? "كل المناطق" : "All Regions"} ({causes.length})
+            <option value="" className="bg-card text-foreground">
+              {lang === "ar" ? "كل المناطق" : "All Regions"}
             </option>
             {regions.map((r) => {
               const count = regionCounts[r.id] || 0;
               if (count === 0) return null;
               return (
-                <option key={r.id} value={r.id}>
-                  {r.emoji} {t(r.nameKey)} ({count})
+                <option key={r.id} value={r.id} className="bg-card text-foreground">
+                  {r.emoji} {t(r.nameKey)}
                 </option>
               );
             })}
