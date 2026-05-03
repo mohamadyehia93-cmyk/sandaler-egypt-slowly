@@ -1658,6 +1658,7 @@ export type Database = {
           route_en: string | null
           slug: string | null
           status: string | null
+          theme: string | null
           title_ar: string
           title_en: string
           trip_type: string | null
@@ -1694,6 +1695,7 @@ export type Database = {
           route_en?: string | null
           slug?: string | null
           status?: string | null
+          theme?: string | null
           title_ar: string
           title_en: string
           trip_type?: string | null
@@ -1730,6 +1732,7 @@ export type Database = {
           route_en?: string | null
           slug?: string | null
           status?: string | null
+          theme?: string | null
           title_ar?: string
           title_en?: string
           trip_type?: string | null
