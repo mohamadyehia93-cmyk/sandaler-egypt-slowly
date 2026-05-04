@@ -119,34 +119,75 @@ export const useHeroSlides = () =>
     },
   });
 
-const makePublishedListHook = <T extends
-  | "causes"
-  | "whos_who"
-  | "culture_actors"
-  | "partners"
-  | "posts"
-  | "organizations"
-  | "meetups"
->(table: T) => () =>
+export const useCauses = () =>
   useQuery({
-    queryKey: [table],
+    queryKey: ["causes"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from(table)
-        .select("*")
-        .eq("status", "published")
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("causes").select("*").eq("status", "published").order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
   });
 
-export const useCauses = makePublishedListHook("causes");
-export const useWhosWho = makePublishedListHook("whos_who");
-export const useCultureActors = makePublishedListHook("culture_actors");
-export const usePartners = makePublishedListHook("partners");
-export const usePosts = makePublishedListHook("posts");
-export const useOrganizations = makePublishedListHook("organizations");
-export const useMeetups = makePublishedListHook("meetups");
+export const useWhosWho = () =>
+  useQuery({
+    queryKey: ["whos_who"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("whos_who").select("*").eq("status", "published").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+export const useCultureActors = () =>
+  useQuery({
+    queryKey: ["culture_actors"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("culture_actors").select("*").eq("status", "published").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+export const usePartners = () =>
+  useQuery({
+    queryKey: ["partners"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("partners").select("*").eq("status", "published").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+export const usePosts = () =>
+  useQuery({
+    queryKey: ["posts"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("posts").select("*").eq("status", "published").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+export const useOrganizations = () =>
+  useQuery({
+    queryKey: ["organizations"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("organizations").select("*").eq("status", "published").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+export const useMeetups = () =>
+  useQuery({
+    queryKey: ["meetups"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("meetups").select("*").eq("status", "published").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
 
 
