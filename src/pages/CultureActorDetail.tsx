@@ -41,6 +41,7 @@ const CultureActorDetail = () => {
   const [actor, setActor] = useState<Actor | null>(null);
   const [region, setRegion] = useState<Region | null>(null);
   const [authorPosts, setAuthorPosts] = useState<Post[]>([]);
+  const [audioTours, setAudioTours] = useState<AudioTour[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,14 +58,26 @@ const CultureActorDetail = () => {
           if (!cancelled) setRegion(r as Region | null);
         }
         if (a?.id) {
-          const { data: p } = await supabase
-            .from("posts")
-            .select("id, slug, title_en, title_ar, category, image, read_time_minutes")
-            .eq("author_id", a.id)
-            .eq("status", "published")
-            .order("created_at", { ascending: false })
-            .limit(10);
-          if (!cancelled) setAuthorPosts((p as Post[]) ?? []);
+          const [{ data: p }, { data: tours }] = await Promise.all([
+            supabase
+              .from("posts")
+              .select("id, slug, title_en, title_ar, category, image, read_time_minutes")
+              .eq("author_id", a.id)
+              .eq("status", "published")
+              .order("created_at", { ascending: false })
+              .limit(10),
+            supabase
+              .from("audio_tours")
+              .select("id, slug, title_en, title_ar, image, duration_minutes, stops_count")
+              .eq("narrator_culture_actor_id", a.id)
+              .eq("status", "published")
+              .order("created_at", { ascending: false })
+              .limit(10),
+          ]);
+          if (!cancelled) {
+            setAuthorPosts((p as Post[]) ?? []);
+            setAudioTours((tours as AudioTour[]) ?? []);
+          }
         }
       } finally {
         if (!cancelled) setLoading(false);
