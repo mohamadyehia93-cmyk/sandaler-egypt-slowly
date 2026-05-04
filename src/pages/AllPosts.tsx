@@ -89,7 +89,7 @@ const AllPosts = () => {
         </div>
 
         {/* Region filter dropdown */}
-        <div className="px-4 pb-3 flex">
+        <div className="px-4 pb-3 flex gap-2">
           <select
             value={activeRegion ?? ""}
             onChange={(e) => setActiveRegion(e.target.value || null)}
@@ -111,6 +111,25 @@ const AllPosts = () => {
                 </option>
               );
             })}
+          </select>
+
+          <select
+            value={activeTheme ?? ""}
+            onChange={(e) => setActiveTheme(e.target.value || null)}
+            className="w-auto px-4 py-2 rounded-full bg-card text-foreground border border-border text-xs font-semibold outline-none cursor-pointer appearance-none bg-no-repeat bg-[right_0.75rem_center] pe-8"
+            style={{
+              backgroundImage:
+                "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='hsl(var(--foreground))' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")",
+            }}
+          >
+            <option value="">
+              {lang === "ar" ? "كل المواضيع" : "All Themes"}
+            </option>
+            {themes.map((th) => (
+              <option key={th.en} value={th.en}>
+                {th[lang]}
+              </option>
+            ))}
           </select>
         </div>
       </header>
