@@ -198,7 +198,7 @@ const PostDetail = () => {
   });
   const { data: allPosts } = usePosts();
 
-  if (isLoading) return <DetailSkeleton />;
+  if (isLoading) return <DetailSkeleton variant="city" />;
   if (!row) return <NotFoundView context="post" />;
 
   // Normalize DB row to shape used below
