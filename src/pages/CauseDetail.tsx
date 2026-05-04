@@ -7,6 +7,7 @@ import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { dbToLegacyCause } from "@/lib/dbAdapters";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import DetailTestimonials from "@/components/DetailTestimonials";
+import NotFoundView from "@/components/NotFound";
 
 const supportOptions = [
   { key: "gift", icon: Gift, label: { en: "Send a Gift", ar: "أرسل هدية" }, desc: { en: "Support through gift packages for the community", ar: "ادعم من خلال هدايا للمجتمع" }, color: "bg-amber-500/10 text-amber-600", path: "gift" },
@@ -26,7 +27,8 @@ const CauseDetail = () => {
     enabled: !!id,
   });
 
-  const cause = dbToLegacyCause(dbCause) || causes.find((c) => c.id === id) || causes[0];
+  const cause = dbToLegacyCause(dbCause) || causes.find((c) => c.id === id);
+  if (!cause) return <NotFoundView context="cause" />;
   const region = regions.find((r) => r.id === cause.regionId);
   const progress = Math.round((cause.raised / cause.goal) * 100);
 

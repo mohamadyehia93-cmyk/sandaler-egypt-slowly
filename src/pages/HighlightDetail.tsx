@@ -4,6 +4,7 @@ import { ArrowLeft, MapPin, Sparkles, Compass, Info, Clock, Camera, Lightbulb, B
 import { useI18n } from "@/lib/i18n";
 import { cityData, experiences, latestPosts, trips } from "@/lib/sampleData";
 import BottomNav from "@/components/BottomNav";
+import NotFoundView from "@/components/NotFound";
 
 const slugify = (s: string) =>
   s.toLowerCase()
@@ -118,16 +119,7 @@ const HighlightDetail = () => {
   }, [city, highlightSlug]);
 
   if (!city || !match) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-8 text-center">
-        <div>
-          <p className="text-muted-foreground mb-3">{lang === "ar" ? "المعلم غير موجود" : "Highlight not found"}</p>
-          <button onClick={() => navigate(-1)} className="text-primary text-sm font-medium">
-            {lang === "ar" ? "رجوع" : "Go back"}
-          </button>
-        </div>
-      </div>
-    );
+    return <NotFoundView context="highlight" />;
   }
 
   const seedKey = slugify(match.en);
