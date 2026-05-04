@@ -281,8 +281,8 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
 
       <p className="px-4 text-[11px] text-muted-foreground">
         {lang === "ar"
-          ? "المواقع تقريبية. اضغط الدبوس لعرض التفاصيل."
-          : "Pin locations are approximate. Tap a pin to view details."}
+          ? "اضغط الدبوس لعرض التفاصيل. الدبابيس بدون موقع دقيق تظهر بالقرب من مركز المدينة."
+          : "Tap a pin to view details. Pins without a precise location are shown near the city center."}
       </p>
     </div>
   );
