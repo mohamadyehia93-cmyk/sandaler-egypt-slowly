@@ -14,9 +14,7 @@ const ExperienceCards = () => {
   const { data: dbRegions } = useRegions();
   const [activeRegion, setActiveRegion] = useState("all");
 
-  const regionsList =
-    dbRegions ??
-    regions.map((r) => ({ id: r.id, name_en: r.nameKey, name_ar: r.nameKey, emoji: r.emoji }));
+  const regionsList = dbRegions ?? [];
 
   const filtered = (experiences ?? []).filter(
     (e) => activeRegion === "all" || e.region_id === activeRegion
