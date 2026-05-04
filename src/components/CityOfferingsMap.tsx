@@ -235,8 +235,7 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
           </Marker>
 
           {visible.map((o) => {
-            const [dLat, dLng] = hashOffset(`${o.category}-${o.id}`);
-            const pos: [number, number] = [center[0] + dLat, center[1] + dLng];
+            const { pos, precise } = resolvePos(o, center);
             const route = CAT_ROUTE[o.category](o.slug || o.id);
             return (
               <Marker
@@ -259,6 +258,11 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
                     {o.subtitle && (
                       <div className="text-[11px] text-muted-foreground mt-0.5">
                         {o.subtitle[lang]}
+                      </div>
+                    )}
+                    {!precise && (
+                      <div className="text-[10px] text-muted-foreground mt-1 italic">
+                        {lang === "ar" ? "موقع تقريبي" : "Approximate location"}
                       </div>
                     )}
                     <button
