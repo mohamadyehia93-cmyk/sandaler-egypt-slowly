@@ -213,6 +213,38 @@ const CultureActorDetail = () => {
         </div>
       )}
 
+      {/* Audio tours narrated by this actor */}
+      {audioTours.length > 0 && (
+        <div className="px-4 mt-6">
+          <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+            <Headphones className="w-4 h-4 text-primary" />
+            {lang === "ar" ? "جولات صوتية بصوته" : "Audio Tours Narrated"}
+          </h2>
+          <div className="space-y-3">
+            {audioTours.map((tour) => (
+              <div
+                key={tour.id}
+                onClick={() => navigate(`/audio-tour/${tour.slug ?? tour.id}`)}
+                className="flex gap-3 rounded-lg bg-card shadow-card border border-border overflow-hidden cursor-pointer"
+              >
+                {tour.image && (
+                  <img src={tour.image} alt={lang === "ar" ? tour.title_ar : tour.title_en} className="w-24 h-20 object-cover flex-shrink-0" />
+                )}
+                <div className="py-2.5 pe-3 flex flex-col justify-center min-w-0">
+                  <h3 className="text-xs font-semibold text-foreground line-clamp-2">
+                    {lang === "ar" ? tour.title_ar : tour.title_en}
+                  </h3>
+                  <div className="flex items-center gap-2 mt-1 text-[10px] text-muted-foreground">
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{tour.duration_minutes} {lang === "ar" ? "د" : "min"}</span>
+                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{tour.stops_count} {lang === "ar" ? "محطات" : "stops"}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Articles by this actor */}
       {authorPosts.length > 0 && (
         <div className="px-4 mt-6">
