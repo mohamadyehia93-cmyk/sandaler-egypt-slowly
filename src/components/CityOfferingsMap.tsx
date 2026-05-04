@@ -154,6 +154,7 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
   const [active, setActive] = useState<Set<Category>>(
     () => new Set(Object.keys(CAT_COLORS) as Category[])
   );
+  const [query, setQuery] = useState("");
 
   const toggle = (c: Category) => {
     setActive((prev) => {
@@ -164,10 +165,25 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
     });
   };
 
-  const visible = useMemo(
-    () => offerings.filter((o) => active.has(o.category)),
-    [offerings, active]
-  );
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return offerings.filter((o) => {
+      if (!active.has(o.category)) return false;
+      if (!q) return true;
+      const hay = [
+        o.title.en,
+        o.title.ar,
+        o.subtitle?.en,
+        o.subtitle?.ar,
+        CAT_LABELS[o.category].en,
+        CAT_LABELS[o.category].ar,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return hay.includes(q);
+    });
+  }, [offerings, active, query]);
 
   const points = useMemo<[number, number][]>(() => {
     const pts = visible.map((o) => resolvePos(o, center).pos);
