@@ -163,6 +163,10 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
     () => new Set(Object.keys(CAT_COLORS) as Category[])
   );
   const [query, setQuery] = useState("");
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const markerRefs = useRef<Record<string, L.Marker | null>>({});
+  const cardRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const listRef = useRef<HTMLDivElement | null>(null);
 
   const toggle = (c: Category) => {
     setActive((prev) => {
