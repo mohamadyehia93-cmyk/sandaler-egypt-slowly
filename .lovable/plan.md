@@ -1,49 +1,74 @@
-## Goal
-Shift visual weight on the home/Explore feed away from chrome (header, banners, labels) and onto the actual content (photos, hero, cards).
+## The Problem
 
-## Changes
+The user asked a simple, factual question — "what are the transport options to go from Cairo to Ismailia?" — and the planner replied by demanding all 6 intake questions (budget, interests, group, days, pace, transport).
 
-### 1. Hero takes over the top of the page (`src/components/HeroCarousel.tsx`)
-- Make edge-to-edge (remove `mx-4` and rounded corners), height `60vh` min `420px`.
-- Stronger bottom-to-top dark gradient; title bumped to `text-3xl font-bold` overlaid on image.
-- Subtler dot indicators (thin pills, white).
-- Slight zoom-in animation on slide change for cinematic feel.
+This happens because the system prompt in `supabase/functions/itinerary-chat/index.ts` enforces a blanket rule:
 
-### 2. Compact, auto-hiding header (`src/pages/Index.tsx`)
-- Header becomes `absolute top-0` over the hero, transparent background, white icons, so the hero starts at the very top.
-- After scroll past hero, header gains a solid background via scroll listener.
-- Remove the standalone "Date Banner" row — fold it into the header as a small calendar icon button next to the bell.
-- Move the language toggle out of the header (to Profile/Settings); keep Search + Calendar + Bell only.
+> "You MUST collect ALL 6 pieces of information BEFORE generating ANY response that contains itinerary content, suggestions, recommendations, links, or activity ideas... ZERO EXCEPTIONS"
 
-### 3. Pill-style top tabs (`src/components/TopTabs.tsx`)
-- Replace full-width underlined tabs with centered rounded pills (active: filled `primary-dark`, inactive: muted text).
-- Tabs sit on a transparent strip directly under the hero, no border line.
+The intake gate was designed for the use case "build me a full multi-day itinerary," but it fires on **every** user message, including:
+- Single-fact lookups ("how do I get from A to B?", "how much does X cost?", "what's the best time to visit Aswan?")
+- Catalog browsing ("show me audio tours in Luxor")
+- Clarifications ("is the Nile cruise wheelchair accessible?")
 
-### 4. Lighter section headers (`src/components/SectionHeader.tsx`)
-- Title: `text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground` (Arabic skips uppercase/tracking).
-- "See All" link: small, muted-foreground, hover→primary.
-- Increase section bottom margin to `mb-8` for breathing room.
+The result: the chatbot feels rigid and unhelpful for anything short of a full trip plan.
 
-### 5. Icon-only bottom nav (`src/components/BottomNav.tsx`)
-- Drop text labels; show only icons (`w-6 h-6`) with a small dot under the active icon.
-- Add `aria-label` for accessibility / RTL.
+## The Fix
 
-### 6. Move trust modules out of main feed (`src/pages/Index.tsx`)
-- Remove `<Testimonials />`, `<Partners />`, `<Certifications />` from the inline Explore stack.
-- Add a single collapsible "Why Sandal?" footer section at the bottom of the feed that, when expanded, renders those three components. Collapsed by default.
+Reframe the system prompt around **intent detection**. The 6-question intake should only trigger when the user actually wants a personalized multi-day itinerary. For one-off questions, answer directly using the catalog.
 
-## Files touched
-- `src/components/HeroCarousel.tsx` — full-bleed taller hero
-- `src/components/TopTabs.tsx` — pill tabs
-- `src/components/SectionHeader.tsx` — quieter typography
-- `src/components/BottomNav.tsx` — icons only
-- `src/pages/Index.tsx` — auto-hiding transparent header, fold date into header, remove lang toggle, collapsed "Why Sandal" footer
+### 1. Edit `supabase/functions/itinerary-chat/index.ts`
 
-## Out of scope (can do in follow-ups)
-- Card-level changes (portrait aspect ratios, removing role badges from thumbnails).
-- Color palette restraint on feed cards.
-- Move language toggle into Settings page (will only remove from header for now; users can still switch via Settings if it exists).
+Replace the "MANDATORY INTAKE FLOW" section with a two-mode model:
 
-## Notes
-- All changes preserve RTL (chevrons, gradients direction-agnostic, Arabic skips uppercase).
-- No backend changes, no new dependencies.
+**Mode A — Direct answer mode (default for most messages):**
+Trigger when the user asks a specific, scoped question such as:
+- Transport / logistics ("how to get from X to Y", "best way to reach Siwa")
+- Single recommendations ("a good seafood restaurant in Alexandria", "audio tours about Coptic Cairo")
+- Factual questions ("opening hours", "best season", "what to pack")
+- Catalog browsing ("show me trips under 2000 EGP")
+
+In this mode: answer concisely, link to relevant catalog items where helpful, and end with a soft offer like *"Want me to build a full day-by-day itinerary around this? I'll just need a few preferences."*
+
+**Mode B — Itinerary builder mode:**
+Trigger only when the user explicitly wants a personalized multi-day plan, e.g.:
+- "Plan 3 days in Luxor"
+- "Build me an itinerary for Siwa"
+- "Help me plan a family trip"
+- The 4 quick-prompt buttons on the empty state
+
+In this mode: collect the 6 intake answers via `[CHOICES:]` blocks before producing the full itinerary. Skip questions the user has already answered in their opening message (e.g. if they said "3 days in Luxor for a couple", don't re-ask days or group).
+
+### 2. Refine the quick prompts (optional polish)
+
+The 4 quick-prompt buttons on the empty state ("Plan 3 days in Luxor & Aswan", etc.) are all itinerary-builder intents — those should still trigger the intake. Keep them as is.
+
+Consider adding 1–2 example "ask" prompts to signal the planner also handles quick questions, e.g.:
+- "How do I get from Cairo to Siwa?"
+- "Best time to visit Aswan?"
+
+### 3. No frontend logic change needed
+
+`ItineraryPlanner.tsx` is already mode-agnostic — it renders whatever the model returns, including markdown answers without `[CHOICES:]` blocks. The `parseChoices` helper handles zero-choice messages cleanly.
+
+## Technical Details
+
+**File touched:** `supabase/functions/itinerary-chat/index.ts` (system prompt only — no schema, no API change). Edge function auto-deploys.
+
+**System prompt structure (new):**
+```
+1. Role + tone
+2. INTENT DETECTION (new): decide between "direct answer" and "itinerary builder"
+3. Direct-answer rules: be concise, cite catalog with markdown links, soft upsell to full planner
+4. Itinerary-builder rules: collect missing intake answers via [CHOICES:], then produce day-by-day plan
+5. Formatting rules (links, EGP, emoji time markers) — unchanged
+6. Language mirroring (AR/EN) — unchanged
+```
+
+**Risk:** the model may occasionally misclassify intent. Mitigation: include 4–5 explicit examples in the prompt (one transport question, one factual question, one catalog browse, one "plan X days" request) so Gemini Flash has clear anchors.
+
+## Out of Scope
+
+- No changes to `saved_itineraries`, choice-chip UI, or catalog generation.
+- No new tables or migrations.
+- No model swap (still `google/gemini-3-flash-preview`).
