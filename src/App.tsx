@@ -19,6 +19,7 @@ import Inbox from "./pages/Inbox.tsx";
 import Profile from "./pages/Profile.tsx";
 import RegionDetail from "./pages/RegionDetail.tsx";
 import CityDetail from "./pages/CityDetail.tsx";
+import HighlightDetail from "./pages/HighlightDetail.tsx";
 import PersonDetail from "./pages/PersonDetail.tsx";
 import PostDetail from "./pages/PostDetail.tsx";
 import CultureActorDetail from "./pages/CultureActorDetail.tsx";
