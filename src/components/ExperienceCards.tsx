@@ -15,7 +15,6 @@ const ExperienceCards = () => {
   const { data: dbRegions } = useRegions();
   const [activeTheme, setActiveTheme] = useState<ExperienceTheme | "all">("all");
   const [activeRegion, setActiveRegion] = useState("all");
-  const [regionOpen, setRegionOpen] = useState(false);
 
   const filtered = (experiences ?? []).filter((e) => {
     const themeMatch = activeTheme === "all" || e.theme === activeTheme;
