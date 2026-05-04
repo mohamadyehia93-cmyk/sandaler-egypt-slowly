@@ -74,49 +74,43 @@ const ExperienceCards = () => {
                 <span className="text-xs text-muted-foreground">({items.length})</span>
               </div>
 
-              <div className="px-4 space-y-3">
+              <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory">
                 {items.map((e) => (
                   <button
                     key={e.id}
                     onClick={() => navigate(`/experience/${e.slug || e.id}`)}
-                    className="w-full flex gap-3 rounded-lg overflow-hidden shadow-card bg-card text-start"
+                    className="min-w-[200px] max-w-[200px] snap-start rounded-lg overflow-hidden shadow-card bg-card text-start"
                   >
-                    <div className="relative w-28 h-28 shrink-0">
+                    <div className="relative h-32">
                       <img
                         src={e.image || "/placeholder.svg"}
                         alt={lang === "ar" ? e.title_ar : e.title_en}
                         className="w-full h-full object-cover"
                       />
+                      <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
+                        <Heart className="w-4 h-4 text-foreground" />
+                      </button>
                     </div>
-                    <div className="flex-1 py-2 pr-3 min-w-0 flex flex-col justify-between">
-                      <div>
-                        <h4 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">
-                          {lang === "ar" ? e.title_ar : e.title_en}
-                        </h4>
-                        {e.host_name_en && (
-                          <div className="flex items-center gap-1.5 mb-1">
-                            {e.host_image && (
-                              <img
-                                src={e.host_image}
-                                alt=""
-                                className="w-4 h-4 rounded-full object-cover"
-                              />
-                            )}
-                            <span className="text-[10px] text-primary font-medium truncate">
-                              {lang === "ar" ? e.host_name_ar : e.host_name_en}
-                            </span>
-                          </div>
-                        )}
-                        {e.city_id && <CityBadge cityId={e.city_id} />}
-                      </div>
-                      <div className="flex items-center justify-between mt-1">
+                    <div className="p-3">
+                      <h4 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">
+                        {lang === "ar" ? e.title_ar : e.title_en}
+                      </h4>
+                      {e.host_name_en && (
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          {e.host_image && (
+                            <img src={e.host_image} alt="" className="w-4 h-4 rounded-full object-cover" />
+                          )}
+                          <span className="text-[10px] text-primary font-medium truncate">
+                            {lang === "ar" ? e.host_name_ar : e.host_name_en}
+                          </span>
+                        </div>
+                      )}
+                      {e.city_id && <div className="mb-2"><CityBadge cityId={e.city_id} /></div>}
+                      <div className="flex items-center justify-between">
                         <span className="text-sm font-bold text-primary-dark">
                           {e.price === 0 ? t("common.free") : `${e.price} ${t("common.egp")}`}
                         </span>
-                        <span className="text-xs text-muted-foreground flex items-center gap-2">
-                          <span>⭐ {e.rating}</span>
-                          <Heart className="w-3.5 h-3.5" />
-                        </span>
+                        <span className="text-xs text-muted-foreground">⭐ {e.rating}</span>
                       </div>
                     </div>
                   </button>
