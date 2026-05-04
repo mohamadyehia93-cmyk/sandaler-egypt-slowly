@@ -1,4 +1,5 @@
-import { ArrowLeft, Share2, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle } from "lucide-react";
+import { ArrowLeft, Share2, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle, ChevronRight, Feather } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
