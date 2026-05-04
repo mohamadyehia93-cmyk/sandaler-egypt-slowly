@@ -4,6 +4,7 @@ import { ArrowLeft, MapPin, Sparkles, Compass, Info, Clock, Camera, Lightbulb, B
 import { useI18n } from "@/lib/i18n";
 import { cityData, experiences, latestPosts, trips } from "@/lib/sampleData";
 import BottomNav from "@/components/BottomNav";
+import NotFoundView from "@/components/NotFound";
 
 const slugify = (s: string) =>
   s.toLowerCase()
