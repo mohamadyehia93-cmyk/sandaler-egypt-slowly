@@ -406,34 +406,54 @@ const CityDetail = () => {
 
         {/* Map of Offerings */}
         {(() => {
+          // Coords helper: read either snake_case (DB) or camelCase (sample data); experiences also fallback to meeting point
+          const coord = (it: any, latKeys: string[], lngKeys: string[]) => {
+            for (const k of latKeys) {
+              const v = it?.[k];
+              if (typeof v === "number" && !Number.isNaN(v)) {
+                for (const lk of lngKeys) {
+                  const lv = it?.[lk];
+                  if (typeof lv === "number" && !Number.isNaN(lv)) return { lat: v, lng: lv };
+                }
+              }
+            }
+            return { lat: null, lng: null };
+          };
           const pins: OfferingPin[] = [
             ...cityExperiences.map((e) => ({
               id: e.id, slug: (e as any).slug, category: "experience" as const,
               title: e.title,
+              ...coord(e, ["lat", "latitude", "meeting_point_lat"], ["lng", "longitude", "meeting_point_lng"]),
             })),
             ...cityAccommodation.map((a) => ({
               id: a.id, slug: (a as any).slug, category: "accommodation" as const,
               title: a.title,
+              ...coord(a, ["lat", "latitude"], ["lng", "longitude"]),
             })),
             ...cityProducts.map((p) => ({
               id: p.id, slug: (p as any).slug, category: "product" as const,
               title: p.title, subtitle: p.village,
+              ...coord(p, ["lat", "latitude"], ["lng", "longitude"]),
             })),
             ...cityAudioTours.map((a) => ({
               id: a.id, slug: (a as any).slug, category: "audio" as const,
               title: a.title,
+              ...coord(a, ["lat", "latitude"], ["lng", "longitude"]),
             })),
             ...cityTrips.map((t) => ({
               id: t.id, slug: (t as any).slug, category: "trip" as const,
               title: t.title,
+              ...coord(t, ["lat", "latitude"], ["lng", "longitude"]),
             })),
             ...cityPeople.map((p) => ({
               id: p.id, slug: (p as any).slug, category: "person" as const,
               title: p.name, subtitle: p.role,
+              ...coord(p, ["lat", "latitude"], ["lng", "longitude"]),
             })),
             ...cityCauses.map((c) => ({
               id: c.id, slug: (c as any).slug, category: "cause" as const,
               title: c.title,
+              ...coord(c, ["lat", "latitude"], ["lng", "longitude"]),
             })),
           ];
           if (pins.length === 0) return null;
