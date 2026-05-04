@@ -70,6 +70,7 @@ import AllPosts from "./pages/AllPosts.tsx";
 import AllAudioTours from "./pages/AllAudioTours.tsx";
 import AllTrips from "./pages/AllTrips.tsx";
 import AllCauses from "./pages/AllCauses.tsx";
+import AllPeople from "./pages/AllPeople.tsx";
 import VisitorProfile from "./pages/VisitorProfile.tsx";
 import StatusesFeed from "./pages/StatusesFeed.tsx";
 // Provider Management Pages
@@ -103,6 +104,7 @@ const App = () => (
             <Route path="/audio-tours" element={<AllAudioTours />} />
             <Route path="/audio-tour/:id" element={<AudioTourDetail />} />
             <Route path="/causes" element={<AllCauses />} />
+            <Route path="/people" element={<AllPeople />} />
             <Route path="/cause/:id" element={<CauseDetail />} />
             <Route path="/organization/:id" element={<OrganizationDetail />} />
             <Route path="/cause/:id/gift" element={<CauseSupportGift />} />
