@@ -26,6 +26,12 @@ type Post = {
   category: string | null; image: string | null;
   read_time_minutes: number | null;
 };
+type AudioTour = {
+  id: string; slug: string | null;
+  title_en: string; title_ar: string;
+  image: string | null;
+  duration_minutes: number; stops_count: number;
+};
 
 const CultureActorDetail = () => {
   const { id } = useParams();
