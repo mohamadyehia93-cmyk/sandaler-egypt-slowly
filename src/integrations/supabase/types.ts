@@ -29,6 +29,8 @@ export type Database = {
           id: string
           image: string | null
           images: string[] | null
+          latitude: number | null
+          longitude: number | null
           name_ar: string
           name_en: string
           price_per_night: number
@@ -53,6 +55,8 @@ export type Database = {
           id?: string
           image?: string | null
           images?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           name_ar: string
           name_en: string
           price_per_night?: number
@@ -77,6 +81,8 @@ export type Database = {
           id?: string
           image?: string | null
           images?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           name_ar?: string
           name_en?: string
           price_per_night?: number
@@ -122,6 +128,8 @@ export type Database = {
           id: string
           image: string | null
           languages: string[] | null
+          latitude: number | null
+          longitude: number | null
           narrator_image: string | null
           narrator_name_ar: string | null
           narrator_name_en: string | null
@@ -145,6 +153,8 @@ export type Database = {
           id?: string
           image?: string | null
           languages?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           narrator_image?: string | null
           narrator_name_ar?: string | null
           narrator_name_en?: string | null
@@ -168,6 +178,8 @@ export type Database = {
           id?: string
           image?: string | null
           languages?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           narrator_image?: string | null
           narrator_name_ar?: string | null
           narrator_name_en?: string | null
@@ -216,6 +228,8 @@ export type Database = {
           goal: number | null
           id: string
           image: string | null
+          latitude: number | null
+          longitude: number | null
           org_founded: string | null
           org_logo: string | null
           org_members: number | null
@@ -243,6 +257,8 @@ export type Database = {
           goal?: number | null
           id?: string
           image?: string | null
+          latitude?: number | null
+          longitude?: number | null
           org_founded?: string | null
           org_logo?: string | null
           org_members?: number | null
@@ -270,6 +286,8 @@ export type Database = {
           goal?: number | null
           id?: string
           image?: string | null
+          latitude?: number | null
+          longitude?: number | null
           org_founded?: string | null
           org_logo?: string | null
           org_members?: number | null
@@ -1191,6 +1209,8 @@ export type Database = {
           id: string
           image: string | null
           images: string[] | null
+          latitude: number | null
+          longitude: number | null
           name_ar: string
           name_en: string
           origin_story_ar: string | null
@@ -1220,6 +1240,8 @@ export type Database = {
           id?: string
           image?: string | null
           images?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           name_ar: string
           name_en: string
           origin_story_ar?: string | null
@@ -1249,6 +1271,8 @@ export type Database = {
           id?: string
           image?: string | null
           images?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           name_ar?: string
           name_en?: string
           origin_story_ar?: string | null
@@ -1646,6 +1670,8 @@ export type Database = {
           inclusions_en: string[] | null
           itinerary_ar: Json | null
           itinerary_en: Json | null
+          latitude: number | null
+          longitude: number | null
           organizer_id: string | null
           organizer_image: string | null
           organizer_name_ar: string | null
@@ -1683,6 +1709,8 @@ export type Database = {
           inclusions_en?: string[] | null
           itinerary_ar?: Json | null
           itinerary_en?: Json | null
+          latitude?: number | null
+          longitude?: number | null
           organizer_id?: string | null
           organizer_image?: string | null
           organizer_name_ar?: string | null
@@ -1720,6 +1748,8 @@ export type Database = {
           inclusions_en?: string[] | null
           itinerary_ar?: Json | null
           itinerary_en?: Json | null
+          latitude?: number | null
+          longitude?: number | null
           organizer_id?: string | null
           organizer_image?: string | null
           organizer_name_ar?: string | null
@@ -1794,6 +1824,8 @@ export type Database = {
           interests_en: string[] | null
           languages_ar: string[] | null
           languages_en: string[] | null
+          latitude: number | null
+          longitude: number | null
           meeting_times_ar: string | null
           meeting_times_en: string | null
           name_ar: string
@@ -1820,6 +1852,8 @@ export type Database = {
           interests_en?: string[] | null
           languages_ar?: string[] | null
           languages_en?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           meeting_times_ar?: string | null
           meeting_times_en?: string | null
           name_ar: string
@@ -1846,6 +1880,8 @@ export type Database = {
           interests_en?: string[] | null
           languages_ar?: string[] | null
           languages_en?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           meeting_times_ar?: string | null
           meeting_times_en?: string | null
           name_ar?: string
