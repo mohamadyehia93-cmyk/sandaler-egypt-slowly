@@ -190,11 +190,19 @@ const CityDetail = () => {
             <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "أبرز المعالم" : "Highlights"}</h3>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            {city.highlights[lang].map((h, i) => (
-              <div key={i} className="bg-card rounded-lg p-3 shadow-card border border-border">
-                <span className="text-xs font-medium text-foreground">{h}</span>
-              </div>
-            ))}
+            {city.highlights.en.map((hEn, i) => {
+              const slug = hEn.toLowerCase().replace(/[''`]/g, "").replace(/[^a-z0-9\u0600-\u06FF]+/g, "-").replace(/^-+|-+$/g, "");
+              const label = city.highlights[lang][i] || hEn;
+              return (
+                <button
+                  key={i}
+                  onClick={() => navigate(`/city/${cityId}/highlight/${slug}`)}
+                  className="bg-card rounded-lg p-3 shadow-card border border-border text-left hover:border-primary hover:shadow-md transition-all active:scale-[0.98]"
+                >
+                  <span className="text-xs font-medium text-foreground">{label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
