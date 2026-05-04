@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart, MapPin, ChevronDown } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
 import { useExperiences, useRegions } from "@/hooks/useListings";
