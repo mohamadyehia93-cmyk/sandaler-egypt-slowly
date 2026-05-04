@@ -4607,6 +4607,7 @@ export const latestPosts = [
     body: {
       en: "Qena has been Egypt's pottery capital for over 5,000 years. This 14-minute documentary visits the village of El-Ballas, where almost every family is involved in the pottery trade.\n\nThe film follows the complete lifecycle of a 'qulla' — the iconic Egyptian water jug that keeps water cool through evaporation. From digging Nile clay, to hand-shaping on kick wheels, to firing in massive communal kilns that glow orange through the night.\n\nMaster potter Hajj Mustafa, 75, demonstrates how to judge clay quality by taste — a technique as old as the pyramids. 'Sweet clay makes strong pots,' he says, placing a pinch on his tongue.\n\nThe documentary also addresses the crisis facing traditional potters: plastic water bottles and refrigerators have decimated demand for the qulla. But a new generation is finding customers through social media and eco-conscious consumers.\n\nFilmed over one week in El-Ballas village, Qena Governorate.",
       ar: "قنا عاصمة الفخار في مصر منذ أكثر من ٥٠٠٠ عام. هذا الفيلم يزور قرية البلاص حيث كل عائلة تقريباً تعمل في الفخار.\n\nيتابع الفيلم دورة حياة كاملة لـ'القُلة' — إبريق الماء المصري الشهير. من حفر طين النيل إلى التشكيل اليدوي إلى الحرق في أفران جماعية ضخمة.\n\nالحاج مصطفى، ٧٥ عاماً، يوضح كيف يحكم على جودة الطين بالتذوق. 'الطين الحلو يصنع أوانٍ قوية'.\n\nيتناول الفيلم أيضاً أزمة الفخاريين التقليديين ولكن جيلاً جديداً يجد زبائن عبر وسائل التواصل الاجتماعي."
+    },
   },
   // ===== New theme: Crafts =====
   {
