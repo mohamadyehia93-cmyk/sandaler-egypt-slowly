@@ -6,6 +6,7 @@ import { cityData, experiences, audioTours, accommodation, products, whosWho, ca
 import { useTransport } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
+import CityOfferingsMap, { OfferingPin } from "@/components/CityOfferingsMap";
 import BottomNav from "@/components/BottomNav";
 
 type PostItem = (typeof latestPosts)[number];
