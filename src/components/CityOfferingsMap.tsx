@@ -3,6 +3,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Search, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
 // Centers for all known cities (same coordinates as RegionMap)
