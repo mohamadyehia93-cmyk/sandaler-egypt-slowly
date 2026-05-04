@@ -1,8 +1,9 @@
 import { ArrowLeft, Headphones, Play, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { audioTours, regions } from "@/lib/sampleData";
+import { useAudioTours, useRegions } from "@/hooks/useListings";
 import CityBadge from "@/components/CityBadge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useMemo } from "react";
 
 type ThemeKey = "history" | "nature" | "culture" | "coast";
