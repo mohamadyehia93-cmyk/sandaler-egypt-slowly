@@ -11,7 +11,7 @@ const TransportCards = () => {
   const { data: transport, isLoading } = useTransport();
 
   return (
-    <SectionHeader titleKey="section.gettingAround" onSeeAll={() => {}}>
+    <SectionHeader titleKey="section.gettingAround">
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (

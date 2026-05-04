@@ -10,7 +10,7 @@ const Partners = () => {
   const { data: partners, isLoading } = usePartners();
 
   return (
-    <SectionHeader titleKey="section.partners" onSeeAll={() => {}}>
+    <SectionHeader titleKey="section.partners">
       <div className="grid grid-cols-3 gap-3 px-4">
         {isLoading
           ? Array.from({ length: 6 }).map((_, i) => (

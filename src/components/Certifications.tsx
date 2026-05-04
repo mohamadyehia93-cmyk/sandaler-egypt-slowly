@@ -15,7 +15,7 @@ const Certifications = forwardRef((_props: {}, ref: React.Ref<HTMLDivElement>) =
 
   return (
     <div ref={ref}>
-      <SectionHeader titleKey="section.certifications" onSeeAll={() => {}}>
+      <SectionHeader titleKey="section.certifications">
         <div className="space-y-3 px-4">
           {certifications.map((c) => (
             <div key={c.id} className="flex items-start gap-3 bg-card rounded-xl p-4 shadow-card border border-border">
