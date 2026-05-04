@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Heart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
+import { experienceThemes, regions } from "@/lib/sampleData";
 import { useExperiences, useRegions } from "@/hooks/useListings";
-import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "./ui/skeleton";
@@ -13,55 +12,33 @@ const ExperienceCards = () => {
   const navigate = useNavigate();
   const { data: experiences, isLoading } = useExperiences();
   const { data: dbRegions } = useRegions();
-  const [activeTheme, setActiveTheme] = useState<ExperienceTheme | "all">("all");
   const [activeRegion, setActiveRegion] = useState("all");
 
-  const filtered = (experiences ?? []).filter((e) => {
-    const themeMatch = activeTheme === "all" || e.theme === activeTheme;
-    const regionMatch = activeRegion === "all" || e.region_id === activeRegion;
-    return themeMatch && regionMatch;
-  });
+  const regionsList =
+    dbRegions ??
+    regions.map((r) => ({ id: r.id, name_en: r.nameKey, name_ar: r.nameKey, emoji: r.emoji }));
 
-  const regionsList = dbRegions ?? regions.map(r => ({ id: r.id, name_en: r.nameKey, name_ar: r.nameKey, emoji: r.emoji }));
+  const filtered = (experiences ?? []).filter(
+    (e) => activeRegion === "all" || e.region_id === activeRegion
+  );
 
-  const activeRegionLabel = activeRegion === "all"
-    ? (lang === "ar" ? "كل المناطق" : "All Regions")
-    : (() => {
-        const r = regionsList.find(r => r.id === activeRegion);
-        return r ? (lang === "ar" ? r.name_ar : r.name_en) : "";
-      })();
+  // Group by theme, preserving the experienceThemes order
+  const grouped = useMemo(() => {
+    return experienceThemes
+      .map((th) => ({
+        theme: th,
+        items: filtered.filter((e) => e.theme === th.key),
+      }))
+      .filter((g) => g.items.length > 0);
+  }, [filtered]);
 
   return (
-    <SectionHeader titleKey="section.experiences" onSeeAll={() => {}}>
-      {/* Theme filter pills */}
-      <div className="flex gap-2 px-4 mb-3 overflow-x-auto hide-scrollbar">
-        <button
-          onClick={() => setActiveTheme("all")}
-          className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
-            activeTheme === "all"
-              ? "bg-primary text-primary-foreground"
-              : "bg-secondary text-secondary-foreground"
-          }`}
-        >
-          {lang === "ar" ? "الكل" : "All"}
-        </button>
-        {experienceThemes.map((th) => (
-          <button
-            key={th.key}
-            onClick={() => setActiveTheme(th.key)}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
-              activeTheme === th.key
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground"
-            }`}
-          >
-            {th.emoji} {th.label[lang]}
-          </button>
-        ))}
-      </div>
-
-      {/* Region dropdown (compact teal) */}
-      <div className="px-4 mb-3">
+    <section className="pb-6">
+      {/* Header */}
+      <div className="px-4 mb-3 flex items-center justify-between">
+        <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+          {t("section.experiences")}
+        </h2>
         <select
           value={activeRegion}
           onChange={(e) => setActiveRegion(e.target.value)}
@@ -76,54 +53,80 @@ const ExperienceCards = () => {
         </select>
       </div>
 
-      {/* Cards */}
-      <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-        {isLoading ? (
-          Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="min-w-[200px] h-[220px] rounded-lg" />
-          ))
-        ) : filtered.map((e) => (
-          <button
-            key={e.id}
-            onClick={() => navigate(`/experience/${e.slug || e.id}`)}
-            className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card text-start"
-          >
-            <div className="relative h-32">
-              <img src={e.image || "/placeholder.svg"} alt={lang === "ar" ? e.title_ar : e.title_en} className="w-full h-full object-cover" />
-              <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
-                <Heart className="w-4 h-4 text-foreground" />
-              </button>
-              <span className="absolute bottom-2 left-2 bg-primary/90 text-primary-foreground text-[9px] font-semibold px-1.5 py-0.5 rounded-full">
-                {experienceThemes.find((th) => th.key === e.theme)?.label[lang]}
-              </span>
-            </div>
-            <div className="p-3">
-              <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">
-                {lang === "ar" ? e.title_ar : e.title_en}
-              </h3>
-              {e.host_name_en && (
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  {e.host_image && <img src={e.host_image} alt="" className="w-4 h-4 rounded-full object-cover" />}
-                  <span className="text-[10px] text-primary font-medium truncate">
-                    {lang === "ar" ? e.host_name_ar : e.host_name_en}
-                  </span>
-                </div>
-              )}
-              <div className="flex items-center gap-2 mb-2">
-                {e.city_id && <CityBadge cityId={e.city_id} />}
-                {e.date && <span className="text-[10px] text-muted-foreground">{e.date}</span>}
+      {/* Grouped vertical feed */}
+      {isLoading ? (
+        <div className="px-4 space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 w-full rounded-lg" />
+          ))}
+        </div>
+      ) : grouped.length === 0 ? (
+        <p className="px-4 text-sm text-muted-foreground text-center py-8">
+          {lang === "ar" ? "لا توجد تجارب" : "No experiences found"}
+        </p>
+      ) : (
+        <div className="space-y-6">
+          {grouped.map(({ theme, items }) => (
+            <div key={theme.key}>
+              <div className="px-4 mb-2 flex items-center gap-2">
+                <span className="text-lg">{theme.emoji}</span>
+                <h3 className="text-base font-bold text-foreground">{theme.label[lang]}</h3>
+                <span className="text-xs text-muted-foreground">({items.length})</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-bold text-primary-dark">
-                  {e.price === 0 ? t("common.free") : `${e.price} ${t("common.egp")}`}
-                </span>
-                <span className="text-xs text-muted-foreground">⭐ {e.rating}</span>
+
+              <div className="px-4 space-y-3">
+                {items.map((e) => (
+                  <button
+                    key={e.id}
+                    onClick={() => navigate(`/experience/${e.slug || e.id}`)}
+                    className="w-full flex gap-3 rounded-lg overflow-hidden shadow-card bg-card text-start"
+                  >
+                    <div className="relative w-28 h-28 shrink-0">
+                      <img
+                        src={e.image || "/placeholder.svg"}
+                        alt={lang === "ar" ? e.title_ar : e.title_en}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 py-2 pr-3 min-w-0 flex flex-col justify-between">
+                      <div>
+                        <h4 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">
+                          {lang === "ar" ? e.title_ar : e.title_en}
+                        </h4>
+                        {e.host_name_en && (
+                          <div className="flex items-center gap-1.5 mb-1">
+                            {e.host_image && (
+                              <img
+                                src={e.host_image}
+                                alt=""
+                                className="w-4 h-4 rounded-full object-cover"
+                              />
+                            )}
+                            <span className="text-[10px] text-primary font-medium truncate">
+                              {lang === "ar" ? e.host_name_ar : e.host_name_en}
+                            </span>
+                          </div>
+                        )}
+                        {e.city_id && <CityBadge cityId={e.city_id} />}
+                      </div>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-sm font-bold text-primary-dark">
+                          {e.price === 0 ? t("common.free") : `${e.price} ${t("common.egp")}`}
+                        </span>
+                        <span className="text-xs text-muted-foreground flex items-center gap-2">
+                          <span>⭐ {e.rating}</span>
+                          <Heart className="w-3.5 h-3.5" />
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
-          </button>
-        ))}
-      </div>
-    </SectionHeader>
+          ))}
+        </div>
+      )}
+    </section>
   );
 };
 
