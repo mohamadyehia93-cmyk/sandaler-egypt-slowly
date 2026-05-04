@@ -243,10 +243,18 @@ const TripCards = () => {
         <div className="space-y-6">
           {grouped.map(({ theme, items }) => (
             <div key={theme.key}>
-              <div className="px-4 mb-2 flex items-center gap-2">
-                <span className="text-lg">{theme.emoji}</span>
-                <h3 className="text-base font-bold text-foreground">{theme.label[lang]}</h3>
-                <span className="text-xs text-muted-foreground">({items.length})</span>
+              <div className="px-4 mb-2 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{theme.emoji}</span>
+                  <h3 className="text-base font-bold text-foreground">{theme.label[lang]}</h3>
+                  <span className="text-xs text-muted-foreground">({items.length})</span>
+                </div>
+                <button
+                  onClick={() => navigate(`/trips?theme=${theme.key}`)}
+                  className="text-xs font-semibold text-primary hover:underline"
+                >
+                  {lang === "ar" ? "عرض الكل ←" : "See all →"}
+                </button>
               </div>
 
               <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory">

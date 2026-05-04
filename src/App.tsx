@@ -67,6 +67,7 @@ import ForgotPassword from "./pages/ForgotPassword.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import AllPosts from "./pages/AllPosts.tsx";
 import AllAudioTours from "./pages/AllAudioTours.tsx";
+import AllTrips from "./pages/AllTrips.tsx";
 import AllCauses from "./pages/AllCauses.tsx";
 import VisitorProfile from "./pages/VisitorProfile.tsx";
 import StatusesFeed from "./pages/StatusesFeed.tsx";
@@ -97,6 +98,7 @@ const App = () => (
             <Route path="/calendar" element={<EventCalendar />} />
             <Route path="/experience/:id" element={<ExperienceDetail />} />
             <Route path="/trip/:id" element={<TripDetail />} />
+            <Route path="/trips" element={<AllTrips />} />
             <Route path="/audio-tours" element={<AllAudioTours />} />
             <Route path="/audio-tour/:id" element={<AudioTourDetail />} />
             <Route path="/causes" element={<AllCauses />} />
