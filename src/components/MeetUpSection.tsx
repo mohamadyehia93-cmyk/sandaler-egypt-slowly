@@ -11,7 +11,7 @@ const MeetUpSection = () => {
   const { data: people, isLoading } = useWhosWho();
 
   return (
-    <SectionHeader titleKey="section.whosWho" onSeeAll={() => {}}>
+    <SectionHeader titleKey="section.whosWho" onSeeAll={() => navigate("/people")}>
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => (
