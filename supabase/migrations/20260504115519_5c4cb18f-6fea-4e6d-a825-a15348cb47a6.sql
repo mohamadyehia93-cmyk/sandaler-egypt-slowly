@@ -1,0 +1,2 @@
+ALTER TABLE public.audio_tours ADD COLUMN IF NOT EXISTS narrator_culture_actor_id uuid REFERENCES public.culture_actors(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_audio_tours_narrator_actor ON public.audio_tours(narrator_culture_actor_id);
