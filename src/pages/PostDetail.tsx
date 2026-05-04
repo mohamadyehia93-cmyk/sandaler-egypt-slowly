@@ -1,11 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Clock, Share2, User, MapPin, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Maximize, Camera, ChevronLeft, ChevronRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { latestPosts, cultureActors, cityData } from "@/lib/sampleData";
+import { cultureActors, cityData } from "@/lib/sampleData";
+import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
+import { usePosts } from "@/hooks/useListings";
 import WishlistButton from "@/components/WishlistButton";
 import { contentTypeConfig } from "@/components/LatestPosts";
 import NotFoundView from "@/components/NotFound";
+import DetailSkeleton from "@/components/DetailSkeleton";
 
 /* ─── Audio Player ─── */
 const AudioPlayer = ({ title, author, image, lang }: { title: string; author: string; image: string; lang: string }) => {
