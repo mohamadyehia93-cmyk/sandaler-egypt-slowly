@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart, MapPin, ChevronDown } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { experienceThemes, ExperienceTheme, regions } from "@/lib/sampleData";
 import { useExperiences, useRegions } from "@/hooks/useListings";
@@ -15,7 +15,6 @@ const ExperienceCards = () => {
   const { data: dbRegions } = useRegions();
   const [activeTheme, setActiveTheme] = useState<ExperienceTheme | "all">("all");
   const [activeRegion, setActiveRegion] = useState("all");
-  const [regionOpen, setRegionOpen] = useState(false);
 
   const filtered = (experiences ?? []).filter((e) => {
     const themeMatch = activeTheme === "all" || e.theme === activeTheme;
@@ -61,35 +60,20 @@ const ExperienceCards = () => {
         ))}
       </div>
 
-      {/* Region dropdown */}
-      <div className="relative px-4 mb-3">
-        <button
-          onClick={() => setRegionOpen(!regionOpen)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground shadow-card"
+      {/* Region dropdown (compact teal) */}
+      <div className="px-4 mb-3">
+        <select
+          value={activeRegion}
+          onChange={(e) => setActiveRegion(e.target.value)}
+          className="px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold border-0 outline-none cursor-pointer"
         >
-          <MapPin className="w-3.5 h-3.5 text-primary" />
-          {activeRegionLabel}
-          <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${regionOpen ? "rotate-180" : ""}`} />
-        </button>
-        {regionOpen && (
-          <div className="absolute top-full left-4 mt-1 z-30 bg-card rounded-lg shadow-elevated border border-border py-1 min-w-[160px]">
-            <button
-              onClick={() => { setActiveRegion("all"); setRegionOpen(false); }}
-              className={`w-full text-start px-3 py-2 text-xs ${activeRegion === "all" ? "text-primary font-semibold bg-secondary" : "text-foreground"}`}
-            >
-              {lang === "ar" ? "كل المناطق" : "All Regions"}
-            </button>
-            {regionsList.map((r) => (
-              <button
-                key={r.id}
-                onClick={() => { setActiveRegion(r.id); setRegionOpen(false); }}
-                className={`w-full text-start px-3 py-2 text-xs ${activeRegion === r.id ? "text-primary font-semibold bg-secondary" : "text-foreground"}`}
-              >
-                {r.emoji} {lang === "ar" ? r.name_ar : r.name_en}
-              </button>
-            ))}
-          </div>
-        )}
+          <option value="all">{lang === "ar" ? "كل المناطق" : "All Regions"}</option>
+          {regionsList.map((r) => (
+            <option key={r.id} value={r.id}>
+              {lang === "ar" ? r.name_ar : r.name_en}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Cards */}
