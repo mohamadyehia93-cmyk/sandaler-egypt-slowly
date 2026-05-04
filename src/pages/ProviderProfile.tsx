@@ -8,10 +8,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ProviderStatusView from "@/components/ProviderStatusView";
 import FollowButton from "@/components/FollowButton";
 import {
-import NotFoundView from "@/components/NotFound";
   ArrowLeft, Share2, MapPin, Star, CheckCircle, MessageSquare,
   Heart, Globe, Clock, ChevronRight, Users
 } from "lucide-react";
+import NotFoundView from "@/components/NotFound";
 
 type ProviderRole =
   | "culture-actor" | "service-provider" | "accommodation-host"
