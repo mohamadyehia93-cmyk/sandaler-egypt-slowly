@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned, Compass, BookOpen, Palette, Mountain } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { regions, regionCities, experiences, latestPosts, whosWho, audioTours, causes, cityData } from "@/lib/sampleData";
+import { useAudioTours } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
 import RegionMap from "@/components/RegionMap";
@@ -114,7 +115,21 @@ const RegionDetail = () => {
   const regionExperiences = cityFilter(experiences.filter((e) => e.regionId === regionId));
   const regionPosts = latestPosts.filter((p) => p.regionId === regionId);
   const regionPeople = cityFilter(whosWho.filter((w) => w.regionId === regionId));
-  const regionAudioTours = cityFilter(audioTours.filter((a) => a.regionId === regionId));
+  const { data: dbAudioTours = [] } = useAudioTours();
+  const regionAudioTours = cityFilter(
+    (dbAudioTours as any[])
+      .filter((a) => a.region_id === regionId)
+      .map((a) => ({
+        id: a.slug || a.id,
+        title: { en: a.title_en, ar: a.title_ar },
+        image: a.image,
+        regionId: a.region_id,
+        cityId: a.city_id,
+        duration: a.duration_minutes,
+        stops: a.stops_count,
+        price: a.price ?? 0,
+      }))
+  );
 
   const selectedCityLabel = selectedCity === "all"
     ? t("filter.allCities")
