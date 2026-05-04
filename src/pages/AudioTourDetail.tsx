@@ -1,4 +1,5 @@
-import { ArrowLeft, Share2, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle } from "lucide-react";
+import { ArrowLeft, Share2, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle, ChevronRight, Feather } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
@@ -48,6 +49,20 @@ const AudioTourDetail = () => {
     queryKey: ["audio_tour", id],
     queryFn: () => fetchByIdOrSlug("audio_tours", id!),
     enabled: !!id,
+  });
+
+  const narratorActorId = (tour as any)?.narrator_culture_actor_id as string | null | undefined;
+  const { data: narratorActor } = useQuery({
+    queryKey: ["audio_tour_narrator_actor", narratorActorId],
+    enabled: !!narratorActorId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("culture_actors")
+        .select("id, slug, name_en, name_ar, title_en, title_ar, image, expertise_en, expertise_ar")
+        .eq("id", narratorActorId!)
+        .maybeSingle();
+      return data;
+    },
   });
 
   const dbStops = (tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string }> | undefined) || [];
@@ -281,19 +296,47 @@ const AudioTourDetail = () => {
         )}
 
         {/* Narrator */}
-        {narratorName && (
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-surface mb-6">
-            {tour.narrator_image ? (
-              <img src={tour.narrator_image} alt={narratorName} className="w-12 h-12 rounded-full object-cover border-2 border-primary/20" />
-            ) : (
-              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-lg">🎙️</div>
-            )}
-            <div>
-              <p className="text-sm font-semibold text-foreground">{lang === "ar" ? "الراوي:" : "Narrator:"} {narratorName}</p>
-              <p className="text-xs text-muted-foreground">{(tour.languages || ["en"]).join(", ")}</p>
-            </div>
-          </div>
-        )}
+        {narratorName && (() => {
+          const actor = narratorActor as any;
+          const displayName = actor ? (lang === "ar" ? actor.name_ar : actor.name_en) : narratorName;
+          const displayTitle = actor ? (lang === "ar" ? actor.title_ar : actor.title_en) : null;
+          const displayImage = actor?.image || tour.narrator_image;
+          const expertise = actor ? ((lang === "ar" ? actor.expertise_ar : actor.expertise_en) ?? []) as string[] : [];
+          const target = actor ? `/culture-actor/${actor.slug ?? actor.id}` : null;
+          const Wrapper: any = target ? "button" : "div";
+          return (
+            <Wrapper
+              {...(target ? { onClick: () => navigate(target), type: "button" } : {})}
+              className={`w-full text-start flex items-center gap-3 p-3 rounded-xl bg-surface mb-6 ${target ? "hover:bg-secondary transition-colors cursor-pointer" : ""}`}
+            >
+              {displayImage ? (
+                <img src={displayImage} alt={displayName} className="w-14 h-14 rounded-full object-cover border-2 border-primary/20 flex-shrink-0" />
+              ) : (
+                <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center text-lg flex-shrink-0">🎙️</div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-semibold text-primary uppercase tracking-wide flex items-center gap-1">
+                  <Feather className="w-3 h-3" />
+                  {lang === "ar" ? "الراوي" : "Narrator"}
+                </p>
+                <p className="text-sm font-semibold text-foreground truncate">{displayName}</p>
+                {displayTitle ? (
+                  <p className="text-xs text-muted-foreground truncate">{displayTitle}</p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">{(tour.languages || ["en"]).join(", ")}</p>
+                )}
+                {expertise.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-1.5">
+                    {expertise.slice(0, 2).map((s, i) => (
+                      <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">{s}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {target && <ChevronRight className={`w-4 h-4 text-muted-foreground flex-shrink-0 ${lang === "ar" ? "rotate-180" : ""}`} />}
+            </Wrapper>
+          );
+        })()}
 
         {/* Description */}
         {description && (

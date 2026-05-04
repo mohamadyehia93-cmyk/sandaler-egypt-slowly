@@ -130,6 +130,7 @@ export type Database = {
           languages: string[] | null
           latitude: number | null
           longitude: number | null
+          narrator_culture_actor_id: string | null
           narrator_image: string | null
           narrator_name_ar: string | null
           narrator_name_en: string | null
@@ -155,6 +156,7 @@ export type Database = {
           languages?: string[] | null
           latitude?: number | null
           longitude?: number | null
+          narrator_culture_actor_id?: string | null
           narrator_image?: string | null
           narrator_name_ar?: string | null
           narrator_name_en?: string | null
@@ -180,6 +182,7 @@ export type Database = {
           languages?: string[] | null
           latitude?: number | null
           longitude?: number | null
+          narrator_culture_actor_id?: string | null
           narrator_image?: string | null
           narrator_name_ar?: string | null
           narrator_name_en?: string | null
@@ -206,6 +209,13 @@ export type Database = {
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audio_tours_narrator_culture_actor_id_fkey"
+            columns: ["narrator_culture_actor_id"]
+            isOneToOne: false
+            referencedRelation: "culture_actors"
             referencedColumns: ["id"]
           },
           {

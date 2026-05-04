@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Quote, Feather, BookOpen, Share2, Instagram, Twitter, MessageCircle } from "lucide-react";
+import { ArrowLeft, MapPin, Quote, Feather, BookOpen, Share2, Instagram, Twitter, MessageCircle, Headphones, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
@@ -26,6 +26,12 @@ type Post = {
   category: string | null; image: string | null;
   read_time_minutes: number | null;
 };
+type AudioTour = {
+  id: string; slug: string | null;
+  title_en: string; title_ar: string;
+  image: string | null;
+  duration_minutes: number; stops_count: number;
+};
 
 const CultureActorDetail = () => {
   const { id } = useParams();
@@ -35,6 +41,7 @@ const CultureActorDetail = () => {
   const [actor, setActor] = useState<Actor | null>(null);
   const [region, setRegion] = useState<Region | null>(null);
   const [authorPosts, setAuthorPosts] = useState<Post[]>([]);
+  const [audioTours, setAudioTours] = useState<AudioTour[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -51,14 +58,26 @@ const CultureActorDetail = () => {
           if (!cancelled) setRegion(r as Region | null);
         }
         if (a?.id) {
-          const { data: p } = await supabase
-            .from("posts")
-            .select("id, slug, title_en, title_ar, category, image, read_time_minutes")
-            .eq("author_id", a.id)
-            .eq("status", "published")
-            .order("created_at", { ascending: false })
-            .limit(10);
-          if (!cancelled) setAuthorPosts((p as Post[]) ?? []);
+          const [{ data: p }, { data: tours }] = await Promise.all([
+            supabase
+              .from("posts")
+              .select("id, slug, title_en, title_ar, category, image, read_time_minutes")
+              .eq("author_id", a.id)
+              .eq("status", "published")
+              .order("created_at", { ascending: false })
+              .limit(10),
+            supabase
+              .from("audio_tours")
+              .select("id, slug, title_en, title_ar, image, duration_minutes, stops_count")
+              .eq("narrator_culture_actor_id", a.id)
+              .eq("status", "published")
+              .order("created_at", { ascending: false })
+              .limit(10),
+          ]);
+          if (!cancelled) {
+            setAuthorPosts((p as Post[]) ?? []);
+            setAudioTours((tours as AudioTour[]) ?? []);
+          }
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -190,6 +209,38 @@ const CultureActorDetail = () => {
                 Twitter
               </a>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Audio tours narrated by this actor */}
+      {audioTours.length > 0 && (
+        <div className="px-4 mt-6">
+          <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+            <Headphones className="w-4 h-4 text-primary" />
+            {lang === "ar" ? "جولات صوتية بصوته" : "Audio Tours Narrated"}
+          </h2>
+          <div className="space-y-3">
+            {audioTours.map((tour) => (
+              <div
+                key={tour.id}
+                onClick={() => navigate(`/audio-tour/${tour.slug ?? tour.id}`)}
+                className="flex gap-3 rounded-lg bg-card shadow-card border border-border overflow-hidden cursor-pointer"
+              >
+                {tour.image && (
+                  <img src={tour.image} alt={lang === "ar" ? tour.title_ar : tour.title_en} className="w-24 h-20 object-cover flex-shrink-0" />
+                )}
+                <div className="py-2.5 pe-3 flex flex-col justify-center min-w-0">
+                  <h3 className="text-xs font-semibold text-foreground line-clamp-2">
+                    {lang === "ar" ? tour.title_ar : tour.title_en}
+                  </h3>
+                  <div className="flex items-center gap-2 mt-1 text-[10px] text-muted-foreground">
+                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{tour.duration_minutes} {lang === "ar" ? "د" : "min"}</span>
+                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{tour.stops_count} {lang === "ar" ? "محطات" : "stops"}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
