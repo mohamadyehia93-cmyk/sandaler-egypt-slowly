@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Globe, MapPin, Users, Target, Handshake, Mail, ExternalLink, Calendar, Award } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { partnersData } from "@/lib/sampleData";
+import NotFoundView from "@/components/NotFound";
 
 const PartnerDetail = () => {
   const { id } = useParams();
@@ -9,7 +10,7 @@ const PartnerDetail = () => {
   const { lang } = useI18n();
 
   const partner = partnersData.find((p) => p.id === id);
-  if (!partner) return <div className="p-8 text-center text-muted-foreground">Partner not found</div>;
+  if (!partner) return <NotFoundView context="partner" />;
 
   return (
     <div className="min-h-screen bg-background pb-20">

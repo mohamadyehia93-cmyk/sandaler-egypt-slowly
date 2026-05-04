@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useUserLocation, distanceMeters, formatDistance } from "@/hooks/useUserLocation";
 import { useOfflineTour, useOnlineStatus } from "@/hooks/useOfflineTour";
 import { toast } from "sonner";
+import NotFoundView from "@/components/NotFound";
 
 const NEAR_THRESHOLD_M = 50; // when within 50m, mark stop as "near you"
 
@@ -179,7 +180,7 @@ const AudioTourDetail = () => {
     );
   }
 
-  if (!tour) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
+  if (!tour) return <NotFoundView context="audio-tour" />;
 
   const title = lang === "ar" ? tour.title_ar : tour.title_en;
   const description = lang === "ar" ? tour.description_ar : tour.description_en;

@@ -3,6 +3,7 @@ import { ArrowLeft, CreditCard, Repeat, TrendingUp, ShieldCheck, Check, ChevronR
 import { useI18n } from "@/lib/i18n";
 import { causes } from "@/lib/sampleData";
 import { useState } from "react";
+import NotFoundView from "@/components/NotFound";
 
 const presetAmounts = [50, 100, 250, 500, 1000];
 
@@ -27,7 +28,7 @@ const CauseSupportDonate = () => {
   const [processing, setProcessing] = useState(false);
 
   const cause = causes.find((c) => c.id === id);
-  if (!cause) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
+  if (!cause) return <NotFoundView context="cause" />;
 
   const progress = Math.round((cause.raised / cause.goal) * 100);
   const finalAmount = showCustom ? (parseInt(customAmount) || 0) : selected;

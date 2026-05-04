@@ -12,6 +12,7 @@ import WishlistButton from "@/components/WishlistButton";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import CityBadge from "@/components/CityBadge";
 import { Skeleton } from "@/components/ui/skeleton";
+import NotFoundView from "@/components/NotFound";
 
 const TRANSPORT_EMOJI: Record<string, string> = {
   felucca: "⛵", "tuk-tuk": "🛺", bus: "🚌", "private-car": "🚗", boat: "🛥️",
@@ -54,7 +55,7 @@ const TransportDetail = () => {
     );
   }
 
-  if (!item) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
+  if (!item) return <NotFoundView context="transport" />;
 
   const name = isAr ? item.name_ar : item.name_en;
   const description = isAr ? item.description_ar : item.description_en;

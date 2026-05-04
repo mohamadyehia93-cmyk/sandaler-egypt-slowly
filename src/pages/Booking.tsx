@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { Skeleton } from "@/components/ui/skeleton";
+import NotFoundView from "@/components/NotFound";
 
 type BookingType = "experience" | "trip" | "stay" | "transport" | "product";
 
@@ -43,7 +44,7 @@ const Booking = () => {
     </div>
   );
 
-  if (!item) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
+  if (!item) return <NotFoundView context="generic" />;
 
   const itemTitle = (lang === "ar"
     ? (item.title_ar || item.name_ar || "")

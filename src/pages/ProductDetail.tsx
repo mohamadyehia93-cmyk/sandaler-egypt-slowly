@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import NotFoundView from "@/components/NotFound";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -29,7 +30,7 @@ const ProductDetail = () => {
     );
   }
 
-  if (!product) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
+  if (!product) return <NotFoundView context="product" />;
 
   const name = lang === "ar" ? product.name_ar : product.name_en;
   const description = lang === "ar" ? product.description_ar : product.description_en;

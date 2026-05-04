@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
+import NotFoundView from "@/components/NotFound";
 
 const AccommodationDetail = () => {
   const { id } = useParams();
@@ -50,7 +51,7 @@ const AccommodationDetail = () => {
     );
   }
 
-  if (!place) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
+  if (!place) return <NotFoundView context="stay" />;
 
   const name = lang === "ar" ? place.name_ar : place.name_en;
   const description = lang === "ar" ? place.description_ar : place.description_en;

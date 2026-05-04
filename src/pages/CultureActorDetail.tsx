@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import ProviderStatusView from "@/components/ProviderStatusView";
 import FollowButton from "@/components/FollowButton";
+import NotFoundView from "@/components/NotFound";
 
 type Region = { id: string; name_en: string; name_ar: string; emoji: string | null; color: string | null };
 type Actor = {
@@ -87,7 +88,7 @@ const CultureActorDetail = () => {
   }, [id]);
 
   if (loading) return <div className="p-8 text-center text-muted-foreground">{lang === "ar" ? "جارٍ التحميل..." : "Loading..."}</div>;
-  if (!actor) return <div className="p-8 text-center text-muted-foreground">{lang === "ar" ? "غير موجود" : "Culture Actor not found"}</div>;
+  if (!actor) return <NotFoundView context="culture-actor" />;
 
   const name = lang === "ar" ? actor.name_ar : actor.name_en;
   const title = lang === "ar" ? (actor.title_ar ?? "") : (actor.title_en ?? "");

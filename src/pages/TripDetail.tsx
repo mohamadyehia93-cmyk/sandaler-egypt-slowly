@@ -9,6 +9,7 @@ import DetailTestimonials from "@/components/DetailTestimonials";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
+import NotFoundView from "@/components/NotFound";
 
 const TripDetail = () => {
   const { id } = useParams();
@@ -47,7 +48,7 @@ const TripDetail = () => {
     );
   }
 
-  if (!trip) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
+  if (!trip) return <NotFoundView context="trip" />;
 
   const title = lang === "ar" ? trip.title_ar : trip.title_en;
   const description = lang === "ar" ? trip.description_ar : trip.description_en;

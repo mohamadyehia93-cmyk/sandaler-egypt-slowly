@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { latestPosts, cultureActors, cityData } from "@/lib/sampleData";
 import WishlistButton from "@/components/WishlistButton";
 import { contentTypeConfig } from "@/components/LatestPosts";
+import NotFoundView from "@/components/NotFound";
 
 /* ─── Audio Player ─── */
 const AudioPlayer = ({ title, author, image, lang }: { title: string; author: string; image: string; lang: string }) => {
@@ -187,7 +188,7 @@ const PostDetail = () => {
   const { lang } = useI18n();
 
   const post = latestPosts.find((p) => p?.id === id);
-  if (!post) return <div className="p-8 text-center text-muted-foreground">Post not found</div>;
+  if (!post) return <NotFoundView context="post" />;
 
   const ct = (post as any).contentType ? contentTypeConfig[(post as any).contentType] : null;
   const CtIcon = ct?.icon;
