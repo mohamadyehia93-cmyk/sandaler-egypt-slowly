@@ -397,7 +397,7 @@ const PostDetail = () => {
               return (
                 <div
                   key={rp.id}
-                  onClick={() => navigate(`/post/${rp.id}`)}
+                  onClick={() => navigate(`/post/${rp.slug || rp.id}`)}
                   className="flex gap-3 rounded-lg bg-card shadow-card border border-border overflow-hidden cursor-pointer"
                 >
                   <div className="relative w-24 h-20 flex-shrink-0">
