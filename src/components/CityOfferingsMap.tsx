@@ -109,6 +109,20 @@ export type OfferingPin = {
   category: Category;
   title: { en: string; ar: string };
   subtitle?: { en: string; ar: string };
+  /** Real GPS coordinates if known. When null/undefined, a deterministic scatter near the city center is used. */
+  lat?: number | null;
+  lng?: number | null;
+};
+
+const resolvePos = (
+  o: OfferingPin,
+  center: [number, number]
+): { pos: [number, number]; precise: boolean } => {
+  if (typeof o.lat === "number" && typeof o.lng === "number" && !Number.isNaN(o.lat) && !Number.isNaN(o.lng)) {
+    return { pos: [o.lat, o.lng], precise: true };
+  }
+  const [dLat, dLng] = hashOffset(`${o.category}-${o.id}`);
+  return { pos: [center[0] + dLat, center[1] + dLng], precise: false };
 };
 
 const FitBounds = ({ points }: { points: [number, number][] }) => {
@@ -155,10 +169,7 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
   );
 
   const points = useMemo<[number, number][]>(() => {
-    const pts = visible.map((o) => {
-      const [dLat, dLng] = hashOffset(`${o.category}-${o.id}`);
-      return [center[0] + dLat, center[1] + dLng] as [number, number];
-    });
+    const pts = visible.map((o) => resolvePos(o, center).pos);
     pts.push(center);
     return pts;
   }, [visible, center]);
@@ -224,8 +235,7 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
           </Marker>
 
           {visible.map((o) => {
-            const [dLat, dLng] = hashOffset(`${o.category}-${o.id}`);
-            const pos: [number, number] = [center[0] + dLat, center[1] + dLng];
+            const { pos, precise } = resolvePos(o, center);
             const route = CAT_ROUTE[o.category](o.slug || o.id);
             return (
               <Marker
@@ -250,6 +260,11 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
                         {o.subtitle[lang]}
                       </div>
                     )}
+                    {!precise && (
+                      <div className="text-[10px] text-muted-foreground mt-1 italic">
+                        {lang === "ar" ? "موقع تقريبي" : "Approximate location"}
+                      </div>
+                    )}
                     <button
                       onClick={() => navigate(route)}
                       className="mt-2 text-xs font-medium text-primary"
@@ -266,8 +281,8 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
 
       <p className="px-4 text-[11px] text-muted-foreground">
         {lang === "ar"
-          ? "المواقع تقريبية. اضغط الدبوس لعرض التفاصيل."
-          : "Pin locations are approximate. Tap a pin to view details."}
+          ? "اضغط الدبوس لعرض التفاصيل. الدبابيس بدون موقع دقيق تظهر بالقرب من مركز المدينة."
+          : "Tap a pin to view details. Pins without a precise location are shown near the city center."}
       </p>
     </div>
   );
