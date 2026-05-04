@@ -429,7 +429,7 @@ const CityDetail = () => {
             })),
             ...cityPeople.map((p) => ({
               id: p.id, slug: (p as any).slug, category: "person" as const,
-              title: p.name, subtitle: p.expertise,
+              title: p.name, subtitle: p.role,
             })),
             ...cityCauses.map((c) => ({
               id: c.id, slug: (c as any).slug, category: "cause" as const,
