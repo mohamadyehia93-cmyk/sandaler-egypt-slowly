@@ -41,7 +41,7 @@ const Testimonials = () => {
   const navigate = useNavigate();
 
   return (
-    <SectionHeader titleKey="section.testimonials" onSeeAll={() => {}}>
+    <SectionHeader titleKey="section.testimonials">
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {testimonials.map((t) => (
           <div key={t.id} className="min-w-[280px] max-w-[280px] bg-card rounded-xl p-4 shadow-card border border-border">

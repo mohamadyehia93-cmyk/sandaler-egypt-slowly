@@ -236,7 +236,7 @@ const CityDetail = () => {
 
         {/* Who's Who */}
         {cityPeople.length > 0 && (
-          <SectionHeader titleKey="section.whosWho" onSeeAll={() => {}}>
+          <SectionHeader titleKey="section.whosWho" onSeeAll={() => navigate("/people")}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityPeople.map((p) => (
                 <div key={p.id} onClick={() => navigate(`/person/${p.id}`)} className="min-w-[160px] max-w-[160px] rounded-lg shadow-card bg-card overflow-hidden cursor-pointer">
@@ -261,7 +261,7 @@ const CityDetail = () => {
 
         {/* Experiences */}
         {cityExperiences.length > 0 && (
-          <SectionHeader titleKey="section.experiences" onSeeAll={() => {}}>
+          <SectionHeader titleKey="section.experiences">
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityExperiences.map((e) => (
                 <div key={e.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/experience/${(e as any).slug || e.id}`)}>
@@ -282,7 +282,7 @@ const CityDetail = () => {
 
         {/* Trips */}
         {cityTrips.length > 0 && (
-          <SectionHeader titleKey="section.trips" onSeeAll={() => {}}>
+          <SectionHeader titleKey="section.trips" onSeeAll={() => navigate("/trips")}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityTrips.map((trip) => (
                 <div key={trip.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/trip/${(trip as any).slug || trip.id}`)}>
@@ -306,7 +306,7 @@ const CityDetail = () => {
         )}
 
         {cityAudioTours.length > 0 && (
-          <SectionHeader titleKey="section.audioTours" onSeeAll={() => {}}>
+          <SectionHeader titleKey="section.audioTours" onSeeAll={() => navigate("/audio-tours")}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityAudioTours.map((tour) => (
                 <div key={tour.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/audio-tour/${(tour as any).slug || tour.id}`)}>
@@ -327,7 +327,7 @@ const CityDetail = () => {
 
         {/* Places to Stay */}
         {cityAccommodation.length > 0 && (
-          <SectionHeader titleKey="section.placesToStay" onSeeAll={() => {}}>
+          <SectionHeader titleKey="section.placesToStay">
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityAccommodation.map((a) => (
                 <div key={a.id} className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${(a as any).slug || a.id}`)}>
@@ -360,7 +360,7 @@ const CityDetail = () => {
 
         {/* Getting Around */}
         {cityTransport.length > 0 && (
-          <SectionHeader titleKey="section.gettingAround" onSeeAll={() => {}}>
+          <SectionHeader titleKey="section.gettingAround">
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {cityTransport.map((tr) => (
                 <div key={tr.id} className="min-w-[140px] rounded-lg shadow-card bg-card p-4 flex flex-col items-center gap-2 cursor-pointer" onClick={() => navigate(`/transport/${tr.slug || tr.id}`)}>
@@ -375,7 +375,7 @@ const CityDetail = () => {
 
         {/* Local Products */}
         {cityProducts.length > 0 && (
-          <SectionHeader titleKey="section.products" onSeeAll={() => {}}>
+          <SectionHeader titleKey="section.products">
             <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
               {cityProducts.map((p) => (
                 <div key={p.id} className="flex-shrink-0 w-40 snap-start rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/product/${(p as any).slug || p.id}`)}>

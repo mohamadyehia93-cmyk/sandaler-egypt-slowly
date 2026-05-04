@@ -21,7 +21,7 @@ const CausesSection = ({ regionId, cityFilter = "all" }: Props) => {
   if (filtered.length === 0) return null;
 
   return (
-    <SectionHeader titleKey="section.causes" onSeeAll={() => {}}>
+    <SectionHeader titleKey="section.causes" onSeeAll={() => navigate("/causes")}>
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {filtered.map((cause) => {
           const progress = Math.round((cause.raised / cause.goal) * 100);

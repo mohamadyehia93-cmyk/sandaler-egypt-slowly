@@ -12,7 +12,7 @@ const ProductGrid = () => {
   const { data: products, isLoading } = useProducts();
 
   return (
-    <SectionHeader titleKey="section.products" onSeeAll={() => {}}>
+    <SectionHeader titleKey="section.products">
       <div className="grid grid-cols-2 gap-3 px-4">
         {isLoading ? (
           Array.from({ length: 4 }).map((_, i) => (

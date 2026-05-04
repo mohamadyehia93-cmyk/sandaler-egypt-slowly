@@ -9,7 +9,7 @@ const RegionScroll = () => {
   const navigate = useNavigate();
 
   return (
-    <SectionHeader titleKey="section.regions" onSeeAll={() => {}}>
+    <SectionHeader titleKey="section.regions">
       <div className="grid grid-cols-4 gap-2 px-4">
         {regions.map((r) => {
           const photo = getRegionImage(r.id);
