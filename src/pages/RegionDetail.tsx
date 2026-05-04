@@ -288,7 +288,7 @@ const RegionDetail = () => {
           <SectionHeader titleKey="section.audioTours" onSeeAll={() => navigate("/audio-tours")}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {regionAudioTours.map((tour) => (
-                <div key={tour.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card">
+                <div key={tour.id} onClick={() => navigate(`/audio-tour/${tour.id}`)} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer">
                   <div className="relative h-32">
                     <img src={tour.image} alt={tour.title[lang]} className="w-full h-full object-cover" />
                     <div className="absolute top-2 left-2 bg-background/80 backdrop-blur-sm text-foreground text-[10px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
