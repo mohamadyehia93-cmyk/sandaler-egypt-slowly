@@ -10,6 +10,7 @@ import CityOfferingsMap, { OfferingPin } from "@/components/CityOfferingsMap";
 import BottomNav from "@/components/BottomNav";
 import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
+import DetailSkeleton from "@/components/DetailSkeleton";
 
 type PostItem = (typeof latestPosts)[number];
 
@@ -112,16 +113,18 @@ const CityDetail = () => {
   const { cityId } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
-  const { data: dbTransport = [] } = useTransport();
-  const { data: dbAudioTours = [] } = useAudioTours();
-  const { data: dbExperiences = [] } = useExperiences();
-  const { data: dbTrips = [] } = useTrips();
-  const { data: dbAccommodations = [] } = useAccommodations();
-  const { data: dbProducts = [] } = useProducts();
-  const { data: dbWhosWho = [] } = useWhosWho();
-  const { data: dbPosts = [] } = usePosts();
+  const { data: dbTransport = [], isLoading: l1 } = useTransport();
+  const { data: dbAudioTours = [], isLoading: l2 } = useAudioTours();
+  const { data: dbExperiences = [], isLoading: l3 } = useExperiences();
+  const { data: dbTrips = [], isLoading: l4 } = useTrips();
+  const { data: dbAccommodations = [], isLoading: l5 } = useAccommodations();
+  const { data: dbProducts = [], isLoading: l6 } = useProducts();
+  const { data: dbWhosWho = [], isLoading: l7 } = useWhosWho();
+  const { data: dbPosts = [], isLoading: l8 } = usePosts();
+  const isLoading = l1 || l2 || l3 || l4 || l5 || l6 || l7 || l8;
 
   const city = cityData[cityId || ""];
+  if (isLoading) return <DetailSkeleton variant="city" />;
   if (!city) return <NotFoundView context="city" />;
 
   const dedupe = <T extends { id: string }>(arr: T[]) => {
