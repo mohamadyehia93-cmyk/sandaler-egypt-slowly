@@ -96,7 +96,7 @@ const AllAudioTours = () => {
           >
             {lang === "ar" ? "كل المناطق" : "All Regions"}
           </button>
-          {regions.map((r) => {
+          {(regions as any[]).map((r) => {
             const count = regionCounts[r.id] || 0;
             if (count === 0) return null;
             return (
@@ -107,7 +107,7 @@ const AllAudioTours = () => {
                   activeRegion === r.id ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
                 }`}
               >
-                {r.emoji} {t(r.nameKey)}
+                {r.emoji} {lang === "ar" ? r.name_ar : r.name_en}
                 <span className="opacity-60">({count})</span>
               </button>
             );
