@@ -216,7 +216,7 @@ const RegionDetail = () => {
 
         {/* Who's Who */}
         {regionPeople.length > 0 && (
-          <SectionHeader titleKey="section.whosWho" onSeeAll={() => {}}>
+          <SectionHeader titleKey="section.whosWho" onSeeAll={() => navigate("/people")}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {regionPeople.map((p) => (
                 <div key={p.id} onClick={() => navigate(`/person/${p.id}`)} className="min-w-[160px] max-w-[160px] rounded-lg shadow-card bg-card overflow-hidden cursor-pointer">
@@ -270,7 +270,7 @@ const RegionDetail = () => {
 
         {/* Audio Tours */}
         {regionAudioTours.length > 0 && (
-          <SectionHeader titleKey="section.audioTours" onSeeAll={() => {}}>
+          <SectionHeader titleKey="section.audioTours" onSeeAll={() => navigate("/audio-tours")}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {regionAudioTours.map((tour) => (
                 <div key={tour.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card">
