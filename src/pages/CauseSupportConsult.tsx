@@ -3,6 +3,7 @@ import { ArrowLeft, MessageCircle, Briefcase, Clock, Calendar, Send, CheckCircle
 import { useI18n } from "@/lib/i18n";
 import { causes } from "@/lib/sampleData";
 import { useState } from "react";
+import NotFoundView from "@/components/NotFound";
 
 const expertiseAreas = [
   { emoji: "💼", area: { en: "Business Strategy", ar: "استراتيجية الأعمال" }, desc: { en: "Help with fundraising, planning, and organizational growth", ar: "مساعدة في جمع التبرعات والتخطيط والنمو المؤسسي" } },
@@ -43,7 +44,7 @@ const CauseSupportConsult = () => {
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  if (!cause) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
+  if (!cause) return <NotFoundView context="cause" />;
 
   const toggleExpertise = (i: number) => {
     setSelectedExpertise((prev) => prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i]);

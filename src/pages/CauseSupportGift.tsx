@@ -3,6 +3,7 @@ import { ArrowLeft, Gift, Package, Heart, Star, ChevronRight, Check, Truck, MapP
 import { useI18n } from "@/lib/i18n";
 import { causes } from "@/lib/sampleData";
 import { useState } from "react";
+import NotFoundView from "@/components/NotFound";
 
 const giftPackages = [
   {
@@ -71,7 +72,7 @@ const CauseSupportGift = () => {
   const [notes, setNotes] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  if (!cause) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
+  if (!cause) return <NotFoundView context="cause" />;
 
   const pkg = selectedPkg !== null ? giftPackages[selectedPkg] : null;
 

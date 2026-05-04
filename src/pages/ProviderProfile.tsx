@@ -11,6 +11,7 @@ import {
   ArrowLeft, Share2, MapPin, Star, CheckCircle, MessageSquare,
   Heart, Globe, Clock, ChevronRight, Users
 } from "lucide-react";
+import NotFoundView from "@/components/NotFound";
 
 type ProviderRole =
   | "culture-actor" | "service-provider" | "accommodation-host"
@@ -133,7 +134,7 @@ const ProviderProfile = () => {
     );
   }
 
-  if (!provider) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
+  if (!provider) return <NotFoundView context="person" />;
 
   const name = lang === "ar" ? provider.name_ar : provider.name_en;
   const bio = lang === "ar" ? provider.bio_ar : provider.bio_en;

@@ -3,6 +3,7 @@ import { ArrowLeft, UserCheck, Calendar, MapPin, Clock, CheckCircle2, Users, Che
 import { useI18n } from "@/lib/i18n";
 import { causes } from "@/lib/sampleData";
 import { useState } from "react";
+import NotFoundView from "@/components/NotFound";
 
 const opportunities = [
   {
@@ -73,7 +74,7 @@ const CauseSupportVolunteer = () => {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  if (!cause) return <div className="p-8 text-center text-muted-foreground">Not found</div>;
+  if (!cause) return <NotFoundView context="cause" />;
 
   const opp = selectedOpp !== null ? opportunities[selectedOpp] : null;
 

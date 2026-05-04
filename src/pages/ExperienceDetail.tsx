@@ -7,6 +7,7 @@ import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import NotFoundView from "@/components/NotFound";
 
 /* ── static fallbacks ────────────────────────────────────────── */
 const fallbackTags = [
@@ -264,7 +265,7 @@ const ExperienceDetail = () => {
   }
 
   if (!exp) {
-    return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Experience not found</div>;
+    return <NotFoundView context="experience" />;
   }
 
   const photos = exp.images?.length ? exp.images : [exp.image || "/placeholder.svg"];

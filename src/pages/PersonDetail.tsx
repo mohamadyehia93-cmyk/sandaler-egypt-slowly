@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import { whosWho, regions, experiences } from "@/lib/sampleData";
 import BottomNav from "@/components/BottomNav";
 import FollowButton from "@/components/FollowButton";
+import NotFoundView from "@/components/NotFound";
 
 const PersonDetail = () => {
   const { id } = useParams();
@@ -11,7 +12,7 @@ const PersonDetail = () => {
   const { lang, t } = useI18n();
 
   const person = whosWho.find((p) => p.id === id);
-  if (!person) return <div className="p-8 text-center text-muted-foreground">Person not found</div>;
+  if (!person) return <NotFoundView context="person" />;
 
   const region = regions.find((r) => r.id === person.regionId);
   const relatedExperiences = experiences.filter(

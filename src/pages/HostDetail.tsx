@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Star, Home, Heart, MessageCircle, Share2, UserPlus, UserCheck, Shield, Calendar, Globe } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { hosts, accommodation, regions } from "@/lib/sampleData";
+import NotFoundView from "@/components/NotFound";
 
 const HostDetail = () => {
   const { id } = useParams();
@@ -11,7 +12,7 @@ const HostDetail = () => {
   const [following, setFollowing] = useState(false);
 
   const host = hosts.find((h) => h.id === id);
-  if (!host) return <div className="p-8 text-center text-muted-foreground">Host not found</div>;
+  if (!host) return <NotFoundView context="host" />;
 
   const region = regions.find((r) => r.id === host.regionId);
   const hostListings = accommodation.filter((a) => a.hostId === host.id);

@@ -3,12 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cityData, experiences, audioTours, accommodation, products, whosWho, causes, latestPosts, trips } from "@/lib/sampleData";
-import { useAudioTours } from "@/hooks/useListings";
-import { useTransport } from "@/hooks/useListings";
+import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
 import CityOfferingsMap, { OfferingPin } from "@/components/CityOfferingsMap";
 import BottomNav from "@/components/BottomNav";
+import SmartImage from "@/components/ui/SmartImage";
+import NotFoundView from "@/components/NotFound";
 
 type PostItem = (typeof latestPosts)[number];
 
@@ -112,28 +113,95 @@ const CityDetail = () => {
   const navigate = useNavigate();
   const { lang, t } = useI18n();
   const { data: dbTransport = [] } = useTransport();
+  const { data: dbAudioTours = [] } = useAudioTours();
+  const { data: dbExperiences = [] } = useExperiences();
+  const { data: dbTrips = [] } = useTrips();
+  const { data: dbAccommodations = [] } = useAccommodations();
+  const { data: dbProducts = [] } = useProducts();
+  const { data: dbWhosWho = [] } = useWhosWho();
+  const { data: dbPosts = [] } = usePosts();
 
   const city = cityData[cityId || ""];
-  if (!city) return <div className="p-8 text-center text-muted-foreground">City not found</div>;
+  if (!city) return <NotFoundView context="city" />;
 
-  const cityExperiences = experiences.filter((e) => e.cityId === cityId);
-  const { data: dbAudioTours = [] } = useAudioTours();
-  const cityAudioTours = (dbAudioTours as any[])
-    .filter((a) => a.city_id === cityId)
-    .map((a) => ({
-      id: a.slug || a.id,
+  const dedupe = <T extends { id: string }>(arr: T[]) => {
+    const seen = new Set<string>();
+    return arr.filter((x) => (seen.has(x.id) ? false : (seen.add(x.id), true)));
+  };
+
+  // Map DB rows to sample-data shape and merge with sample fallback
+  const cityExperiences = dedupe([
+    ...(dbExperiences as any[]).filter((e) => e.city_id === cityId).map((e) => ({
+      id: e.slug || e.id, slug: e.slug,
+      title: { en: e.title_en, ar: e.title_ar },
+      image: e.image, price: e.price ?? 0, rating: e.rating ?? 0,
+      cityId: e.city_id, regionId: e.region_id,
+    })),
+    ...experiences.filter((e) => e.cityId === cityId),
+  ]);
+  const cityAudioTours = dedupe(
+    (dbAudioTours as any[]).filter((a) => a.city_id === cityId).map((a) => ({
+      id: a.slug || a.id, slug: a.slug,
       title: { en: a.title_en, ar: a.title_ar },
-      image: a.image,
-      price: a.price ?? 0,
-      slug: a.slug,
-    }));
-  const cityAccommodation = accommodation.filter((a) => a.cityId === cityId);
-  const cityProducts = products.filter((p) => p.cityId === cityId);
-  const cityPeople = whosWho.filter((w) => w.cityId === cityId);
+      image: a.image, price: a.price ?? 0,
+    }))
+  );
+  const cityAccommodation = dedupe([
+    ...(dbAccommodations as any[]).filter((a) => a.city_id === cityId).map((a) => ({
+      id: a.slug || a.id, slug: a.slug,
+      title: { en: a.name_en, ar: a.name_ar },
+      type: { en: a.accommodation_type || "Stay", ar: a.accommodation_type || "إقامة" },
+      location: { en: a.host_name_en || "", ar: a.host_name_ar || "" },
+      image: a.image, price: a.price_per_night ?? 0, rating: a.rating ?? 0,
+      cityId: a.city_id,
+    })),
+    ...accommodation.filter((a) => a.cityId === cityId),
+  ]);
+  const cityProducts = dedupe([
+    ...(dbProducts as any[]).filter((p) => p.city_id === cityId).map((p) => ({
+      id: p.slug || p.id, slug: p.slug,
+      title: { en: p.name_en, ar: p.name_ar },
+      village: { en: p.seller_village_en || "", ar: p.seller_village_ar || "" },
+      badge: { en: (p.badges?.[0]) || "", ar: (p.badges?.[0]) || "" },
+      image: p.image, price: p.price ?? 0,
+      cityId: p.city_id,
+    })),
+    ...products.filter((p) => p.cityId === cityId),
+  ]);
+  const cityPeople = dedupe([
+    ...(dbWhosWho as any[]).filter((w) => w.city_id === cityId).map((w) => ({
+      id: w.slug || w.id, slug: w.slug,
+      name: { en: w.name_en, ar: w.name_ar },
+      role: { en: w.role_en || "", ar: w.role_ar || "" },
+      bio: { en: w.bio_en || "", ar: w.bio_ar || "" },
+      image: w.image, cityId: w.city_id,
+    })),
+    ...whosWho.filter((w) => w.cityId === cityId),
+  ]);
   const cityCauses = causes.filter((c) => c.cityId === cityId);
-  const cityPosts = latestPosts.filter((p) => (p as any).cityId === cityId);
+  const cityPosts = dedupe([
+    ...(dbPosts as any[]).filter((p) => p.city_id === cityId).map((p) => ({
+      id: p.slug || p.id, slug: p.slug,
+      title: { en: p.title_en, ar: p.title_ar },
+      category: { en: p.category || "Article", ar: p.category || "مقال" },
+      author: { en: p.author_name_en || "", ar: p.author_name_ar || "" },
+      image: p.image, readTime: p.read_time_minutes ?? 5,
+      cityId: p.city_id, regionId: p.region_id,
+    })) as any[],
+    ...latestPosts.filter((p) => (p as any).cityId === cityId),
+  ]);
   const cityTransport = dbTransport.filter((tr) => tr.city_id === cityId);
-  const cityTrips = trips.filter((tr) => tr.cityId === cityId);
+  const cityTrips = dedupe([
+    ...(dbTrips as any[]).filter((tr) => tr.city_id === cityId).map((tr) => ({
+      id: tr.slug || tr.id, slug: tr.slug,
+      title: { en: tr.title_en, ar: tr.title_ar },
+      route: { en: tr.route_en || "", ar: tr.route_ar || "" },
+      image: tr.image, price: tr.price ?? 0, date: tr.date || "",
+      cityId: tr.city_id,
+    })),
+    ...trips.filter((tr) => tr.cityId === cityId),
+  ]);
+
 
   return (
     <div className="min-h-screen bg-surface pb-20">
@@ -147,8 +215,8 @@ const CityDetail = () => {
 
       {/* Hero Image */}
       <div className="relative h-48 mx-4 mt-2 rounded-xl overflow-hidden">
-        <img src={city.image} alt={city.name[lang]} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <SmartImage src={city.image} alt={city.name[lang]} loading="eager" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
         <div className="absolute bottom-3 left-4 right-4">
           <h2 className="text-xl font-bold text-white mb-1">{city.name[lang]}</h2>
           <div className="flex items-center gap-2 text-white/80 text-xs">
