@@ -403,6 +403,53 @@ const CityDetail = () => {
         {cityCauses.length > 0 && (
           <CausesSection regionId={city.regionId} cityFilter={cityId || ""} />
         )}
+
+        {/* Map of Offerings */}
+        {(() => {
+          const pins: OfferingPin[] = [
+            ...cityExperiences.map((e) => ({
+              id: e.id, slug: (e as any).slug, category: "experience" as const,
+              title: e.title,
+            })),
+            ...cityAccommodation.map((a) => ({
+              id: a.id, slug: (a as any).slug, category: "accommodation" as const,
+              title: a.title,
+            })),
+            ...cityProducts.map((p) => ({
+              id: p.id, slug: (p as any).slug, category: "product" as const,
+              title: p.title, subtitle: p.village,
+            })),
+            ...cityAudioTours.map((a) => ({
+              id: a.id, slug: (a as any).slug, category: "audio" as const,
+              title: a.title,
+            })),
+            ...cityTrips.map((t) => ({
+              id: t.id, slug: (t as any).slug, category: "trip" as const,
+              title: t.title,
+            })),
+            ...cityPeople.map((p) => ({
+              id: p.id, slug: (p as any).slug, category: "person" as const,
+              title: p.name, subtitle: p.expertise,
+            })),
+            ...cityCauses.map((c) => ({
+              id: c.id, slug: (c as any).slug, category: "cause" as const,
+              title: c.title,
+            })),
+          ];
+          if (pins.length === 0) return null;
+          return (
+            <div className="space-y-3">
+              <div className="px-4 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-primary" />
+                <h3 className="text-base font-bold text-foreground">
+                  {lang === "ar" ? `خريطة ${city.name.ar}` : `Map of ${city.name.en}`}
+                </h3>
+                <span className="text-xs text-muted-foreground">({pins.length})</span>
+              </div>
+              <CityOfferingsMap cityId={cityId || ""} cityName={city.name} offerings={pins} />
+            </div>
+          );
+        })()}
       </div>
 
       <BottomNav />
