@@ -109,6 +109,20 @@ export type OfferingPin = {
   category: Category;
   title: { en: string; ar: string };
   subtitle?: { en: string; ar: string };
+  /** Real GPS coordinates if known. When null/undefined, a deterministic scatter near the city center is used. */
+  lat?: number | null;
+  lng?: number | null;
+};
+
+const resolvePos = (
+  o: OfferingPin,
+  center: [number, number]
+): { pos: [number, number]; precise: boolean } => {
+  if (typeof o.lat === "number" && typeof o.lng === "number" && !Number.isNaN(o.lat) && !Number.isNaN(o.lng)) {
+    return { pos: [o.lat, o.lng], precise: true };
+  }
+  const [dLat, dLng] = hashOffset(`${o.category}-${o.id}`);
+  return { pos: [center[0] + dLat, center[1] + dLng], precise: false };
 };
 
 const FitBounds = ({ points }: { points: [number, number][] }) => {
