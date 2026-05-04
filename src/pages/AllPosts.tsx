@@ -33,11 +33,11 @@ const AllPosts = () => {
   const [search, setSearch] = useState("");
 
   const themes = useMemo(() => {
-    const map = new Map<string, { en: string; ar: string }>();
+    const seen: Record<string, { en: string; ar: string }> = {};
     latestPosts.forEach((p: any) => {
-      if (p.category?.en && !map.has(p.category.en)) map.set(p.category.en, p.category);
+      if (p.category?.en && !seen[p.category.en]) seen[p.category.en] = p.category;
     });
-    return Array.from(map.values());
+    return Object.values(seen);
   }, []);
 
   const filteredPosts = useMemo(
