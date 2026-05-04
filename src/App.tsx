@@ -19,6 +19,7 @@ import Inbox from "./pages/Inbox.tsx";
 import Profile from "./pages/Profile.tsx";
 import RegionDetail from "./pages/RegionDetail.tsx";
 import CityDetail from "./pages/CityDetail.tsx";
+import HighlightDetail from "./pages/HighlightDetail.tsx";
 import PersonDetail from "./pages/PersonDetail.tsx";
 import PostDetail from "./pages/PostDetail.tsx";
 import CultureActorDetail from "./pages/CultureActorDetail.tsx";
@@ -111,6 +112,7 @@ const App = () => (
             <Route path="/region/:regionId" element={<RegionDetail />} />
             <Route path="/person/:id" element={<PersonDetail />} />
             <Route path="/city/:cityId" element={<CityDetail />} />
+            <Route path="/city/:cityId/highlight/:highlightSlug" element={<HighlightDetail />} />
             <Route path="/posts" element={<AllPosts />} />
             <Route path="/post/:id" element={<PostDetail />} />
             <Route path="/culture-actor/:id" element={<CultureActorDetail />} />
