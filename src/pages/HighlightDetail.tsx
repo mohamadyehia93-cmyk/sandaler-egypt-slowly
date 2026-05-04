@@ -118,16 +118,7 @@ const HighlightDetail = () => {
   }, [city, highlightSlug]);
 
   if (!city || !match) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-8 text-center">
-        <div>
-          <p className="text-muted-foreground mb-3">{lang === "ar" ? "المعلم غير موجود" : "Highlight not found"}</p>
-          <button onClick={() => navigate(-1)} className="text-primary text-sm font-medium">
-            {lang === "ar" ? "رجوع" : "Go back"}
-          </button>
-        </div>
-      </div>
-    );
+    return <NotFoundView context="highlight" />;
   }
 
   const seedKey = slugify(match.en);
