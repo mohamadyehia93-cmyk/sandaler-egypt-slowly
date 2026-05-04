@@ -29,17 +29,27 @@ const AllPosts = () => {
   const { lang, t } = useI18n();
   const navigate = useNavigate();
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  const [activeTheme, setActiveTheme] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+
+  const themes = useMemo(() => {
+    const map = new Map<string, { en: string; ar: string }>();
+    latestPosts.forEach((p: any) => {
+      if (p.category?.en && !map.has(p.category.en)) map.set(p.category.en, p.category);
+    });
+    return Array.from(map.values());
+  }, []);
 
   const filteredPosts = useMemo(
     () =>
       latestPosts.filter((p: any) => {
         if (activeRegion && p.regionId !== activeRegion) return false;
+        if (activeTheme && p.category?.en !== activeTheme) return false;
         if (!search.trim()) return true;
         const q = search.toLowerCase();
         return p.title.en.toLowerCase().includes(q) || p.title.ar.includes(q);
       }),
-    [search, activeRegion]
+    [search, activeRegion, activeTheme]
   );
 
   const regionCounts = useMemo(() => {
