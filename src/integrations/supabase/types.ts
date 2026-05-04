@@ -1119,6 +1119,7 @@ export type Database = {
           body_en: string | null
           category: string | null
           city_id: string | null
+          content_type: string | null
           created_at: string
           excerpt_ar: string | null
           excerpt_en: string | null
@@ -1144,6 +1145,7 @@ export type Database = {
           body_en?: string | null
           category?: string | null
           city_id?: string | null
+          content_type?: string | null
           created_at?: string
           excerpt_ar?: string | null
           excerpt_en?: string | null
@@ -1169,6 +1171,7 @@ export type Database = {
           body_en?: string | null
           category?: string | null
           city_id?: string | null
+          content_type?: string | null
           created_at?: string
           excerpt_ar?: string | null
           excerpt_en?: string | null
