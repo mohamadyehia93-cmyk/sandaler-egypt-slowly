@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned, Compass, BookOpen, Palette, Mountain } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { regions, regionCities, experiences, latestPosts, whosWho, audioTours, causes, cityData } from "@/lib/sampleData";
-import { useAudioTours } from "@/hooks/useListings";
+import { useAudioTours, useExperiences, useWhosWho, usePosts } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
 import RegionMap from "@/components/RegionMap";
@@ -114,10 +114,50 @@ const RegionDetail = () => {
   const cityFilter = <T extends { cityId?: string }>(items: T[]) =>
     selectedCity === "all" ? items : items.filter((i) => i.cityId === selectedCity);
 
-  const regionExperiences = cityFilter(experiences.filter((e) => e.regionId === regionId));
-  const regionPosts = latestPosts.filter((p) => p.regionId === regionId);
-  const regionPeople = cityFilter(whosWho.filter((w) => w.regionId === regionId));
   const { data: dbAudioTours = [] } = useAudioTours();
+  const { data: dbExperiences = [] } = useExperiences();
+  const { data: dbWhosWho = [] } = useWhosWho();
+  const { data: dbPosts = [] } = usePosts();
+
+  const dedupe = <T extends { id: string }>(arr: T[]) => {
+    const seen = new Set<string>();
+    return arr.filter((x) => (seen.has(x.id) ? false : (seen.add(x.id), true)));
+  };
+
+  const regionExperiences = cityFilter(
+    dedupe([
+      ...(dbExperiences as any[]).filter((e) => e.region_id === regionId).map((e) => ({
+        id: e.slug || e.id, slug: e.slug,
+        title: { en: e.title_en, ar: e.title_ar },
+        image: e.image, price: e.price ?? 0, rating: e.rating ?? 0,
+        cityId: e.city_id, regionId: e.region_id,
+      })),
+      ...experiences.filter((e) => e.regionId === regionId),
+    ])
+  );
+  const regionPosts = dedupe([
+    ...(dbPosts as any[]).filter((p) => p.region_id === regionId).map((p) => ({
+      id: p.slug || p.id, slug: p.slug,
+      title: { en: p.title_en, ar: p.title_ar },
+      category: { en: p.category || "Article", ar: p.category || "مقال" },
+      author: { en: p.author_name_en || "", ar: p.author_name_ar || "" },
+      image: p.image, readTime: p.read_time_minutes ?? 5,
+      cityId: p.city_id, regionId: p.region_id,
+    })) as any[],
+    ...latestPosts.filter((p) => p.regionId === regionId),
+  ]);
+  const regionPeople = cityFilter(
+    dedupe([
+      ...(dbWhosWho as any[]).filter((w) => w.region_id === regionId).map((w) => ({
+        id: w.slug || w.id, slug: w.slug,
+        name: { en: w.name_en, ar: w.name_ar },
+        role: { en: w.role_en || "", ar: w.role_ar || "" },
+        bio: { en: w.bio_en || "", ar: w.bio_ar || "" },
+        image: w.image, cityId: w.city_id, regionId: w.region_id,
+      })),
+      ...whosWho.filter((w) => w.regionId === regionId),
+    ])
+  );
   const regionAudioTours = cityFilter(
     (dbAudioTours as any[])
       .filter((a) => a.region_id === regionId)
