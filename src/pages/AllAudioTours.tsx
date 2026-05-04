@@ -18,7 +18,7 @@ const THEME_META: Record<ThemeKey, { en: string; ar: string; emoji: string }> = 
 const THEME_ORDER: ThemeKey[] = ["history", "culture", "nature", "coast"];
 
 const classifyTour = (t: any): ThemeKey => {
-  const txt = `${t.title?.en ?? ""} ${t.title?.ar ?? ""}`.toLowerCase();
+  const txt = `${t.title_en ?? ""} ${t.title_ar ?? ""}`.toLowerCase();
   if (/(temple|tomb|pharaoh|oracle|akhenaten|edfu|luxor|aswan|nubian|hathor|christianity|fortress|ancient|gateway|resistance)/.test(txt)) return "history";
   if (/(birds|whales|reef|blue hole|oasis|nature|palm|wildlife|lake)/.test(txt)) return "nature";
   if (/(sea|port|beach|red sea|gulf|hurghada|matrouh|marsa|dahab|quseir|coast)/.test(txt)) return "coast";
@@ -30,16 +30,18 @@ const AllAudioTours = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  const { data: audioTours = [], isLoading } = useAudioTours();
+  const { data: regions = [] } = useRegions();
 
   const filtered = useMemo(
     () =>
-      audioTours.filter((a) => {
-        if (activeRegion && a.regionId !== activeRegion) return false;
+      (audioTours as any[]).filter((a) => {
+        if (activeRegion && a.region_id !== activeRegion) return false;
         if (!search.trim()) return true;
         const q = search.toLowerCase();
-        return a.title.en.toLowerCase().includes(q) || a.title.ar.includes(q);
+        return (a.title_en ?? "").toLowerCase().includes(q) || (a.title_ar ?? "").includes(q);
       }),
-    [search, activeRegion]
+    [search, activeRegion, audioTours]
   );
 
   const grouped = useMemo(() => {
@@ -50,11 +52,11 @@ const AllAudioTours = () => {
 
   const regionCounts = useMemo(() => {
     const c: Record<string, number> = {};
-    audioTours.forEach((a) => {
-      c[a.regionId] = (c[a.regionId] || 0) + 1;
+    (audioTours as any[]).forEach((a) => {
+      if (a.region_id) c[a.region_id] = (c[a.region_id] || 0) + 1;
     });
     return c;
-  }, []);
+  }, [audioTours]);
 
   return (
     <div className="min-h-screen bg-surface pb-8">
