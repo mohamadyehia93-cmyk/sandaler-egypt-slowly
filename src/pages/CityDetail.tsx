@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cityData, experiences, audioTours, accommodation, products, whosWho, causes, latestPosts, trips } from "@/lib/sampleData";
+import { useAudioTours } from "@/hooks/useListings";
 import { useTransport } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
@@ -116,7 +117,16 @@ const CityDetail = () => {
   if (!city) return <div className="p-8 text-center text-muted-foreground">City not found</div>;
 
   const cityExperiences = experiences.filter((e) => e.cityId === cityId);
-  const cityAudioTours = audioTours.filter((a) => a.cityId === cityId);
+  const { data: dbAudioTours = [] } = useAudioTours();
+  const cityAudioTours = (dbAudioTours as any[])
+    .filter((a) => a.city_id === cityId)
+    .map((a) => ({
+      id: a.slug || a.id,
+      title: { en: a.title_en, ar: a.title_ar },
+      image: a.image,
+      price: a.price ?? 0,
+      slug: a.slug,
+    }));
   const cityAccommodation = accommodation.filter((a) => a.cityId === cityId);
   const cityProducts = products.filter((p) => p.cityId === cityId);
   const cityPeople = whosWho.filter((w) => w.cityId === cityId);
