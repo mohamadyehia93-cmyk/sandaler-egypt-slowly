@@ -293,18 +293,12 @@ const ExperienceDetail = () => {
         </div>
       </div>
 
-      {/* ── 2. PHOTO GRID ──────────────────────────────────────── */}
-      <div className="grid grid-cols-[1fr_1fr] gap-0.5 h-[220px] relative">
-        <img src={photos[0]} alt={title} className="w-full h-[220px] object-cover" />
-        <div className="grid grid-rows-2 gap-0.5">
-          <img src={photos[1] || photos[0]} alt="" className="w-full h-full object-cover" />
-          <div className="relative">
-            <img src={photos[2] || photos[0]} alt="" className="w-full h-full object-cover" />
-            {photos.length > 3 && (
-              <span className="absolute bottom-1.5 right-1.5 bg-black/55 text-primary-foreground text-[11px] px-2 py-0.5 rounded-md">+{photos.length - 3} photos</span>
-            )}
-          </div>
-        </div>
+      {/* ── 2. HERO PHOTO ──────────────────────────────────────── */}
+      <div className="relative h-[260px]">
+        <img src={photos[0]} alt={title} className="w-full h-full object-cover" />
+        {photos.length > 1 && (
+          <span className="absolute bottom-2.5 right-2.5 bg-black/55 text-primary-foreground text-[11px] px-2 py-0.5 rounded-md">+{photos.length - 1} photos</span>
+        )}
         {exp.verified && (
           <span className="absolute top-2.5 left-2.5 bg-secondary border border-primary/40 text-primary-dark text-[9px] font-medium px-2 py-0.5 rounded-full">✓ Ambassador verified</span>
         )}
