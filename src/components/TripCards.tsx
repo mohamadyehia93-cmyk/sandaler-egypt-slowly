@@ -61,7 +61,7 @@ const TripCards = () => {
       </div>
 
       {/* Filter dropdowns row */}
-      <div className="flex gap-2 px-4 mb-3 flex-wrap">
+      <div className="flex gap-2 px-4 mb-3 overflow-x-auto hide-scrollbar">
         {/* Region dropdown */}
         <div className="relative">
           <button
