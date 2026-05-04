@@ -8,6 +8,7 @@ import { causes, regions } from "@/lib/sampleData";
 import ProviderStatusView from "@/components/ProviderStatusView";
 import DailyStatusCard from "@/components/DailyStatusCard";
 import { useAuth } from "@/hooks/useAuth";
+import NotFoundView from "@/components/NotFound";
 import { toast } from "@/hooks/use-toast";
 import {
   useIsFollowing,
@@ -21,7 +22,8 @@ const OrganizationDetail = () => {
   const { lang, t } = useI18n();
   const { user } = useAuth();
 
-  const cause = causes.find((c) => c.id === id) || causes[0];
+  const cause = causes.find((c) => c.id === id);
+  if (!cause) return <NotFoundView context="organization" />;
   const region = regions.find((r) => r.id === cause.regionId);
   const org = cause.org;
 
