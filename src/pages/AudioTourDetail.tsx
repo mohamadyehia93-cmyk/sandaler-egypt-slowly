@@ -51,6 +51,20 @@ const AudioTourDetail = () => {
     enabled: !!id,
   });
 
+  const narratorActorId = (tour as any)?.narrator_culture_actor_id as string | null | undefined;
+  const { data: narratorActor } = useQuery({
+    queryKey: ["audio_tour_narrator_actor", narratorActorId],
+    enabled: !!narratorActorId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("culture_actors")
+        .select("id, slug, name_en, name_ar, title_en, title_ar, image, expertise_en, expertise_ar")
+        .eq("id", narratorActorId!)
+        .maybeSingle();
+      return data;
+    },
+  });
+
   const dbStops = (tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string }> | undefined) || [];
   const stopsCount = dbStops.length || tour?.stops_count || 5;
   const mapStops = dbStops.map((s) => ({
