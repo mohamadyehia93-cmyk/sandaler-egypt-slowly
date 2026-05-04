@@ -199,6 +199,37 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
 
   return (
     <div className="space-y-3">
+      {/* Search bar */}
+      <div className="px-4">
+        <div className="relative">
+          <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={lang === "ar" ? "ابحث في الخريطة..." : "Search the map..."}
+            className="w-full bg-card border border-border rounded-full text-sm py-2 pl-9 pr-9 placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+            aria-label={lang === "ar" ? "ابحث في الخريطة" : "Search the map"}
+          />
+          {query && (
+            <button
+              onClick={() => setQuery("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-secondary"
+              aria-label={lang === "ar" ? "مسح" : "Clear"}
+            >
+              <X className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          )}
+        </div>
+        {(query || visible.length !== offerings.length) && (
+          <p className="text-[11px] text-muted-foreground mt-1.5 px-1">
+            {lang === "ar"
+              ? `${visible.length} نتيجة من ${offerings.length}`
+              : `${visible.length} of ${offerings.length} results`}
+          </p>
+        )}
+      </div>
+
       {/* Filter chips */}
       <div className="flex gap-2 px-4 overflow-x-auto hide-scrollbar">
         {presentCategories.map((c) => {
