@@ -90,49 +90,140 @@ const AllPosts = () => {
           </div>
         </div>
 
-        {/* Region filter dropdown */}
-        <div className="px-4 pb-3 flex gap-2">
-          <select
-            value={activeRegion ?? ""}
-            onChange={(e) => setActiveRegion(e.target.value || null)}
-            className="w-auto px-4 py-2 rounded-full bg-primary text-primary-foreground border border-primary text-xs font-semibold outline-none cursor-pointer appearance-none bg-no-repeat bg-[right_0.75rem_center] pe-8"
-            style={{
-              backgroundImage:
-                "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")",
-            }}
-          >
-            <option value="" className="bg-card text-foreground">
-              {lang === "ar" ? "كل المناطق" : "All Regions"}
-            </option>
-            {regions.map((r) => {
-              const count = regionCounts[r.id] || 0;
-              if (count === 0) return null;
-              return (
-                <option key={r.id} value={r.id} className="bg-card text-foreground">
-                  {r.emoji} {t(r.nameKey)}
-                </option>
-              );
-            })}
-          </select>
+        {/* Filters trigger + active chips */}
+        <div className="px-4 pb-3 flex items-center gap-2 flex-wrap">
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                {lang === "ar" ? "تصفية" : "Filters"}
+                {(activeRegion || activeTheme) && (
+                  <span className="ms-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-primary-foreground text-primary text-[10px] font-bold">
+                    {(activeRegion ? 1 : 0) + (activeTheme ? 1 : 0)}
+                  </span>
+                )}
+              </button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle className="text-start">
+                  {lang === "ar" ? "تصفية المنشورات" : "Filter Posts"}
+                </SheetTitle>
+              </SheetHeader>
 
-          <select
-            value={activeTheme ?? ""}
-            onChange={(e) => setActiveTheme(e.target.value || null)}
-            className="w-auto px-4 py-2 rounded-full bg-card text-foreground border border-border text-xs font-semibold outline-none cursor-pointer appearance-none bg-no-repeat bg-[right_0.75rem_center] pe-8"
-            style={{
-              backgroundImage:
-                "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='hsl(var(--foreground))' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")",
-            }}
-          >
-            <option value="" className="bg-card text-foreground">
-              {lang === "ar" ? "كل المواضيع" : "All Themes"}
-            </option>
-            {themes.map((th) => (
-              <option key={th.en} value={th.en} className="bg-card text-foreground">
-                {th[lang]}
-              </option>
-            ))}
-          </select>
+              <div className="mt-4 space-y-6">
+                {/* Region group */}
+                <div>
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase mb-2">
+                    {lang === "ar" ? "المنطقة" : "Region"}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setActiveRegion(null)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${
+                        !activeRegion
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-card text-foreground border-border"
+                      }`}
+                    >
+                      {lang === "ar" ? "الكل" : "All"}
+                    </button>
+                    {regions.map((r) => {
+                      const count = regionCounts[r.id] || 0;
+                      if (count === 0) return null;
+                      const active = activeRegion === r.id;
+                      return (
+                        <button
+                          key={r.id}
+                          onClick={() => setActiveRegion(r.id)}
+                          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border ${
+                            active
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "bg-card text-foreground border-border"
+                          }`}
+                        >
+                          <span>{r.emoji}</span>
+                          <span>{t(r.nameKey)}</span>
+                          {active && <Check className="w-3 h-3" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Theme group */}
+                <div>
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase mb-2">
+                    {lang === "ar" ? "الموضوع" : "Theme"}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setActiveTheme(null)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${
+                        !activeTheme
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-card text-foreground border-border"
+                      }`}
+                    >
+                      {lang === "ar" ? "الكل" : "All"}
+                    </button>
+                    {themes.map((th) => {
+                      const active = activeTheme === th.en;
+                      return (
+                        <button
+                          key={th.en}
+                          onClick={() => setActiveTheme(th.en)}
+                          className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border ${
+                            active
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : "bg-card text-foreground border-border"
+                          }`}
+                        >
+                          <span>{th[lang]}</span>
+                          {active && <Check className="w-3 h-3" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <SheetFooter className="mt-6 flex-row gap-2 sm:flex-row">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    setActiveRegion(null);
+                    setActiveTheme(null);
+                  }}
+                >
+                  {lang === "ar" ? "مسح الكل" : "Clear all"}
+                </Button>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+
+          {activeRegion && (
+            <button
+              onClick={() => setActiveRegion(null)}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary text-foreground text-xs font-semibold"
+            >
+              {(() => {
+                const r = regions.find((x) => x.id === activeRegion);
+                return r ? `${r.emoji} ${t(r.nameKey)}` : "";
+              })()}
+              <XIcon className="w-3 h-3" />
+            </button>
+          )}
+          {activeTheme && (
+            <button
+              onClick={() => setActiveTheme(null)}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary text-foreground text-xs font-semibold"
+            >
+              {themes.find((th) => th.en === activeTheme)?.[lang]}
+              <XIcon className="w-3 h-3" />
+            </button>
+          )}
         </div>
       </header>
 
