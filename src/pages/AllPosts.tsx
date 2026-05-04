@@ -1,9 +1,10 @@
 import { ArrowLeft, Bookmark, Mic, Film, Camera, MessageSquare, ChefHat, ClipboardList, Map, FileText, Search, SlidersHorizontal, X as XIcon, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { latestPosts, regions } from "@/lib/sampleData";
+import { usePosts, useRegions } from "@/hooks/useListings";
 import { contentTypeConfig } from "@/components/LatestPosts";
 import CityBadge from "@/components/CityBadge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useMemo } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ type ContentSection = {
 };
 
 const sections: ContentSection[] = [
-  { id: "articles", label: { en: "Articles", ar: "مقالات" }, icon: FileText, color: "bg-primary", filter: (p) => !p.contentType },
+  { id: "articles", label: { en: "Articles", ar: "مقالات" }, icon: FileText, color: "bg-primary", filter: (p) => !p.contentType || p.contentType === "article" },
   { id: "podcast", label: { en: "Podcasts", ar: "بودكاست" }, icon: Mic, color: "bg-purple-500", filter: (p) => p.contentType === "podcast" },
   { id: "documentary", label: { en: "Documentaries", ar: "وثائقيات" }, icon: Film, color: "bg-rose-500", filter: (p) => p.contentType === "documentary" },
   { id: "photo-series", label: { en: "Photo Series", ar: "سلسلة صور" }, icon: Camera, color: "bg-sky-500", filter: (p) => p.contentType === "photo-series" },
@@ -28,39 +29,58 @@ const sections: ContentSection[] = [
 ];
 
 const AllPosts = () => {
-  const { lang, t } = useI18n();
+  const { lang } = useI18n();
   const navigate = useNavigate();
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [activeTheme, setActiveTheme] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const { data: dbPosts = [], isLoading } = usePosts();
+  const { data: regions = [] } = useRegions();
+
+  // Normalize DB posts into the shape this page expects
+  const posts = useMemo(
+    () =>
+      (dbPosts as any[]).map((p) => ({
+        id: p.slug || p.id,
+        title: { en: p.title_en, ar: p.title_ar },
+        image: p.image,
+        regionId: p.region_id,
+        cityId: p.city_id,
+        category: { en: p.category ?? "General", ar: p.category ?? "عام" },
+        author: { en: p.author_name_en ?? "", ar: p.author_name_ar ?? "" },
+        readTime: p.read_time_minutes ?? 5,
+        contentType: (p as any).content_type ?? null,
+      })),
+    [dbPosts]
+  );
 
   const themes = useMemo(() => {
     const seen: Record<string, { en: string; ar: string }> = {};
-    latestPosts.forEach((p: any) => {
+    posts.forEach((p) => {
       if (p.category?.en && !seen[p.category.en]) seen[p.category.en] = p.category;
     });
     return Object.values(seen);
-  }, []);
+  }, [posts]);
 
   const filteredPosts = useMemo(
     () =>
-      latestPosts.filter((p: any) => {
+      posts.filter((p) => {
         if (activeRegion && p.regionId !== activeRegion) return false;
         if (activeTheme && p.category?.en !== activeTheme) return false;
         if (!search.trim()) return true;
         const q = search.toLowerCase();
-        return p.title.en.toLowerCase().includes(q) || p.title.ar.includes(q);
+        return (p.title.en ?? "").toLowerCase().includes(q) || (p.title.ar ?? "").includes(q);
       }),
-    [search, activeRegion, activeTheme]
+    [search, activeRegion, activeTheme, posts]
   );
 
   const regionCounts = useMemo(() => {
     const c: Record<string, number> = {};
-    latestPosts.forEach((p: any) => {
+    posts.forEach((p) => {
       if (p.regionId) c[p.regionId] = (c[p.regionId] || 0) + 1;
     });
     return c;
-  }, []);
+  }, [posts]);
 
   return (
     <div className="min-h-screen bg-surface pb-8">
@@ -90,7 +110,7 @@ const AllPosts = () => {
           </div>
         </div>
 
-        {/* Filters trigger + active chips */}
+        {/* Filters */}
         <div className="px-4 pb-3 flex items-center gap-2 flex-wrap">
           <Sheet>
             <SheetTrigger asChild>
@@ -112,7 +132,6 @@ const AllPosts = () => {
               </SheetHeader>
 
               <div className="mt-4 space-y-6">
-                {/* Region group */}
                 <div>
                   <h3 className="text-xs font-bold text-muted-foreground uppercase mb-2">
                     {lang === "ar" ? "المنطقة" : "Region"}
@@ -121,14 +140,12 @@ const AllPosts = () => {
                     <button
                       onClick={() => setActiveRegion(null)}
                       className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${
-                        !activeRegion
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-card text-foreground border-border"
+                        !activeRegion ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
                       }`}
                     >
                       {lang === "ar" ? "الكل" : "All"}
                     </button>
-                    {regions.map((r) => {
+                    {(regions as any[]).map((r) => {
                       const count = regionCounts[r.id] || 0;
                       if (count === 0) return null;
                       const active = activeRegion === r.id;
@@ -137,13 +154,11 @@ const AllPosts = () => {
                           key={r.id}
                           onClick={() => setActiveRegion(r.id)}
                           className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border ${
-                            active
-                              ? "bg-primary text-primary-foreground border-primary"
-                              : "bg-card text-foreground border-border"
+                            active ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
                           }`}
                         >
                           <span>{r.emoji}</span>
-                          <span>{t(r.nameKey)}</span>
+                          <span>{lang === "ar" ? r.name_ar : r.name_en}</span>
                           {active && <Check className="w-3 h-3" />}
                         </button>
                       );
@@ -151,7 +166,6 @@ const AllPosts = () => {
                   </div>
                 </div>
 
-                {/* Theme group */}
                 <div>
                   <h3 className="text-xs font-bold text-muted-foreground uppercase mb-2">
                     {lang === "ar" ? "الموضوع" : "Theme"}
@@ -160,9 +174,7 @@ const AllPosts = () => {
                     <button
                       onClick={() => setActiveTheme(null)}
                       className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${
-                        !activeTheme
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-card text-foreground border-border"
+                        !activeTheme ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
                       }`}
                     >
                       {lang === "ar" ? "الكل" : "All"}
@@ -174,9 +186,7 @@ const AllPosts = () => {
                           key={th.en}
                           onClick={() => setActiveTheme(th.en)}
                           className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border ${
-                            active
-                              ? "bg-primary text-primary-foreground border-primary"
-                              : "bg-card text-foreground border-border"
+                            active ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
                           }`}
                         >
                           <span>{th[lang]}</span>
@@ -209,8 +219,8 @@ const AllPosts = () => {
               className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary text-foreground text-xs font-semibold"
             >
               {(() => {
-                const r = regions.find((x) => x.id === activeRegion);
-                return r ? `${r.emoji} ${t(r.nameKey)}` : "";
+                const r = (regions as any[]).find((x) => x.id === activeRegion);
+                return r ? `${r.emoji} ${lang === "ar" ? r.name_ar : r.name_en}` : "";
               })()}
               <XIcon className="w-3 h-3" />
             </button>
@@ -228,72 +238,80 @@ const AllPosts = () => {
       </header>
 
       <div className="pt-4">
-        {sections.map((section) => {
-          const posts = filteredPosts.filter(section.filter);
-          if (posts.length === 0) return null;
-          const SIcon = section.icon;
+        {isLoading ? (
+          <div className="px-4 space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-32 w-full rounded-lg" />
+            ))}
+          </div>
+        ) : (
+          sections.map((section) => {
+            const sPosts = filteredPosts.filter(section.filter);
+            if (sPosts.length === 0) return null;
+            const SIcon = section.icon;
 
-          return (
-            <section key={section.id} className="mb-8">
-              <div className="flex items-end justify-between px-4 mb-3">
-                <div className="flex items-center gap-2">
-                  <div className={`w-7 h-7 rounded-lg ${section.color} flex items-center justify-center`}>
-                    <SIcon className="w-4 h-4 text-white" />
+            return (
+              <section key={section.id} className="mb-8">
+                <div className="flex items-end justify-between px-4 mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-7 h-7 rounded-lg ${section.color} flex items-center justify-center`}>
+                      <SIcon className="w-4 h-4 text-white" />
+                    </div>
+                    <h2 className="text-base font-bold text-foreground">{section.label[lang]}</h2>
+                    <span className="text-xs text-muted-foreground">({sPosts.length})</span>
                   </div>
-                  <h2 className="text-base font-bold text-foreground">{section.label[lang]}</h2>
-                  <span className="text-xs text-muted-foreground">({posts.length})</span>
                 </div>
-              </div>
 
-              <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-                {posts.map((p: any) => {
-                  const ct = p.contentType ? contentTypeConfig[p.contentType] : null;
-                  const CtIcon = ct?.icon;
-                  return (
-                    <div
-                      key={p.id}
-                      onClick={() => navigate(`/post/${p.id}`)}
-                      className="min-w-[240px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card cursor-pointer active:scale-[0.98] transition-transform"
-                    >
-                      <div className="relative h-32">
-                        <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        <button
-                          className="absolute top-2 right-2 p-1.5 rounded-full bg-background/30 backdrop-blur-sm"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Bookmark className="w-3.5 h-3.5 text-white" />
-                        </button>
-                        {ct && CtIcon && (
-                          <span className={`absolute top-2 left-2 inline-flex items-center gap-0.5 ${ct.color} text-white text-[10px] font-semibold px-1.5 py-0.5 rounded`}>
-                            <CtIcon className="w-3 h-3" />
-                            {ct.label[lang]}
-                          </span>
-                        )}
-                        <div className="absolute bottom-2 left-2 right-2">
-                          <span className="inline-block bg-primary text-primary-foreground text-[10px] font-semibold px-1.5 py-0.5 rounded mb-0.5">
-                            {p.category[lang]}
-                          </span>
-                          {p.cityId && <CityBadge cityId={p.cityId} variant="overlay" />}
+                <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+                  {sPosts.map((p: any) => {
+                    const ct = p.contentType ? contentTypeConfig[p.contentType as keyof typeof contentTypeConfig] : null;
+                    const CtIcon = ct?.icon;
+                    return (
+                      <div
+                        key={p.id}
+                        onClick={() => navigate(`/post/${p.id}`)}
+                        className="min-w-[240px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card cursor-pointer active:scale-[0.98] transition-transform"
+                      >
+                        <div className="relative h-32">
+                          <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                          <button
+                            className="absolute top-2 right-2 p-1.5 rounded-full bg-background/30 backdrop-blur-sm"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Bookmark className="w-3.5 h-3.5 text-white" />
+                          </button>
+                          {ct && CtIcon && (
+                            <span className={`absolute top-2 left-2 inline-flex items-center gap-0.5 ${ct.color} text-white text-[10px] font-semibold px-1.5 py-0.5 rounded`}>
+                              <CtIcon className="w-3 h-3" />
+                              {ct.label[lang]}
+                            </span>
+                          )}
+                          <div className="absolute bottom-2 left-2 right-2">
+                            <span className="inline-block bg-primary text-primary-foreground text-[10px] font-semibold px-1.5 py-0.5 rounded mb-0.5">
+                              {p.category[lang]}
+                            </span>
+                            {p.cityId && <CityBadge cityId={p.cityId} variant="overlay" />}
+                          </div>
+                        </div>
+                        <div className="p-3">
+                          <h3 className="text-sm font-bold text-foreground line-clamp-2 leading-tight">
+                            {p.title[lang]}
+                          </h3>
+                          <p className="text-[11px] text-muted-foreground mt-1">
+                            {p.author[lang]} · {p.readTime} {lang === "ar" ? "د" : "min"}
+                          </p>
                         </div>
                       </div>
-                      <div className="p-3">
-                        <h3 className="text-sm font-bold text-foreground line-clamp-2 leading-tight">
-                          {p.title[lang]}
-                        </h3>
-                        <p className="text-[11px] text-muted-foreground mt-1">
-                          {p.author[lang]} · {p.readTime} {lang === "ar" ? "د" : "min"}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          );
-        })}
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })
+        )}
 
-        {filteredPosts.length === 0 && (
+        {!isLoading && filteredPosts.length === 0 && (
           <div className="text-center py-12">
             <Search className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
             <p className="text-sm text-muted-foreground">

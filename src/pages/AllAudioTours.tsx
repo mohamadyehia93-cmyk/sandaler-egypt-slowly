@@ -1,8 +1,9 @@
 import { ArrowLeft, Headphones, Play, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { audioTours, regions } from "@/lib/sampleData";
+import { useAudioTours, useRegions } from "@/hooks/useListings";
 import CityBadge from "@/components/CityBadge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useMemo } from "react";
 
 type ThemeKey = "history" | "nature" | "culture" | "coast";
@@ -17,7 +18,7 @@ const THEME_META: Record<ThemeKey, { en: string; ar: string; emoji: string }> = 
 const THEME_ORDER: ThemeKey[] = ["history", "culture", "nature", "coast"];
 
 const classifyTour = (t: any): ThemeKey => {
-  const txt = `${t.title?.en ?? ""} ${t.title?.ar ?? ""}`.toLowerCase();
+  const txt = `${t.title_en ?? ""} ${t.title_ar ?? ""}`.toLowerCase();
   if (/(temple|tomb|pharaoh|oracle|akhenaten|edfu|luxor|aswan|nubian|hathor|christianity|fortress|ancient|gateway|resistance)/.test(txt)) return "history";
   if (/(birds|whales|reef|blue hole|oasis|nature|palm|wildlife|lake)/.test(txt)) return "nature";
   if (/(sea|port|beach|red sea|gulf|hurghada|matrouh|marsa|dahab|quseir|coast)/.test(txt)) return "coast";
@@ -29,16 +30,18 @@ const AllAudioTours = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  const { data: audioTours = [], isLoading } = useAudioTours();
+  const { data: regions = [] } = useRegions();
 
   const filtered = useMemo(
     () =>
-      audioTours.filter((a) => {
-        if (activeRegion && a.regionId !== activeRegion) return false;
+      (audioTours as any[]).filter((a) => {
+        if (activeRegion && a.region_id !== activeRegion) return false;
         if (!search.trim()) return true;
         const q = search.toLowerCase();
-        return a.title.en.toLowerCase().includes(q) || a.title.ar.includes(q);
+        return (a.title_en ?? "").toLowerCase().includes(q) || (a.title_ar ?? "").includes(q);
       }),
-    [search, activeRegion]
+    [search, activeRegion, audioTours]
   );
 
   const grouped = useMemo(() => {
@@ -49,11 +52,11 @@ const AllAudioTours = () => {
 
   const regionCounts = useMemo(() => {
     const c: Record<string, number> = {};
-    audioTours.forEach((a) => {
-      c[a.regionId] = (c[a.regionId] || 0) + 1;
+    (audioTours as any[]).forEach((a) => {
+      if (a.region_id) c[a.region_id] = (c[a.region_id] || 0) + 1;
     });
     return c;
-  }, []);
+  }, [audioTours]);
 
   return (
     <div className="min-h-screen bg-surface pb-8">
@@ -93,7 +96,7 @@ const AllAudioTours = () => {
           >
             {lang === "ar" ? "كل المناطق" : "All Regions"}
           </button>
-          {regions.map((r) => {
+          {(regions as any[]).map((r) => {
             const count = regionCounts[r.id] || 0;
             if (count === 0) return null;
             return (
@@ -104,7 +107,7 @@ const AllAudioTours = () => {
                   activeRegion === r.id ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
                 }`}
               >
-                {r.emoji} {t(r.nameKey)}
+                {r.emoji} {lang === "ar" ? r.name_ar : r.name_en}
                 <span className="opacity-60">({count})</span>
               </button>
             );
@@ -134,15 +137,15 @@ const AllAudioTours = () => {
                 {tours.map((a) => (
                   <div
                     key={a.id}
-                    onClick={() => navigate(`/audio-tour/${a.id}`)}
+                    onClick={() => navigate(`/audio-tour/${a.slug || a.id}`)}
                     className="min-w-[260px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card cursor-pointer active:scale-[0.98] transition-transform"
                   >
                     <div className="relative h-36">
-                      <img src={a.image} alt={a.title[lang]} className="w-full h-full object-cover" />
+                      <img src={a.image} alt={lang === "ar" ? a.title_ar : a.title_en} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <div className="absolute top-2 left-2 flex items-center gap-1 bg-primary/90 text-primary-foreground px-2 py-0.5 rounded-full text-[10px] font-medium">
                         <Headphones className="w-3 h-3" />
-                        {a.duration} {t("common.min")} · {a.stops} {t("common.stops")}
+                        {a.duration_minutes} {t("common.min")} · {a.stops_count} {t("common.stops")}
                       </div>
                       <button
                         className="absolute top-2 right-2 p-1.5 rounded-full bg-primary text-primary-foreground"
@@ -152,12 +155,12 @@ const AllAudioTours = () => {
                       </button>
                       <div className="absolute bottom-2 left-2 right-2">
                         <h3 className="text-sm font-bold text-primary-foreground line-clamp-2 leading-tight">
-                          {a.title[lang]}
+                          {lang === "ar" ? a.title_ar : a.title_en}
                         </h3>
                       </div>
                     </div>
                     <div className="p-3 flex items-center justify-between">
-                      <CityBadge cityId={a.cityId} />
+                      {a.city_id && <CityBadge cityId={a.city_id} />}
                       <span className="text-sm font-bold text-primary-dark">
                         {a.price === 0 ? t("common.free") : `${a.price} ${t("common.egp")}`}
                       </span>

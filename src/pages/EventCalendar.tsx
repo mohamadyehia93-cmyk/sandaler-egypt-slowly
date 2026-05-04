@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Clock, Users, Star } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { experiences, trips } from "@/lib/sampleData";
+import { useExperiences, useTrips } from "@/hooks/useListings";
 
 type CalendarEvent = {
   id: string;
@@ -16,23 +16,10 @@ type CalendarEvent = {
   rating?: number;
 };
 
-const parseDate = (dateStr: string): Date | null => {
-  if (dateStr === "Ongoing") return null;
+const parseDate = (dateStr: string | null | undefined): Date | null => {
+  if (!dateStr || dateStr === "Ongoing") return null;
   const d = new Date(dateStr);
   return isNaN(d.getTime()) ? null : d;
-};
-
-const buildEvents = (): CalendarEvent[] => {
-  const events: CalendarEvent[] = [];
-  experiences.forEach((e) => {
-    const d = parseDate(e.date);
-    if (d) events.push({ id: e.id, type: "experience", title: e.title, date: d, price: e.price, image: e.image, region: e.region, rating: e.rating });
-  });
-  trips.forEach((t) => {
-    const d = parseDate(t.date);
-    if (d) events.push({ id: t.id, type: "trip", title: t.title, date: d, price: t.price, image: t.image, route: t.route });
-  });
-  return events;
 };
 
 const DAYS_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -46,7 +33,37 @@ const isSameDay = (a: Date, b: Date) =>
 const EventCalendar = () => {
   const navigate = useNavigate();
   const { lang, t } = useI18n();
-  const allEvents = useMemo(buildEvents, []);
+  const { data: experiences = [] } = useExperiences();
+  const { data: trips = [] } = useTrips();
+
+  const allEvents = useMemo<CalendarEvent[]>(() => {
+    const events: CalendarEvent[] = [];
+    (experiences as any[]).forEach((e) => {
+      const d = parseDate(e.date);
+      if (d) events.push({
+        id: e.slug || e.id,
+        type: "experience",
+        title: { en: e.title_en, ar: e.title_ar },
+        date: d,
+        price: e.price ?? 0,
+        image: e.image,
+        rating: e.rating,
+      });
+    });
+    (trips as any[]).forEach((tr) => {
+      const d = parseDate(tr.date);
+      if (d) events.push({
+        id: tr.slug || tr.id,
+        type: "trip",
+        title: { en: tr.title_en, ar: tr.title_ar },
+        date: d,
+        price: tr.price ?? 0,
+        image: tr.image,
+        route: tr.route_en || tr.route_ar ? { en: tr.route_en ?? "", ar: tr.route_ar ?? "" } : undefined,
+      });
+    });
+    return events;
+  }, [experiences, trips]);
 
   const [currentMonth, setCurrentMonth] = useState(() => {
     // Start at earliest event month

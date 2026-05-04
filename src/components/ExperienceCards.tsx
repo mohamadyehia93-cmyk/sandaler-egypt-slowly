@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Heart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { experienceThemes, regions } from "@/lib/sampleData";
+import { experienceThemes } from "@/lib/sampleData";
 import { useExperiences, useRegions } from "@/hooks/useListings";
 import CityBadge from "./CityBadge";
 import { useNavigate } from "react-router-dom";
@@ -14,9 +14,7 @@ const ExperienceCards = () => {
   const { data: dbRegions } = useRegions();
   const [activeRegion, setActiveRegion] = useState("all");
 
-  const regionsList =
-    dbRegions ??
-    regions.map((r) => ({ id: r.id, name_en: r.nameKey, name_ar: r.nameKey, emoji: r.emoji }));
+  const regionsList = dbRegions ?? [];
 
   const filtered = (experiences ?? []).filter(
     (e) => activeRegion === "all" || e.region_id === activeRegion
