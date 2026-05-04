@@ -137,15 +137,15 @@ const AllAudioTours = () => {
                 {tours.map((a) => (
                   <div
                     key={a.id}
-                    onClick={() => navigate(`/audio-tour/${a.id}`)}
+                    onClick={() => navigate(`/audio-tour/${a.slug || a.id}`)}
                     className="min-w-[260px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card cursor-pointer active:scale-[0.98] transition-transform"
                   >
                     <div className="relative h-36">
-                      <img src={a.image} alt={a.title[lang]} className="w-full h-full object-cover" />
+                      <img src={a.image} alt={lang === "ar" ? a.title_ar : a.title_en} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <div className="absolute top-2 left-2 flex items-center gap-1 bg-primary/90 text-primary-foreground px-2 py-0.5 rounded-full text-[10px] font-medium">
                         <Headphones className="w-3 h-3" />
-                        {a.duration} {t("common.min")} · {a.stops} {t("common.stops")}
+                        {a.duration_minutes} {t("common.min")} · {a.stops_count} {t("common.stops")}
                       </div>
                       <button
                         className="absolute top-2 right-2 p-1.5 rounded-full bg-primary text-primary-foreground"
@@ -155,12 +155,12 @@ const AllAudioTours = () => {
                       </button>
                       <div className="absolute bottom-2 left-2 right-2">
                         <h3 className="text-sm font-bold text-primary-foreground line-clamp-2 leading-tight">
-                          {a.title[lang]}
+                          {lang === "ar" ? a.title_ar : a.title_en}
                         </h3>
                       </div>
                     </div>
                     <div className="p-3 flex items-center justify-between">
-                      <CityBadge cityId={a.cityId} />
+                      {a.city_id && <CityBadge cityId={a.city_id} />}
                       <span className="text-sm font-bold text-primary-dark">
                         {a.price === 0 ? t("common.free") : `${a.price} ${t("common.egp")}`}
                       </span>
