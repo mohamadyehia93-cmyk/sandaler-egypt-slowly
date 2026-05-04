@@ -140,6 +140,14 @@ const FitBounds = ({ points }: { points: [number, number][] }) => {
   return null;
 };
 
+const FlyTo = ({ target }: { target: [number, number] | null }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (target) map.flyTo(target, Math.max(map.getZoom(), 15), { duration: 0.6 });
+  }, [target, map]);
+  return null;
+};
+
 interface CityOfferingsMapProps {
   cityId: string;
   cityName: { en: string; ar: string };
