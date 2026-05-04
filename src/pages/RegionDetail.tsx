@@ -10,6 +10,7 @@ import RegionMap from "@/components/RegionMap";
 import BottomNav from "@/components/BottomNav";
 import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
+import DetailSkeleton from "@/components/DetailSkeleton";
 
 type PostItem = (typeof latestPosts)[number];
 
@@ -107,17 +108,20 @@ const RegionDetail = () => {
   const [cityDropOpen, setCityDropOpen] = useState(false);
 
   const region = regions.find((r) => r.id === regionId);
-  if (!region) return <NotFoundView context="region" />;
 
   const cities = regionCities[regionId || ""] || [];
 
   const cityFilter = <T extends { cityId?: string }>(items: T[]) =>
     selectedCity === "all" ? items : items.filter((i) => i.cityId === selectedCity);
 
-  const { data: dbAudioTours = [] } = useAudioTours();
-  const { data: dbExperiences = [] } = useExperiences();
-  const { data: dbWhosWho = [] } = useWhosWho();
-  const { data: dbPosts = [] } = usePosts();
+  const { data: dbAudioTours = [], isLoading: l1 } = useAudioTours();
+  const { data: dbExperiences = [], isLoading: l2 } = useExperiences();
+  const { data: dbWhosWho = [], isLoading: l3 } = useWhosWho();
+  const { data: dbPosts = [], isLoading: l4 } = usePosts();
+  const isLoading = l1 || l2 || l3 || l4;
+
+  if (isLoading) return <DetailSkeleton variant="region" />;
+  if (!region) return <NotFoundView context="region" />;
 
   const dedupe = <T extends { id: string }>(arr: T[]) => {
     const seen = new Set<string>();
