@@ -241,7 +241,7 @@ const RegionDetail = () => {
 
         {/* Experiences */}
         {regionExperiences.length > 0 && (
-          <SectionHeader titleKey="section.experiences" onSeeAll={() => {}}>
+          <SectionHeader titleKey="section.experiences">
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
               {regionExperiences.map((e) => (
                 <div key={e.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/experience/${e.id}`)}>
