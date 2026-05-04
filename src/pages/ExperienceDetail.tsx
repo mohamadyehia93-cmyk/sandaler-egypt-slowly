@@ -21,7 +21,7 @@ const fallbackTags = [
 const fallbackSteps = [
   { num: 1, title: "Board the traditional felucca", desc: "Meet Hassan at Manzala main dock. Life jackets provided. 30 min · Arabic + English", color: "bg-secondary" },
   { num: 2, title: "Spot migratory birds", desc: "Scan the lake for flamingos, herons and cormorants. Binoculars provided. 2 hrs", color: "bg-secondary" },
-  { num: 3, title: "Local tea and stories", desc: "Wind down at a fisherman's café. Hassan shares Manzala's fishing heritage. 30 min", color: "bg-[#FAC775]" },
+  { num: 3, title: "Local tea and stories", desc: "Wind down at a fisherman's café. Hassan shares Manzala's fishing heritage. 30 min", color: "bg-warning/30" },
 ];
 
 const thingsToKnow = [
@@ -330,7 +330,7 @@ const ExperienceDetail = () => {
 
           {/* AI summary */}
           {reviews.length > 0 && (
-            <div className="bg-secondary border-l-[3px] border-l-[#2BBFB3] rounded-r-lg p-2.5 mb-2.5">
+            <div className="bg-secondary border-l-[3px] border-l-primary rounded-r-lg p-2.5 mb-2.5">
               <p className="text-[9px] font-medium text-primary mb-1">✦ AI summary of {exp.reviews_count || reviews.length} reviews</p>
               <p className="text-[11px] italic text-primary-dark leading-[1.55]">
                 Visitors love {hostName?.split(" ")[0] || "the host"}'s deep knowledge and patience. Most recommend this experience for its authenticity and connection to local culture.
