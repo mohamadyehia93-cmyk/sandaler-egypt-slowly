@@ -169,10 +169,7 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
   );
 
   const points = useMemo<[number, number][]>(() => {
-    const pts = visible.map((o) => {
-      const [dLat, dLng] = hashOffset(`${o.category}-${o.id}`);
-      return [center[0] + dLat, center[1] + dLng] as [number, number];
-    });
+    const pts = visible.map((o) => resolvePos(o, center).pos);
     pts.push(center);
     return pts;
   }, [visible, center]);
