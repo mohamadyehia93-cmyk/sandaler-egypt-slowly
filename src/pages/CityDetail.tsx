@@ -9,6 +9,8 @@ import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
 import CityOfferingsMap, { OfferingPin } from "@/components/CityOfferingsMap";
 import BottomNav from "@/components/BottomNav";
+import SmartImage from "@/components/ui/SmartImage";
+import NotFoundView from "@/components/NotFound";
 
 type PostItem = (typeof latestPosts)[number];
 
@@ -114,7 +116,7 @@ const CityDetail = () => {
   const { data: dbTransport = [] } = useTransport();
 
   const city = cityData[cityId || ""];
-  if (!city) return <div className="p-8 text-center text-muted-foreground">City not found</div>;
+  if (!city) return <NotFoundView context="city" />;
 
   const cityExperiences = experiences.filter((e) => e.cityId === cityId);
   const { data: dbAudioTours = [] } = useAudioTours();
@@ -147,8 +149,8 @@ const CityDetail = () => {
 
       {/* Hero Image */}
       <div className="relative h-48 mx-4 mt-2 rounded-xl overflow-hidden">
-        <img src={city.image} alt={city.name[lang]} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <SmartImage src={city.image} alt={city.name[lang]} loading="eager" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
         <div className="absolute bottom-3 left-4 right-4">
           <h2 className="text-xl font-bold text-white mb-1">{city.name[lang]}</h2>
           <div className="flex items-center gap-2 text-white/80 text-xs">

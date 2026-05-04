@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -7,82 +8,97 @@ import { I18nProvider } from "@/lib/i18n";
 import { UserRoleProvider } from "@/hooks/useUserRole";
 import { AuthProvider } from "@/hooks/useAuth";
 import RouteGuard from "@/components/RouteGuard";
+
+// Eager — first paint critical
 import Index from "./pages/Index.tsx";
 import Splash from "./pages/Splash.tsx";
-import ExperienceDetail from "./pages/ExperienceDetail.tsx";
-import TripDetail from "./pages/TripDetail.tsx";
-import AudioTourDetail from "./pages/AudioTourDetail.tsx";
-import CauseDetail from "./pages/CauseDetail.tsx";
-import OrganizationDetail from "./pages/OrganizationDetail.tsx";
-import Wishlists from "./pages/Wishlists.tsx";
-import Inbox from "./pages/Inbox.tsx";
-import Profile from "./pages/Profile.tsx";
-import RegionDetail from "./pages/RegionDetail.tsx";
-import CityDetail from "./pages/CityDetail.tsx";
-import HighlightDetail from "./pages/HighlightDetail.tsx";
-import PersonDetail from "./pages/PersonDetail.tsx";
-import PostDetail from "./pages/PostDetail.tsx";
-import CultureActorDetail from "./pages/CultureActorDetail.tsx";
-import AccommodationDetail from "./pages/AccommodationDetail.tsx";
-import HostDetail from "./pages/HostDetail.tsx";
-import TransportDetail from "./pages/TransportDetail.tsx";
-import ProductDetail from "./pages/ProductDetail.tsx";
-import PartnerDetail from "./pages/PartnerDetail.tsx";
-import ImpactDashboard from "./pages/ImpactDashboard.tsx";
-import BadgesQuests from "./pages/BadgesQuests.tsx";
-import Settings from "./pages/Settings.tsx";
-import HelpSupport from "./pages/HelpSupport.tsx";
-import CauseSupportGift from "./pages/CauseSupportGift.tsx";
-import CauseSupportDonate from "./pages/CauseSupportDonate.tsx";
-import CauseSupportVolunteer from "./pages/CauseSupportVolunteer.tsx";
-import CauseSupportConsult from "./pages/CauseSupportConsult.tsx";
-import Booking from "./pages/Booking.tsx";
-import EventCalendar from "./pages/EventCalendar.tsx";
-import NotFound from "./pages/NotFound.tsx";
-import ProviderProfile from "./pages/ProviderProfile.tsx";
-// Provider Dashboards
-import CultureActorDashboard from "./pages/dashboards/CultureActorDashboard.tsx";
-import ServiceProviderDashboard from "./pages/dashboards/ServiceProviderDashboard.tsx";
-import WhosWhoDashboard from "./pages/dashboards/WhosWhoDashboard.tsx";
-import OrganizationDashboard from "./pages/dashboards/OrganizationDashboard.tsx";
-import AmbassadorDashboard from "./pages/dashboards/AmbassadorDashboard.tsx";
-import ProductSellerDashboard from "./pages/dashboards/ProductSellerDashboard.tsx";
-import TripOrganizerDashboard from "./pages/dashboards/TripOrganizerDashboard.tsx";
-import SubjectExpertDashboard from "./pages/dashboards/SubjectExpertDashboard.tsx";
-import NarratorDashboard from "./pages/dashboards/NarratorDashboard.tsx";
-import MyAudioTours from "./pages/dashboards/MyAudioTours.tsx";
-import NewAudioTour from "./pages/dashboards/NewAudioTour.tsx";
-import NewExperience from "./pages/dashboards/NewExperience.tsx";
-import NewArticle from "./pages/dashboards/NewArticle.tsx";
-import NewProduct from "./pages/dashboards/NewProduct.tsx";
-import NewTrip from "./pages/dashboards/NewTrip.tsx";
-import NewSession from "./pages/dashboards/NewSession.tsx";
-import NewProgram from "./pages/dashboards/NewProgram.tsx";
-import NewFlagReport from "./pages/dashboards/NewFlagReport.tsx";
-import NewCollection from "./pages/dashboards/NewCollection.tsx";
-import Community from "./pages/Community.tsx";
-import ItineraryPlanner from "./pages/ItineraryPlanner.tsx";
 import Login from "./pages/Login.tsx";
 import Signup from "./pages/Signup.tsx";
-import ForgotPassword from "./pages/ForgotPassword.tsx";
-import ResetPassword from "./pages/ResetPassword.tsx";
-import AllPosts from "./pages/AllPosts.tsx";
-import AllAudioTours from "./pages/AllAudioTours.tsx";
-import AllTrips from "./pages/AllTrips.tsx";
-import AllCauses from "./pages/AllCauses.tsx";
-import AllPeople from "./pages/AllPeople.tsx";
-import VisitorProfile from "./pages/VisitorProfile.tsx";
-import StatusesFeed from "./pages/StatusesFeed.tsx";
-// Provider Management Pages
-import MyContent from "./pages/dashboards/MyContent.tsx";
-import MyListings from "./pages/dashboards/MyListings.tsx";
-import MyProducts from "./pages/dashboards/MyProducts.tsx";
-import MyTrips from "./pages/dashboards/MyTrips.tsx";
-import MyPrograms from "./pages/dashboards/MyPrograms.tsx";
-import MyCollections from "./pages/dashboards/MyCollections.tsx";
-import MyTasks from "./pages/dashboards/MyTasks.tsx";
+import NotFound from "./pages/NotFound.tsx";
 
-const queryClient = new QueryClient();
+// Lazy — everything else
+const ExperienceDetail = lazy(() => import("./pages/ExperienceDetail.tsx"));
+const TripDetail = lazy(() => import("./pages/TripDetail.tsx"));
+const AudioTourDetail = lazy(() => import("./pages/AudioTourDetail.tsx"));
+const CauseDetail = lazy(() => import("./pages/CauseDetail.tsx"));
+const OrganizationDetail = lazy(() => import("./pages/OrganizationDetail.tsx"));
+const Wishlists = lazy(() => import("./pages/Wishlists.tsx"));
+const Inbox = lazy(() => import("./pages/Inbox.tsx"));
+const Profile = lazy(() => import("./pages/Profile.tsx"));
+const RegionDetail = lazy(() => import("./pages/RegionDetail.tsx"));
+const CityDetail = lazy(() => import("./pages/CityDetail.tsx"));
+const HighlightDetail = lazy(() => import("./pages/HighlightDetail.tsx"));
+const PersonDetail = lazy(() => import("./pages/PersonDetail.tsx"));
+const PostDetail = lazy(() => import("./pages/PostDetail.tsx"));
+const CultureActorDetail = lazy(() => import("./pages/CultureActorDetail.tsx"));
+const AccommodationDetail = lazy(() => import("./pages/AccommodationDetail.tsx"));
+const HostDetail = lazy(() => import("./pages/HostDetail.tsx"));
+const TransportDetail = lazy(() => import("./pages/TransportDetail.tsx"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail.tsx"));
+const PartnerDetail = lazy(() => import("./pages/PartnerDetail.tsx"));
+const ImpactDashboard = lazy(() => import("./pages/ImpactDashboard.tsx"));
+const BadgesQuests = lazy(() => import("./pages/BadgesQuests.tsx"));
+const Settings = lazy(() => import("./pages/Settings.tsx"));
+const HelpSupport = lazy(() => import("./pages/HelpSupport.tsx"));
+const CauseSupportGift = lazy(() => import("./pages/CauseSupportGift.tsx"));
+const CauseSupportDonate = lazy(() => import("./pages/CauseSupportDonate.tsx"));
+const CauseSupportVolunteer = lazy(() => import("./pages/CauseSupportVolunteer.tsx"));
+const CauseSupportConsult = lazy(() => import("./pages/CauseSupportConsult.tsx"));
+const Booking = lazy(() => import("./pages/Booking.tsx"));
+const EventCalendar = lazy(() => import("./pages/EventCalendar.tsx"));
+const ProviderProfile = lazy(() => import("./pages/ProviderProfile.tsx"));
+const CultureActorDashboard = lazy(() => import("./pages/dashboards/CultureActorDashboard.tsx"));
+const ServiceProviderDashboard = lazy(() => import("./pages/dashboards/ServiceProviderDashboard.tsx"));
+const WhosWhoDashboard = lazy(() => import("./pages/dashboards/WhosWhoDashboard.tsx"));
+const OrganizationDashboard = lazy(() => import("./pages/dashboards/OrganizationDashboard.tsx"));
+const AmbassadorDashboard = lazy(() => import("./pages/dashboards/AmbassadorDashboard.tsx"));
+const ProductSellerDashboard = lazy(() => import("./pages/dashboards/ProductSellerDashboard.tsx"));
+const TripOrganizerDashboard = lazy(() => import("./pages/dashboards/TripOrganizerDashboard.tsx"));
+const SubjectExpertDashboard = lazy(() => import("./pages/dashboards/SubjectExpertDashboard.tsx"));
+const NarratorDashboard = lazy(() => import("./pages/dashboards/NarratorDashboard.tsx"));
+const MyAudioTours = lazy(() => import("./pages/dashboards/MyAudioTours.tsx"));
+const NewAudioTour = lazy(() => import("./pages/dashboards/NewAudioTour.tsx"));
+const NewExperience = lazy(() => import("./pages/dashboards/NewExperience.tsx"));
+const NewArticle = lazy(() => import("./pages/dashboards/NewArticle.tsx"));
+const NewProduct = lazy(() => import("./pages/dashboards/NewProduct.tsx"));
+const NewTrip = lazy(() => import("./pages/dashboards/NewTrip.tsx"));
+const NewSession = lazy(() => import("./pages/dashboards/NewSession.tsx"));
+const NewProgram = lazy(() => import("./pages/dashboards/NewProgram.tsx"));
+const NewFlagReport = lazy(() => import("./pages/dashboards/NewFlagReport.tsx"));
+const NewCollection = lazy(() => import("./pages/dashboards/NewCollection.tsx"));
+const Community = lazy(() => import("./pages/Community.tsx"));
+const ItineraryPlanner = lazy(() => import("./pages/ItineraryPlanner.tsx"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword.tsx"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
+const AllPosts = lazy(() => import("./pages/AllPosts.tsx"));
+const AllAudioTours = lazy(() => import("./pages/AllAudioTours.tsx"));
+const AllTrips = lazy(() => import("./pages/AllTrips.tsx"));
+const AllCauses = lazy(() => import("./pages/AllCauses.tsx"));
+const AllPeople = lazy(() => import("./pages/AllPeople.tsx"));
+const VisitorProfile = lazy(() => import("./pages/VisitorProfile.tsx"));
+const StatusesFeed = lazy(() => import("./pages/StatusesFeed.tsx"));
+const MyContent = lazy(() => import("./pages/dashboards/MyContent.tsx"));
+const MyListings = lazy(() => import("./pages/dashboards/MyListings.tsx"));
+const MyProducts = lazy(() => import("./pages/dashboards/MyProducts.tsx"));
+const MyTrips = lazy(() => import("./pages/dashboards/MyTrips.tsx"));
+const MyPrograms = lazy(() => import("./pages/dashboards/MyPrograms.tsx"));
+const MyCollections = lazy(() => import("./pages/dashboards/MyCollections.tsx"));
+const MyTasks = lazy(() => import("./pages/dashboards/MyTasks.tsx"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+const RouteFallback = () => (
+  <div className="min-h-screen bg-surface flex items-center justify-center">
+    <div className="w-10 h-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -94,6 +110,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <RouteGuard>
+              <Suspense fallback={<RouteFallback />}>
               <Routes>
             <Route path="/welcome" element={<Splash />} />
             <Route path="/" element={<Index />} />
@@ -140,7 +157,6 @@ const App = () => (
             <Route path="/profile/badges" element={<BadgesQuests />} />
             <Route path="/profile/settings" element={<Settings />} />
             <Route path="/profile/help" element={<HelpSupport />} />
-            {/* Provider Dashboards */}
             <Route path="/dashboard/culture-actor/new-article" element={<NewArticle />} />
             <Route path="/dashboard/culture-actor/my-content" element={<MyContent />} />
             <Route path="/dashboard/culture-actor" element={<CultureActorDashboard />} />
@@ -169,6 +185,7 @@ const App = () => (
             <Route path="/dashboard/narrator" element={<NarratorDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+              </Suspense>
           </RouteGuard>
         </BrowserRouter>
         </AuthProvider>

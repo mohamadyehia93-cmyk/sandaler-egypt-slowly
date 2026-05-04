@@ -8,6 +8,8 @@ import SectionHeader from "@/components/SectionHeader";
 import CausesSection from "@/components/CausesSection";
 import RegionMap from "@/components/RegionMap";
 import BottomNav from "@/components/BottomNav";
+import SmartImage from "@/components/ui/SmartImage";
+import NotFoundView from "@/components/NotFound";
 
 type PostItem = (typeof latestPosts)[number];
 
@@ -105,7 +107,7 @@ const RegionDetail = () => {
   const [cityDropOpen, setCityDropOpen] = useState(false);
 
   const region = regions.find((r) => r.id === regionId);
-  if (!region) return <div className="p-8 text-center text-muted-foreground">Region not found</div>;
+  if (!region) return <NotFoundView context="region" />;
 
   const cities = regionCities[regionId || ""] || [];
 
