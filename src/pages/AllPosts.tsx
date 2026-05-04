@@ -1,10 +1,12 @@
-import { ArrowLeft, Bookmark, Mic, Film, Camera, MessageSquare, ChefHat, ClipboardList, Map, FileText, Search } from "lucide-react";
+import { ArrowLeft, Bookmark, Mic, Film, Camera, MessageSquare, ChefHat, ClipboardList, Map, FileText, Search, SlidersHorizontal, X as XIcon, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { latestPosts, regions } from "@/lib/sampleData";
 import { contentTypeConfig } from "@/components/LatestPosts";
 import CityBadge from "@/components/CityBadge";
 import { useState, useMemo } from "react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
 type ContentSection = {
   id: string;
