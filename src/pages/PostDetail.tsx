@@ -1,11 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Clock, Share2, User, MapPin, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Maximize, Camera, ChevronLeft, ChevronRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { latestPosts, cultureActors, cityData } from "@/lib/sampleData";
+import { cultureActors, cityData } from "@/lib/sampleData";
+import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
+import { usePosts } from "@/hooks/useListings";
 import WishlistButton from "@/components/WishlistButton";
 import { contentTypeConfig } from "@/components/LatestPosts";
 import NotFoundView from "@/components/NotFound";
+import DetailSkeleton from "@/components/DetailSkeleton";
 
 /* ─── Audio Player ─── */
 const AudioPlayer = ({ title, author, image, lang }: { title: string; author: string; image: string; lang: string }) => {
@@ -187,19 +191,55 @@ const PostDetail = () => {
   const navigate = useNavigate();
   const { lang } = useI18n();
 
-  const post = latestPosts.find((p) => p?.id === id);
-  if (!post) return <NotFoundView context="post" />;
+  const { data: row, isLoading } = useQuery({
+    queryKey: ["post", id],
+    queryFn: () => fetchByIdOrSlug("posts", id!),
+    enabled: !!id,
+  });
+  const { data: allPosts } = usePosts();
 
-  const ct = (post as any).contentType ? contentTypeConfig[(post as any).contentType] : null;
+  if (isLoading) return <DetailSkeleton variant="city" />;
+  if (!row) return <NotFoundView context="post" />;
+
+  // Normalize DB row to shape used below
+  const post = {
+    id: row.id,
+    slug: row.slug,
+    image: row.image || "/placeholder.svg",
+    title: { en: row.title_en, ar: row.title_ar },
+    body: { en: row.body_en || "", ar: row.body_ar || "" },
+    category: { en: row.category || "", ar: row.category || "" },
+    author: { en: row.author_name_en || "", ar: row.author_name_ar || row.author_name_en || "" },
+    authorId: row.author_id,
+    date: row.created_at,
+    readTime: row.read_time_minutes ?? 5,
+    regionId: row.region_id,
+    cityId: row.city_id,
+    contentType: row.content_type,
+  };
+
+  const ct = post.contentType ? contentTypeConfig[post.contentType] : null;
   const CtIcon = ct?.icon;
-  const contentType = (post as any).contentType as string | undefined;
+  const contentType = post.contentType as string | undefined;
 
-  const relatedPosts = latestPosts.filter((p) => p && p.id !== id && p.regionId === post.regionId).slice(0, 3);
+  const relatedPosts = (allPosts ?? [])
+    .filter((p: any) => p && p.id !== post.id && p.region_id === post.regionId)
+    .slice(0, 3)
+    .map((p: any) => ({
+      id: p.id,
+      slug: p.slug,
+      image: p.image || "/placeholder.svg",
+      title: { en: p.title_en, ar: p.title_ar },
+      category: { en: p.category || "", ar: p.category || "" },
+      readTime: p.read_time_minutes ?? 5,
+      contentType: p.content_type,
+    }));
+
   const formattedDate = new Date(post.date).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US", {
     year: "numeric", month: "long", day: "numeric",
   });
 
-  const paragraphs = post.body[lang].split("\n\n");
+  const paragraphs = (post.body[lang] || "").split("\n\n");
 
   const timeLabel = ct
     ? (ct === contentTypeConfig.podcast || ct === contentTypeConfig.documentary || ct === contentTypeConfig["recipe-video"])
@@ -357,7 +397,7 @@ const PostDetail = () => {
               return (
                 <div
                   key={rp.id}
-                  onClick={() => navigate(`/post/${rp.id}`)}
+                  onClick={() => navigate(`/post/${rp.slug || rp.id}`)}
                   className="flex gap-3 rounded-lg bg-card shadow-card border border-border overflow-hidden cursor-pointer"
                 >
                   <div className="relative w-24 h-20 flex-shrink-0">
