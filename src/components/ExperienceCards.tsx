@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Heart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { experienceThemes, regions } from "@/lib/sampleData";
+import { experienceThemes } from "@/lib/sampleData";
 import { useExperiences, useRegions } from "@/hooks/useListings";
 import CityBadge from "./CityBadge";
 import { useNavigate } from "react-router-dom";
