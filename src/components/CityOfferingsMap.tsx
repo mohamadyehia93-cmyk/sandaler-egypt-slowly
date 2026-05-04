@@ -281,6 +281,16 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
         >
           <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
           <FitBounds points={points} />
+          <FlyTo
+            target={
+              selectedKey
+                ? (() => {
+                    const o = visible.find((x) => `${x.category}-${x.id}` === selectedKey);
+                    return o ? resolvePos(o, center).pos : null;
+                  })()
+                : null
+            }
+          />
 
           {/* City center marker */}
           <Marker position={center} icon={makeIcon("#1A7A74")}>
@@ -297,12 +307,19 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
           {visible.map((o) => {
             const { pos, precise } = resolvePos(o, center);
             const route = CAT_ROUTE[o.category](o.slug || o.id);
+            const key = `${o.category}-${o.id}`;
             return (
               <Marker
-                key={`${o.category}-${o.id}`}
+                key={key}
                 position={pos}
                 icon={makeIcon(CAT_COLORS[o.category])}
-                eventHandlers={{ click: () => navigate(route) }}
+                ref={(ref) => { markerRefs.current[key] = ref; }}
+                eventHandlers={{
+                  click: () => {
+                    setSelectedKey(key);
+                    cardRefs.current[key]?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+                  },
+                }}
               >
                 <Popup>
                   <div className="min-w-[140px]">
@@ -338,6 +355,59 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
           })}
         </MapContainer>
       </div>
+
+      {/* Synced bottom sheet list */}
+      {visible.length > 0 && (
+        <div ref={listRef} className="flex gap-2.5 px-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory pb-1">
+          {visible.map((o) => {
+            const key = `${o.category}-${o.id}`;
+            const isSelected = selectedKey === key;
+            const { precise } = resolvePos(o, center);
+            return (
+              <button
+                key={key}
+                ref={(ref) => { cardRefs.current[key] = ref; }}
+                onClick={() => {
+                  setSelectedKey(key);
+                  // Open the popup once the map flies in
+                  setTimeout(() => markerRefs.current[key]?.openPopup(), 650);
+                }}
+                className={`shrink-0 snap-start w-[180px] text-left rounded-xl border bg-card p-2.5 transition-all ${
+                  isSelected
+                    ? "border-primary shadow-md scale-[1.02]"
+                    : "border-border shadow-card"
+                }`}
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ background: CAT_COLORS[o.category] }}
+                  />
+                  <span
+                    className="text-[10px] font-semibold uppercase tracking-wide truncate"
+                    style={{ color: CAT_COLORS[o.category] }}
+                  >
+                    {CAT_LABELS[o.category][lang]}
+                  </span>
+                </div>
+                <h4 className="text-xs font-semibold text-foreground line-clamp-2 leading-snug">
+                  {o.title[lang]}
+                </h4>
+                {o.subtitle && (
+                  <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">
+                    {o.subtitle[lang]}
+                  </p>
+                )}
+                {!precise && (
+                  <p className="text-[9px] text-muted-foreground italic mt-0.5">
+                    {lang === "ar" ? "موقع تقريبي" : "Approx."}
+                  </p>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       <p className="px-4 text-[11px] text-muted-foreground">
         {lang === "ar"
