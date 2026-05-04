@@ -367,9 +367,9 @@ const CityDetail = () => {
         {/* Local Products */}
         {cityProducts.length > 0 && (
           <SectionHeader titleKey="section.products" onSeeAll={() => {}}>
-            <div className="grid grid-cols-2 gap-3 px-4">
+            <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
               {cityProducts.map((p) => (
-                <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/product/${(p as any).slug || p.id}`)}>
+                <div key={p.id} className="flex-shrink-0 w-40 snap-start rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/product/${(p as any).slug || p.id}`)}>
                   <div className="relative h-32">
                     <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
                     <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
