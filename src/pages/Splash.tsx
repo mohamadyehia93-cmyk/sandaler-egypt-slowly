@@ -346,6 +346,12 @@ const SplashPage = () => {
               >
                 {t("splash.login")}
               </button>
+              <button
+                onClick={handleGuestMode}
+                className="mt-3 text-sm text-primary-foreground/80 underline underline-offset-4"
+              >
+                {lang === "ar" ? "المتابعة كضيف" : "Continue as guest"}
+              </button>
             </div>
           </motion.div>
         )}
