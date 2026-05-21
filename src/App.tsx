@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -199,4 +200,12 @@ const App = () => {
   );
 };
 
-export default App;
+const SentryFallback = () => (
+  <div style={{ padding: 20, textAlign: 'center', fontFamily: 'Cairo, sans-serif' }}>
+    <h1>Something went wrong</h1>
+    <p>We've been notified and are looking into it.</p>
+    <button onClick={() => window.location.reload()}>Reload</button>
+  </div>
+);
+
+export default Sentry.withErrorBoundary(App, { fallback: <SentryFallback /> });
