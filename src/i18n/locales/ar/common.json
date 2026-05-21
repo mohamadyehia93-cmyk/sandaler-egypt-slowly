@@ -1,0 +1,49 @@
+{
+  "app": {
+    "name": "صندل",
+    "tagline": "اكتشف مصر. ببطء."
+  },
+  "nav": {
+    "explore": "استكشف",
+    "wishlists": "المفضلة",
+    "inbox": "الرسائل",
+    "profile": "الملف الشخصي"
+  },
+  "common": {
+    "book": "احجز",
+    "book_now": "احجز الآن",
+    "save": "حفظ",
+    "share": "مشاركة",
+    "message": "راسل",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "continue": "متابعة",
+    "back": "رجوع",
+    "next": "التالي",
+    "done": "تم",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "free_cancellation": "إلغاء مجاني",
+    "per_person": "/ شخص",
+    "spots_available": "{{count}} مقاعد متاحة",
+    "verified_attendees": "{{count}} زائراً موثقاً",
+    "ambassador_verified": "موثق من السفير"
+  },
+  "roles": {
+    "visitor": "زائر",
+    "culture_actor": "ناقل ثقافي",
+    "service_provider": "مقدم خدمة",
+    "whos_who": "شخصية محلية",
+    "organization": "منظمة",
+    "ambassador": "سفير",
+    "product_seller": "بائع منتجات",
+    "trip_organizer": "منظم رحلات",
+    "subject_expert": "خبير متخصص"
+  },
+  "auth": {
+    "sign_in": "تسجيل الدخول",
+    "sign_up": "إنشاء حساب",
+    "get_started": "ابدأ الآن",
+    "log_out": "تسجيل الخروج"
+  }
+}

@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/lib/i18n";
 import { UserRoleProvider } from "@/hooks/useUserRole";
 import { AuthProvider } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
 import RouteGuard from "@/components/RouteGuard";
 import Index from "./pages/Index.tsx";
 import Splash from "./pages/Splash.tsx";
@@ -77,7 +78,9 @@ import MyTasks from "./pages/dashboards/MyTasks.tsx";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  useLanguage(); // sets html lang and dir on mount and on language change
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <I18nProvider>
@@ -162,6 +165,7 @@ const App = () => (
       </I18nProvider>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;

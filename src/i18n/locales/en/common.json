@@ -1,0 +1,49 @@
+{
+  "app": {
+    "name": "Sandal",
+    "tagline": "Discover Egypt. Slowly."
+  },
+  "nav": {
+    "explore": "Explore",
+    "wishlists": "Wishlists",
+    "inbox": "Inbox",
+    "profile": "Profile"
+  },
+  "common": {
+    "book": "Book",
+    "book_now": "Book Now",
+    "save": "Save",
+    "share": "Share",
+    "message": "Message",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "continue": "Continue",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "free_cancellation": "Free cancellation",
+    "per_person": "/person",
+    "spots_available": "{{count}} spots available",
+    "verified_attendees": "{{count}} verified attendees",
+    "ambassador_verified": "Ambassador verified"
+  },
+  "roles": {
+    "visitor": "Visitor",
+    "culture_actor": "Culture Actor",
+    "service_provider": "Service Provider",
+    "whos_who": "Who's Who",
+    "organization": "Organization",
+    "ambassador": "Ambassador",
+    "product_seller": "Product Seller",
+    "trip_organizer": "Trip Organizer",
+    "subject_expert": "Subject Expert"
+  },
+  "auth": {
+    "sign_in": "Sign in",
+    "sign_up": "Sign up",
+    "get_started": "Get Started",
+    "log_out": "Log out"
+  }
+}
