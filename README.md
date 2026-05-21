@@ -106,3 +106,45 @@ sandaler-egypt-slowly/
 ├── .env.example                 # Template for required env vars
 └── package.json
 ```
+
+---
+
+## User Roles
+
+Sandal supports 9 distinct user roles, each with its own dashboard and permissions:
+
+1. **Visitor** — discovers, books, experiences, contributes to community impact
+2. **Culture Actor** — local writers/photographers/podcasters creating editorial content
+3. **Service Provider** — offers bookable experiences (boatmen, cooks, guides, craftspeople)
+4. **Who's Who** — high-trust local experts (non-transactional, moderated contact)
+5. **Organization** — NGOs/initiatives running programs, accepting donations and volunteers
+6. **Ambassador** — paid trusted locals doing verification, onboarding, safety
+7. **Product Seller** — authentic local goods (crafts, food, textiles)
+8. **Trip Organizer** — curated multi-stop trips
+9. **Subject Expert** — researchers/academics creating educational depth
+
+---
+
+## Design System
+
+- **Primary color:** Sandal Teal `#2BBFB3`
+- **Font:** Cairo (Google Fonts) — used for both Arabic and Latin scripts
+- **Mobile-first:** designed at 390px viewport width (iPhone 14 Pro)
+- **RTL support:** full mirror layout when language is Arabic
+- **Role accent colors:** each provider role has a distinct accent (see `tailwind.config.ts` → `role.*`)
+
+---
+
+## Deployment
+
+Currently deployed via Lovable at: https://sandaler-egypt-slowly.lovable.app
+
+---
+
+## Contributing
+
+Internal project. Contact Mohamed Yehia for access.
+
+## License
+
+All rights reserved. Sandal © 2026.
