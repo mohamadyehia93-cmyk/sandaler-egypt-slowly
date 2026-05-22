@@ -78,12 +78,24 @@ These files contain foundational work that **must not be silently overwritten**.
 | `src/lib/audio/AudioPlayer.ts` | Howler singleton |
 | `src/i18n/` | Translation files + i18next config |
 | `src/hooks/useLanguage.ts` | RTL/LTR document sync |
+| `src/hooks/useAudioTour.ts` | AudioPlayer React subscription |
+| `src/hooks/useAnalytics.ts` | Typed PostHog event helpers |
+| `src/i18n/config.ts` | i18next bootstrap (explicit entry) |
 | `vite.config.ts` | PWA plugin + build config |
 | `tailwind.config.ts` | Design tokens |
 | `src/index.css` | Sandal CSS variables |
 | `index.html` | OG tags, Cairo font, PWA meta |
 | `.env.example` | Env var template |
+| `.gitignore` | Blocks .env from being committed |
 | `package.json` | Dependency list |
+| `public/favicon.svg` | Sandal-branded SVG favicon |
+| `public/sandal-logo.svg` | Primary brand logo asset |
+| `public/pwa-192x192.png` | PWA icon (manifest + iOS) |
+| `public/pwa-512x512.png` | PWA icon large (maskable) |
+| `supabase/functions/` | Edge Functions — needs deploy review |
+| `supabase/migrations/` | Schema migrations — irreversible in prod |
+| `CONTRIBUTING.md` | This file — workflow definition |
+| `README.md` | Project documentation |
 
 ---
 
