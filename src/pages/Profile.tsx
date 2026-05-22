@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { User, MapPin, ChevronRight, LogOut, LogIn, Bookmark } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
-import { useI18n } from "@/lib/i18n";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/hooks/useLanguage";
 import { useUserRole, roleLabels } from "@/hooks/useUserRole";
 import { VisitorModeProfileToggle } from "@/components/VisitorModeToggle";
 import { useAuth } from "@/hooks/useAuth";
@@ -19,7 +21,8 @@ type SavedItinerary = {
 };
 
 const Profile = () => {
-  const { t, lang } = useI18n();
+  const { t } = useTranslation();
+  const { lang } = useLanguage();
   const navigate = useNavigate();
   const { role } = useUserRole();
   const { user, loading, signOut } = useAuth();
@@ -45,7 +48,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     await signOut();
-    toast.success(lang === "ar" ? "تم تسجيل الخروج" : "Logged out");
+    toast.success(t("profile.logged_out_toast"));
     navigate("/");
   };
 
@@ -64,19 +67,22 @@ const Profile = () => {
           <User className="w-8 h-8 text-primary" />
         </div>
         <h2 className="text-xl font-bold text-foreground">
-          {lang === "ar" ? "سجّل دخولك" : "Sign in to your account"}
+          {t("profile.sign_in_title")}
         </h2>
         <p className="text-sm text-muted-foreground text-center max-w-xs">
-          {lang === "ar" ? "سجّل دخولك لحفظ الرحلات والوصول لملفك الشخصي" : "Sign in to save itineraries and access your profile"}
+          {t("profile.sign_in_subtitle")}
         </p>
         <div className="flex gap-3">
           <Button onClick={() => navigate("/login")} className="gap-2">
             <LogIn className="w-4 h-4" />
-            {lang === "ar" ? "تسجيل الدخول" : "Sign In"}
+            {t("profile.sign_in_button")}
           </Button>
           <Button variant="outline" onClick={() => navigate("/signup")}>
-            {lang === "ar" ? "إنشاء حساب" : "Sign Up"}
+            {t("profile.sign_up_button")}
           </Button>
+        </div>
+        <div className="mt-2">
+          <LanguageToggle />
         </div>
         <BottomNav />
       </div>
@@ -85,29 +91,32 @@ const Profile = () => {
 
   const googleAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture;
   const googleName = user.user_metadata?.full_name || user.user_metadata?.name;
-  const displayName = profile?.display_name || googleName || user.email || (lang === "ar" ? "مسافر" : "Traveler");
+  const displayName = profile?.display_name || googleName || user.email || t("profile.traveler");
   const avatarUrl = profile?.avatar_url || googleAvatar;
 
   const stats = [
-    { value: String(itineraries.length), label: lang === "ar" ? "خطط" : "Plans" },
-    { value: "0", label: lang === "ar" ? "تقييمات" : "Reviews" },
+    { value: String(itineraries.length), label: t("profile.plans") },
+    { value: "0", label: t("profile.reviews") },
   ];
 
   const menuItems = [
-    { label: lang === "ar" ? "لوحة التأثير" : "Impact Dashboard", path: "/profile/impact" },
-    { label: lang === "ar" ? "الشارات والمهام" : "Badges & Quests", path: "/profile/badges" },
-    { label: lang === "ar" ? "الإعدادات" : "Settings", path: "/profile/settings" },
-    { label: lang === "ar" ? "المساعدة والدعم" : "Help & Support", path: "/profile/help" },
+    { label: t("profile.impact_dashboard"), path: "/profile/impact" },
+    { label: t("profile.badges_quests"), path: "/profile/badges" },
+    { label: t("profile.settings"), path: "/profile/settings" },
+    { label: t("profile.help_support"), path: "/profile/help" },
   ];
 
   return (
     <div className="min-h-screen bg-surface pb-20">
       <header className="px-4 py-4 bg-background flex items-center justify-between">
         <h1 className="text-xl font-bold text-primary-dark">{t("nav.profile")}</h1>
-        <button onClick={handleLogout} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-destructive transition-colors">
-          <LogOut className="w-4 h-4" />
-          {lang === "ar" ? "خروج" : "Logout"}
-        </button>
+        <div className="flex items-center gap-2">
+          <LanguageToggle className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs font-medium hover:bg-accent transition-colors" iconClassName="w-3.5 h-3.5" />
+          <button onClick={handleLogout} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-destructive transition-colors">
+            <LogOut className="w-4 h-4" />
+            {t("profile.logout_short")}
+          </button>
+        </div>
       </header>
 
       <div className="px-4 py-6">
@@ -127,7 +136,7 @@ const Profile = () => {
           </div>
           <div className="flex items-center gap-1 mt-1">
             <span className="w-2 h-2 rounded-full bg-primary" />
-            <span className="text-xs font-medium text-primary">{roleLabels[role]?.[lang] || (lang === "ar" ? "مستكشف" : "Explorer")}</span>
+            <span className="text-xs font-medium text-primary">{roleLabels[role]?.[lang] || t("profile.explorer")}</span>
           </div>
         </div>
 
@@ -138,7 +147,7 @@ const Profile = () => {
           <div className="mb-6">
             <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
               <Bookmark className="w-4 h-4 text-primary" />
-              {lang === "ar" ? "الخطط المحفوظة" : "Saved Itineraries"}
+              {t("profile.saved_itineraries")}
             </h3>
             <div className="space-y-2">
               {itineraries.map((it) => (
@@ -151,7 +160,7 @@ const Profile = () => {
                     <p className="text-sm font-medium text-foreground">{it.title}</p>
                     <p className="text-xs text-muted-foreground">
                       {it.destination && `${it.destination} · `}
-                      {it.duration_days && `${it.duration_days} ${lang === "ar" ? "أيام" : "days"} · `}
+                      {it.duration_days && `${it.duration_days} ${t("profile.days_unit")} · `}
                       {new Date(it.created_at).toLocaleDateString()}
                     </p>
                   </div>

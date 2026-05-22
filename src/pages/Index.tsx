@@ -2,10 +2,12 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Calendar, Search, X, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useI18n } from "@/lib/i18n";
+import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/hooks/useLanguage";
 import { useExperiences, useAudioTours, useAccommodations, useTransport, useProducts, useWhosWho } from "@/hooks/useListings";
 import BottomNav from "@/components/BottomNav";
 import TopTabs from "@/components/TopTabs";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import HeroCarousel from "@/components/HeroCarousel";
 import RegionScroll from "@/components/RegionScroll";
 import LatestPosts from "@/components/LatestPosts";
@@ -22,7 +24,8 @@ import Partners from "@/components/Partners";
 import Certifications from "@/components/Certifications";
 
 const Index = () => {
-  const { t, lang } = useI18n();
+  const { t } = useTranslation();
+  const { lang } = useLanguage();
   const [activeTab, setActiveTab] = useState("explore");
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,31 +53,31 @@ const Index = () => {
 
     dbExperiences.forEach((e: any) => {
       const title = pick(e.title_en, e.title_ar);
-      if (title?.toLowerCase().includes(q)) results.push({ id: e.id, title, type: pick("Experience", "تجربة"), route: `/experience/${e.slug || e.id}` });
+      if (title?.toLowerCase().includes(q)) results.push({ id: e.id, title, type: t("explore.result_type_experience"), route: `/experience/${e.slug || e.id}` });
     });
     dbAudioTours.forEach((a: any) => {
       const title = pick(a.title_en, a.title_ar);
-      if (title?.toLowerCase().includes(q)) results.push({ id: a.id, title, type: pick("Audio Tour", "جولة صوتية"), route: `/audio-tour/${a.slug || a.id}` });
+      if (title?.toLowerCase().includes(q)) results.push({ id: a.id, title, type: t("explore.result_type_audio_tour"), route: `/audio-tour/${a.slug || a.id}` });
     });
     dbAccommodations.forEach((ac: any) => {
       const title = pick(ac.name_en, ac.name_ar);
-      if (title?.toLowerCase().includes(q)) results.push({ id: ac.id, title, type: pick("Stay", "إقامة"), route: `/stay/${ac.slug || ac.id}` });
+      if (title?.toLowerCase().includes(q)) results.push({ id: ac.id, title, type: t("explore.result_type_stay"), route: `/stay/${ac.slug || ac.id}` });
     });
     dbWhosWho.forEach((w: any) => {
       const title = pick(w.name_en, w.name_ar);
-      if (title?.toLowerCase().includes(q)) results.push({ id: w.id, title, type: pick("Person", "شخصية"), route: `/person/${w.slug || w.id}` });
+      if (title?.toLowerCase().includes(q)) results.push({ id: w.id, title, type: t("explore.result_type_person"), route: `/person/${w.slug || w.id}` });
     });
     dbProducts.forEach((p: any) => {
       const title = pick(p.name_en, p.name_ar);
-      if (title?.toLowerCase().includes(q)) results.push({ id: p.id, title, type: pick("Product", "منتج"), route: `/product/${p.slug || p.id}` });
+      if (title?.toLowerCase().includes(q)) results.push({ id: p.id, title, type: t("explore.result_type_product"), route: `/product/${p.slug || p.id}` });
     });
     dbTransport.forEach((tr: any) => {
       const title = pick(tr.name_en, tr.name_ar);
-      if (title?.toLowerCase().includes(q)) results.push({ id: tr.id, title, type: pick("Transport", "مواصلات"), route: `/transport/${tr.slug || tr.id}` });
+      if (title?.toLowerCase().includes(q)) results.push({ id: tr.id, title, type: t("explore.result_type_transport"), route: `/transport/${tr.slug || tr.id}` });
     });
 
     return results.slice(0, 8);
-  }, [searchQuery, lang, dbTransport, dbExperiences, dbAudioTours, dbAccommodations, dbProducts, dbWhosWho]);
+  }, [searchQuery, lang, t, dbTransport, dbExperiences, dbAudioTours, dbAccommodations, dbProducts, dbWhosWho]);
 
   const headerTextClass = scrolled ? "text-foreground" : "text-primary-foreground";
 
@@ -94,24 +97,28 @@ const Index = () => {
             </span>
           </div>
           <div className="flex items-center gap-1">
+            <LanguageToggle
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${headerTextClass} hover:bg-background/20`}
+              iconClassName="w-3.5 h-3.5"
+            />
             <button
               className={`p-2 transition-colors ${headerTextClass}`}
               onClick={() => { setSearchOpen(!searchOpen); setSearchQuery(""); }}
-              aria-label="Search"
+              aria-label={t("common.search")}
             >
               {searchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
             </button>
             <button
               className={`p-2 transition-colors ${headerTextClass}`}
               onClick={() => navigate("/calendar")}
-              aria-label={t("date.chooseDate")}
+              aria-label={t("explore.choose_date_banner")}
             >
               <Calendar className="w-5 h-5" />
             </button>
             <button
               className={`relative p-2 transition-colors ${headerTextClass}`}
               onClick={() => navigate("/inbox")}
-              aria-label="Notifications"
+              aria-label={t("common.notifications")}
             >
               <Bell className="w-5 h-5" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
@@ -128,7 +135,7 @@ const Index = () => {
                 autoFocus
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={lang === "ar" ? "ابحث عن تجارب، إقامات، جولات..." : "Search experiences, stays, tours..."}
+                placeholder={t("explore.search_placeholder")}
                 className="pl-9 pr-3 h-9 text-sm bg-secondary border-none"
               />
             </div>
@@ -136,7 +143,7 @@ const Index = () => {
               <div className="absolute left-4 right-4 top-full z-50 bg-background border border-border rounded-lg shadow-lg mt-1 max-h-72 overflow-y-auto">
                 {searchResults.length === 0 ? (
                   <div className="p-4 text-sm text-muted-foreground text-center">
-                    {lang === "ar" ? "لا توجد نتائج" : "No results found"}
+                    {t("explore.no_results")}
                   </div>
                 ) : (
                   searchResults.map((r) => (
@@ -177,7 +184,7 @@ const Index = () => {
                   onClick={() => setWhyOpen((o) => !o)}
                   className="w-full flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"
                 >
-                  {lang === "ar" ? "لماذا صندل؟" : "Why Sandal?"}
+                  {t("explore.why_sandal")}
                   <ChevronDown
                     className={`w-3.5 h-3.5 transition-transform ${whyOpen ? "rotate-180" : ""}`}
                   />

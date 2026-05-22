@@ -48,6 +48,7 @@ const CauseSupportVolunteer = lazy(() => import("./pages/CauseSupportVolunteer.t
 const CauseSupportConsult = lazy(() => import("./pages/CauseSupportConsult.tsx"));
 const Booking = lazy(() => import("./pages/Booking.tsx"));
 const BookingSuccess = lazy(() => import("./pages/BookingSuccess.tsx"));
+const BookingCancelled = lazy(() => import("./components/BookingCancelled.tsx"));
 const EventCalendar = lazy(() => import("./pages/EventCalendar.tsx"));
 const ProviderProfile = lazy(() => import("./pages/ProviderProfile.tsx"));
 const CultureActorDashboard = lazy(() => import("./pages/dashboards/CultureActorDashboard.tsx"));
@@ -156,7 +157,7 @@ const App = () => {
             <Route path="/visitor/:id" element={<VisitorProfile />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/booking/success" element={<BookingSuccess />} />
-            <Route path="/booking/cancelled" element={<div className="p-8 text-center font-cairo">Booking cancelled. <a href="/" className="text-primary underline">Return home</a></div>} />
+            <Route path="/booking/cancelled" element={<BookingCancelled />} />
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile" element={<Profile />} />

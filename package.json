@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "icons:generate": "node scripts/generate-icons.mjs"
+    "icons:generate": "node scripts/generate-icons.mjs",
+    "i18n:check": "node scripts/check-i18n.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
