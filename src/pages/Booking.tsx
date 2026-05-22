@@ -6,6 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { Skeleton } from "@/components/ui/skeleton";
 import NotFoundView from "@/components/NotFound";
+import { useAuth } from "@/hooks/useAuth";
+import { useBooking } from "@/hooks/useBooking";
 
 type BookingType = "experience" | "trip" | "stay" | "transport" | "product";
 
@@ -24,6 +26,10 @@ const Booking = () => {
 
   const type = (params.get("type") || "experience") as BookingType;
   const id = params.get("id") || "";
+  const slotId = params.get("slot");
+
+  const { user } = useAuth();
+  const { startBookingCheckout, isProcessing, error: bookingError } = useBooking();
 
   const { data: item, isLoading } = useQuery({
     queryKey: ["booking-item", type, id],
@@ -56,7 +62,10 @@ const Booking = () => {
   const nights = isStay ? 2 : 0;
   const quantity = isProduct ? guests : 1;
   const subtotal = isProduct ? unitPrice * quantity : isStay ? unitPrice * nights : unitPrice * guests;
-  const serviceFee = Math.round(subtotal * 0.05);
+  // Experiences carry 10% platform fee (Ambassador verification + content production overhead);
+  // stays/products/trips/transport are simpler transactions at 5%. The differential is intentional.
+  const isExperience = type === "experience";
+  const serviceFee = Math.round(subtotal * (isExperience ? 0.10 : 0.05));
   const total = subtotal + serviceFee;
 
   const priceLabel = isStay
@@ -284,6 +293,20 @@ const Booking = () => {
         )}
       </div>
 
+      {/* Inline checkout notices (experience flow only) */}
+      {isExperience && !slotId && step === "payment" && (
+        <div className="mx-4 mb-3 p-3 rounded-lg bg-warning/10 border border-warning text-sm">
+          {lang === "ar"
+            ? "يرجى اختيار موعد محدد من صفحة التجربة قبل إتمام الحجز."
+            : "Please pick a specific time slot from the experience page before checkout."}
+        </div>
+      )}
+      {bookingError && (
+        <div className="mx-4 mb-3 p-3 rounded-lg bg-destructive/10 border border-destructive text-sm text-destructive">
+          {bookingError}
+        </div>
+      )}
+
       {/* Sticky Bottom */}
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
         <div>
@@ -299,11 +322,32 @@ const Booking = () => {
           </button>
         ) : (
           <button
-            onClick={() => setStep("confirmed")}
-            disabled={!paymentMethod}
+            onClick={async () => {
+              if (isExperience) {
+                if (!user) {
+                  navigate(`/login?return=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+                  return;
+                }
+                if (!slotId) return; // Surfaced inline above; no-op so user can read the notice
+                await startBookingCheckout({
+                  experienceId: id,
+                  slotId,
+                  guests,
+                  totalAmountEgp: total,
+                  visitorEmail: user.email || "",
+                });
+                // On success the browser redirects to Stripe. On failure bookingError is set.
+              } else {
+                // TODO(Sprint 3): wire stays/products/trips/transport to Stripe (or Fawry/Paymob per type)
+                setStep("confirmed");
+              }
+            }}
+            disabled={!paymentMethod || isProcessing || (isExperience && !slotId)}
             className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-50"
           >
-            {lang === "ar" ? "ادفع الآن" : "Pay Now"}
+            {isProcessing
+              ? (lang === "ar" ? "جاري المعالجة..." : "Processing...")
+              : (lang === "ar" ? "ادفع الآن" : "Pay Now")}
           </button>
         )}
       </div>

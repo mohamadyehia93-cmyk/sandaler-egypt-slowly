@@ -78,6 +78,9 @@ serve(async (req) => {
 
     const experience = (slot as unknown as { experiences: { id: string; title_en: string; provider_id: string } }).experiences;
     const expectedTotal = slot.price * guests;
+    // 10% platform fee for experiences is intentional — covers Ambassador verification + content
+    // production overhead. Stays/products/trips/transport use 5% (handled in their own checkout
+    // flows when wired). Do not "standardize" these — the differential is by design.
     const platformFee = Math.round(expectedTotal * 0.10);
     const expectedWithFee = expectedTotal + platformFee;
 
