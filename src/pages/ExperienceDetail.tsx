@@ -155,6 +155,7 @@ const ExperienceDetail = () => {
   const slots = useMemo(() => {
     if (dbSlots && dbSlots.length > 0) {
       return dbSlots.map((s: any) => ({
+        id: s.id, // UUID — required by /booking page to drive Stripe checkout
         date: formatSlotDate(s.slot_date),
         time: `${formatTime(s.start_time)} – ${formatTime(s.end_time)}`,
         price: s.price,
@@ -706,7 +707,12 @@ const ExperienceDetail = () => {
           {/* confirm */}
           <div className="px-4 pt-2">
             <button
-              onClick={() => { setSheetOpen(false); navigate(`/booking?type=experience&id=${exp.id || id}`); }}
+              onClick={() => {
+                setSheetOpen(false);
+                const slotUuid = (slots[sheetSlot] as { id?: string } | undefined)?.id;
+                const slotParam = slotUuid ? `&slot=${slotUuid}` : "";
+                navigate(`/booking?type=experience&id=${exp.id || id}${slotParam}`);
+              }}
               className="w-full h-[46px] bg-primary rounded-[10px] text-primary-foreground text-sm font-bold"
             >
               Confirm — {(slots[sheetSlot]?.price || unitPrice) * sheetGuests + Math.round((slots[sheetSlot]?.price || unitPrice) * sheetGuests * 0.1)} EGP
