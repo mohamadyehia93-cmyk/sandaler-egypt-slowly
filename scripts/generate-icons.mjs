@@ -26,12 +26,27 @@ const ogSvg = `
         <stop offset="100%" stop-color="#0F4A45"/>
       </linearGradient>
     </defs>
+
+    <!-- Background -->
     <rect width="1200" height="630" fill="url(#bg)"/>
-    <circle cx="600" cy="180" r="50" fill="#FAEEDA" opacity="0.9"/>
-    <path d="M200 360 Q400 300 600 340 Q800 380 1000 320 L1000 480 Q800 540 600 500 Q400 460 200 520 Z" fill="white" opacity="0.92"/>
-    <text x="600" y="270" text-anchor="middle" font-family="Cairo, sans-serif" font-weight="800" font-size="80" fill="white">Sandal</text>
-    <text x="600" y="320" text-anchor="middle" font-family="Cairo, sans-serif" font-weight="400" font-size="28" fill="#FAEEDA" opacity="0.9">Discover Egypt. Slowly.</text>
-    <text x="600" y="595" text-anchor="middle" font-family="Cairo, sans-serif" font-weight="400" font-size="22" fill="white" opacity="0.7">Egypt's slow rural tourism platform</text>
+
+    <!-- Sun, top-left corner area -->
+    <circle cx="220" cy="180" r="42" fill="#FAEEDA" opacity="0.9"/>
+
+    <!-- Felucca sail and hull, decorative left side -->
+    <g transform="translate(140, 240)">
+      <path d="M 80 0 L 80 140 L 160 140 Z" fill="white" opacity="0.88"/>
+      <path d="M 0 145 Q 80 168 160 145 L 145 175 Q 80 192 15 175 Z" fill="white" opacity="0.85"/>
+    </g>
+
+    <!-- Text content, right-aligned to avoid felucca -->
+    <text x="700" y="280" font-family="Cairo, sans-serif" font-weight="800" font-size="96" fill="white">Sandal</text>
+    <text x="700" y="345" font-family="Cairo, sans-serif" font-weight="400" font-size="32" fill="#FAEEDA" opacity="0.92">Discover Egypt. Slowly.</text>
+    <text x="700" y="395" font-family="Cairo, sans-serif" font-weight="400" font-size="22" fill="white" opacity="0.6">اكتشف مصر. ببطء.</text>
+
+    <!-- Bottom byline -->
+    <line x1="700" y1="540" x2="900" y2="540" stroke="white" stroke-width="2" opacity="0.3"/>
+    <text x="700" y="580" font-family="Cairo, sans-serif" font-weight="500" font-size="22" fill="white" opacity="0.75">Egypt's slow rural tourism platform</text>
   </svg>
 `;
 await sharp(Buffer.from(ogSvg)).png().toFile('public/og-image.png');
