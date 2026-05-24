@@ -4,6 +4,7 @@ import { Bell, Calendar, Search, X, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
+import { SEO } from "@/components/SEO";
 import { useExperiences, useAudioTours, useAccommodations, useTransport, useProducts, useWhosWho } from "@/hooks/useListings";
 import BottomNav from "@/components/BottomNav";
 import TopTabs from "@/components/TopTabs";
@@ -83,6 +84,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-surface pb-20">
+      <SEO url="/" />
       {/* Floating header */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${

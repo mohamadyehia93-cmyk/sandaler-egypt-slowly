@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+>
+  <url>
+    <loc>https://sandal.eg/</loc>
+    <lastmod>2026-05-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sandal.eg/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://sandal.eg/?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sandal.eg/"/>
+  </url>
+  <url>
+    <loc>https://sandal.eg/audio-tours</loc>
+    <lastmod>2026-05-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sandal.eg/audio-tours"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://sandal.eg/audio-tours?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sandal.eg/audio-tours"/>
+  </url>
+  <url>
+    <loc>https://sandal.eg/trips</loc>
+    <lastmod>2026-05-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sandal.eg/trips"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://sandal.eg/trips?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sandal.eg/trips"/>
+  </url>
+  <url>
+    <loc>https://sandal.eg/causes</loc>
+    <lastmod>2026-05-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sandal.eg/causes"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://sandal.eg/causes?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sandal.eg/causes"/>
+  </url>
+  <url>
+    <loc>https://sandal.eg/people</loc>
+    <lastmod>2026-05-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sandal.eg/people"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://sandal.eg/people?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sandal.eg/people"/>
+  </url>
+  <url>
+    <loc>https://sandal.eg/posts</loc>
+    <lastmod>2026-05-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sandal.eg/posts"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://sandal.eg/posts?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sandal.eg/posts"/>
+  </url>
+  <url>
+    <loc>https://sandal.eg/login</loc>
+    <lastmod>2026-05-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sandal.eg/login"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://sandal.eg/login?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sandal.eg/login"/>
+  </url>
+  <url>
+    <loc>https://sandal.eg/signup</loc>
+    <lastmod>2026-05-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://sandal.eg/signup"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://sandal.eg/signup?lang=ar"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://sandal.eg/signup"/>
+  </url>
+</urlset>
