@@ -72,6 +72,7 @@ const NewProgram = lazy(() => import("./pages/dashboards/NewProgram.tsx"));
 const NewFlagReport = lazy(() => import("./pages/dashboards/NewFlagReport.tsx"));
 const NewCollection = lazy(() => import("./pages/dashboards/NewCollection.tsx"));
 const Community = lazy(() => import("./pages/Community.tsx"));
+const Status = lazy(() => import("./pages/Status.tsx"));
 const ItineraryPlanner = lazy(() => import("./pages/ItineraryPlanner.tsx"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword.tsx"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
@@ -155,6 +156,7 @@ const App = () => {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/community" element={<Community />} />
+            <Route path="/status" element={<Status />} />
             <Route path="/statuses" element={<StatusesFeed />} />
             <Route path="/visitor/:id" element={<VisitorProfile />} />
             <Route path="/booking" element={<Booking />} />
