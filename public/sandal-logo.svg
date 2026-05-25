@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="sandalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2BBFB3"/>
+      <stop offset="100%" stop-color="#1A7A74"/>
+    </linearGradient>
+    <linearGradient id="waterGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="112" fill="url(#sandalGradient)"/>
+
+  <!-- Sun, positioned center-upper -->
+  <circle cx="256" cy="200" r="32" fill="#FAEEDA" opacity="0.95"/>
+
+  <!-- Felucca sail (the iconic triangular lateen sail) -->
+  <path d="M 256 240 L 256 380 L 340 380 Z" fill="white" opacity="0.96"/>
+
+  <!-- Felucca hull (curved boat shape under the sail) -->
+  <path d="M 180 385 Q 256 405 332 385 L 320 410 Q 256 425 192 410 Z" fill="white" opacity="0.94"/>
+
+  <!-- Subtle water reflection lines (small, soft) -->
+  <line x1="160" y1="435" x2="220" y2="435" stroke="white" stroke-width="2" opacity="0.3" stroke-linecap="round"/>
+  <line x1="290" y1="435" x2="360" y2="435" stroke="white" stroke-width="2" opacity="0.3" stroke-linecap="round"/>
+  <line x1="180" y1="455" x2="240" y2="455" stroke="white" stroke-width="1.5" opacity="0.2" stroke-linecap="round"/>
+  <line x1="290" y1="455" x2="340" y2="455" stroke="white" stroke-width="1.5" opacity="0.2" stroke-linecap="round"/>
+</svg>
