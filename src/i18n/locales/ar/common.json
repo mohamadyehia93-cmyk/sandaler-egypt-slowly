@@ -263,5 +263,23 @@
     "switch_to_arabic": "تبديل للعربية",
     "english_label": "English",
     "arabic_label": "العربية"
+  },
+  "region": {
+    "about": "عن {{name}}",
+    "explore": "استكشف {{name}}...",
+    "seasonal": "موسمي",
+    "tab_discover": "اكتشف",
+    "tab_stories": "قصص",
+    "tab_experiences": "تجارب",
+    "tab_audio": "جولات صوتية",
+    "no_stories": "لا توجد قصص بعد",
+    "no_experiences": "لا توجد تجارب بعد",
+    "no_audio": "لا توجد جولات صوتية بعد",
+    "min_read": "دقيقة للقراءة",
+    "free": "مجاني",
+    "min": "دقيقة",
+    "stops": "محطات",
+    "not_found": "لم نجد هذه المنطقة",
+    "return_home": "العودة للرئيسية"
   }
 }

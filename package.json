@@ -28,7 +28,13 @@
       "/people",
       "/posts",
       "/login",
-      "/signup"
+      "/signup",
+      "/regions/nile-delta",
+      "/regions/suez-canal",
+      "/regions/upper-egypt",
+      "/regions/mariout",
+      "/regions/fayyum",
+      "/regions/frontiers"
     ]
   },
   "dependencies": {

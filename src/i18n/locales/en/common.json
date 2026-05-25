@@ -263,5 +263,23 @@
     "switch_to_arabic": "Switch to Arabic",
     "english_label": "English",
     "arabic_label": "العربية"
+  },
+  "region": {
+    "about": "About {{name}}",
+    "explore": "Explore {{name}}...",
+    "seasonal": "Seasonal",
+    "tab_discover": "Discover",
+    "tab_stories": "Stories",
+    "tab_experiences": "Things to Do",
+    "tab_audio": "Audio Tours",
+    "no_stories": "No stories yet",
+    "no_experiences": "No experiences yet",
+    "no_audio": "No audio tours yet",
+    "min_read": "min read",
+    "free": "Free",
+    "min": "min",
+    "stops": "stops",
+    "not_found": "Region not found",
+    "return_home": "Return home"
   }
 }

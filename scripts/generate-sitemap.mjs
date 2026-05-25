@@ -7,7 +7,15 @@ const ROOT = join(__dirname, "..");
 const PUBLIC = join(ROOT, "public");
 const BASE_URL = "https://sandal.eg";
 
-// Static routes to include in sitemap
+const REGION_SLUGS = [
+  "nile-delta",
+  "suez-canal",
+  "upper-egypt",
+  "mariout",
+  "fayyum",
+  "frontiers",
+];
+
 const staticRoutes = [
   { path: "/", changefreq: "daily", priority: "1.0" },
   { path: "/audio-tours", changefreq: "daily", priority: "0.9" },
@@ -17,6 +25,11 @@ const staticRoutes = [
   { path: "/posts", changefreq: "daily", priority: "0.8" },
   { path: "/login", changefreq: "monthly", priority: "0.3" },
   { path: "/signup", changefreq: "monthly", priority: "0.3" },
+  ...REGION_SLUGS.map((slug) => ({
+    path: `/regions/${slug}`,
+    changefreq: "weekly",
+    priority: "0.9",
+  })),
 ];
 
 const today = new Date().toISOString().split("T")[0];
