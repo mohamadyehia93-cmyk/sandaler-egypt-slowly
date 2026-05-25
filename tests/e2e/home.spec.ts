@@ -27,7 +27,7 @@ test.describe("Home page", () => {
     expect(response?.status()).toBe(200);
     const body = await response!.text();
     expect(body).toContain("<urlset");
-    expect(body).toContain("sandal.eg");
+    expect(body).toContain("sandaler-egypt-slowly.lovable.app");
     // All 6 region routes are present
     expect(body).toContain("/regions/nile-delta");
     expect(body).toContain("/regions/fayyum");
@@ -39,7 +39,7 @@ test.describe("Home page", () => {
     expect(response?.status()).toBe(200);
     const body = await response!.text();
     expect(body).toContain("Sitemap:");
-    expect(body).toContain("sandal.eg/sitemap.xml");
+    expect(body).toContain("sandaler-egypt-slowly.lovable.app/sitemap.xml");
   });
 });
 
