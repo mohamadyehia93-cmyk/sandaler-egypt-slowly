@@ -5,7 +5,8 @@ import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const PUBLIC = join(ROOT, "public");
-const BASE_URL = "https://sandal.eg";
+// TODO: switch to "https://sandal.eg" once the domain is registered (Sprint 3)
+const BASE_URL = "https://sandaler-egypt-slowly.lovable.app";
 
 const REGION_SLUGS = [
   "nile-delta",

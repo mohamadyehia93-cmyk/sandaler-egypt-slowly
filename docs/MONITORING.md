@@ -40,11 +40,14 @@ every 30s and renders a three-state UI (loading / error / health grid). It is
 
 Configure an external uptime monitor (UptimeRobot, BetterStack, or Pingdom) with:
 
-| Check                | Target                                  | Interval | Alert when            |
-| -------------------- | --------------------------------------- | -------- | --------------------- |
-| Health (primary)     | `/functions/v1/health`                  | 1 min    | HTTP != 200 for 2 min |
-| Home page            | `https://sandal.eg/`                    | 5 min    | HTTP != 200 for 5 min |
-| Status page          | `https://sandal.eg/status`              | 5 min    | HTTP != 200 for 5 min |
+| Check                | Target                                                          | Interval | Alert when            |
+| -------------------- | --------------------------------------------------------------- | -------- | --------------------- |
+| Health (primary)     | `/functions/v1/health`                                          | 1 min    | HTTP != 200 for 2 min |
+| Home page            | `https://sandaler-egypt-slowly.lovable.app/`                    | 5 min    | HTTP != 200 for 5 min |
+| Status page          | `https://sandaler-egypt-slowly.lovable.app/status`              | 5 min    | HTTP != 200 for 5 min |
+
+> **Note:** Current live URL is `https://sandaler-egypt-slowly.lovable.app`. Update these targets
+> to `https://sandal.eg` once the domain is registered (Sprint 3).
 
 - Use a keyword check on the health monitor: alert if the response body does
   **not** contain `"status": "healthy"`. This catches a 503 `degraded` response
@@ -127,7 +130,7 @@ selector masking, and dev opt-out.
 
 ### Site is up but Google isn't indexing region pages
 
-1. Confirm `https://sandal.eg/sitemap.xml` returns 200 and lists all 6 region
+1. Confirm `https://sandaler-egypt-slowly.lovable.app/sitemap.xml` returns 200 and lists all 6 region
    routes.
 2. Confirm `npm run build` (with react-snap) produced
    `dist/regions/<slug>/index.html` with real prerendered HTML.
