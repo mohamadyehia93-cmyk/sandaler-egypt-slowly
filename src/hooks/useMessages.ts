@@ -105,7 +105,7 @@ export const useMessages = (conversationId: string | null) => {
     fetchMsgs();
 
     const channel = supabase
-      .channel(`messages-${conversationId}`)
+      .channel(`conversation:${conversationId}`, { config: { private: true } })
       .on("postgres_changes", {
         event: "INSERT",
         schema: "public",
