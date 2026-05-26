@@ -52,20 +52,24 @@ function buildCatalog(lang: "en" | "ar"): string {
 }
 
 async function streamChat({
-  messages, catalog, onDelta, onDone, onError,
+  messages, catalog, accessToken, onDelta, onDone, onError, onUnauthorized,
 }: {
   messages: Msg[]; catalog: string;
+  accessToken: string;
   onDelta: (t: string) => void; onDone: () => void; onError: (e: string) => void;
+  onUnauthorized: () => void;
 }) {
   try {
     const resp = await fetch(CHAT_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        Authorization: `Bearer ${accessToken}`,
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
       },
       body: JSON.stringify({ messages, catalog }),
     });
+    if (resp.status === 401) { onUnauthorized(); return; }
     if (!resp.ok) {
       const err = await resp.json().catch(() => ({ error: "Request failed" }));
       onError(err.error || `Error ${resp.status}`);
@@ -272,6 +276,12 @@ const ItineraryPlanner = () => {
 
   const send = useCallback(async (text: string) => {
     if (!text.trim() || isLoading) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      // Session expired or missing — bounce to login. No API call fires.
+      navigate("/login?next=/itinerary");
+      return;
+    }
     setError(null);
     const userMsg: Msg = { role: "user", content: text.trim() };
     const allMessages = [...messages, userMsg];
@@ -294,11 +304,16 @@ const ItineraryPlanner = () => {
     await streamChat({
       messages: allMessages,
       catalog,
+      accessToken: session.access_token,
       onDelta: upsert,
       onDone: () => setIsLoading(false),
       onError: (e) => { setError(e); setIsLoading(false); },
+      onUnauthorized: () => {
+        setIsLoading(false);
+        navigate("/login?next=/itinerary");
+      },
     });
-  }, [messages, isLoading, catalog]);
+  }, [messages, isLoading, catalog, navigate]);
 
   const saveItinerary = useCallback(async () => {
     if (!user || messages.length === 0) {
@@ -322,6 +337,46 @@ const ItineraryPlanner = () => {
   }, [user, messages, savedId, lang]);
 
   const prompts = quickPrompts[lang] || quickPrompts.en;
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-surface pb-20 flex flex-col">
+        <header className="flex items-center gap-3 px-4 py-3 bg-background border-b border-border">
+          <button onClick={() => navigate(-1)} aria-label="Back">
+            <ArrowLeft className="w-5 h-5 text-foreground" />
+          </button>
+          <div className="flex items-center gap-2 flex-1">
+            <Sparkles className="w-5 h-5 text-primary" />
+            <h1 className="text-lg font-bold text-foreground">
+              {lang === "ar" ? "مخطط الرحلة" : "Trip Planner"}
+            </h1>
+          </div>
+        </header>
+        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+            <Sparkles className="w-8 h-8 text-primary" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground">
+            {lang === "ar"
+              ? "سجّل دخولك لاستخدام مخطط الرحلة بالذكاء الاصطناعي"
+              : "Sign in to use the AI Trip Planner"}
+          </h2>
+          <p className="text-sm text-muted-foreground max-w-sm">
+            {lang === "ar"
+              ? "خطّط رحلتك المثالية في مصر، احفظها، وعد إليها في أي وقت."
+              : "Plan your perfect Egypt trip, save it, and come back to it anytime."}
+          </p>
+          <Button
+            onClick={() => navigate("/login?next=/itinerary")}
+            className="mt-2 w-full max-w-xs"
+          >
+            {lang === "ar" ? "تسجيل الدخول للمتابعة" : "Sign in to continue"}
+          </Button>
+        </div>
+        <BottomNav />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-surface pb-20 flex flex-col">

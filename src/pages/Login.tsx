@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ import { toast } from "sonner";
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const next = params.get("next") || "/profile";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -25,7 +27,7 @@ const Login = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      navigate("/profile");
+      navigate(next);
     }
   };
 
@@ -93,12 +95,12 @@ const Login = () => {
           className="w-full gap-2"
           onClick={async () => {
           const result = await lovable.auth.signInWithOAuth("google", {
-              redirect_uri: window.location.origin,
+              redirect_uri: window.location.origin + next,
             });
             if (result.error) {
               toast.error(result.error instanceof Error ? result.error.message : t("auth.google_signin_failed"));
             } else if (!result.redirected) {
-              navigate("/profile");
+              navigate(next);
             }
           }}
         >
@@ -108,7 +110,7 @@ const Login = () => {
 
         <p className="text-center text-sm text-muted-foreground">
           {t("auth.dont_have_account")}{" "}
-          <Link to="/signup" className="text-primary font-medium hover:underline">
+          <Link to={`/signup${next !== "/profile" ? `?next=${encodeURIComponent(next)}` : ""}`} className="text-primary font-medium hover:underline">
             {t("auth.sign_up")}
           </Link>
         </p>
