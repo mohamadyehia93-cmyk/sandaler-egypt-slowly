@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -7,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/lib/i18n";
 import { UserRoleProvider } from "@/hooks/useUserRole";
 import { AuthProvider } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
 import RouteGuard from "@/components/RouteGuard";
 
 // Eager — first paint critical
@@ -26,6 +28,7 @@ const Wishlists = lazy(() => import("./pages/Wishlists.tsx"));
 const Inbox = lazy(() => import("./pages/Inbox.tsx"));
 const Profile = lazy(() => import("./pages/Profile.tsx"));
 const RegionDetail = lazy(() => import("./pages/RegionDetail.tsx"));
+const RegionPage = lazy(() => import("./pages/RegionPage.tsx"));
 const CityDetail = lazy(() => import("./pages/CityDetail.tsx"));
 const HighlightDetail = lazy(() => import("./pages/HighlightDetail.tsx"));
 const PersonDetail = lazy(() => import("./pages/PersonDetail.tsx"));
@@ -45,6 +48,8 @@ const CauseSupportDonate = lazy(() => import("./pages/CauseSupportDonate.tsx"));
 const CauseSupportVolunteer = lazy(() => import("./pages/CauseSupportVolunteer.tsx"));
 const CauseSupportConsult = lazy(() => import("./pages/CauseSupportConsult.tsx"));
 const Booking = lazy(() => import("./pages/Booking.tsx"));
+const BookingSuccess = lazy(() => import("./pages/BookingSuccess.tsx"));
+const BookingCancelled = lazy(() => import("./components/BookingCancelled.tsx"));
 const EventCalendar = lazy(() => import("./pages/EventCalendar.tsx"));
 const ProviderProfile = lazy(() => import("./pages/ProviderProfile.tsx"));
 const CultureActorDashboard = lazy(() => import("./pages/dashboards/CultureActorDashboard.tsx"));
@@ -67,6 +72,7 @@ const NewProgram = lazy(() => import("./pages/dashboards/NewProgram.tsx"));
 const NewFlagReport = lazy(() => import("./pages/dashboards/NewFlagReport.tsx"));
 const NewCollection = lazy(() => import("./pages/dashboards/NewCollection.tsx"));
 const Community = lazy(() => import("./pages/Community.tsx"));
+const Status = lazy(() => import("./pages/Status.tsx"));
 const ItineraryPlanner = lazy(() => import("./pages/ItineraryPlanner.tsx"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword.tsx"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
@@ -100,7 +106,9 @@ const RouteFallback = () => (
   </div>
 );
 
-const App = () => (
+const App = () => {
+  useLanguage(); // sets html lang and dir on mount and on language change
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <I18nProvider>
@@ -129,6 +137,7 @@ const App = () => (
             <Route path="/cause/:id/volunteer" element={<CauseSupportVolunteer />} />
             <Route path="/cause/:id/consult" element={<CauseSupportConsult />} />
             <Route path="/region/:regionId" element={<RegionDetail />} />
+            <Route path="/regions/:slug" element={<RegionPage />} />
             <Route path="/person/:id" element={<PersonDetail />} />
             <Route path="/city/:cityId" element={<CityDetail />} />
             <Route path="/city/:cityId/highlight/:highlightSlug" element={<HighlightDetail />} />
@@ -147,9 +156,12 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/community" element={<Community />} />
+            <Route path="/status" element={<Status />} />
             <Route path="/statuses" element={<StatusesFeed />} />
             <Route path="/visitor/:id" element={<VisitorProfile />} />
             <Route path="/booking" element={<Booking />} />
+            <Route path="/booking/success" element={<BookingSuccess />} />
+            <Route path="/booking/cancelled" element={<BookingCancelled />} />
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile" element={<Profile />} />
@@ -193,6 +205,15 @@ const App = () => (
       </I18nProvider>
     </TooltipProvider>
   </QueryClientProvider>
+  );
+};
+
+const SentryFallback = () => (
+  <div style={{ padding: 20, textAlign: 'center', fontFamily: 'Cairo, sans-serif' }}>
+    <h1>Something went wrong</h1>
+    <p>We've been notified and are looking into it.</p>
+    <button onClick={() => window.location.reload()}>Reload</button>
+  </div>
 );
 
-export default App;
+export default Sentry.withErrorBoundary(App, { fallback: <SentryFallback /> });

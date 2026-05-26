@@ -14,9 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"DM Sans"', '"Cairo"', 'sans-serif'],
+        sans: ['"Cairo"', 'system-ui', 'sans-serif'],
         cairo: ['"Cairo"', 'sans-serif'],
-        display: ['"DM Sans"', 'sans-serif'],
+        display: ['"Cairo"', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

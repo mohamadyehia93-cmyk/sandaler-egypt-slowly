@@ -12,3 +12,15 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /booking
+Disallow: /booking/
+Disallow: /profile
+Disallow: /profile/
+Disallow: /dashboard/
+Disallow: /inbox
+Disallow: /wishlists
+Disallow: /planner
+Disallow: /reset-password
+Disallow: /forgot-password
+
+Sitemap: https://sandaler-egypt-slowly.lovable.app/sitemap.xml

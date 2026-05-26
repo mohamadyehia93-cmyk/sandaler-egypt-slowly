@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback, useMemo } from "react";
 import { ArrowLeft, Share2, Heart, MessageCircle, MapPin, Bus, Train, ChevronRight, Plus, Minus, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useI18n } from "@/lib/i18n";
+import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/hooks/useLanguage";
 import { useQuery } from "@tanstack/react-query";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,21 +17,6 @@ const fallbackTags = [
   { label: "4 hours", bg: "bg-muted", border: "border-border", text: "text-muted-foreground" },
   { label: "Women-friendly", bg: "bg-success/10", border: "border-success/40", text: "text-success" },
   { label: "Seasonal: Oct–Mar", bg: "bg-warning/10", border: "border-warning/40", text: "text-warning" },
-];
-
-const fallbackSteps = [
-  { num: 1, title: "Board the traditional felucca", desc: "Meet Hassan at Manzala main dock. Life jackets provided. 30 min · Arabic + English", color: "bg-secondary" },
-  { num: 2, title: "Spot migratory birds", desc: "Scan the lake for flamingos, herons and cormorants. Binoculars provided. 2 hrs", color: "bg-secondary" },
-  { num: 3, title: "Local tea and stories", desc: "Wind down at a fisherman's café. Hassan shares Manzala's fishing heritage. 30 min", color: "bg-warning/30" },
-];
-
-const thingsToKnow = [
-  { icon: "👥", label: "Guest requirements", desc: "Ages 8+. Life jackets provided." },
-  { icon: "🥾", label: "Activity level", desc: "Light — seated on the boat." },
-  { icon: "🎒", label: "What to bring", desc: "Binoculars, sun cream, layers." },
-  { icon: "📵", label: "Offline friendly", desc: "Download map before your trip." },
-  { icon: "🤝", label: "Rural etiquette", desc: "Read our 2-min guide before booking." },
-  { icon: "❌", label: "Cancellation", desc: "Free up to 24h before start." },
 ];
 
 /* ── helpers ──────────────────────────────────────────────────── */
@@ -59,8 +45,24 @@ const formatSlotDate = (dateStr: string) => {
 const ExperienceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { lang } = useI18n();
+  const { t } = useTranslation();
+  const { lang } = useLanguage();
   const reviewsRef = useRef<HTMLDivElement>(null);
+
+  const fallbackSteps = [
+    { num: 1, title: t("experience.step_1_title"), desc: t("experience.step_1_desc"), color: "bg-secondary" },
+    { num: 2, title: t("experience.step_2_title"), desc: t("experience.step_2_desc"), color: "bg-secondary" },
+    { num: 3, title: t("experience.step_3_title"), desc: t("experience.step_3_desc"), color: "bg-warning/30" },
+  ];
+
+  const thingsToKnow = [
+    { icon: "👥", label: t("experience.guest_requirements"), desc: t("experience.things_to_know_descriptions_guest_requirements") },
+    { icon: "🥾", label: t("experience.activity_level"), desc: t("experience.things_to_know_descriptions_activity_level") },
+    { icon: "🎒", label: t("experience.what_to_bring"), desc: t("experience.things_to_know_descriptions_what_to_bring") },
+    { icon: "📵", label: t("experience.offline_friendly"), desc: t("experience.things_to_know_descriptions_offline_friendly") },
+    { icon: "🤝", label: t("experience.rural_etiquette"), desc: t("experience.things_to_know_descriptions_rural_etiquette") },
+    { icon: "❌", label: t("experience.cancellation_policy"), desc: t("experience.things_to_know_descriptions_cancellation") },
+  ];
 
   const [saved, setSaved] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(0);
@@ -155,6 +157,7 @@ const ExperienceDetail = () => {
   const slots = useMemo(() => {
     if (dbSlots && dbSlots.length > 0) {
       return dbSlots.map((s: any) => ({
+        id: s.id, // UUID — required by /booking page to drive Stripe checkout
         date: formatSlotDate(s.slot_date),
         time: `${formatTime(s.start_time)} – ${formatTime(s.end_time)}`,
         price: s.price,
@@ -196,23 +199,27 @@ const ExperienceDetail = () => {
     : (exp?.host_name_en || "HM").split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase();
 
   const hostSubtitle = provider
-    ? `${provider.role === "service-provider" ? "Local guide" : provider.role} · ${provider.city_en || ""} · ${provider.years_active || 0} years`
-    : "Local boatman · Lake Manzala · 8 years";
+    ? t("experience.host_subtitle", {
+        role: provider.role === "service-provider" ? t("experience.host_role_service_provider") : provider.role,
+        city: provider.city_en || "",
+        years: provider.years_active || 0,
+      })
+    : t("experience.host_default_subtitle");
 
   const hostCredentials = provider
     ? [
         provider.bio_en ? provider.bio_en.split(".")[0] : null,
-        provider.languages ? `Speaks: ${provider.languages}` : null,
-        `On Sandal since ${new Date(provider.created_at).getFullYear()} · ${provider.review_count || 0} reviews`,
+        provider.languages ? t("experience.speaks", { languages: provider.languages }) : null,
+        t("experience.on_sandal_since", { year: new Date(provider.created_at).getFullYear(), count: provider.review_count || 0 }),
         provider.specialties && Array.isArray(provider.specialties)
-          ? `Specializes in: ${(provider.specialties as any[]).map((s: any) => s.en || s).join(", ")}`
+          ? t("experience.specializes_in", { topics: (provider.specialties as any[]).map((s: any) => s.en || s).join(", ") })
           : null,
       ].filter(Boolean) as string[]
     : [
-        "Born and raised in Manzala — knows every inch of the lake",
-        "Speaks: Arabic, English (conversational)",
-        "On Sandal since 2024 · 24 completed experiences",
-        "Specializes in: flamingo season, fishing heritage, wetland ecology",
+        t("experience.host_fallback_born_raised"),
+        t("experience.host_fallback_speaks"),
+        t("experience.host_fallback_on_sandal"),
+        t("experience.host_fallback_specializes"),
       ];
 
   const unitPrice = slots[selectedSlot]?.price ?? exp?.price ?? 150;
@@ -278,7 +285,7 @@ const ExperienceDetail = () => {
         <button onClick={() => navigate(-1)} className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center">
           <ArrowLeft className="w-4 h-4 text-foreground" />
         </button>
-        <span className="text-xs text-muted-foreground font-normal">{regionName} · Experiences</span>
+        <span className="text-xs text-muted-foreground font-normal">{regionName} · {t("experience.experiences_subtitle")}</span>
         <div className="flex gap-2">
           <button className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center">
             <Share2 className="w-3.5 h-3.5 text-foreground" />
@@ -297,10 +304,10 @@ const ExperienceDetail = () => {
       <div className="relative h-[260px]">
         <img src={photos[0]} alt={title} className="w-full h-full object-cover" />
         {photos.length > 1 && (
-          <span className="absolute bottom-2.5 right-2.5 bg-black/55 text-primary-foreground text-[11px] px-2 py-0.5 rounded-md">+{photos.length - 1} photos</span>
+          <span className="absolute bottom-2.5 right-2.5 bg-black/55 text-primary-foreground text-[11px] px-2 py-0.5 rounded-md">{t("experience.more_photos", { count: photos.length - 1 })}</span>
         )}
         {exp.verified && (
-          <span className="absolute top-2.5 left-2.5 bg-secondary border border-primary/40 text-primary-dark text-[9px] font-medium px-2 py-0.5 rounded-full">✓ Ambassador verified</span>
+          <span className="absolute top-2.5 left-2.5 bg-secondary border border-primary/40 text-primary-dark text-[9px] font-medium px-2 py-0.5 rounded-full">✓ {t("common.ambassador_verified")}</span>
         )}
       </div>
 
@@ -311,23 +318,23 @@ const ExperienceDetail = () => {
         <div className="pt-3.5">
           <h1 className="text-[17px] font-bold text-foreground leading-[1.35] mb-2">{title}</h1>
           <div className="flex gap-1.5 overflow-x-auto hide-scrollbar mb-2.5">
-            {tags.map((t, i) => (
-              <span key={i} className={`flex-shrink-0 px-2.5 py-[3px] rounded-full text-[10px] font-medium border ${t.bg} ${t.border} ${t.text}`}>{t.label}</span>
+            {tags.map((tag, i) => (
+              <span key={i} className={`flex-shrink-0 px-2.5 py-[3px] rounded-full text-[10px] font-medium border ${tag.bg} ${tag.border} ${tag.text}`}>{tag.label}</span>
             ))}
           </div>
           <div className="flex items-center gap-1.5 flex-wrap mb-2.5">
             <StarRow count={exp.rating || 0} />
             <span className="text-[13px] font-semibold text-foreground">{exp.rating || 0}</span>
-            <button onClick={scrollToReviews} className="text-xs text-primary underline">{exp.reviews_count || reviews.length} reviews</button>
-            <span className="bg-success/10 border border-success/40 text-success text-[10px] font-medium px-2 py-0.5 rounded-full">{reviews.filter(r => r.verified).length} verified attendees</span>
+            <button onClick={scrollToReviews} className="text-xs text-primary underline">{t("experience.reviews_count", { count: exp.reviews_count || reviews.length })}</button>
+            <span className="bg-success/10 border border-success/40 text-success text-[10px] font-medium px-2 py-0.5 rounded-full">{t("common.verified_attendees", { count: reviews.filter(r => r.verified).length })}</span>
           </div>
 
           {/* AI summary */}
           {reviews.length > 0 && (
             <div className="bg-secondary border-l-[3px] border-l-primary rounded-r-lg p-2.5 mb-2.5">
-              <p className="text-[9px] font-medium text-primary mb-1">✦ AI summary of {exp.reviews_count || reviews.length} reviews</p>
+              <p className="text-[9px] font-medium text-primary mb-1">{t("experience.ai_summary", { count: exp.reviews_count || reviews.length })}</p>
               <p className="text-[11px] italic text-primary-dark leading-[1.55]">
-                Visitors love {hostName?.split(" ")[0] || "the host"}'s deep knowledge and patience. Most recommend this experience for its authenticity and connection to local culture.
+                {t("experience.ai_summary_template", { name: hostName?.split(" ")[0] || t("experience.default_host_name") })}
               </p>
             </div>
           )}
@@ -360,11 +367,11 @@ const ExperienceDetail = () => {
             onClick={() => navigate(`/inbox?personId=${providerId || exp.provider_id || ""}&name=${encodeURIComponent(hostName || "")}`)}
             className="w-full h-10 rounded-lg border border-primary text-primary text-xs font-semibold mb-1.5"
           >
-            Message {hostName?.split(" ")[0] || "Host"}
+            {t("experience.message_host", { name: hostName?.split(" ")[0] || t("experience.default_host_name") })}
           </button>
           <div className="flex items-start gap-1.5">
             <span className="text-xs flex-shrink-0">🔒</span>
-            <p className="text-[10px] text-muted-foreground leading-[1.5]">Always book and pay through Sandal to protect your experience. Support: +20 100 XXX XXXX</p>
+            <p className="text-[10px] text-muted-foreground leading-[1.5]">{t("experience.always_book_through_sandal")}</p>
           </div>
         </div>
 
@@ -372,9 +379,13 @@ const ExperienceDetail = () => {
 
         {/* 3D REVENUE TRANSPARENCY */}
         <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2">Where your money goes</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.where_your_money_goes")}</h2>
           <div className="grid grid-cols-3 gap-2">
-            {[{ n: String(hostShare), l: `EGP to ${hostName?.split(" ")[0] || "Host"}` }, { n: String(unitPrice - hostShare), l: "Platform fee" }, { n: "0", l: "To intermediary" }].map((c, i) => (
+            {[
+              { n: String(hostShare), l: t("experience.egp_to", { name: hostName?.split(" ")[0] || t("experience.default_host_name") }) },
+              { n: String(unitPrice - hostShare), l: t("experience.platform_fee") },
+              { n: "0", l: t("experience.to_intermediary") },
+            ].map((c, i) => (
               <div key={i} className="border border-border rounded-lg p-2.5 text-center bg-card">
                 <p className="text-xl font-bold text-primary">{c.n}</p>
                 <p className="text-[10px] text-muted-foreground mt-0.5">{c.l}</p>
@@ -387,7 +398,7 @@ const ExperienceDetail = () => {
 
         {/* 3E WHAT YOU'LL DO — Timeline */}
         <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2.5">What you'll do</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-2.5">{t("experience.what_youll_do")}</h2>
           <div className="space-y-0">
             {fallbackSteps.map((s, i) => (
               <div key={s.num} className="flex gap-2.5 relative pb-2">
@@ -409,7 +420,7 @@ const ExperienceDetail = () => {
 
         {/* 3F UPCOMING AVAILABILITY */}
         <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2">Upcoming availability</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.upcoming_availability")}</h2>
           <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
             {slots.map((s, i) => (
               <button
@@ -422,8 +433,8 @@ const ExperienceDetail = () => {
                 <p className={`text-xs font-semibold ${selectedSlot === i ? "text-primary-dark" : "text-foreground"}`}>{s.date}</p>
                 <p className="text-[11px] text-muted-foreground mt-0.5">{s.time}</p>
                 <div className="flex justify-between items-center mt-1.5">
-                  <span className={`text-[11px] font-semibold ${s.discounted ? "text-warning" : "text-primary"}`}>{s.price} EGP</span>
-                  <span className={`text-[10px] ${s.low ? "text-destructive font-medium" : "text-muted-foreground"}`}>{s.spots} spots</span>
+                  <span className={`text-[11px] font-semibold ${s.discounted ? "text-warning" : "text-primary"}`}>{s.price} {t("common.egp")}</span>
+                  <span className={`text-[10px] ${s.low ? "text-destructive font-medium" : "text-muted-foreground"}`}>{s.spots} {t("experience.spots")}</span>
                 </div>
               </button>
             ))}
@@ -436,8 +447,8 @@ const ExperienceDetail = () => {
         <div>
           <div className="flex justify-between items-center py-3 border-y border-border">
             <div>
-              <p className="text-[13px] font-semibold text-foreground">Adults</p>
-              <button className="text-[11px] text-primary underline">+ Add children (half price)</button>
+              <p className="text-[13px] font-semibold text-foreground">{t("experience.adults")}</p>
+              <button className="text-[11px] text-primary underline">{t("experience.add_children_half_price")}</button>
             </div>
             <div className="flex items-center gap-3">
               <button onClick={() => setGuests(Math.max(1, guests - 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center">
@@ -450,11 +461,11 @@ const ExperienceDetail = () => {
             </div>
           </div>
           <div className="py-2.5 space-y-1.5">
-            <div className="flex justify-between"><span className="text-[13px] text-foreground">{guests} × {unitPrice} EGP</span><span className="text-[13px] text-foreground">{guests * unitPrice} EGP</span></div>
-            <div className="flex justify-between"><span className="text-xs text-muted-foreground">Platform fee</span><span className="text-xs text-muted-foreground">{platformFee} EGP</span></div>
-            <div className="flex justify-between"><span className="text-[11px] text-muted-foreground">Free cancellation until Dec 25</span><span className="text-xs font-medium text-success">✓</span></div>
+            <div className="flex justify-between"><span className="text-[13px] text-foreground">{guests} × {unitPrice} {t("common.egp")}</span><span className="text-[13px] text-foreground">{guests * unitPrice} {t("common.egp")}</span></div>
+            <div className="flex justify-between"><span className="text-xs text-muted-foreground">{t("experience.platform_fee")}</span><span className="text-xs text-muted-foreground">{platformFee} {t("common.egp")}</span></div>
+            <div className="flex justify-between"><span className="text-[11px] text-muted-foreground">{t("experience.free_cancellation_until_dec_25")}</span><span className="text-xs font-medium text-success">✓</span></div>
             <div className="h-px bg-black/[0.06]" />
-            <div className="flex justify-between"><span className="text-sm font-semibold text-foreground">Total</span><span className="text-sm font-semibold text-foreground">{total} EGP</span></div>
+            <div className="flex justify-between"><span className="text-sm font-semibold text-foreground">{t("booking.total")}</span><span className="text-sm font-semibold text-foreground">{total} {t("common.egp")}</span></div>
           </div>
         </div>
 
@@ -462,14 +473,18 @@ const ExperienceDetail = () => {
 
         {/* 3H MEETING POINT MAP */}
         <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2">Where we'll meet</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.where_well_meet")}</h2>
           <div className="relative w-full h-[120px] bg-secondary rounded-[10px] border border-primary/40 mb-2 flex items-center justify-center overflow-hidden">
             <span className="text-2xl">📍</span>
-            <span className="absolute bottom-2.5 bg-card border border-border text-foreground text-[9px] px-1.5 py-0.5 rounded">{exp.meeting_point_name || "Meeting Point"}</span>
+            <span className="absolute bottom-2.5 bg-card border border-border text-foreground text-[9px] px-1.5 py-0.5 rounded">{exp.meeting_point_name || t("experience.meeting_point_default")}</span>
           </div>
           <div className="flex items-start gap-1.5">
             <span className="text-xs flex-shrink-0">🚌</span>
-            <p className="text-[11px] text-muted-foreground leading-[1.5]">Hotel pickup available from Mansoura city center (+20 EGP). Select when booking. Download <span className="text-primary underline">offline map</span> for areas with poor signal.</p>
+            <p className="text-[11px] text-muted-foreground leading-[1.5]">
+              {t("experience.hotel_pickup_description", { offlineMap: t("experience.offline_map") }).split(t("experience.offline_map"))[0]}
+              <span className="text-primary underline">{t("experience.offline_map")}</span>
+              {t("experience.hotel_pickup_description", { offlineMap: t("experience.offline_map") }).split(t("experience.offline_map"))[1]}
+            </p>
           </div>
         </div>
 
@@ -479,22 +494,22 @@ const ExperienceDetail = () => {
         {regionTransport && regionTransport.length > 0 && (
           <>
             <div>
-              <h2 className="text-sm font-semibold text-foreground mb-2">Getting there</h2>
+              <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.getting_there")}</h2>
               <div className="bg-secondary rounded-[10px] border border-primary/40 p-3">
-                <p className="text-xs font-semibold text-primary-dark mb-2">Transport options in {regionName}</p>
+                <p className="text-xs font-semibold text-primary-dark mb-2">{t("experience.transport_options_in", { region: regionName })}</p>
                 <div className="space-y-1.5">
-                  {regionTransport.map((t) => {
-                    const Icon = t.transport_type === "train" ? Train : Bus;
-                    const name = lang === "ar" ? t.name_ar : t.name_en;
-                    const from = lang === "ar" ? (t.from_ar || t.from_en) : t.from_en;
-                    const to = lang === "ar" ? (t.to_ar || t.to_en) : t.to_en;
+                  {regionTransport.map((tr) => {
+                    const Icon = tr.transport_type === "train" ? Train : Bus;
+                    const name = lang === "ar" ? tr.name_ar : tr.name_en;
+                    const from = lang === "ar" ? (tr.from_ar || tr.from_en) : tr.from_en;
+                    const to = lang === "ar" ? (tr.to_ar || tr.to_en) : tr.to_en;
                     return (
-                      <div key={t.id} className="flex items-center gap-2.5">
+                      <div key={tr.id} className="flex items-center gap-2.5">
                         <div className="w-[26px] h-[26px] rounded-[7px] bg-primary flex items-center justify-center flex-shrink-0">
                           <Icon className="w-3 h-3 text-primary-foreground" />
                         </div>
                         <span className="text-[11px] text-primary-dark leading-[1.4]">
-                          {name}: {from} → {to} · {t.duration || "?"} · {t.price} EGP
+                          {name}: {from} → {to} · {tr.duration || "?"} · {tr.price} {t("common.egp")}
                         </span>
                       </div>
                     );
@@ -509,8 +524,8 @@ const ExperienceDetail = () => {
         {/* 3J REVIEWS */}
         <div ref={reviewsRef}>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-semibold text-foreground"><span className="text-warning">★</span> {exp.rating || 0} · {exp.reviews_count || reviews.length} reviews</span>
-            <button className="text-xs font-medium text-primary">See all →</button>
+            <span className="text-sm font-semibold text-foreground"><span className="text-warning">★</span> {exp.rating || 0} · {t("experience.reviews_count", { count: exp.reviews_count || reviews.length })}</span>
+            <button className="text-xs font-medium text-primary">{t("common.see_all")} →</button>
           </div>
           <div className="grid grid-cols-2 gap-2 mb-2">
             {reviews.slice(0, 4).map((r, i) => (
@@ -527,7 +542,7 @@ const ExperienceDetail = () => {
                 {r.verified && (
                   <span className="inline-flex items-center gap-1 bg-success/10 rounded-lg px-1.5 py-0.5">
                     <span className="w-[5px] h-[5px] rounded-full bg-success" />
-                    <span className="text-[9px] font-medium text-success">Verified attendee</span>
+                    <span className="text-[9px] font-medium text-success">{t("experience.verified_attendee")}</span>
                   </span>
                 )}
               </div>
@@ -539,14 +554,14 @@ const ExperienceDetail = () => {
 
         {/* 3K THINGS TO KNOW */}
         <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2.5">Things to know</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-2.5">{t("experience.things_to_know")}</h2>
           <div className="grid grid-cols-2 gap-2">
-            {thingsToKnow.map((t, i) => (
+            {thingsToKnow.map((thing, i) => (
               <div key={i} className="flex items-start gap-1.5">
-                <span className="text-base mt-0.5 flex-shrink-0">{t.icon}</span>
+                <span className="text-base mt-0.5 flex-shrink-0">{thing.icon}</span>
                 <div>
-                  <p className="text-[11px] font-semibold text-foreground mb-0.5">{t.label}</p>
-                  <p className="text-[10px] text-muted-foreground leading-[1.4]">{t.desc}</p>
+                  <p className="text-[11px] font-semibold text-foreground mb-0.5">{thing.label}</p>
+                  <p className="text-[10px] text-muted-foreground leading-[1.4]">{thing.desc}</p>
                 </div>
               </div>
             ))}
@@ -561,8 +576,8 @@ const ExperienceDetail = () => {
             <div className="flex gap-2.5 items-start border border-warning/40 rounded-[10px] p-3 bg-warning/10">
               <div className="w-9 h-9 rounded-full bg-warning flex items-center justify-center text-primary-foreground text-base font-bold flex-shrink-0">✓</div>
               <div>
-                <p className="text-xs font-semibold text-warning mb-0.5">Ambassador verified experience</p>
-                <p className="text-[10px] text-warning leading-[1.5]">{hostName}'s listing was physically visited and verified by a local Ambassador. Location confirmed, safety checked, photos authenticated.</p>
+                <p className="text-xs font-semibold text-warning mb-0.5">{t("experience.ambassador_verified_full")}</p>
+                <p className="text-[10px] text-warning leading-[1.5]">{t("experience.ambassador_verified_description", { name: hostName })}</p>
               </div>
             </div>
             <Divider />
@@ -571,17 +586,21 @@ const ExperienceDetail = () => {
 
         {/* 3M SAFETY NOTE */}
         <div className="bg-muted rounded-lg p-2.5">
-          <p className="text-[10px] text-muted-foreground leading-[1.55]">Always book and pay through Sandal to protect your experience. Sandal holds payment until after your visit is confirmed complete. Support: +20 100 XXX XXXX</p>
+          <p className="text-[10px] text-muted-foreground leading-[1.55]">{t("experience.payment_held")}</p>
         </div>
 
         <Divider />
 
         {/* 3N IMPACT DASHBOARD */}
         <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2">Your visit's impact</h2>
+          <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.your_visit_impact")}</h2>
           <div className="bg-muted rounded-[10px] p-3">
             <div className="grid grid-cols-3 gap-2">
-              {[{ n: String(hostShare), l: `EGP to ${hostName?.split(" ")[0] || "Host"}` }, { n: String(unitPrice - hostShare), l: "EGP to local fund" }, { n: String(exp.reviews_count || reviews.length), l: "Visitors this month" }].map((c, i) => (
+              {[
+                { n: String(hostShare), l: t("experience.egp_to", { name: hostName?.split(" ")[0] || t("experience.default_host_name") }) },
+                { n: String(unitPrice - hostShare), l: t("experience.egp_to_local_fund") },
+                { n: String(exp.reviews_count || reviews.length), l: t("experience.visitors_this_month") },
+              ].map((c, i) => (
                 <div key={i} className="bg-card border border-border rounded-lg p-2.5 text-center">
                   <p className="text-lg font-bold text-primary">{c.n}</p>
                   <p className="text-[9px] text-muted-foreground mt-0.5">{c.l}</p>
@@ -596,7 +615,7 @@ const ExperienceDetail = () => {
         {/* 3O RELATED EXPERIENCES */}
         {relatedExps && relatedExps.length > 0 && (
           <div>
-            <h2 className="text-sm font-semibold text-foreground mb-2">More experiences in {regionName}</h2>
+            <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.more_experiences_in", { region: regionName })}</h2>
             <div className="flex gap-2.5 overflow-x-auto hide-scrollbar pb-1.5">
               {relatedExps.map((r) => {
                 const rTitle = lang === "ar" ? r.title_ar : r.title_en;
@@ -612,12 +631,12 @@ const ExperienceDetail = () => {
                     </div>
                     <div className="p-2">
                       <p className="text-[11px] font-semibold text-foreground leading-[1.3] mb-0.5 line-clamp-2">{rTitle}</p>
-                      <p className="text-[10px] text-muted-foreground mb-1.5">{r.theme || ""} · {hrs} · {r.price} EGP · ★{r.rating}</p>
+                      <p className="text-[10px] text-muted-foreground mb-1.5">{r.theme || ""} · {hrs} · {r.price} {t("common.egp")} · ★{r.rating}</p>
                       <button
                         onClick={() => navigate(`/experience/${r.slug || r.id}`)}
                         className="w-full h-7 rounded-md bg-primary text-primary-foreground text-[10px] font-semibold"
                       >
-                        Book
+                        {t("common.book")}
                       </button>
                     </div>
                   </div>
@@ -631,7 +650,7 @@ const ExperienceDetail = () => {
         {description && (
           <>
             <div className="h-4" />
-            <h2 className="text-sm font-semibold text-foreground mb-2">About This Experience</h2>
+            <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.about_this_experience")}</h2>
             <p className="text-[13px] text-muted-foreground leading-relaxed mb-4">{description}</p>
           </>
         )}
@@ -642,7 +661,7 @@ const ExperienceDetail = () => {
         <div className="w-[22px] h-[22px] rounded-full bg-primary flex items-center justify-center flex-shrink-0">
           <MessageCircle className="w-[11px] h-[11px] text-primary-foreground" />
         </div>
-        <span className="text-xs text-primary-dark flex-1 min-w-0 truncate">Message {hostName?.split(" ")[0] || "Host"} · usually replies within 2h</span>
+        <span className="text-xs text-primary-dark flex-1 min-w-0 truncate">{t("experience.message_provider_within", { name: hostName?.split(" ")[0] || t("experience.default_host_name"), time: "2h" })}</span>
         <a href="https://wa.me/" target="_blank" rel="noopener" className="bg-primary text-primary-foreground text-[9px] font-semibold px-2 py-0.5 rounded-[10px] flex-shrink-0">
           WhatsApp ↗
         </a>
@@ -651,12 +670,12 @@ const ExperienceDetail = () => {
       {/* ── 5. STICKY BOTTOM BOOKING BAR ───────────────────────── */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-2px_12px_rgba(0,0,0,0.06)] px-4 py-3 pb-7 flex items-center justify-between">
         <div>
-          <span className="text-xl font-bold text-primary">{unitPrice} EGP</span>
-          <span className="text-[13px] text-muted-foreground"> /person</span>
-          <p className="text-[11px] font-medium text-success">✓ Free cancellation</p>
+          <span className="text-xl font-bold text-primary">{unitPrice} {t("common.egp")}</span>
+          <span className="text-[13px] text-muted-foreground"> {t("common.per_person")}</span>
+          <p className="text-[11px] font-medium text-success">✓ {t("common.free_cancellation")}</p>
         </div>
         <button onClick={() => setSheetOpen(true)} className="h-[46px] px-[26px] bg-primary rounded-[10px] text-primary-foreground text-sm font-bold">
-          Book now
+          {t("common.book_now")}
         </button>
       </div>
 
@@ -667,14 +686,14 @@ const ExperienceDetail = () => {
             <div className="w-8 h-1 rounded-full bg-border" />
           </div>
           <SheetHeader className="px-4 pb-3">
-            <SheetTitle className="text-base font-bold text-foreground">Select a time</SheetTitle>
+            <SheetTitle className="text-base font-bold text-foreground">{t("experience.select_a_time")}</SheetTitle>
           </SheetHeader>
 
           {/* adults */}
           <div className="px-4 pb-3 flex justify-between items-center border-b border-border">
             <div>
-              <p className="text-sm font-semibold text-foreground">{sheetGuests} adult{sheetGuests > 1 ? "s" : ""}</p>
-              <button className="text-xs text-primary underline">Add children</button>
+              <p className="text-sm font-semibold text-foreground">{t(sheetGuests > 1 ? "experience.n_adults_other" : "experience.n_adults_one", { count: sheetGuests })}</p>
+              <button className="text-xs text-primary underline">{t("experience.add_children")}</button>
             </div>
             <div className="flex items-center gap-3">
               <button onClick={() => setSheetGuests(Math.max(1, sheetGuests - 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center"><Minus className="w-3.5 h-3.5" /></button>
@@ -695,8 +714,8 @@ const ExperienceDetail = () => {
                 >
                   <p className="text-sm font-semibold text-foreground">{s.time}</p>
                   <div className="flex justify-between mt-1">
-                    <span className="text-xs text-muted-foreground">{s.price} EGP / guest</span>
-                    <span className={`text-xs ${s.low ? "text-destructive font-medium" : "text-muted-foreground"}`}>{s.spots} spots available</span>
+                    <span className="text-xs text-muted-foreground">{s.price} {t("common.egp")} {t("common.per_person")}</span>
+                    <span className={`text-xs ${s.low ? "text-destructive font-medium" : "text-muted-foreground"}`}>{t("common.spots_available", { count: s.spots })}</span>
                   </div>
                 </button>
               ))}
@@ -706,10 +725,15 @@ const ExperienceDetail = () => {
           {/* confirm */}
           <div className="px-4 pt-2">
             <button
-              onClick={() => { setSheetOpen(false); navigate(`/booking?type=experience&id=${exp.id || id}`); }}
+              onClick={() => {
+                setSheetOpen(false);
+                const slotUuid = (slots[sheetSlot] as { id?: string } | undefined)?.id;
+                const slotParam = slotUuid ? `&slot=${slotUuid}` : "";
+                navigate(`/booking?type=experience&id=${exp.id || id}${slotParam}`);
+              }}
               className="w-full h-[46px] bg-primary rounded-[10px] text-primary-foreground text-sm font-bold"
             >
-              Confirm — {(slots[sheetSlot]?.price || unitPrice) * sheetGuests + Math.round((slots[sheetSlot]?.price || unitPrice) * sheetGuests * 0.1)} EGP
+              {t("experience.confirm_with_total", { amount: (slots[sheetSlot]?.price || unitPrice) * sheetGuests + Math.round((slots[sheetSlot]?.price || unitPrice) * sheetGuests * 0.1) })}
             </button>
           </div>
         </SheetContent>

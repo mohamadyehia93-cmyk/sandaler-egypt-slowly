@@ -1,25 +1,49 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Primary meta -->
     <title>Sandal — Discover Egypt Slowly</title>
-    <meta name="description" content="Egypt's slow rural tourism platform. Discover overlooked villages, book local experiences, and explore the Nile Delta." />
+    <meta name="description" content="Egypt's slow rural tourism platform. Discover overlooked villages, book local experiences, and explore the Nile Delta, Suez Canal, Fayyum, and beyond." />
     <meta name="author" content="Sandal" />
+    <meta name="theme-color" content="#2BBFB3" />
 
-    <meta property="og:title" content="Sandal — Discover Egypt Slowly" />
-    <meta property="og:description" content="Egypt's slow rural tourism platform. Discover overlooked villages, book local experiences, and explore the Nile Delta." />
+    <!-- Cairo font with preconnect for speed -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+    <!-- iOS PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Sandal">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:title" content="Sandal — Discover Egypt Slowly" />
+    <meta property="og:description" content="Egypt's slow rural tourism platform. Discover overlooked villages and book authentic local experiences." />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="ar_EG" />
+    <meta property="og:site_name" content="Sandal" />
 
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:title" content="Sandal — Discover Egypt Slowly" />
+    <meta name="twitter:description" content="Egypt's slow rural tourism platform." />
+    <meta name="twitter:image" content="/og-image.png" />
   </head>
-
   <body>
     <div id="root"></div>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
