@@ -45,9 +45,14 @@ export const useConversations = () => {
 
   useEffect(() => {
     if (!user) return;
+    // Private user-scoped channel. Server-side broadcasts on
+    // `user:<uid>` (e.g. "conversations:changed") trigger a refetch.
+    // Direct postgres_changes on `conversations` is intentionally not
+    // used here under private realtime mode — opening /inbox always
+    // refetches on mount, which covers the common case.
     const channel = supabase
-      .channel("conversations-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "conversations" }, () => {
+      .channel(`user:${user.id}`, { config: { private: true } })
+      .on("broadcast", { event: "conversations:changed" }, () => {
         fetchConversations();
       })
       .subscribe();
@@ -100,7 +105,7 @@ export const useMessages = (conversationId: string | null) => {
     fetchMsgs();
 
     const channel = supabase
-      .channel(`messages-${conversationId}`)
+      .channel(`conversation:${conversationId}`, { config: { private: true } })
       .on("postgres_changes", {
         event: "INSERT",
         schema: "public",
