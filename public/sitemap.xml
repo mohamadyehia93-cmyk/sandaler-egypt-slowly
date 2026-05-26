@@ -103,24 +103,6 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://sandaler-egypt-slowly.lovable.app/regions/upper-egypt"/>
   </url>
   <url>
-    <loc>https://sandaler-egypt-slowly.lovable.app/regions/mariout</loc>
-    <lastmod>2026-05-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://sandaler-egypt-slowly.lovable.app/regions/mariout"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://sandaler-egypt-slowly.lovable.app/regions/mariout?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://sandaler-egypt-slowly.lovable.app/regions/mariout"/>
-  </url>
-  <url>
-    <loc>https://sandaler-egypt-slowly.lovable.app/regions/fayyum</loc>
-    <lastmod>2026-05-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://sandaler-egypt-slowly.lovable.app/regions/fayyum"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://sandaler-egypt-slowly.lovable.app/regions/fayyum?lang=ar"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://sandaler-egypt-slowly.lovable.app/regions/fayyum"/>
-  </url>
-  <url>
     <loc>https://sandaler-egypt-slowly.lovable.app/regions/frontiers</loc>
     <lastmod>2026-05-25</lastmod>
     <changefreq>weekly</changefreq>

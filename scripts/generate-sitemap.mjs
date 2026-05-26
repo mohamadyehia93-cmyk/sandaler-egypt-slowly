@@ -12,8 +12,6 @@ const REGION_SLUGS = [
   "nile-delta",
   "suez-canal",
   "upper-egypt",
-  "mariout",
-  "fayyum",
   "frontiers",
 ];
 

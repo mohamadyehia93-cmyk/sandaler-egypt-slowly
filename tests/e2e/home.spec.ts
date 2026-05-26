@@ -28,9 +28,9 @@ test.describe("Home page", () => {
     const body = await response!.text();
     expect(body).toContain("<urlset");
     expect(body).toContain("sandaler-egypt-slowly.lovable.app");
-    // All 6 region routes are present
+    // All 4 curated region routes are present
     expect(body).toContain("/regions/nile-delta");
-    expect(body).toContain("/regions/fayyum");
+    expect(body).toContain("/regions/suez-canal");
     expect(body).toContain("/regions/frontiers");
   });
 
