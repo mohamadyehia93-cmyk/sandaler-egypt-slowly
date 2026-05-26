@@ -7,7 +7,7 @@
     "dev": "vite",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "build": "npm run sitemap && vite build",
-    "postbuild": "react-snap",
+    "postbuild": "react-snap || echo 'react-snap prerender skipped (non-fatal)'",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
