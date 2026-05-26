@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ import { toast } from "sonner";
 const Signup = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const next = params.get("next") || "";
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +32,7 @@ const Signup = () => {
       password,
       options: {
         data: { display_name: displayName },
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: window.location.origin + (next || ""),
       },
     });
     setLoading(false);
@@ -38,7 +40,7 @@ const Signup = () => {
       toast.error(error.message);
     } else {
       toast.success(t("auth.account_created_check_email"));
-      navigate("/login");
+      navigate(next ? `/login?next=${encodeURIComponent(next)}` : "/login");
     }
   };
 
@@ -111,12 +113,12 @@ const Signup = () => {
           className="w-full gap-2"
           onClick={async () => {
           const result = await lovable.auth.signInWithOAuth("google", {
-              redirect_uri: window.location.origin,
+              redirect_uri: window.location.origin + (next || "/profile"),
             });
             if (result.error) {
               toast.error(result.error instanceof Error ? result.error.message : t("auth.google_signin_failed"));
             } else if (!result.redirected) {
-              navigate("/profile");
+              navigate(next || "/profile");
             }
           }}
         >
@@ -126,7 +128,7 @@ const Signup = () => {
 
         <p className="text-center text-sm text-muted-foreground">
           {t("auth.already_have_account_q")}{" "}
-          <Link to="/login" className="text-primary font-medium hover:underline">
+          <Link to={next ? `/login?next=${encodeURIComponent(next)}` : "/login"} className="text-primary font-medium hover:underline">
             {t("auth.sign_in")}
           </Link>
         </p>
