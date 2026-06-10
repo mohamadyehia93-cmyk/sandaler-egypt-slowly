@@ -153,7 +153,7 @@ const Community = () => {
     author_name:
       (user!.user_metadata as any)?.display_name ||
       (user!.user_metadata as any)?.full_name ||
-      user!.email ||
+      // Never expose the full email publicly — fall back to a generic label.
       (lang === "ar" ? "مستخدم" : "User"),
     author_avatar:
       (user!.user_metadata as any)?.avatar_url ||
