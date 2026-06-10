@@ -135,7 +135,7 @@ const NewEvent = () => {
         toast.success(lang === "ar" ? "تم نشر الفعالية!" : "Event published!");
       }
       queryClient.invalidateQueries({ queryKey: ["events"] });
-      navigate("/dashboard/trip-organizer/my-events");
+      navigate("/dashboard/trip-organizer/events");
     } catch (err: any) {
       toast.error(err.message || "Failed to save event");
     } finally {
