@@ -86,6 +86,20 @@ const EventCalendar = () => {
   });
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
+  const routeFor = (ev: CalendarEvent) =>
+    ev.type === "trip" ? `/trip/${ev.id}` : ev.type === "event" ? `/event/${ev.id}` : `/experience/${ev.id}`;
+  const typeBadgeClass = (type: CalendarEvent["type"]) =>
+    type === "trip"
+      ? "bg-amber-100 text-amber-700"
+      : type === "event"
+      ? "bg-primary/15 text-primary-dark"
+      : "bg-primary/10 text-primary";
+  const typeLabel = (type: CalendarEvent["type"], short = false) => {
+    if (type === "trip") return lang === "ar" ? "رحلة" : "Trip";
+    if (type === "event") return lang === "ar" ? "فعالية" : "Event";
+    return lang === "ar" ? "تجربة" : short ? "Exp" : "Experience";
+  };
+
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
