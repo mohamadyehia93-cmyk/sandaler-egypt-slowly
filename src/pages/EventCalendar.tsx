@@ -36,6 +36,7 @@ const EventCalendar = () => {
   const { lang, t } = useI18n();
   const { data: experiences = [] } = useExperiences();
   const { data: trips = [] } = useTrips();
+  const { data: cultureEvents = [] } = useEvents();
 
   const allEvents = useMemo<CalendarEvent[]>(() => {
     const events: CalendarEvent[] = [];
