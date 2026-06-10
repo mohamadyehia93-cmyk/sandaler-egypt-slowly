@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cityData, experiences, audioTours, accommodation, products, whosWho, causes, latestPosts, trips } from "@/lib/sampleData";
-import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts } from "@/hooks/useListings";
+import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
+import EventsSection from "@/components/EventsSection";
 import CausesSection from "@/components/CausesSection";
 import CityOfferingsMap, { OfferingPin } from "@/components/CityOfferingsMap";
 import BottomNav from "@/components/BottomNav";
@@ -121,6 +122,7 @@ const CityDetail = () => {
   const { data: dbProducts = [], isLoading: l6 } = useProducts();
   const { data: dbWhosWho = [], isLoading: l7 } = useWhosWho();
   const { data: dbPosts = [], isLoading: l8 } = usePosts();
+  const { data: dbEvents = [] } = useEvents();
   const isLoading = l1 || l2 || l3 || l4 || l5 || l6 || l7 || l8;
 
   const city = cityData[cityId || ""];
@@ -204,6 +206,7 @@ const CityDetail = () => {
     })),
     ...trips.filter((tr) => tr.cityId === cityId),
   ]);
+  const cityEvents = (dbEvents as any[]).filter((e) => e.city_id === cityId);
 
 
   return (
@@ -339,6 +342,9 @@ const CityDetail = () => {
             </div>
           </SectionHeader>
         )}
+
+        {/* Events */}
+        <EventsSection events={cityEvents} />
 
         {/* Experiences */}
         {cityExperiences.length > 0 && (

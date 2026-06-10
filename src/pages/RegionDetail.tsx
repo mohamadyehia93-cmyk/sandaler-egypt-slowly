@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned, Compass, BookOpen, Palette, Mountain } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { regions, regionCities, experiences, latestPosts, whosWho, audioTours, causes, cityData } from "@/lib/sampleData";
-import { useAudioTours, useExperiences, useWhosWho, usePosts } from "@/hooks/useListings";
+import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
+import EventsSection from "@/components/EventsSection";
 import CausesSection from "@/components/CausesSection";
 import RegionMap from "@/components/RegionMap";
 import BottomNav from "@/components/BottomNav";
@@ -118,6 +119,7 @@ const RegionDetail = () => {
   const { data: dbExperiences = [], isLoading: l2 } = useExperiences();
   const { data: dbWhosWho = [], isLoading: l3 } = useWhosWho();
   const { data: dbPosts = [], isLoading: l4 } = usePosts();
+  const { data: dbEvents = [] } = useEvents();
   const isLoading = l1 || l2 || l3 || l4;
 
   if (isLoading) return <DetailSkeleton variant="region" />;
@@ -139,6 +141,9 @@ const RegionDetail = () => {
       ...experiences.filter((e) => e.regionId === regionId),
     ])
   );
+  const regionEvents = (dbEvents as any[])
+    .filter((e) => e.region_id === regionId)
+    .filter((e) => selectedCity === "all" || e.city_id === selectedCity);
   const regionPosts = dedupe([
     ...(dbPosts as any[]).filter((p) => p.region_id === regionId).map((p) => ({
       id: p.slug || p.id, slug: p.slug,
@@ -299,6 +304,9 @@ const RegionDetail = () => {
             </div>
           </SectionHeader>
         )}
+
+        {/* Events */}
+        <EventsSection events={regionEvents} />
 
         {/* Experiences */}
         {regionExperiences.length > 0 && (

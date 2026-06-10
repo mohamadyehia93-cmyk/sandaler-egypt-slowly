@@ -189,5 +189,19 @@ export const useMeetups = () =>
     },
   });
 
+export const useEvents = () =>
+  useQuery({
+    queryKey: ["events"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("events")
+        .select("*")
+        .eq("status", "published")
+        .order("start_date", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+  });
+
 
 

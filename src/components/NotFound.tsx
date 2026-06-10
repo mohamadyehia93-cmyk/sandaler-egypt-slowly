@@ -19,6 +19,7 @@ export type NotFoundContext =
   | "host"
   | "transport"
   | "culture-actor"
+  | "event"
   | "generic";
 
 const COPY: Record<NotFoundContext, { en: string; ar: string }> = {
@@ -38,6 +39,7 @@ const COPY: Record<NotFoundContext, { en: string; ar: string }> = {
   host: { en: "Host not found", ar: "المضيف غير موجود" },
   transport: { en: "Transport option not found", ar: "وسيلة النقل غير موجودة" },
   "culture-actor": { en: "Culture actor not found", ar: "الفاعل الثقافي غير موجود" },
+  event: { en: "Event not found", ar: "الفعالية غير موجودة" },
   generic: { en: "Page not found", ar: "الصفحة غير موجودة" },
 };
 
