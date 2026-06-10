@@ -155,8 +155,8 @@ serve(async (req) => {
         quantity: 1,
       }],
       customer_email: visitorEmail,
-      success_url: `${successUrl}?booking_id=${booking.id}`,
-      cancel_url: `${cancelUrl}?booking_id=${booking.id}`,
+      success_url: `${successOrigin}/booking/success?booking_id=${booking.id}`,
+      cancel_url: `${cancelOrigin}/booking/cancelled?booking_id=${booking.id}`,
       metadata: {
         booking_id: booking.id,
         experience_id: experienceId,
