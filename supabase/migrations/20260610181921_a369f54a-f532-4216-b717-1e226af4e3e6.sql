@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS providers_user_id_unique ON public.providers (user_id) WHERE user_id IS NOT NULL;
