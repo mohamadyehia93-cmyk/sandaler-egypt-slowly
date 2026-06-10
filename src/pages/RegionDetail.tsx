@@ -119,6 +119,7 @@ const RegionDetail = () => {
   const { data: dbExperiences = [], isLoading: l2 } = useExperiences();
   const { data: dbWhosWho = [], isLoading: l3 } = useWhosWho();
   const { data: dbPosts = [], isLoading: l4 } = usePosts();
+  const { data: dbEvents = [] } = useEvents();
   const isLoading = l1 || l2 || l3 || l4;
 
   if (isLoading) return <DetailSkeleton variant="region" />;
