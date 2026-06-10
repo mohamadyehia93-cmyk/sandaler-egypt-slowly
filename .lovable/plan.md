@@ -1,60 +1,54 @@
-# Add Cultural Events to City & Region Pages
+## Goal
+Make the provider role flow actually work so a real user can: sign up → log in → choose a provider role → land on the right dashboard → upload their offering/content. Then test all 8 roles end to end.
 
-I think it's a strong fit. The app already has a culture theme, an `EventCalendar` page, and a `meetups` table — but cultural events (festivals, exhibitions, concerts) deserve their own curated, provider-managed table rather than being mixed with casual community meetups. Per your choices: a **new `events` table**, **providers/organizers create them**, and the section shows **all events with upcoming ones first**.
+## Root cause (why it's broken today)
+- `useUserRole` derives a user's role **only** from the `providers` table (`providers.user_id = auth.uid()`) — this is the secure design and is correct.
+- The onboarding screen (`Splash.tsx`) lets a user pick a provider role, but its `handleFinish` calls `setRole(...)`, which in the hardened `useUserRole` is a **no-op for every non-visitor role**. It only writes to `localStorage`, which the role system ignores.
+- **Nothing in the app ever inserts a row into `providers`** for the signed-up user. The RLS insert policy exists (`auth.uid() = user_id`) but is never used.
+- The 8 seeded `providers` rows all have `user_id = NULL`, so they belong to no account.
+- Onboarding (`/welcome`) is only reachable from Settings — it is not part of the signup flow, so a new user never even gets there.
 
-## What you'll get
-- An **Events** section on every city page (`/city/:slug`) and region page (`/region/:slug`), styled exactly like the existing Experiences/Trips rails (horizontal card scroll under a `SectionHeader`).
-- Each card shows image, title, date badge, venue/location, and category. Past events appear after upcoming ones with a muted "Past" tag.
-- A **tap-through event detail page** consistent with the app's slug routing.
-- A **provider "My Events"** area so verified providers/organizers can add and edit their own events.
-- A few **seeded sample events** so the section isn't empty on launch.
-- Events also flow into the existing **EventCalendar** page automatically.
+Net result: every account stays a "visitor" forever and can never reach a dashboard or upload anything.
 
 ## Plan
 
-### 1. Database — `events` table (migration)
-Fields (plus standard id/created_at/updated_at):
-- Bilingual: `title_en/ar`, `description_en/ar`, `location_en/ar`, `venue_en/ar`
-- Scope: `region_id` (text), `city_id` (text) — matching how `meetups` links
-- Timing: `start_date` (date), `end_date` (date, nullable), `event_time` (text, nullable)
-- Meta: `category` (text, e.g. festival/exhibition/concert/workshop), `image` (text), `slug` (text, unique), `is_free` (boolean), `price` (numeric, nullable), `ticket_url` (text, nullable)
-- Ownership/visibility: `organizer_id` (uuid), `status` (text default `published`)
+### 1. Enable auto-confirm email (auth setting)
+Turn on auto-confirm so test (and real) signups can log in immediately without inbox access. Project-wide auth setting.
 
-Access rules (RLS + GRANTs):
-- Public can read published events (anon + authenticated SELECT).
-- Authenticated organizers can insert/update/delete **only their own** events (`auth.uid() = organizer_id`).
-- `service_role` full access.
-- `updated_at` trigger using existing `update_updated_at_column`.
+### 2. Database: one provider profile per user
+Add a partial unique index on `providers.user_id` (where `user_id is not null`) so:
+- a user can have at most one provider profile, and
+- we can safely `upsert` on `user_id`.
 
-Seed ~4–6 sample events across a couple of cities/regions via an insert.
+(The existing insert RLS policy `auth.uid() = user_id` already allows the user to create their own row; we'll add an update policy scoped the same way if not present, so re-selecting a role updates the existing row.)
 
-### 2. Data hook
-- Add `useEvents` to `src/hooks/useListings.ts` (mirrors `useMeetups`): fetch published events. Sorting/filtering by upcoming-first done in the components.
+### 3. Wire onboarding role selection to persist the role
+Create a small helper `becomeProvider(role)` that upserts a `providers` row for the current user:
+- `user_id` = `auth.uid()`
+- `role` = selected provider role
+- `name_en` / `name_ar` = the user's display name (from profile / auth metadata), falling back to the email local-part (both are NOT NULL)
+- `slug` = generated from the name + a short unique suffix
 
-### 3. Reusable card + section
-- New `EventCard` component (image, date chip, title, venue, category; "Past" badge when `start_date < today`).
-- Shared sort helper: upcoming events (date >= today) ascending by date, then past events descending.
+Update `Splash.tsx` `handleFinish`:
+- If the chosen role is a provider role and the user **is logged in** → call `becomeProvider(role)`, then navigate to that role's dashboard. `useUserRole` re-reads `providers` and grants access.
+- If the chosen role is a provider role and the user is **not logged in** → stash the selection in `sessionStorage` and send them to `/signup?next=/welcome`; on return to `/welcome` while authenticated, auto-complete the provider creation.
+- Visitor path is unchanged.
 
-### 4. City & Region pages
-- `CityDetail.tsx`: filter events by `city_id === cityId`, render an Events `SectionHeader` (titleKey `section.events`) with `onSeeAll` → EventCalendar/events list. Place it near the other discovery rails. Hide section when empty.
-- `RegionDetail.tsx`: same, filtered by `region_id === regionId` (and respect the page's existing city filter if one is selected).
+### 4. Make the role flow reachable
+- Add a clear "Become a host / provider" entry on the Profile page that routes a logged-in visitor to `/welcome` (Settings already links there).
+- Ensure `/welcome` behaves correctly when already authenticated.
 
-### 5. Event detail page
-- New `EventDetail.tsx` route `/event/:slug` using the existing dual-identifier (UUID or slug) lookup pattern. Shows full description, date/time, venue + city/region cross-links, category, price/free, and a ticket/contact action (in-app messaging or `ticket_url`).
+### 5. Test the full cycle for all 8 roles
+Enable auto-confirm, then for each role (culture-actor, service-provider, who's-who, organization, ambassador, product-seller, trip-organizer, subject-expert):
+1. Sign up a test account and log in.
+2. Go through onboarding and pick the role → confirm it lands on the correct dashboard.
+3. Open that role's "new …" wizard, fill required fields, submit.
+4. Verify the row is created in the DB (experiences / products / trips / events / etc.) and that RLS accepted it.
 
-### 6. Provider management ("My Events")
-- A provider-portal screen listing the organizer's events with create/edit/delete.
-- A simple Events form (bilingual fields, date, city/region pickers, category, image upload to existing `listing-images` bucket, free/price). Scoped so providers manage only their own rows (enforced by RLS).
-
-### 7. i18n + calendar
-- Add bilingual keys: `section.events`, `events.upcoming`, `events.past`, `events.free`, category labels, form labels.
-- Extend `EventCalendar.tsx` to include `useEvents` alongside experiences/trips so events show on the calendar too.
+I'll report a pass/fail matrix per role with any wizard or RLS issues found, and fix blockers as they come up.
 
 ## Technical notes
-- `city_id`/`region_id` are `text` (slug-style ids) on existing tables — the new table follows the same convention so filtering matches the current `e.city_id === cityId` pattern.
-- All new colors/spacing use existing semantic tokens; cards reuse the Cairo type scale and 12px radius from project memory.
-- "All, upcoming first" ordering is applied client-side so the same hook serves both pages and the calendar.
-
-## Out of scope (unless you want it)
-- Ticketing/payments for events (would reuse the existing booking/platform-fee flow if added later).
-- Admin moderation dashboard beyond provider self-management.
+- Upload RLS already only requires `provider_id/seller_id/organizer_id = auth.uid()`, so once a user has a provider role and reaches the wizard, submits should pass.
+- `useUserRole` uses `.maybeSingle()` on `providers`, so the unique-per-user constraint (step 2) is required to avoid errors.
+- `RouteGuard` redirects providers away from visitor-only pages but does not block visitors from dashboards by URL; role gating still works because `dashboardPath` is null for visitors. No change needed there for this fix.
+- Roles outside the 8 dashboard roles (e.g. `accommodation-host`, `transport-provider` seeds) are not selectable in onboarding and remain unaffected.

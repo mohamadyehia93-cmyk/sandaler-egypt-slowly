@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, MapPin, ChevronRight, LogOut, LogIn, Bookmark } from "lucide-react";
+import { User, MapPin, ChevronRight, LogOut, LogIn, Bookmark, Briefcase } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -141,6 +141,31 @@ const Profile = () => {
         </div>
 
         <VisitorModeProfileToggle />
+
+        {/* Become a provider (visitors only) */}
+        {role === "visitor" && (
+          <button
+            onClick={() => navigate("/welcome")}
+            className="w-full bg-card rounded-xl shadow-card p-4 flex items-center justify-between mb-6 text-left"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Briefcase className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  {lang === "ar" ? "كن مزوّداً" : "Become a provider"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {lang === "ar" ? "قدّم تجاربك ومحتواك للزوار" : "Offer your experiences and content to visitors"}
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </button>
+        )}
+
+
 
         {/* Saved Itineraries */}
         {itineraries.length > 0 && (
