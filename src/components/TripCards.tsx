@@ -230,9 +230,9 @@ const TripCards = () => {
 
       {/* Grouped vertical feed with horizontal scrollers */}
       {isLoading ? (
-        <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+        <div className="grid grid-cols-3 gap-3 px-4">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="min-w-[220px] h-[220px] rounded-lg" />
+            <Skeleton key={i} className="h-[220px] rounded-lg" />
           ))}
         </div>
       ) : grouped.length === 0 ? (
@@ -257,12 +257,12 @@ const TripCards = () => {
                 </button>
               </div>
 
-              <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory">
+              <div className="grid grid-cols-3 gap-3 px-4">
                 {items.slice(0, 3).map((tr: any) => (
                   <div
                     key={tr.id}
                     onClick={() => navigate(`/trip/${tr.slug || tr.id}`)}
-                    className="min-w-[220px] max-w-[220px] snap-start rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
+                    className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
                   >
                     <div className="relative h-32">
                       <img

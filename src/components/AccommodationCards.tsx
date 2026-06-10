@@ -13,13 +13,13 @@ const AccommodationCards = () => {
 
   return (
     <SectionHeader titleKey="section.placesToStay">
-      <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+      <div className="grid grid-cols-3 gap-3 px-4">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="min-w-[200px] h-[220px] rounded-lg" />
+            <Skeleton key={i} className="h-[220px] rounded-lg" />
           ))
         ) : (accommodation ?? []).slice(0, 3).map((a) => (
-          <div key={a.id} className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${a.slug || a.id}`)}>
+          <div key={a.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${a.slug || a.id}`)}>
             <div className="relative h-32">
               <img src={a.image || "/placeholder.svg"} alt={lang === "ar" ? a.name_ar : a.name_en} className="w-full h-full object-cover" />
               <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">

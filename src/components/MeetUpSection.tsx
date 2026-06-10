@@ -12,16 +12,16 @@ const MeetUpSection = () => {
 
   return (
     <SectionHeader titleKey="section.whosWho" onSeeAll={() => navigate("/people")}>
-      <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+      <div className="grid grid-cols-3 gap-3 px-4">
         {isLoading
-          ? Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="min-w-[150px] h-[180px] rounded-lg" />
+          ? Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-[180px] rounded-lg" />
             ))
           : (people ?? []).slice(0, 3).map((person: any) => (
               <div
                 key={person.id}
                 onClick={() => navigate(`/person/${person.slug || person.id}`)}
-                className="min-w-[150px] rounded-lg shadow-card bg-card p-3 flex flex-col items-center gap-2 cursor-pointer"
+                className="rounded-lg shadow-card bg-card p-3 flex flex-col items-center gap-2 cursor-pointer"
               >
                 <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/30">
                   <img

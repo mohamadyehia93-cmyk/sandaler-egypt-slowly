@@ -33,7 +33,7 @@ const PostCard = ({ p, lang, navigate }: any) => {
   const title = lang === "ar" ? p.title_ar : p.title_en;
   return (
     <div
-      className="min-w-[220px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card relative cursor-pointer"
+      className="rounded-lg overflow-hidden shadow-card bg-card relative cursor-pointer"
       onClick={() => navigate(`/post/${p.slug || p.id}`)}
     >
       <div className="relative h-40">
@@ -72,9 +72,9 @@ const LatestPosts = () => {
   if (isLoading) {
     return (
       <SectionHeader titleKey="section.latestPosts" onSeeAll={() => navigate("/posts")}>
-        <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+        <div className="grid grid-cols-3 gap-3 px-4">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="min-w-[220px] h-40 rounded-lg" />
+            <Skeleton key={i} className="h-40 rounded-lg" />
           ))}
         </div>
       </SectionHeader>
@@ -98,7 +98,7 @@ const LatestPosts = () => {
             <h3 className="px-4 mb-2 text-[13px] font-bold text-foreground">
               {THEME_LABEL[theme][lang]}
             </h3>
-            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+            <div className="grid grid-cols-3 gap-3 px-4">
               {grouped[theme].slice(0, 3).map((p: any) => (
                 <PostCard key={p.id} p={p} lang={lang} navigate={navigate} />
               ))}
