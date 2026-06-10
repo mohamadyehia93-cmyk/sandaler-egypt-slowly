@@ -12,13 +12,13 @@ const TransportCards = () => {
 
   return (
     <SectionHeader titleKey="section.gettingAround">
-      <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+      <div className="grid grid-cols-3 gap-3 px-4">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="min-w-[140px] h-[130px] rounded-lg" />
+            <Skeleton key={i} className="h-[130px] rounded-lg" />
           ))
         ) : (transport ?? []).slice(0, 3).map((tr) => (
-          <div key={tr.id} onClick={() => navigate(`/transport/${tr.slug || tr.id}`)} className="min-w-[140px] rounded-lg shadow-card bg-card p-4 flex flex-col items-center gap-2 cursor-pointer">
+          <div key={tr.id} onClick={() => navigate(`/transport/${tr.slug || tr.id}`)} className="rounded-lg shadow-card bg-card p-4 flex flex-col items-center gap-2 cursor-pointer">
             {tr.image && <img src={tr.image} alt="" className="w-10 h-10 rounded-full object-cover" />}
             <h3 className="text-xs font-semibold text-foreground text-center line-clamp-2">
               {lang === "ar" ? tr.name_ar : tr.name_en}

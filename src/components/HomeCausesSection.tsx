@@ -12,10 +12,10 @@ const HomeCausesSection = () => {
 
   return (
     <SectionHeader titleKey="section.causes" onSeeAll={() => navigate("/causes")}>
-      <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+      <div className="grid grid-cols-3 gap-3 px-4">
         {isLoading
           ? Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="min-w-[220px] h-[200px] rounded-lg" />
+              <Skeleton key={i} className="h-[200px] rounded-lg" />
             ))
           : (causes ?? []).slice(0, 3).map((cause: any) => {
               const goal = cause.goal || 1;
@@ -24,7 +24,7 @@ const HomeCausesSection = () => {
                 <div
                   key={cause.id}
                   onClick={() => navigate(`/cause/${cause.slug || cause.id}`)}
-                  className="min-w-[220px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
+                  className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
                 >
                   <div className="relative h-28">
                     <img

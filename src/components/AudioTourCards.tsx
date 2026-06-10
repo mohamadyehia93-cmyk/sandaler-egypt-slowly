@@ -13,16 +13,16 @@ const AudioTourCards = () => {
 
   return (
     <SectionHeader titleKey="section.audioTours" onSeeAll={() => navigate("/audio-tours")}>
-      <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+      <div className="grid grid-cols-3 gap-3 px-4">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="min-w-[260px] h-[200px] rounded-lg" />
+            <Skeleton key={i} className="h-[200px] rounded-lg" />
           ))
         ) : (audioTours ?? []).slice(0, 3).map((a: any) => (
           <div
             key={a.id}
             onClick={() => navigate(`/audio-tour/${a.slug || a.id}`)}
-            className="min-w-[260px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
+            className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
           >
             <div className="relative h-36">
               <img src={a.image ?? ""} alt={lang === "ar" ? a.title_ar : a.title_en} className="w-full h-full object-cover" />
