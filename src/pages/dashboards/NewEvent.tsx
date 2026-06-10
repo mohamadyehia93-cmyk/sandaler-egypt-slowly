@@ -115,6 +115,7 @@ const NewEvent = () => {
         event_time: form.event_time || null,
         venue_en: form.venue_en.trim() || null,
         venue_ar: form.venue_ar.trim() || null,
+        capacity: form.capacity ? parseInt(form.capacity, 10) || null : null,
         is_free: form.is_free,
         price: form.is_free ? null : parseFloat(form.price) || null,
         ticket_url: form.ticket_url.trim() || null,
