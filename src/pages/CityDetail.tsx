@@ -122,6 +122,7 @@ const CityDetail = () => {
   const { data: dbProducts = [], isLoading: l6 } = useProducts();
   const { data: dbWhosWho = [], isLoading: l7 } = useWhosWho();
   const { data: dbPosts = [], isLoading: l8 } = usePosts();
+  const { data: dbEvents = [] } = useEvents();
   const isLoading = l1 || l2 || l3 || l4 || l5 || l6 || l7 || l8;
 
   const city = cityData[cityId || ""];
@@ -205,6 +206,7 @@ const CityDetail = () => {
     })),
     ...trips.filter((tr) => tr.cityId === cityId),
   ]);
+  const cityEvents = (dbEvents as any[]).filter((e) => e.city_id === cityId);
 
 
   return (
