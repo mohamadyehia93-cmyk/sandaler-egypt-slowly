@@ -155,10 +155,9 @@ const Community = () => {
       (user!.user_metadata as any)?.full_name ||
       // Never expose the full email publicly — fall back to a generic label.
       (lang === "ar" ? "مستخدم" : "User"),
-    author_avatar:
-      (user!.user_metadata as any)?.avatar_url ||
-      (user!.user_metadata as any)?.picture ||
-      null,
+    // Never persist raw external OAuth photo URLs (e.g. lh3.googleusercontent.com)
+    // in publicly readable comments — they are linkable PII. Render initials instead.
+    author_avatar: null,
   });
 
   const requireAuth = () => {
