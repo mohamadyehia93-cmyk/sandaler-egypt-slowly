@@ -240,6 +240,7 @@ const SplashPage = () => {
   const { t, lang, setLang } = useI18n();
   const navigate = useNavigate();
   const { setRole } = useUserRole();
+  const { user } = useAuth();
   const { data: dbRegions } = useRegions();
   const { data: dbCities } = useCities();
 
@@ -271,17 +272,61 @@ const SplashPage = () => {
     "subject-expert": "/dashboard/subject-expert",
   };
 
-  const handleFinish = () => {
-    const mappedRole = selectedRole ? (onboardingToUserRole[selectedRole] || "visitor") : "visitor";
-    setRole(mappedRole);
-    // Save personalization to localStorage
+  const persistPersonalization = () => {
     if (selectedInterests.length > 0) localStorage.setItem("sandal-interests", JSON.stringify(selectedInterests));
     if (selectedStyle) localStorage.setItem("sandal-travel-style", selectedStyle);
     if (selectedBudget) localStorage.setItem("sandal-budget", selectedBudget);
     if (selectedCities.length > 0) localStorage.setItem("sandal-cities", JSON.stringify(selectedCities));
     localStorage.setItem("sandal-onboarded", "true");
-    const route = mappedRole !== "visitor" ? (roleDashboardPaths[mappedRole] || "/") : "/";
-    navigate(route);
+  };
+
+  const completeProvider = async (role: LocalRole) => {
+    const { error } = await becomeProvider(role);
+    if (error) {
+      toast.error(lang === "ar" ? "تعذّر إنشاء ملف المزوّد" : "Could not set up your provider profile");
+      return false;
+    }
+    return true;
+  };
+
+  // If the user returns to onboarding already authenticated with a pending
+  // provider selection (made before signing in), finish creating the profile.
+  useEffect(() => {
+    const pending = sessionStorage.getItem("sandal-pending-role") as LocalRole | null;
+    if (!pending || !user) return;
+    (async () => {
+      const ok = await completeProvider(pending);
+      sessionStorage.removeItem("sandal-pending-role");
+      if (ok) {
+        persistPersonalization();
+        navigate(roleDashboardPaths[pending] || "/");
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const handleFinish = async () => {
+    const mappedRole = selectedRole ? (onboardingToUserRole[selectedRole] || "visitor") : "visitor";
+
+    // Visitor: no provider profile needed.
+    if (mappedRole === "visitor") {
+      persistPersonalization();
+      navigate("/");
+      return;
+    }
+
+    // Provider role requires authentication so we can write the providers row.
+    if (!user) {
+      sessionStorage.setItem("sandal-pending-role", mappedRole);
+      toast.message(lang === "ar" ? "سجّل الدخول لإكمال التسجيل كمزوّد" : "Sign in to finish registering as a provider");
+      navigate(`/signup?next=${encodeURIComponent("/welcome")}`);
+      return;
+    }
+
+    const ok = await completeProvider(mappedRole as LocalRole);
+    if (!ok) return;
+    persistPersonalization();
+    navigate(roleDashboardPaths[mappedRole] || "/");
   };
 
   const handleGuestMode = () => {
