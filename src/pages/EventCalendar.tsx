@@ -64,8 +64,20 @@ const EventCalendar = () => {
         route: tr.route_en || tr.route_ar ? { en: tr.route_en ?? "", ar: tr.route_ar ?? "" } : undefined,
       });
     });
+    (cultureEvents as any[]).forEach((ev) => {
+      const d = parseDate(ev.start_date);
+      if (d) events.push({
+        id: ev.slug || ev.id,
+        type: "event",
+        title: { en: ev.title_en, ar: ev.title_ar },
+        date: d,
+        price: ev.is_free ? 0 : (ev.price ?? 0),
+        image: ev.image,
+        venue: ev.venue_en || ev.venue_ar ? { en: ev.venue_en ?? "", ar: ev.venue_ar ?? "" } : undefined,
+      });
+    });
     return events;
-  }, [experiences, trips]);
+  }, [experiences, trips, cultureEvents]);
 
   const [currentMonth, setCurrentMonth] = useState(() => {
     // Start at earliest event month
