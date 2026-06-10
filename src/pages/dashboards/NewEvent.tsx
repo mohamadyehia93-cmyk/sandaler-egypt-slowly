@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCities, useRegions } from "@/hooks/useListings";
-import { ArrowLeft, Upload, FileText, Tag, MapPin, Calendar, Clock, DollarSign, Ticket } from "lucide-react";
+import { ArrowLeft, Upload, FileText, Tag, MapPin, Calendar, Clock, DollarSign, Ticket, Users } from "lucide-react";
 import { toast } from "sonner";
 
 const CATEGORIES = ["festival", "exhibition", "concert", "workshop", "performance", "market"];
@@ -39,6 +39,7 @@ const NewEvent = () => {
     event_time: "",
     venue_en: "",
     venue_ar: "",
+    capacity: "",
     is_free: true,
     price: "",
     ticket_url: "",
@@ -65,6 +66,7 @@ const NewEvent = () => {
           event_time: data.event_time || "",
           venue_en: data.venue_en || "",
           venue_ar: data.venue_ar || "",
+          capacity: data.capacity != null ? String(data.capacity) : "",
           is_free: data.is_free ?? true,
           price: data.price != null ? String(data.price) : "",
           ticket_url: data.ticket_url || "",
@@ -113,6 +115,7 @@ const NewEvent = () => {
         event_time: form.event_time || null,
         venue_en: form.venue_en.trim() || null,
         venue_ar: form.venue_ar.trim() || null,
+        capacity: form.capacity ? parseInt(form.capacity, 10) || null : null,
         is_free: form.is_free,
         price: form.is_free ? null : parseFloat(form.price) || null,
         ticket_url: form.ticket_url.trim() || null,
@@ -132,7 +135,7 @@ const NewEvent = () => {
         toast.success(lang === "ar" ? "تم نشر الفعالية!" : "Event published!");
       }
       queryClient.invalidateQueries({ queryKey: ["events"] });
-      navigate("/dashboard/trip-organizer/my-events");
+      navigate("/dashboard/trip-organizer/events");
     } catch (err: any) {
       toast.error(err.message || "Failed to save event");
     } finally {
@@ -250,6 +253,11 @@ const NewEvent = () => {
             <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "المكان (عربي)" : "Venue (Arabic)"}</label>
             <input className={inputClass} dir="rtl" value={form.venue_ar} onChange={(e) => set("venue_ar", e.target.value)} maxLength={120} />
           </div>
+        </div>
+
+        <div>
+          <label className={labelClass}><Users className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "السعة (عدد الحضور)" : "Capacity (attendees)"}</label>
+          <input type="number" className={inputClass} placeholder={lang === "ar" ? "مثال: ١٠٠" : "e.g. 100"} value={form.capacity} onChange={(e) => set("capacity", e.target.value)} min="0" />
         </div>
 
         <div className="flex items-center justify-between bg-card border border-border rounded-xl px-4 py-3">

@@ -54,6 +54,7 @@ const EventCalendar = lazy(() => import("./pages/EventCalendar.tsx"));
 const EventDetail = lazy(() => import("./pages/EventDetail.tsx"));
 const NewEvent = lazy(() => import("./pages/dashboards/NewEvent.tsx"));
 const MyEvents = lazy(() => import("./pages/dashboards/MyEvents.tsx"));
+const EventsDashboard = lazy(() => import("./pages/dashboards/EventsDashboard.tsx"));
 const ProviderProfile = lazy(() => import("./pages/ProviderProfile.tsx"));
 const CultureActorDashboard = lazy(() => import("./pages/dashboards/CultureActorDashboard.tsx"));
 const ServiceProviderDashboard = lazy(() => import("./pages/dashboards/ServiceProviderDashboard.tsx"));
@@ -194,6 +195,7 @@ const App = () => {
             <Route path="/dashboard/trip-organizer/my-trips" element={<MyTrips />} />
             <Route path="/dashboard/trip-organizer/new-event" element={<NewEvent />} />
             <Route path="/dashboard/trip-organizer/my-events" element={<MyEvents />} />
+            <Route path="/dashboard/trip-organizer/events" element={<EventsDashboard />} />
             <Route path="/dashboard/trip-organizer" element={<TripOrganizerDashboard />} />
             <Route path="/dashboard/subject-expert/new-collection" element={<NewCollection />} />
             <Route path="/dashboard/subject-expert/my-collections" element={<MyCollections />} />

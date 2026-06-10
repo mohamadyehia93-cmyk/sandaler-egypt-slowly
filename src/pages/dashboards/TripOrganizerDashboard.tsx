@@ -92,7 +92,7 @@ const TripOrganizerDashboard = () => {
           <Plus className="w-4 h-4" /> {lang === "ar" ? "إنشاء رحلة" : "Create Trip"}
         </button>
 
-        <button onClick={() => navigate("/dashboard/trip-organizer/my-events")} className="w-full bg-card border border-border text-foreground rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
+        <button onClick={() => navigate("/dashboard/trip-organizer/events")} className="w-full bg-card border border-border text-foreground rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
           <Calendar className="w-4 h-4 text-role-trip-organizer" /> {lang === "ar" ? "إدارة الفعاليات" : "Manage Events"}
         </button>
       </div>
