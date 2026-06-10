@@ -263,18 +263,14 @@ const EventCalendar = () => {
                 .map((ev) => (
                   <div
                     key={`${ev.type}-${ev.id}`}
-                    onClick={() => navigate(ev.type === "trip" ? `/trip/${ev.id}` : `/experience/${ev.id}`)}
+                    onClick={() => navigate(routeFor(ev))}
                     className="flex gap-3 rounded-xl bg-card shadow-card border border-border overflow-hidden cursor-pointer"
                   >
                     <img src={ev.image} alt={ev.title[lang]} className="w-20 h-20 object-cover flex-shrink-0" />
                     <div className="py-2.5 pe-3 flex flex-col justify-center flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-                          ev.type === "trip"
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-primary/10 text-primary"
-                        }`}>
-                          {ev.type === "trip" ? (lang === "ar" ? "رحلة" : "Trip") : (lang === "ar" ? "تجربة" : "Exp")}
+                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${typeBadgeClass(ev.type)}`}>
+                          {typeLabel(ev.type, true)}
                         </span>
                         <span className="text-[10px] text-muted-foreground">
                           {ev.date.toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US", { month: "short", day: "numeric" })}
