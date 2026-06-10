@@ -50,32 +50,60 @@ export const roleLabels: Record<UserRole, { en: string; ar: string }> = {
 
 const UserRoleContext = createContext<UserRoleContextType | null>(null);
 
-export const UserRoleProvider = ({ children }: { children: ReactNode }) => {
-  const [role, setRoleState] = useState<UserRole>("visitor");
-  const [visitorMode, setVisitorMode] = useState(false);
+const VALID_LOCAL_ROLES = Object.keys(roleDashboardPaths) as LocalRole[];
 
+export const UserRoleProvider = ({ children }: { children: ReactNode }) => {
+  const { user } = useAuth();
+  const [role, setRoleState] = useState<UserRole>("visitor");
+  const [visitorMode, setVisitorMode] = useState(
+    () => localStorage.getItem("sandal-visitor-mode") === "true"
+  );
+
+  // Source of truth for the user's role is the server (providers table),
+  // verified against the authenticated user id. localStorage is never trusted
+  // as an authorization gate — it only holds the visitor-mode UI preference.
   useEffect(() => {
-    const savedRole = localStorage.getItem("sandal-role") as UserRole | null;
-    const savedVisitorMode = localStorage.getItem("sandal-visitor-mode");
-    if (savedRole && savedRole !== "visitor") {
-      setRoleState(savedRole);
-      setVisitorMode(savedVisitorMode === "true");
-    } else if (savedRole === "visitor") {
+    let cancelled = false;
+
+    if (!user) {
       setRoleState("visitor");
+      return;
     }
-  }, []);
+
+    (async () => {
+      const { data, error } = await supabase
+        .from("providers")
+        .select("role")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (cancelled) return;
+
+      const dbRole = data?.role as LocalRole | undefined;
+      if (!error && dbRole && VALID_LOCAL_ROLES.includes(dbRole)) {
+        setRoleState(dbRole);
+      } else {
+        setRoleState("visitor");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const isProvider = role !== "visitor";
   const isVisitorMode = isProvider && visitorMode;
 
+  // Role can no longer be set from the client as an authorization source;
+  // it is derived from the server. This setter only handles the visitor reset.
   const setRole = useCallback((newRole: UserRole) => {
-    setRoleState(newRole);
-    localStorage.setItem("sandal-role", newRole);
     if (newRole === "visitor") {
       setVisitorMode(false);
       localStorage.removeItem("sandal-visitor-mode");
     }
   }, []);
+
 
   const enterVisitorMode = useCallback(() => {
     setVisitorMode(true);
