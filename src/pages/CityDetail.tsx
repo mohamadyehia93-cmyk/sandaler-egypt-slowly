@@ -343,6 +343,9 @@ const CityDetail = () => {
           </SectionHeader>
         )}
 
+        {/* Events */}
+        <EventsSection events={cityEvents} />
+
         {/* Experiences */}
         {cityExperiences.length > 0 && (
           <SectionHeader titleKey="section.experiences">
