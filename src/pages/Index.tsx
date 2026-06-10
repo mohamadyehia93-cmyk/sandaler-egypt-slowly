@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Bell, Calendar, Search, X, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
@@ -27,7 +27,8 @@ import Certifications from "@/components/Certifications";
 const Index = () => {
   const { t } = useTranslation();
   const { lang } = useLanguage();
-  const [activeTab, setActiveTab] = useState("explore");
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "explore");
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
@@ -39,6 +40,11 @@ const Index = () => {
   const { data: dbAccommodations = [] } = useAccommodations();
   const { data: dbProducts = [] } = useProducts();
   const { data: dbWhosWho = [] } = useWhosWho();
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab) setActiveTab(tab);
+  }, [searchParams]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
