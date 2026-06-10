@@ -141,6 +141,9 @@ const RegionDetail = () => {
       ...experiences.filter((e) => e.regionId === regionId),
     ])
   );
+  const regionEvents = (dbEvents as any[])
+    .filter((e) => e.region_id === regionId)
+    .filter((e) => selectedCity === "all" || e.city_id === selectedCity);
   const regionPosts = dedupe([
     ...(dbPosts as any[]).filter((p) => p.region_id === regionId).map((p) => ({
       id: p.slug || p.id, slug: p.slug,
