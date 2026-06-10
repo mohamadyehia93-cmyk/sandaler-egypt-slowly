@@ -18,7 +18,7 @@ const EventCard = ({ event, onClick }: { event: EventRow; onClick?: () => void }
   return (
     <div
       onClick={onClick}
-      className="min-w-[220px] max-w-[220px] rounded-xl overflow-hidden shadow-card bg-card cursor-pointer active:scale-[0.98] transition-transform"
+      className="rounded-xl overflow-hidden shadow-card bg-card cursor-pointer active:scale-[0.98] transition-transform"
     >
       <div className="relative h-32">
         {event.image ? (
