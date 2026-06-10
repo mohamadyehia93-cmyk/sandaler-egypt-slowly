@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useI18n } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { useUserRole, type UserRole, type LocalRole } from "@/hooks/useUserRole";
+import { type UserRole, type LocalRole } from "@/hooks/useUserRole";
 import { useRegions, useCities } from "@/hooks/useListings";
 import { useAuth } from "@/hooks/useAuth";
 import { becomeProvider } from "@/lib/becomeProvider";
