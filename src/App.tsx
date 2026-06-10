@@ -126,6 +126,7 @@ const App = () => {
             <Route path="/welcome" element={<Splash />} />
             <Route path="/" element={<Index />} />
             <Route path="/calendar" element={<EventCalendar />} />
+            <Route path="/event/:id" element={<EventDetail />} />
             <Route path="/experience/:id" element={<ExperienceDetail />} />
             <Route path="/trip/:id" element={<TripDetail />} />
             <Route path="/trips" element={<AllTrips />} />
@@ -191,6 +192,8 @@ const App = () => {
             <Route path="/dashboard/product-seller" element={<ProductSellerDashboard />} />
             <Route path="/dashboard/trip-organizer/new-trip" element={<NewTrip />} />
             <Route path="/dashboard/trip-organizer/my-trips" element={<MyTrips />} />
+            <Route path="/dashboard/trip-organizer/new-event" element={<NewEvent />} />
+            <Route path="/dashboard/trip-organizer/my-events" element={<MyEvents />} />
             <Route path="/dashboard/trip-organizer" element={<TripOrganizerDashboard />} />
             <Route path="/dashboard/subject-expert/new-collection" element={<NewCollection />} />
             <Route path="/dashboard/subject-expert/my-collections" element={<MyCollections />} />
