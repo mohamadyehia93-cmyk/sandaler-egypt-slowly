@@ -32,6 +32,28 @@ serve(async (req) => {
     const body: BookingRequest = await req.json();
     const { experienceId, slotId, guests, totalAmountEgp, visitorEmail, successUrl, cancelUrl } = body;
 
+    // Validate redirect origins against an allowlist to prevent post-payment phishing.
+    // Only the origin of the client-supplied URLs is honored; final paths are fixed server-side.
+    const isAllowedOrigin = (raw: string): string | null => {
+      try {
+        const u = new URL(raw);
+        if (u.protocol !== 'https:' && u.hostname !== 'localhost') return null;
+        const host = u.hostname;
+        const allowed =
+          host === 'localhost' ||
+          host === 'sandaler-egypt-slowly.lovable.app' ||
+          host.endsWith('.lovable.app') ||
+          host.endsWith('.lovable.dev');
+        return allowed ? u.origin : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const fallbackOrigin = 'https://sandaler-egypt-slowly.lovable.app';
+    const successOrigin = isAllowedOrigin(successUrl ?? '') ?? fallbackOrigin;
+    const cancelOrigin = isAllowedOrigin(cancelUrl ?? '') ?? fallbackOrigin;
+
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -133,8 +155,8 @@ serve(async (req) => {
         quantity: 1,
       }],
       customer_email: visitorEmail,
-      success_url: `${successUrl}?booking_id=${booking.id}`,
-      cancel_url: `${cancelUrl}?booking_id=${booking.id}`,
+      success_url: `${successOrigin}/booking/success?booking_id=${booking.id}`,
+      cancel_url: `${cancelOrigin}/booking/cancelled?booking_id=${booking.id}`,
       metadata: {
         booking_id: booking.id,
         experience_id: experienceId,
