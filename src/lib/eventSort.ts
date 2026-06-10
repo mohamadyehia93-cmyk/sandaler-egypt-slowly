@@ -19,6 +19,7 @@ export type EventRow = {
   is_free?: boolean;
   price?: number | null;
   ticket_url?: string | null;
+  capacity?: number | null;
 };
 
 const startOfToday = () => new Date(new Date().toDateString()).getTime();
