@@ -66,6 +66,7 @@ const NewEvent = () => {
           event_time: data.event_time || "",
           venue_en: data.venue_en || "",
           venue_ar: data.venue_ar || "",
+          capacity: data.capacity != null ? String(data.capacity) : "",
           is_free: data.is_free ?? true,
           price: data.price != null ? String(data.price) : "",
           ticket_url: data.ticket_url || "",
