@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.enforce_comment_author_identity() FROM PUBLIC, anon, authenticated;
