@@ -200,8 +200,8 @@ const App = () => {
               </Suspense>
           </RouteGuard>
         </BrowserRouter>
-        </AuthProvider>
         </UserRoleProvider>
+        </AuthProvider>
       </I18nProvider>
     </TooltipProvider>
   </QueryClientProvider>
