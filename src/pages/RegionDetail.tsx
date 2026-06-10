@@ -78,12 +78,12 @@ const RegionPostsSection = ({
           </button>
         ))}
       </div>
-      <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+      <div className="grid grid-cols-3 gap-3 px-4">
         {filtered.slice(0, 3).map((post) => (
           <div
             key={post.id}
             onClick={() => navigate(`/post/${post.id}`)}
-            className="min-w-[220px] shrink-0 rounded-xl overflow-hidden shadow-card bg-card cursor-pointer"
+            className="rounded-xl overflow-hidden shadow-card bg-card cursor-pointer"
           >
             <div className="relative h-32">
               <img src={post.image} alt={post.title[lang]} className="w-full h-full object-cover" />
@@ -290,9 +290,9 @@ const RegionDetail = () => {
         {/* Who's Who */}
         {regionPeople.length > 0 && (
           <SectionHeader titleKey="section.whosWho" onSeeAll={() => navigate("/people")}>
-            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+            <div className="grid grid-cols-3 gap-3 px-4">
               {regionPeople.slice(0, 3).map((p) => (
-                <div key={p.id} onClick={() => navigate(`/person/${p.id}`)} className="min-w-[160px] max-w-[160px] rounded-lg shadow-card bg-card overflow-hidden cursor-pointer">
+                <div key={p.id} onClick={() => navigate(`/person/${p.id}`)} className="rounded-lg shadow-card bg-card overflow-hidden cursor-pointer">
                   <div className="relative h-28">
                     <img src={p.image} alt={p.name[lang]} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -318,9 +318,9 @@ const RegionDetail = () => {
         {/* Experiences */}
         {regionExperiences.length > 0 && (
           <SectionHeader titleKey="section.experiences" onSeeAll={() => navigate("/?tab=experiences")}>
-            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+            <div className="grid grid-cols-3 gap-3 px-4">
               {regionExperiences.slice(0, 3).map((e) => (
-                <div key={e.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/experience/${e.id}`)}>
+                <div key={e.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/experience/${e.id}`)}>
                   <div className="relative h-32">
                     <img src={e.image} alt={e.title[lang]} className="w-full h-full object-cover" />
                     <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
@@ -347,9 +347,9 @@ const RegionDetail = () => {
         {/* Audio Tours */}
         {regionAudioTours.length > 0 && (
           <SectionHeader titleKey="section.audioTours" onSeeAll={() => navigate("/audio-tours")}>
-            <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
+            <div className="grid grid-cols-3 gap-3 px-4">
               {regionAudioTours.slice(0, 3).map((tour) => (
-                <div key={tour.id} onClick={() => navigate(`/audio-tour/${tour.id}`)} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer">
+                <div key={tour.id} onClick={() => navigate(`/audio-tour/${tour.id}`)} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer">
                   <div className="relative h-32">
                     <img src={tour.image} alt={tour.title[lang]} className="w-full h-full object-cover" />
                     <div className="absolute top-2 left-2 bg-background/80 backdrop-blur-sm text-foreground text-[10px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
