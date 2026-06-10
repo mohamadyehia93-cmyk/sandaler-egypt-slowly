@@ -49,7 +49,14 @@ const RegionPostsSection = ({
         <h3 className="text-base font-bold text-foreground">
           {lang === "ar" ? "مقالات ومنشورات" : "Posts & Articles"}
         </h3>
+        <button
+          onClick={() => navigate("/posts")}
+          className="ms-auto text-xs font-semibold text-primary hover:underline"
+        >
+          {lang === "ar" ? "عرض الكل ←" : "See all →"}
+        </button>
       </div>
+
       <div className="flex gap-2 px-4 overflow-x-auto hide-scrollbar">
         <button
           onClick={() => setActiveCategory("all")}
@@ -72,7 +79,7 @@ const RegionPostsSection = ({
         ))}
       </div>
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-        {filtered.map((post) => (
+        {filtered.slice(0, 3).map((post) => (
           <div
             key={post.id}
             onClick={() => navigate(`/post/${post.id}`)}
@@ -284,7 +291,7 @@ const RegionDetail = () => {
         {regionPeople.length > 0 && (
           <SectionHeader titleKey="section.whosWho" onSeeAll={() => navigate("/people")}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-              {regionPeople.map((p) => (
+              {regionPeople.slice(0, 3).map((p) => (
                 <div key={p.id} onClick={() => navigate(`/person/${p.id}`)} className="min-w-[160px] max-w-[160px] rounded-lg shadow-card bg-card overflow-hidden cursor-pointer">
                   <div className="relative h-28">
                     <img src={p.image} alt={p.name[lang]} className="w-full h-full object-cover" />
@@ -310,9 +317,9 @@ const RegionDetail = () => {
 
         {/* Experiences */}
         {regionExperiences.length > 0 && (
-          <SectionHeader titleKey="section.experiences">
+          <SectionHeader titleKey="section.experiences" onSeeAll={() => navigate("/?tab=experiences")}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-              {regionExperiences.map((e) => (
+              {regionExperiences.slice(0, 3).map((e) => (
                 <div key={e.id} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/experience/${e.id}`)}>
                   <div className="relative h-32">
                     <img src={e.image} alt={e.title[lang]} className="w-full h-full object-cover" />
@@ -341,7 +348,7 @@ const RegionDetail = () => {
         {regionAudioTours.length > 0 && (
           <SectionHeader titleKey="section.audioTours" onSeeAll={() => navigate("/audio-tours")}>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-              {regionAudioTours.map((tour) => (
+              {regionAudioTours.slice(0, 3).map((tour) => (
                 <div key={tour.id} onClick={() => navigate(`/audio-tour/${tour.id}`)} className="min-w-[220px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer">
                   <div className="relative h-32">
                     <img src={tour.image} alt={tour.title[lang]} className="w-full h-full object-cover" />

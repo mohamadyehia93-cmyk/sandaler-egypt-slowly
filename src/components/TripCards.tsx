@@ -258,7 +258,7 @@ const TripCards = () => {
               </div>
 
               <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory">
-                {items.map((tr: any) => (
+                {items.slice(0, 3).map((tr: any) => (
                   <div
                     key={tr.id}
                     onClick={() => navigate(`/trip/${tr.slug || tr.id}`)}

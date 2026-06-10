@@ -18,7 +18,7 @@ const ProductGrid = () => {
           Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-[200px] rounded-lg" />
           ))
-        ) : (products ?? []).map((p) => (
+        ) : (products ?? []).slice(0, 3).map((p) => (
           <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card">
             <div className="relative h-32">
               <img src={p.image || "/placeholder.svg"} alt={lang === "ar" ? p.name_ar : p.name_en} className="w-full h-full object-cover" />

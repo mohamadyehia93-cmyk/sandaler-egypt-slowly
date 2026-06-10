@@ -17,7 +17,7 @@ const TransportCards = () => {
           Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="min-w-[140px] h-[130px] rounded-lg" />
           ))
-        ) : (transport ?? []).map((tr) => (
+        ) : (transport ?? []).slice(0, 3).map((tr) => (
           <div key={tr.id} onClick={() => navigate(`/transport/${tr.slug || tr.id}`)} className="min-w-[140px] rounded-lg shadow-card bg-card p-4 flex flex-col items-center gap-2 cursor-pointer">
             {tr.image && <img src={tr.image} alt="" className="w-10 h-10 rounded-full object-cover" />}
             <h3 className="text-xs font-semibold text-foreground text-center line-clamp-2">
