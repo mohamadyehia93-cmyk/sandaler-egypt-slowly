@@ -573,6 +573,7 @@ export type Database = {
       }
       events: {
         Row: {
+          capacity: number | null
           category: string | null
           city_id: string | null
           created_at: string
@@ -599,6 +600,7 @@ export type Database = {
           venue_en: string | null
         }
         Insert: {
+          capacity?: number | null
           category?: string | null
           city_id?: string | null
           created_at?: string
@@ -625,6 +627,7 @@ export type Database = {
           venue_en?: string | null
         }
         Update: {
+          capacity?: number | null
           category?: string | null
           city_id?: string | null
           created_at?: string
