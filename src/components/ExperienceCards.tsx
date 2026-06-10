@@ -72,12 +72,12 @@ const ExperienceCards = () => {
                 <span className="text-xs text-muted-foreground">({items.length})</span>
               </div>
 
-              <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory">
-                {items.map((e) => (
+              <div className="grid grid-cols-3 gap-3 px-4">
+                {items.slice(0, 3).map((e) => (
                   <button
                     key={e.id}
                     onClick={() => navigate(`/experience/${e.slug || e.id}`)}
-                    className="min-w-[200px] max-w-[200px] snap-start rounded-lg overflow-hidden shadow-card bg-card text-start"
+                    className="rounded-lg overflow-hidden shadow-card bg-card text-start"
                   >
                     <div className="relative h-32">
                       <img
