@@ -2,17 +2,18 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Clock, Users, Star } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { useExperiences, useTrips } from "@/hooks/useListings";
+import { useExperiences, useTrips, useEvents } from "@/hooks/useListings";
 
 type CalendarEvent = {
   id: string;
-  type: "experience" | "trip";
+  type: "experience" | "trip" | "event";
   title: { en: string; ar: string };
   date: Date;
   price: number;
   image: string;
   region?: { en: string; ar: string };
   route?: { en: string; ar: string };
+  venue?: { en: string; ar: string };
   rating?: number;
 };
 
