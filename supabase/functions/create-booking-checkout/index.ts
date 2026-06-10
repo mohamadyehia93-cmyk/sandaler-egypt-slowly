@@ -32,6 +32,28 @@ serve(async (req) => {
     const body: BookingRequest = await req.json();
     const { experienceId, slotId, guests, totalAmountEgp, visitorEmail, successUrl, cancelUrl } = body;
 
+    // Validate redirect origins against an allowlist to prevent post-payment phishing.
+    // Only the origin of the client-supplied URLs is honored; final paths are fixed server-side.
+    const isAllowedOrigin = (raw: string): string | null => {
+      try {
+        const u = new URL(raw);
+        if (u.protocol !== 'https:' && u.hostname !== 'localhost') return null;
+        const host = u.hostname;
+        const allowed =
+          host === 'localhost' ||
+          host === 'sandaler-egypt-slowly.lovable.app' ||
+          host.endsWith('.lovable.app') ||
+          host.endsWith('.lovable.dev');
+        return allowed ? u.origin : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const fallbackOrigin = 'https://sandaler-egypt-slowly.lovable.app';
+    const successOrigin = isAllowedOrigin(successUrl ?? '') ?? fallbackOrigin;
+    const cancelOrigin = isAllowedOrigin(cancelUrl ?? '') ?? fallbackOrigin;
+
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
