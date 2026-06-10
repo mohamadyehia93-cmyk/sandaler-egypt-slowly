@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useI18n } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { useUserRole, type UserRole } from "@/hooks/useUserRole";
+import { useUserRole, type UserRole, type LocalRole } from "@/hooks/useUserRole";
 import { useRegions, useCities } from "@/hooks/useListings";
+import { useAuth } from "@/hooks/useAuth";
+import { becomeProvider } from "@/lib/becomeProvider";
+import { toast } from "sonner";
 import {
   User, Pen, Briefcase, Home, Truck, Map, ShoppingBag, Building2, Shield,
   ArrowLeft, ArrowRight, MapPin, Compass, Headphones, Heart, UtensilsCrossed,
