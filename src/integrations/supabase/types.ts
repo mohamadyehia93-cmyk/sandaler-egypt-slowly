@@ -571,6 +571,87 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          category: string | null
+          city_id: string | null
+          created_at: string
+          description_ar: string | null
+          description_en: string | null
+          end_date: string | null
+          event_time: string | null
+          id: string
+          image: string | null
+          is_free: boolean
+          location_ar: string | null
+          location_en: string | null
+          organizer_id: string | null
+          price: number | null
+          region_id: string | null
+          slug: string | null
+          start_date: string
+          status: string
+          ticket_url: string | null
+          title_ar: string
+          title_en: string
+          updated_at: string
+          venue_ar: string | null
+          venue_en: string | null
+        }
+        Insert: {
+          category?: string | null
+          city_id?: string | null
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          end_date?: string | null
+          event_time?: string | null
+          id?: string
+          image?: string | null
+          is_free?: boolean
+          location_ar?: string | null
+          location_en?: string | null
+          organizer_id?: string | null
+          price?: number | null
+          region_id?: string | null
+          slug?: string | null
+          start_date: string
+          status?: string
+          ticket_url?: string | null
+          title_ar: string
+          title_en: string
+          updated_at?: string
+          venue_ar?: string | null
+          venue_en?: string | null
+        }
+        Update: {
+          category?: string | null
+          city_id?: string | null
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          end_date?: string | null
+          event_time?: string | null
+          id?: string
+          image?: string | null
+          is_free?: boolean
+          location_ar?: string | null
+          location_en?: string | null
+          organizer_id?: string | null
+          price?: number | null
+          region_id?: string | null
+          slug?: string | null
+          start_date?: string
+          status?: string
+          ticket_url?: string | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+          venue_ar?: string | null
+          venue_en?: string | null
+        }
+        Relationships: []
+      }
       experience_reviews: {
         Row: {
           created_at: string
