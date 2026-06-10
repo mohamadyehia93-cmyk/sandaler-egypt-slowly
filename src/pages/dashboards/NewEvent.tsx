@@ -39,6 +39,7 @@ const NewEvent = () => {
     event_time: "",
     venue_en: "",
     venue_ar: "",
+    capacity: "",
     is_free: true,
     price: "",
     ticket_url: "",
