@@ -305,6 +305,9 @@ const RegionDetail = () => {
           </SectionHeader>
         )}
 
+        {/* Events */}
+        <EventsSection events={regionEvents} />
+
         {/* Experiences */}
         {regionExperiences.length > 0 && (
           <SectionHeader titleKey="section.experiences">
