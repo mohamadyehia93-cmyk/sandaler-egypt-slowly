@@ -13,8 +13,8 @@ const SITE_NAME = "Sandal";
 const DEFAULT_TITLE = "Sandal — Discover Egypt. Slowly.";
 const DEFAULT_DESCRIPTION =
   "Explore authentic rural Egypt through local experiences, audio tours, stays, and trips — all curated by community ambassadors.";
-const DEFAULT_IMAGE = "https://sandal.eg/og-image.png";
-const BASE_URL = "https://sandal.eg";
+const DEFAULT_IMAGE = "https://sandaler-egypt-slowly.lovable.app/og-image.png";
+const BASE_URL = "https://sandaler-egypt-slowly.lovable.app";
 
 export function SEO({
   title,
