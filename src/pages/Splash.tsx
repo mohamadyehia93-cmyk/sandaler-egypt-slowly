@@ -239,7 +239,6 @@ const onboardingToUserRole: Record<string, UserRole> = {
 const SplashPage = () => {
   const { t, lang, setLang } = useI18n();
   const navigate = useNavigate();
-  const { setRole } = useUserRole();
   const { user } = useAuth();
   const { data: dbRegions } = useRegions();
   const { data: dbCities } = useCities();
