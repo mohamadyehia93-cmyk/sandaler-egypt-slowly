@@ -255,6 +255,11 @@ const NewEvent = () => {
           </div>
         </div>
 
+        <div>
+          <label className={labelClass}><Users className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "السعة (عدد الحضور)" : "Capacity (attendees)"}</label>
+          <input type="number" className={inputClass} placeholder={lang === "ar" ? "مثال: ١٠٠" : "e.g. 100"} value={form.capacity} onChange={(e) => set("capacity", e.target.value)} min="0" />
+        </div>
+
         <div className="flex items-center justify-between bg-card border border-border rounded-xl px-4 py-3">
           <span className="text-sm font-medium text-foreground">{lang === "ar" ? "فعالية مجانية" : "Free event"}</span>
           <button
