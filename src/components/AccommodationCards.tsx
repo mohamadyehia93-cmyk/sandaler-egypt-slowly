@@ -18,7 +18,7 @@ const AccommodationCards = () => {
           Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="min-w-[200px] h-[220px] rounded-lg" />
           ))
-        ) : (accommodation ?? []).map((a) => (
+        ) : (accommodation ?? []).slice(0, 3).map((a) => (
           <div key={a.id} className="min-w-[200px] rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${a.slug || a.id}`)}>
             <div className="relative h-32">
               <img src={a.image || "/placeholder.svg"} alt={lang === "ar" ? a.name_ar : a.name_en} className="w-full h-full object-cover" />

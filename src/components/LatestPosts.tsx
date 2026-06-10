@@ -99,7 +99,7 @@ const LatestPosts = () => {
               {THEME_LABEL[theme][lang]}
             </h3>
             <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-              {grouped[theme].slice(0, 10).map((p: any) => (
+              {grouped[theme].slice(0, 3).map((p: any) => (
                 <PostCard key={p.id} p={p} lang={lang} navigate={navigate} />
               ))}
             </div>

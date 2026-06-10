@@ -17,7 +17,7 @@ const HomeCausesSection = () => {
           ? Array.from({ length: 3 }).map((_, i) => (
               <Skeleton key={i} className="min-w-[220px] h-[200px] rounded-lg" />
             ))
-          : (causes ?? []).map((cause: any) => {
+          : (causes ?? []).slice(0, 3).map((cause: any) => {
               const goal = cause.goal || 1;
               const progress = Math.round((cause.raised / goal) * 100);
               return (

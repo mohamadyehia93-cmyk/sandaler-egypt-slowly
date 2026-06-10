@@ -18,7 +18,7 @@ const AudioTourCards = () => {
           Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="min-w-[260px] h-[200px] rounded-lg" />
           ))
-        ) : (audioTours ?? []).map((a: any) => (
+        ) : (audioTours ?? []).slice(0, 3).map((a: any) => (
           <div
             key={a.id}
             onClick={() => navigate(`/audio-tour/${a.slug || a.id}`)}
