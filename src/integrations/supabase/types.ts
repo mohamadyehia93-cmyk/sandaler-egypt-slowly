@@ -117,6 +117,45 @@ export type Database = {
           },
         ]
       }
+      ambassador_tasks: {
+        Row: {
+          ambassador_id: string
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          location: string | null
+          status: string
+          title_ar: string | null
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          ambassador_id: string
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          location?: string | null
+          status?: string
+          title_ar?: string | null
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          ambassador_id?: string
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          location?: string | null
+          status?: string
+          title_ar?: string | null
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       audio_tours: {
         Row: {
           city_id: string | null
@@ -474,6 +513,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      collections: {
+        Row: {
+          abstract_ar: string | null
+          abstract_en: string | null
+          cover_image: string | null
+          created_at: string
+          discipline: string | null
+          entries: Json
+          expert_id: string
+          id: string
+          license: string
+          refs: Json
+          region_id: string | null
+          slug: string | null
+          status: string
+          title_ar: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          abstract_ar?: string | null
+          abstract_en?: string | null
+          cover_image?: string | null
+          created_at?: string
+          discipline?: string | null
+          entries?: Json
+          expert_id: string
+          id?: string
+          license?: string
+          refs?: Json
+          region_id?: string | null
+          slug?: string | null
+          status?: string
+          title_ar: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          abstract_ar?: string | null
+          abstract_en?: string | null
+          cover_image?: string | null
+          created_at?: string
+          discipline?: string | null
+          entries?: Json
+          expert_id?: string
+          id?: string
+          license?: string
+          refs?: Json
+          region_id?: string | null
+          slug?: string | null
+          status?: string
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       conversations: {
         Row: {
@@ -856,6 +952,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      flag_reports: {
+        Row: {
+          action_taken: string | null
+          created_at: string
+          description: string
+          id: string
+          issue_type: string
+          location: string | null
+          priority: string
+          provider_name: string | null
+          reporter_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          action_taken?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          issue_type: string
+          location?: string | null
+          priority: string
+          provider_name?: string | null
+          reporter_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          action_taken?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          issue_type?: string
+          location?: string | null
+          priority?: string
+          provider_name?: string | null
+          reporter_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       follows: {
         Row: {
@@ -1512,6 +1650,75 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      programs: {
+        Row: {
+          created_at: string
+          description_ar: string | null
+          description_en: string | null
+          donation_target: number | null
+          end_date: string | null
+          goals: Json
+          id: string
+          image: string | null
+          location_ar: string | null
+          location_en: string | null
+          organization_id: string | null
+          owner_id: string
+          program_type: string | null
+          slug: string | null
+          start_date: string | null
+          status: string
+          title_ar: string
+          title_en: string
+          updated_at: string
+          volunteers_needed: number | null
+        }
+        Insert: {
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          donation_target?: number | null
+          end_date?: string | null
+          goals?: Json
+          id?: string
+          image?: string | null
+          location_ar?: string | null
+          location_en?: string | null
+          organization_id?: string | null
+          owner_id: string
+          program_type?: string | null
+          slug?: string | null
+          start_date?: string | null
+          status?: string
+          title_ar: string
+          title_en: string
+          updated_at?: string
+          volunteers_needed?: number | null
+        }
+        Update: {
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          donation_target?: number | null
+          end_date?: string | null
+          goals?: Json
+          id?: string
+          image?: string | null
+          location_ar?: string | null
+          location_en?: string | null
+          organization_id?: string | null
+          owner_id?: string
+          program_type?: string | null
+          slug?: string | null
+          start_date?: string | null
+          status?: string
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+          volunteers_needed?: number | null
         }
         Relationships: []
       }

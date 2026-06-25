@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { slugify } from "@/lib/dashboardForms";
 import { ArrowLeft, FileText, MapPin, Clock, Users, Calendar, Tag } from "lucide-react";
 import { toast } from "sonner";
 
@@ -15,6 +18,8 @@ const sessionTypes = [
 const NewSession = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -29,13 +34,40 @@ const NewSession = () => {
 
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
+      return;
+    }
     if (!form.title.trim() || !form.type || !form.date) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
-    toast.success(lang === "ar" ? "تم إنشاء الجلسة بنجاح!" : "Session created successfully!");
-    navigate("/dashboard/whos-who");
+    setSubmitting(true);
+    try {
+      const description = [form.type, form.description.trim()].filter(Boolean).join(" — ");
+      const { error } = await supabase.from("meetups").insert({
+        organizer_id: user.id,
+        title_en: form.title.trim(),
+        title_ar: form.title.trim(),
+        description_en: description || null,
+        description_ar: description || null,
+        meetup_date: form.date || null,
+        meetup_time: form.time || null,
+        location_en: form.location || null,
+        location_ar: form.location || null,
+        capacity: parseInt(form.maxSpots) || 20,
+        slug: slugify(form.title, user.id.slice(0, 6)),
+        status: "published",
+      });
+      if (error) throw error;
+      toast.success(lang === "ar" ? "تم نشر الجلسة بنجاح!" : "Session published successfully!");
+      navigate("/dashboard/whos-who/my-sessions");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create session");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-whos-who/40";
@@ -97,8 +129,8 @@ const NewSession = () => {
           <input className={inputClass} placeholder={lang === "ar" ? "مثال: بيت السحيمي، القاهرة" : "e.g. Bayt Al-Suhaymi, Cairo"} value={form.location} onChange={(e) => set("location", e.target.value)} maxLength={100} />
         </div>
 
-        <button onClick={handleSubmit} className="w-full bg-role-whos-who text-white rounded-xl py-4 font-bold text-sm mt-4">
-          {lang === "ar" ? "نشر الجلسة" : "Publish Session"}
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-whos-who text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
+          {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر الجلسة" : "Publish Session")}
         </button>
       </div>
     </div>

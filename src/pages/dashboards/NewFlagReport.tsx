@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Upload, FileText, MapPin, Tag, AlertTriangle, Image } from "lucide-react";
 import { toast } from "sonner";
 
@@ -22,6 +24,8 @@ const priorityLevels = [
 const NewFlagReport = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     issueType: "",
@@ -34,14 +38,36 @@ const NewFlagReport = () => {
 
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
+      return;
+    }
     if (!form.issueType || !form.priority || !form.description.trim()) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
-    toast.success(lang === "ar" ? "تم إرسال البلاغ بنجاح!" : "Report submitted successfully!");
-    navigate("/dashboard/ambassador");
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.from("flag_reports").insert({
+        reporter_id: user.id,
+        issue_type: form.issueType,
+        priority: form.priority,
+        provider_name: form.providerName || null,
+        location: form.location || null,
+        description: form.description.trim(),
+        action_taken: form.actionTaken || null,
+      });
+      if (error) throw error;
+      toast.success(lang === "ar" ? "تم إرسال البلاغ بنجاح!" : "Report submitted successfully!");
+      navigate("/dashboard/ambassador/my-tasks");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to submit report");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-ambassador/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
@@ -105,8 +131,8 @@ const NewFlagReport = () => {
           </div>
         </div>
 
-        <button onClick={handleSubmit} className="w-full bg-role-ambassador text-white rounded-xl py-4 font-bold text-sm mt-4">
-          {lang === "ar" ? "إرسال البلاغ" : "Submit Report"}
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-ambassador text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
+          {submitting ? (lang === "ar" ? "جاري الإرسال..." : "Submitting...") : (lang === "ar" ? "إرسال البلاغ" : "Submit Report")}
         </button>
       </div>
     </div>

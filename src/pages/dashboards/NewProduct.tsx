@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Upload, Plus, Trash2, FileText, Image, Tag, MapPin, DollarSign, Package } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { slugify, uploadImages } from "@/lib/dashboardForms";
+import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, DollarSign, Package } from "lucide-react";
 import { toast } from "sonner";
 
 const categories = [
@@ -16,6 +20,9 @@ const categories = [
 const NewProduct = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   const [form, setForm] = useState({
     name: "",
@@ -41,13 +48,48 @@ const NewProduct = () => {
   const addShipping = () => setForm((p) => ({ ...p, shippingOptions: [...p.shippingOptions, ""] }));
   const removeShipping = (idx: number) => setForm((p) => ({ ...p, shippingOptions: p.shippingOptions.filter((_, i) => i !== idx) }));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
+      return;
+    }
     if (!form.name.trim() || !form.description.trim() || !form.category || !form.price.trim()) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
-    toast.success(lang === "ar" ? "تمت إضافة المنتج بنجاح!" : "Product added successfully!");
-    navigate("/dashboard/product-seller");
+    setSubmitting(true);
+    try {
+      const images = await uploadImages(photos, user.id);
+      const originStory = [form.material && `${lang === "ar" ? "المادة" : "Material"}: ${form.material}`, form.dimensions && `${lang === "ar" ? "الأبعاد" : "Dimensions"}: ${form.dimensions}`, ...form.shippingOptions.filter(Boolean)]
+        .filter(Boolean)
+        .join(" · ");
+
+      const { error } = await supabase.from("products").insert({
+        seller_id: user.id,
+        name_en: form.name.trim(),
+        name_ar: form.name.trim(),
+        description_en: form.description.trim(),
+        description_ar: form.description.trim(),
+        origin_story_en: originStory || null,
+        origin_story_ar: originStory || null,
+        category: form.category,
+        price: parseInt(form.price) || 0,
+        stock: parseInt(form.stock) || 0,
+        seller_village_en: form.origin || null,
+        seller_village_ar: form.origin || null,
+        image: images[0] || null,
+        images,
+        slug: slugify(form.name, user.id.slice(0, 6)),
+        status: "published",
+      });
+      if (error) throw error;
+      toast.success(lang === "ar" ? "تمت إضافة المنتج بنجاح!" : "Product published successfully!");
+      navigate("/dashboard/product-seller/my-products");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create product");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-product-seller/40";
@@ -63,10 +105,7 @@ const NewProduct = () => {
       <div className="px-4 py-5 space-y-5">
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-product-seller" />{lang === "ar" ? "صور المنتج" : "Product Photos"}</label>
-          <div className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center gap-2 bg-card">
-            <Upload className="w-8 h-8 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">{lang === "ar" ? "حتى ٥ صور" : "Up to 5 photos"}</span>
-          </div>
+          <PhotoPicker files={photos} onChange={setPhotos} max={5} hint={lang === "ar" ? "حتى ٥ صور" : "Up to 5 photos"} />
         </div>
 
         <div>
@@ -131,8 +170,8 @@ const NewProduct = () => {
           </div>
         </div>
 
-        <button onClick={handleSubmit} className="w-full bg-role-product-seller text-white rounded-xl py-4 font-bold text-sm mt-4">
-          {lang === "ar" ? "نشر المنتج" : "Publish Product"}
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-product-seller text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
+          {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر المنتج" : "Publish Product")}
         </button>
       </div>
     </div>

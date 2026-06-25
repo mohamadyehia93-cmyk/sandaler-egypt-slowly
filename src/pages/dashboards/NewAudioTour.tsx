@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { slugify, uploadImages } from "@/lib/dashboardForms";
+import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import { ArrowLeft, FileText, MapPin, Clock, Tag, Languages, DollarSign, Plus, Trash2, Mic, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -16,6 +20,9 @@ const themes = [
 const NewAudioTour = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -25,7 +32,6 @@ const NewAudioTour = () => {
     duration: "",
     price: "",
     languages: [] as string[],
-    coverImage: "",
   });
 
   const [stops, setStops] = useState<{ name: string; desc_en: string; desc_ar: string }[]>([
@@ -46,13 +52,55 @@ const NewAudioTour = () => {
   const updateStop = (i: number, key: "name" | "desc_en" | "desc_ar", v: string) =>
     setStops((s) => s.map((stop, idx) => (idx === i ? { ...stop, [key]: v } : stop)));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
+      return;
+    }
     if (!form.title.trim() || !form.city.trim() || !form.theme || stops.length === 0 || !stops[0].name.trim()) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة وإضافة محطة واحدة على الأقل" : "Please fill required fields and add at least one stop");
       return;
     }
-    toast.success(lang === "ar" ? "تم إنشاء الجولة الصوتية بنجاح!" : "Audio tour created successfully!");
-    navigate("/dashboard/narrator/my-tours");
+    setSubmitting(true);
+    try {
+      const images = await uploadImages(photos, user.id);
+      const cleanStops = stops
+        .filter((s) => s.name.trim())
+        .map((s) => ({ label_en: s.name.trim(), label_ar: s.name.trim(), desc_en: s.desc_en.trim(), desc_ar: s.desc_ar.trim() }));
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("display_name, avatar_url")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      const { error } = await supabase.from("audio_tours").insert({
+        creator_id: user.id,
+        title_en: form.title.trim(),
+        title_ar: form.title.trim(),
+        description_en: form.description.trim() || null,
+        description_ar: form.description.trim() || null,
+        city_id: form.city.trim(),
+        duration_minutes: parseInt(form.duration) || 30,
+        stops_count: cleanStops.length,
+        stops: cleanStops,
+        price: parseInt(form.price) || 0,
+        languages: form.languages.length > 0 ? form.languages : ["ar"],
+        narrator_name_en: profile?.display_name || null,
+        narrator_name_ar: profile?.display_name || null,
+        narrator_image: profile?.avatar_url || null,
+        image: images[0] || null,
+        slug: slugify(form.title, user.id.slice(0, 6)),
+        status: "published",
+      });
+      if (error) throw error;
+      toast.success(lang === "ar" ? "تم نشر الجولة الصوتية بنجاح!" : "Audio tour published successfully!");
+      navigate("/dashboard/narrator/my-tours");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create audio tour");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-narrator/40";
@@ -117,9 +165,7 @@ const NewAudioTour = () => {
 
         <div>
           <label className={labelClass}><ImageIcon className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "صورة الغلاف" : "Cover Image"}</label>
-          <button className="w-full border-2 border-dashed border-border rounded-xl py-6 text-xs text-muted-foreground hover:border-role-narrator transition-colors">
-            {lang === "ar" ? "اضغط لرفع صورة" : "Tap to upload image"}
-          </button>
+          <PhotoPicker files={photos} onChange={setPhotos} max={1} hint={lang === "ar" ? "اضغط لرفع صورة" : "Tap to upload image"} />
         </div>
 
         {/* Stops */}
@@ -144,16 +190,13 @@ const NewAudioTour = () => {
                 <input className={inputClass} placeholder={lang === "ar" ? "اسم المكان" : "Place name"} value={s.name} onChange={(e) => updateStop(i, "name", e.target.value)} />
                 <textarea dir="ltr" className={`${inputClass} min-h-[56px] resize-none`} placeholder="Short description (English) — what the visitor sees/hears here" value={s.desc_en} onChange={(e) => updateStop(i, "desc_en", e.target.value)} maxLength={200} />
                 <textarea dir="rtl" className={`${inputClass} min-h-[56px] resize-none text-right`} placeholder="وصف مختصر (عربي) — ما يراه الزائر ويسمعه هنا" value={s.desc_ar} onChange={(e) => updateStop(i, "desc_ar", e.target.value)} maxLength={200} />
-                <button className="w-full text-[10px] font-semibold text-role-narrator border border-dashed border-role-narrator/40 rounded-lg py-2 flex items-center justify-center gap-1">
-                  <Mic className="w-3 h-3" /> {lang === "ar" ? "رفع تسجيل صوتي" : "Upload audio recording"}
-                </button>
               </div>
             ))}
           </div>
         </div>
 
-        <button onClick={handleSubmit} className="w-full bg-role-narrator text-white rounded-xl py-4 font-bold text-sm mt-4">
-          {lang === "ar" ? "نشر الجولة" : "Publish Tour"}
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-narrator text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
+          {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر الجولة" : "Publish Tour")}
         </button>
       </div>
     </div>

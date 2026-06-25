@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Upload, Plus, Trash2, FileText, Image, Tag, MapPin, BookOpen } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { slugify, uploadImages } from "@/lib/dashboardForms";
+import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
 const disciplines = [
@@ -17,6 +21,9 @@ const disciplines = [
 const NewCollection = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -42,13 +49,44 @@ const NewCollection = () => {
   const addRef = () => setForm((p) => ({ ...p, references: [...p.references, ""] }));
   const removeRef = (idx: number) => setForm((p) => ({ ...p, references: p.references.filter((_, i) => i !== idx) }));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
+      return;
+    }
     if (!form.title.trim() || !form.abstract.trim() || !form.discipline) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
-    toast.success(lang === "ar" ? "تم إنشاء المجموعة بنجاح!" : "Collection created successfully!");
-    navigate("/dashboard/subject-expert");
+    setSubmitting(true);
+    try {
+      const images = await uploadImages(photos, user.id);
+      const entries = form.entries.filter((e) => e.title.trim()).map((e) => ({ title: e.title.trim(), summary: e.summary.trim() }));
+      const refs = form.references.map((r) => r.trim()).filter(Boolean);
+
+      const { error } = await supabase.from("collections").insert({
+        expert_id: user.id,
+        title_en: form.title.trim(),
+        title_ar: form.title.trim(),
+        abstract_en: form.abstract.trim(),
+        abstract_ar: form.abstract.trim(),
+        discipline: form.discipline,
+        region_id: form.region || null,
+        cover_image: images[0] || null,
+        entries,
+        refs,
+        license: form.license,
+        slug: slugify(form.title, user.id.slice(0, 6)),
+        status: "published",
+      });
+      if (error) throw error;
+      toast.success(lang === "ar" ? "تم نشر المجموعة بنجاح!" : "Collection published successfully!");
+      navigate("/dashboard/subject-expert/my-collections");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create collection");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-subject-expert/40";
@@ -64,10 +102,7 @@ const NewCollection = () => {
       <div className="px-4 py-5 space-y-5">
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-subject-expert" />{lang === "ar" ? "صورة الغلاف" : "Cover Image"}</label>
-          <div className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center gap-2 bg-card">
-            <Upload className="w-8 h-8 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">{lang === "ar" ? "صورة غلاف المجموعة" : "Collection cover image"}</span>
-          </div>
+          <PhotoPicker files={photos} onChange={setPhotos} max={1} hint={lang === "ar" ? "صورة غلاف المجموعة" : "Collection cover image"} />
         </div>
 
         <div>
@@ -129,8 +164,8 @@ const NewCollection = () => {
           </div>
         </div>
 
-        <button onClick={handleSubmit} className="w-full bg-role-subject-expert text-white rounded-xl py-4 font-bold text-sm mt-4">
-          {lang === "ar" ? "نشر المجموعة" : "Publish Collection"}
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-subject-expert text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
+          {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر المجموعة" : "Publish Collection")}
         </button>
       </div>
     </div>

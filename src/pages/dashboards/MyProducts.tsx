@@ -1,82 +1,81 @@
 import { useNavigate } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Plus, Eye, Package, MoreVertical, Search, Filter, MapPin } from "lucide-react";
-import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft, Plus, Trash2, Eye, ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
 
 const MyProducts = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"active" | "out" | "drafts">("active");
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  const tabs = [
-    { key: "active" as const, label: lang === "ar" ? "متاح" : "In Stock", count: 15 },
-    { key: "out" as const, label: lang === "ar" ? "نفذ" : "Sold Out", count: 3 },
-    { key: "drafts" as const, label: lang === "ar" ? "مسودات" : "Drafts", count: 2 },
-  ];
+  const { data: items = [], isLoading } = useQuery({
+    queryKey: ["my-products", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("id, name_en, name_ar, image, price, stock, status, created_at")
+        .eq("seller_id", user!.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
 
-  const products = {
-    active: [
-      { id: "p1", title: lang === "ar" ? "مجوهرات يدوية مستوحاة من البحر" : "Sea-Inspired Handmade Jewelry", stock: 24, sold: 48, price: "600 EGP", image: "https://images.unsplash.com/photo-1515562141589-67f0d569b6c4?w=100&q=80" },
-      { id: "p4", title: lang === "ar" ? "نسيج نوبي يدوي" : "Nubian Hand-woven Textile", stock: 8, sold: 32, price: "450 EGP", image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=100&q=80" },
-      { id: "p5", title: lang === "ar" ? "زيت زيتون سيوة" : "Siwa Olive Oil", stock: 50, sold: 120, price: "180 EGP", image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=100&q=80" },
-    ],
-    out: [
-      { id: "p2", title: lang === "ar" ? "كرسي تراثي من النخيل" : "Palm Tree Heritage Chair", stock: 0, sold: 15, price: "1000 EGP", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=100&q=80" },
-    ],
-    drafts: [
-      { id: "d1", title: lang === "ar" ? "سلال الواحة" : "Oasis Baskets", stock: 0, sold: 0, price: "250 EGP", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=100&q=80" },
-    ],
+  const handleDelete = async (id: string) => {
+    if (!window.confirm(lang === "ar" ? "حذف هذا المنتج؟" : "Delete this product?")) return;
+    const { error } = await supabase.from("products").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(lang === "ar" ? "تم الحذف" : "Deleted");
+    queryClient.invalidateQueries({ queryKey: ["my-products"] });
+    queryClient.invalidateQueries({ queryKey: ["products"] });
   };
 
   return (
     <div className="min-h-screen bg-surface pb-24">
-      <header className="bg-role-product-seller text-white px-4 py-4">
-        <div className="flex items-center justify-between mb-3">
-          <button onClick={() => navigate("/dashboard/product-seller")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-          <button onClick={() => navigate("/dashboard/product-seller/new-product")} className="flex items-center gap-1 bg-white/20 rounded-lg px-3 py-1.5 text-xs font-semibold">
-            <Plus className="w-3.5 h-3.5" /> {lang === "ar" ? "جديد" : "New"}
-          </button>
-        </div>
+      <header className="bg-role-product-seller text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
+        <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{lang === "ar" ? "منتجاتي" : "My Products"}</h1>
       </header>
 
-      <div className="px-4 pt-3 pb-2">
-        <div className="flex gap-2">
-          <div className="flex-1 flex items-center gap-2 bg-card rounded-lg px-3 py-2 border border-border">
-            <Search className="w-4 h-4 text-muted-foreground" />
-            <input type="text" placeholder={lang === "ar" ? "ابحث..." : "Search..."} className="bg-transparent text-sm flex-1 outline-none text-foreground placeholder:text-muted-foreground" />
+      <div className="px-4 py-5 space-y-3">
+        {!user ? (
+          <p className="text-center text-sm text-muted-foreground py-12">{lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in"}</p>
+        ) : isLoading ? (
+          <p className="text-center text-sm text-muted-foreground py-12">{lang === "ar" ? "جاري التحميل..." : "Loading..."}</p>
+        ) : items.length === 0 ? (
+          <div className="text-center py-16">
+            <ShoppingBag className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground">{lang === "ar" ? "لا توجد منتجات بعد" : "No products yet"}</p>
           </div>
-          <button className="p-2 bg-card rounded-lg border border-border"><Filter className="w-4 h-4 text-muted-foreground" /></button>
-        </div>
-      </div>
-
-      <div className="flex gap-1 px-4 pb-3">
-        {tabs.map((tab) => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${activeTab === tab.key ? "bg-role-product-seller text-white" : "bg-card text-muted-foreground border border-border"}`}>
-            {tab.label} ({tab.count})
-          </button>
-        ))}
-      </div>
-
-      <div className="px-4 space-y-2">
-        {products[activeTab].map((product) => (
-          <div key={product.id} onClick={() => navigate(`/product/${product.id}`)} className="bg-card rounded-xl shadow-card overflow-hidden cursor-pointer hover:shadow-md transition-shadow">
-            <div className="flex gap-3 p-3">
-              <img src={product.image} alt={product.title} className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between">
-                  <h3 className="text-sm font-semibold text-foreground line-clamp-1">{product.title}</h3>
-                  <button onClick={(e) => e.stopPropagation()} className="p-0.5 text-muted-foreground"><MoreVertical className="w-4 h-4" /></button>
-                </div>
-                <div className="flex items-center gap-3 mt-1.5 text-[10px] text-muted-foreground">
-                  <span className="flex items-center gap-0.5"><Package className="w-3 h-3" /> {product.stock} {lang === "ar" ? "في المخزون" : "in stock"}</span>
-                  <span>{product.sold} {lang === "ar" ? "مباع" : "sold"}</span>
-                  <span className="font-semibold text-foreground">{product.price}</span>
-                </div>
+        ) : (
+          items.map((e) => (
+            <div key={e.id} className="bg-card rounded-xl shadow-card p-3 flex gap-3 items-center">
+              <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary shrink-0 flex items-center justify-center">
+                {e.image ? <img src={e.image} alt="" className="w-full h-full object-cover" /> : <ShoppingBag className="w-6 h-6 text-muted-foreground" />}
               </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground line-clamp-1">{lang === "ar" ? e.name_ar : e.name_en}</p>
+                <p className="text-[11px] text-muted-foreground">{e.price ? `${e.price} ${lang === "ar" ? "ج.م" : "EGP"}` : "—"} · {lang === "ar" ? "المخزون" : "Stock"}: {e.stock ?? 0}</p>
+                <span className="text-[10px] font-medium text-success">{e.status}</span>
+              </div>
+              <button onClick={() => navigate(`/product/${e.id}`)} className="p-2 rounded-lg bg-role-product-seller/10 text-role-product-seller">
+                <Eye className="w-4 h-4" />
+              </button>
+              <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
-          </div>
-        ))}
+          ))
+        )}
+
+        <button onClick={() => navigate("/dashboard/product-seller/new-product")} className="w-full bg-role-product-seller text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2 mt-2">
+          <Plus className="w-4 h-4" /> {lang === "ar" ? "إضافة منتج" : "Add Product"}
+        </button>
       </div>
     </div>
   );

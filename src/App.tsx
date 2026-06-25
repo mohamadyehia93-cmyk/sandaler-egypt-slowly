@@ -50,6 +50,7 @@ const CauseSupportConsult = lazy(() => import("./pages/CauseSupportConsult.tsx")
 const Booking = lazy(() => import("./pages/Booking.tsx"));
 const BookingSuccess = lazy(() => import("./pages/BookingSuccess.tsx"));
 const BookingCancelled = lazy(() => import("./components/BookingCancelled.tsx"));
+const MyBookings = lazy(() => import("./pages/MyBookings.tsx"));
 const EventCalendar = lazy(() => import("./pages/EventCalendar.tsx"));
 const EventDetail = lazy(() => import("./pages/EventDetail.tsx"));
 const NewEvent = lazy(() => import("./pages/dashboards/NewEvent.tsx"));
@@ -94,6 +95,7 @@ const MyTrips = lazy(() => import("./pages/dashboards/MyTrips.tsx"));
 const MyPrograms = lazy(() => import("./pages/dashboards/MyPrograms.tsx"));
 const MyCollections = lazy(() => import("./pages/dashboards/MyCollections.tsx"));
 const MyTasks = lazy(() => import("./pages/dashboards/MyTasks.tsx"));
+const MySessions = lazy(() => import("./pages/dashboards/MySessions.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -167,6 +169,7 @@ const App = () => {
             <Route path="/booking" element={<Booking />} />
             <Route path="/booking/success" element={<BookingSuccess />} />
             <Route path="/booking/cancelled" element={<BookingCancelled />} />
+            <Route path="/bookings" element={<MyBookings />} />
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile" element={<Profile />} />
@@ -181,6 +184,7 @@ const App = () => {
             <Route path="/dashboard/service-provider/my-listings" element={<MyListings />} />
             <Route path="/dashboard/service-provider" element={<ServiceProviderDashboard />} />
             <Route path="/dashboard/whos-who/new-session" element={<NewSession />} />
+            <Route path="/dashboard/whos-who/my-sessions" element={<MySessions />} />
             <Route path="/dashboard/whos-who" element={<WhosWhoDashboard />} />
             <Route path="/dashboard/organization/new-program" element={<NewProgram />} />
             <Route path="/dashboard/organization/my-programs" element={<MyPrograms />} />
