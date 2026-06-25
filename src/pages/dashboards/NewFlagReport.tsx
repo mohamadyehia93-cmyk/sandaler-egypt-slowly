@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +25,8 @@ const NewFlagReport = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
@@ -36,7 +38,64 @@ const NewFlagReport = () => {
     actionTaken: "",
   });
 
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("flag_reports").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(lang === "ar" ? "تعذر تحميل البلاغ" : "Could not load report");
+        return;
+      }
+      setForm({
+        issueType: data.issue_type || "",
+        priority: data.priority || "",
+        providerName: data.provider_name || "",
+        location: data.location || "",
+        description: data.description || "",
+        actionTaken: data.action_taken || "",
+      });
+    })();
+  }, [isEdit, id, lang]);
+
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
+
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
+      return;
+    }
+    if (!form.issueType || !form.priority || !form.description.trim()) {
+      toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const payload = {
+        reporter_id: user.id,
+        issue_type: form.issueType,
+        priority: form.priority,
+        provider_name: form.providerName || null,
+        location: form.location || null,
+        description: form.description.trim(),
+        action_taken: form.actionTaken || null,
+      };
+      if (isEdit) {
+        const { error } = await supabase.from("flag_reports").update(payload).eq("id", id);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم تحديث البلاغ!" : "Report updated!");
+      } else {
+        const { error } = await supabase.from("flag_reports").insert(payload);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم إرسال البلاغ بنجاح!" : "Report submitted successfully!");
+      }
+      navigate("/dashboard/ambassador/my-tasks");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save report");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
 
   const handleSubmit = async () => {
     if (!user) {
