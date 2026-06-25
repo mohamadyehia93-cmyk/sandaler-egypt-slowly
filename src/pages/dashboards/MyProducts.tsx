@@ -66,6 +66,9 @@ const MyProducts = () => {
               <button onClick={() => navigate(`/product/${e.id}`)} className="p-2 rounded-lg bg-role-product-seller/10 text-role-product-seller">
                 <Eye className="w-4 h-4" />
               </button>
+              <button onClick={() => navigate(`/dashboard/product-seller/edit-product/${e.id}`)} className="p-2 rounded-lg bg-role-product-seller/10 text-role-product-seller">
+                <Pencil className="w-4 h-4" />
+              </button>
               <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
                 <Trash2 className="w-4 h-4" />
               </button>
