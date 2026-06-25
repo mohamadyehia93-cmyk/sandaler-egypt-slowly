@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,8 +22,11 @@ const NewArticle = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -34,7 +37,28 @@ const NewArticle = () => {
     hasAudio: false,
   });
 
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("posts").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(lang === "ar" ? "تعذر تحميل المقال" : "Could not load article");
+        return;
+      }
+      setForm({
+        title: data.title_en || "",
+        body: data.body_en || "",
+        category: data.category || "",
+        location: "",
+        tags: Array.isArray(data.tags) && data.tags.length ? (data.tags as string[]) : [""],
+        hasAudio: data.content_type === "audio",
+      });
+      setExistingImages(Array.isArray(data.images) ? (data.images as string[]) : data.image ? [data.image] : []);
+    })();
+  }, [isEdit, id, lang]);
+
   const set = (key: string, value: string | boolean) => setForm((p) => ({ ...p, [key]: value }));
+
 
   const updateTag = (idx: number, value: string) => {
     setForm((p) => {
