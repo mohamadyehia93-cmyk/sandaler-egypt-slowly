@@ -271,6 +271,7 @@ const SplashPage = () => {
     "product-seller": "/dashboard/product-seller",
     "trip-organizer": "/dashboard/trip-organizer",
     "subject-expert": "/dashboard/subject-expert",
+    "narrator": "/dashboard/narrator",
   };
 
   const persistPersonalization = () => {
