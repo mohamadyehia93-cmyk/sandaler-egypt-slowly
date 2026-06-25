@@ -94,6 +94,7 @@ const MyTrips = lazy(() => import("./pages/dashboards/MyTrips.tsx"));
 const MyPrograms = lazy(() => import("./pages/dashboards/MyPrograms.tsx"));
 const MyCollections = lazy(() => import("./pages/dashboards/MyCollections.tsx"));
 const MyTasks = lazy(() => import("./pages/dashboards/MyTasks.tsx"));
+const MySessions = lazy(() => import("./pages/dashboards/MySessions.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
