@@ -201,7 +201,7 @@ const NewAudioTour = () => {
 
         <div>
           <label className={labelClass}><ImageIcon className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "صورة الغلاف" : "Cover Image"}</label>
-          <PhotoPicker files={photos} onChange={setPhotos} max={1} hint={lang === "ar" ? "اضغط لرفع صورة" : "Tap to upload image"} />
+          <PhotoPicker files={photos} onChange={setPhotos} max={1} hint={lang === "ar" ? "اضغط لرفع صورة" : "Tap to upload image"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
         {/* Stops */}
