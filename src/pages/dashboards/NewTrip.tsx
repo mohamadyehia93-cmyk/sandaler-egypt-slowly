@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Upload, Plus, Trash2, FileText, Image, Tag, MapPin, Clock, Users, DollarSign, Calendar, ListChecks } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { slugify, uploadImages } from "@/lib/dashboardForms";
+import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Clock, Users, DollarSign, Calendar, ListChecks } from "lucide-react";
 import { toast } from "sonner";
 
 const tripTypes = [
@@ -13,6 +17,9 @@ const tripTypes = [
 const NewTrip = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -48,13 +55,55 @@ const NewTrip = () => {
   const addIncludes = () => setForm((p) => ({ ...p, includes: [...p.includes, ""] }));
   const removeIncludes = (idx: number) => setForm((p) => ({ ...p, includes: p.includes.filter((_, i) => i !== idx) }));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
+      return;
+    }
     if (!form.title.trim() || !form.description.trim() || !form.tripType || !form.price.trim()) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
-    toast.success(lang === "ar" ? "تم إنشاء الرحلة بنجاح!" : "Trip created successfully!");
-    navigate("/dashboard/trip-organizer");
+    setSubmitting(true);
+    try {
+      const images = await uploadImages(photos, user.id);
+      const destinations = form.destinations.map((d) => d.trim()).filter(Boolean);
+      const route = [form.startLocation.trim(), ...destinations].filter(Boolean).join(" → ");
+      const itinerary = form.itinerary
+        .filter((i) => i.description.trim())
+        .map((i, idx) => ({ day: idx + 1, description: i.description.trim() }));
+      const inclusions = form.includes.map((i) => i.trim()).filter(Boolean);
+
+      const { error } = await supabase.from("trips").insert({
+        organizer_id: user.id,
+        title_en: form.title.trim(),
+        title_ar: form.title.trim(),
+        description_en: form.description.trim(),
+        description_ar: form.description.trim(),
+        trip_type: form.tripType,
+        price: parseInt(form.price) || 0,
+        duration_days: parseInt(form.days) || 1,
+        capacity_max: parseInt(form.maxGroup) || null,
+        date: form.departureDate || null,
+        route_en: route || null,
+        route_ar: route || null,
+        itinerary_en: itinerary,
+        itinerary_ar: itinerary,
+        inclusions_en: inclusions,
+        inclusions_ar: inclusions,
+        image: images[0] || null,
+        images,
+        slug: slugify(form.title, user.id.slice(0, 6)),
+        status: "published",
+      });
+      if (error) throw error;
+      toast.success(lang === "ar" ? "تم نشر الرحلة بنجاح!" : "Trip published successfully!");
+      navigate("/dashboard/trip-organizer/my-trips");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create trip");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-trip-organizer/40";
@@ -70,10 +119,7 @@ const NewTrip = () => {
       <div className="px-4 py-5 space-y-5">
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-trip-organizer" />{lang === "ar" ? "صور الرحلة" : "Trip Photos"}</label>
-          <div className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center gap-2 bg-card">
-            <Upload className="w-8 h-8 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">{lang === "ar" ? "حتى ٥ صور" : "Up to 5 photos"}</span>
-          </div>
+          <PhotoPicker files={photos} onChange={setPhotos} max={5} hint={lang === "ar" ? "حتى ٥ صور" : "Up to 5 photos"} />
         </div>
 
         <div>
@@ -163,8 +209,8 @@ const NewTrip = () => {
           </div>
         </div>
 
-        <button onClick={handleSubmit} className="w-full bg-role-trip-organizer text-white rounded-xl py-4 font-bold text-sm mt-4">
-          {lang === "ar" ? "نشر الرحلة" : "Publish Trip"}
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-trip-organizer text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
+          {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر الرحلة" : "Publish Trip")}
         </button>
       </div>
     </div>
