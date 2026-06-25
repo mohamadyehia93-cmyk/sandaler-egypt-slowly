@@ -135,7 +135,7 @@ const NewProduct = () => {
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-role-product-seller text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-        <h1 className="text-lg font-bold">{lang === "ar" ? "إضافة منتج" : "Add Product"}</h1>
+        <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل المنتج" : "Edit Product") : (lang === "ar" ? "إضافة منتج" : "Add Product")}</h1>
       </header>
 
       <div className="px-4 py-5 space-y-5">
