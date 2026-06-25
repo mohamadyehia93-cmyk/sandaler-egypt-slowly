@@ -86,12 +86,13 @@ const NewProduct = () => {
     }
     setSubmitting(true);
     try {
-      const images = await uploadImages(photos, user.id);
+      const uploaded = await uploadImages(photos, user.id);
+      const images = [...existingImages, ...uploaded];
       const originStory = [form.material && `${lang === "ar" ? "المادة" : "Material"}: ${form.material}`, form.dimensions && `${lang === "ar" ? "الأبعاد" : "Dimensions"}: ${form.dimensions}`, ...form.shippingOptions.filter(Boolean)]
         .filter(Boolean)
         .join(" · ");
 
-      const { error } = await supabase.from("products").insert({
+      const payload = {
         seller_id: user.id,
         name_en: form.name.trim(),
         name_ar: form.name.trim(),
@@ -106,18 +107,26 @@ const NewProduct = () => {
         seller_village_ar: form.origin || null,
         image: images[0] || null,
         images,
-        slug: slugify(form.name, user.id.slice(0, 6)),
         status: "published",
-      });
-      if (error) throw error;
-      toast.success(lang === "ar" ? "تمت إضافة المنتج بنجاح!" : "Product published successfully!");
+      };
+
+      if (isEdit) {
+        const { error } = await supabase.from("products").update(payload).eq("id", id);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم تحديث المنتج!" : "Product updated!");
+      } else {
+        const { error } = await supabase.from("products").insert({ ...payload, slug: slugify(form.name, user.id.slice(0, 6)) });
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تمت إضافة المنتج بنجاح!" : "Product published successfully!");
+      }
       navigate("/dashboard/product-seller/my-products");
     } catch (err: any) {
-      toast.error(err.message || "Failed to create product");
+      toast.error(err.message || "Failed to save product");
     } finally {
       setSubmitting(false);
     }
   };
+
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-product-seller/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
