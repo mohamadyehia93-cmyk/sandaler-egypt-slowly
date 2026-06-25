@@ -34,14 +34,40 @@ serve(async (req) => {
       const session = event.data.object as Stripe.Checkout.Session;
       const bookingId = session.metadata?.booking_id;
       if (bookingId) {
-        await supabase
+        // Load the booking first so we can (a) avoid double-processing duplicate
+        // webhook deliveries and (b) decrement slot availability exactly once.
+        const { data: existing } = await supabase
           .from('bookings')
-          .update({
-            status: 'confirmed',
-            paid_at: new Date().toISOString(),
-            stripe_payment_intent_id: session.payment_intent as string,
-          })
-          .eq('id', bookingId);
+          .select('status, slot_id, guests')
+          .eq('id', bookingId)
+          .single();
+
+        if (existing && existing.status !== 'confirmed') {
+          await supabase
+            .from('bookings')
+            .update({
+              status: 'confirmed',
+              paid_at: new Date().toISOString(),
+              stripe_payment_intent_id: session.payment_intent as string,
+            })
+            .eq('id', bookingId);
+
+          // Decrement remaining spots on the booked slot (clamped at 0).
+          if (existing.slot_id) {
+            const { data: slot } = await supabase
+              .from('experience_slots')
+              .select('spots_available')
+              .eq('id', existing.slot_id)
+              .single();
+            if (slot) {
+              const remaining = Math.max((slot.spots_available ?? 0) - (existing.guests ?? 0), 0);
+              await supabase
+                .from('experience_slots')
+                .update({ spots_available: remaining })
+                .eq('id', existing.slot_id);
+            }
+          }
+        }
       }
       break;
     }
