@@ -63,6 +63,9 @@ const MyPrograms = () => {
                 <p className="text-[11px] text-muted-foreground line-clamp-1">{e.program_type}{e.start_date ? ` · ${e.start_date}` : ""}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
+              <button onClick={() => navigate(`/dashboard/organization/edit-program/${e.id}`)} className="p-2 rounded-lg bg-role-organization/10 text-role-organization">
+                <Pencil className="w-4 h-4" />
+              </button>
               <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
                 <Trash2 className="w-4 h-4" />
               </button>
