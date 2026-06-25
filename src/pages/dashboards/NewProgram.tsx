@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,8 +20,11 @@ const NewProgram = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -35,7 +38,32 @@ const NewProgram = () => {
     donationTarget: "",
   });
 
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("programs").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(lang === "ar" ? "تعذر تحميل البرنامج" : "Could not load program");
+        return;
+      }
+      const goals = Array.isArray(data.goals) ? (data.goals as any[]) : [];
+      setForm({
+        title: data.title_en || "",
+        description: data.description_en || "",
+        type: data.program_type || "",
+        location: data.location_en || "",
+        startDate: data.start_date || "",
+        endDate: data.end_date || "",
+        volunteersNeeded: data.volunteers_needed != null ? String(data.volunteers_needed) : "",
+        goals: goals.length ? goals.map((g: any) => String(g)) : [""],
+        donationTarget: data.donation_target != null ? String(data.donation_target) : "",
+      });
+      setExistingImages(data.image ? [data.image] : []);
+    })();
+  }, [isEdit, id, lang]);
+
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
+
 
   const updateGoal = (idx: number, value: string) => {
     setForm((p) => { const arr = [...p.goals]; arr[idx] = value; return { ...p, goals: arr }; });
