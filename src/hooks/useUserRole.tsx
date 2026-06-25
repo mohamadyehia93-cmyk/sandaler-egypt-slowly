@@ -10,7 +10,8 @@ export type LocalRole =
   | "ambassador"
   | "product-seller"
   | "trip-organizer"
-  | "subject-expert";
+  | "subject-expert"
+  | "narrator";
 
 export type UserRole = "visitor" | LocalRole;
 
