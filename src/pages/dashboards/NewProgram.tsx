@@ -135,7 +135,7 @@ const NewProgram = () => {
       <div className="px-4 py-5 space-y-5">
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-organization" />{lang === "ar" ? "صور البرنامج" : "Program Photos"}</label>
-          <PhotoPicker files={photos} onChange={setPhotos} max={3} hint={lang === "ar" ? "حتى ٣ صور" : "Up to 3 photos"} />
+          <PhotoPicker files={photos} onChange={setPhotos} max={3} hint={lang === "ar" ? "حتى ٣ صور" : "Up to 3 photos"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
         <div>
