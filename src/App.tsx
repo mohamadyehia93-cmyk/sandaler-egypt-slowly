@@ -169,6 +169,7 @@ const App = () => {
             <Route path="/booking" element={<Booking />} />
             <Route path="/booking/success" element={<BookingSuccess />} />
             <Route path="/booking/cancelled" element={<BookingCancelled />} />
+            <Route path="/bookings" element={<MyBookings />} />
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile" element={<Profile />} />
