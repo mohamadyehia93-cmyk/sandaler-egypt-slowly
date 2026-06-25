@@ -63,6 +63,9 @@ const MyCollections = () => {
                 <p className="text-[11px] text-muted-foreground line-clamp-1">{e.discipline}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
+              <button onClick={() => navigate(`/dashboard/subject-expert/edit-collection/${e.id}`)} className="p-2 rounded-lg bg-role-subject-expert/10 text-role-subject-expert">
+                <Pencil className="w-4 h-4" />
+              </button>
               <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
                 <Trash2 className="w-4 h-4" />
               </button>
