@@ -48,6 +48,7 @@ export const roleLabels: Record<UserRole, { en: string; ar: string }> = {
   "product-seller": { en: "Product Seller", ar: "بائع منتجات" },
   "trip-organizer": { en: "Trip Organizer", ar: "منظم رحلات" },
   "subject-expert": { en: "Subject Expert", ar: "خبير متخصص" },
+  "narrator": { en: "Narrator", ar: "راوي" },
 };
 
 const UserRoleContext = createContext<UserRoleContextType | null>(null);
