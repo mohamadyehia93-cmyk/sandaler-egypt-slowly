@@ -2092,6 +2092,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_follower_count: {
+        Args: { _target_id: string; _target_type: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
