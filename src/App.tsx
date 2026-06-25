@@ -182,6 +182,7 @@ const App = () => {
             <Route path="/dashboard/service-provider/my-listings" element={<MyListings />} />
             <Route path="/dashboard/service-provider" element={<ServiceProviderDashboard />} />
             <Route path="/dashboard/whos-who/new-session" element={<NewSession />} />
+            <Route path="/dashboard/whos-who/my-sessions" element={<MySessions />} />
             <Route path="/dashboard/whos-who" element={<WhosWhoDashboard />} />
             <Route path="/dashboard/organization/new-program" element={<NewProgram />} />
             <Route path="/dashboard/organization/my-programs" element={<MyPrograms />} />
