@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Upload, Plus, Trash2, FileText, Image, Tag, MapPin, Mic } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { slugify, uploadImages } from "@/lib/dashboardForms";
+import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Mic } from "lucide-react";
 import { toast } from "sonner";
 
 const categories = [
@@ -17,6 +21,9 @@ const categories = [
 const NewArticle = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -40,13 +47,47 @@ const NewArticle = () => {
   const addTag = () => setForm((p) => ({ ...p, tags: [...p.tags, ""] }));
   const removeTag = (idx: number) => setForm((p) => ({ ...p, tags: p.tags.filter((_, i) => i !== idx) }));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
+      return;
+    }
     if (!form.title.trim() || !form.body.trim() || !form.category) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
-    toast.success(lang === "ar" ? "تم نشر المقال بنجاح!" : "Article published successfully!");
-    navigate("/dashboard/culture-actor");
+    setSubmitting(true);
+    try {
+      const images = await uploadImages(photos, user.id);
+      const tags = form.tags.map((t) => t.trim()).filter(Boolean);
+      const excerpt = form.body.trim().slice(0, 160);
+      const readTime = Math.max(1, Math.round(form.body.trim().split(/\s+/).length / 200));
+
+      const { error } = await supabase.from("posts").insert({
+        author_id: user.id,
+        title_en: form.title.trim(),
+        title_ar: form.title.trim(),
+        body_en: form.body.trim(),
+        body_ar: form.body.trim(),
+        excerpt_en: excerpt,
+        excerpt_ar: excerpt,
+        category: form.category,
+        tags,
+        image: images[0] || null,
+        images,
+        read_time_minutes: readTime,
+        content_type: form.hasAudio ? "audio" : "article",
+        slug: slugify(form.title, user.id.slice(0, 6)),
+        status: "published",
+      });
+      if (error) throw error;
+      toast.success(lang === "ar" ? "تم نشر المقال بنجاح!" : "Article published successfully!");
+      navigate("/dashboard/culture-actor/my-content");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to publish article");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-culture-actor/40";
@@ -63,10 +104,7 @@ const NewArticle = () => {
         {/* Cover Image */}
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "صورة الغلاف" : "Cover Image"}</label>
-          <div className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center gap-2 bg-card">
-            <Upload className="w-8 h-8 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">{lang === "ar" ? "اسحب أو اضغط للرفع" : "Drag or tap to upload"}</span>
-          </div>
+          <PhotoPicker files={photos} onChange={setPhotos} max={3} hint={lang === "ar" ? "اسحب أو اضغط للرفع" : "Drag or tap to upload"} />
         </div>
 
         {/* Title */}
@@ -125,8 +163,8 @@ const NewArticle = () => {
           </button>
         </div>
 
-        <button onClick={handleSubmit} className="w-full bg-role-culture-actor text-white rounded-xl py-4 font-bold text-sm mt-4">
-          {lang === "ar" ? "نشر المقال" : "Publish Article"}
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-culture-actor text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
+          {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر المقال" : "Publish Article")}
         </button>
       </div>
     </div>
