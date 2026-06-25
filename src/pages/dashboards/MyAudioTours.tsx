@@ -66,6 +66,9 @@ const MyAudioTours = () => {
               <button onClick={() => navigate(`/audio-tour/${e.id}`)} className="p-2 rounded-lg bg-role-narrator/10 text-role-narrator">
                 <Eye className="w-4 h-4" />
               </button>
+              <button onClick={() => navigate(`/dashboard/narrator/edit-tour/${e.id}`)} className="p-2 rounded-lg bg-role-narrator/10 text-role-narrator">
+                <Pencil className="w-4 h-4" />
+              </button>
               <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
                 <Trash2 className="w-4 h-4" />
               </button>
