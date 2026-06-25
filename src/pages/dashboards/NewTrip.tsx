@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,8 +18,11 @@ const NewTrip = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -35,7 +38,36 @@ const NewTrip = () => {
     departureDate: "",
   });
 
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("trips").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(lang === "ar" ? "تعذر تحميل الرحلة" : "Could not load trip");
+        return;
+      }
+      const routeParts = (data.route_en || "").split(" → ").map((s: string) => s.trim()).filter(Boolean);
+      const itin = Array.isArray(data.itinerary_en) ? (data.itinerary_en as any[]) : [];
+      const inc = Array.isArray(data.inclusions_en) ? (data.inclusions_en as any[]) : [];
+      setForm({
+        title: data.title_en || "",
+        description: data.description_en || "",
+        tripType: data.trip_type || "",
+        days: data.duration_days != null ? String(data.duration_days) : "",
+        maxGroup: data.capacity_max != null ? String(data.capacity_max) : "",
+        price: data.price != null ? String(data.price) : "",
+        startLocation: routeParts[0] || "",
+        destinations: routeParts.length > 1 ? routeParts.slice(1) : [""],
+        itinerary: itin.length ? itin.map((i: any, idx: number) => ({ day: String(idx + 1), description: i.description || "" })) : [{ day: "1", description: "" }],
+        includes: inc.length ? inc.map((i: any) => String(i)) : [""],
+        departureDate: data.date || "",
+      });
+      setExistingImages(Array.isArray(data.images) ? (data.images as string[]) : data.image ? [data.image] : []);
+    })();
+  }, [isEdit, id, lang]);
+
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
+
 
   const updateDest = (idx: number, value: string) => {
     setForm((p) => { const arr = [...p.destinations]; arr[idx] = value; return { ...p, destinations: arr }; });
