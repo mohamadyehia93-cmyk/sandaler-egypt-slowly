@@ -84,13 +84,14 @@ const NewAudioTour = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    if (!form.title.trim() || !form.city.trim() || !form.theme || stops.length === 0 || !stops[0].name.trim()) {
+    if (!form.title.trim() || !form.city.trim() || (!isEdit && !form.theme) || stops.length === 0 || !stops[0].name.trim()) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة وإضافة محطة واحدة على الأقل" : "Please fill required fields and add at least one stop");
       return;
     }
     setSubmitting(true);
     try {
-      const images = await uploadImages(photos, user.id);
+      const uploaded = await uploadImages(photos, user.id);
+      const images = [...existingImages, ...uploaded];
       const cleanStops = stops
         .filter((s) => s.name.trim())
         .map((s) => ({ label_en: s.name.trim(), label_ar: s.name.trim(), desc_en: s.desc_en.trim(), desc_ar: s.desc_ar.trim() }));
@@ -101,7 +102,7 @@ const NewAudioTour = () => {
         .eq("user_id", user.id)
         .maybeSingle();
 
-      const { error } = await supabase.from("audio_tours").insert({
+      const payload = {
         creator_id: user.id,
         title_en: form.title.trim(),
         title_ar: form.title.trim(),
@@ -117,18 +118,26 @@ const NewAudioTour = () => {
         narrator_name_ar: profile?.display_name || null,
         narrator_image: profile?.avatar_url || null,
         image: images[0] || null,
-        slug: slugify(form.title, user.id.slice(0, 6)),
         status: "published",
-      });
-      if (error) throw error;
-      toast.success(lang === "ar" ? "تم نشر الجولة الصوتية بنجاح!" : "Audio tour published successfully!");
+      };
+
+      if (isEdit) {
+        const { error } = await supabase.from("audio_tours").update(payload).eq("id", id);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم تحديث الجولة!" : "Audio tour updated!");
+      } else {
+        const { error } = await supabase.from("audio_tours").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم نشر الجولة الصوتية بنجاح!" : "Audio tour published successfully!");
+      }
       navigate("/dashboard/narrator/my-tours");
     } catch (err: any) {
-      toast.error(err.message || "Failed to create audio tour");
+      toast.error(err.message || "Failed to save audio tour");
     } finally {
       setSubmitting(false);
     }
   };
+
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-narrator/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
