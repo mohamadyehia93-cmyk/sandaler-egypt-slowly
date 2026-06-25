@@ -137,7 +137,7 @@ const NewArticle = () => {
         {/* Cover Image */}
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "صورة الغلاف" : "Cover Image"}</label>
-          <PhotoPicker files={photos} onChange={setPhotos} max={3} hint={lang === "ar" ? "اسحب أو اضغط للرفع" : "Drag or tap to upload"} />
+          <PhotoPicker files={photos} onChange={setPhotos} max={3} hint={lang === "ar" ? "اسحب أو اضغط للرفع" : "Drag or tap to upload"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
         {/* Title */}
