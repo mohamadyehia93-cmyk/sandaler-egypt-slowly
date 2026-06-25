@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,8 +21,11 @@ const NewProduct = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     name: "",
@@ -36,7 +39,31 @@ const NewProduct = () => {
     shippingOptions: [""],
   });
 
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("products").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(lang === "ar" ? "تعذر تحميل المنتج" : "Could not load product");
+        return;
+      }
+      setForm({
+        name: data.name_en || "",
+        description: data.description_en || "",
+        category: data.category || "",
+        price: data.price != null ? String(data.price) : "",
+        stock: data.stock != null ? String(data.stock) : "",
+        origin: data.seller_village_en || "",
+        material: "",
+        dimensions: "",
+        shippingOptions: data.origin_story_en ? data.origin_story_en.split(" · ").filter(Boolean) : [""],
+      });
+      setExistingImages(Array.isArray(data.images) ? (data.images as string[]) : data.image ? [data.image] : []);
+    })();
+  }, [isEdit, id, lang]);
+
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
+
 
   const updateShipping = (idx: number, value: string) => {
     setForm((p) => {
