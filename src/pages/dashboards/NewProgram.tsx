@@ -82,10 +82,11 @@ const NewProgram = () => {
     }
     setSubmitting(true);
     try {
-      const images = await uploadImages(photos, user.id);
+      const uploaded = await uploadImages(photos, user.id);
+      const images = [...existingImages, ...uploaded];
       const goals = form.goals.map((g) => g.trim()).filter(Boolean);
 
-      const { error } = await supabase.from("programs").insert({
+      const payload = {
         owner_id: user.id,
         title_en: form.title.trim(),
         title_ar: form.title.trim(),
@@ -100,18 +101,26 @@ const NewProgram = () => {
         donation_target: parseInt(form.donationTarget) || null,
         goals,
         image: images[0] || null,
-        slug: slugify(form.title, user.id.slice(0, 6)),
         status: "published",
-      });
-      if (error) throw error;
-      toast.success(lang === "ar" ? "تم نشر البرنامج بنجاح!" : "Program published successfully!");
+      };
+
+      if (isEdit) {
+        const { error } = await supabase.from("programs").update(payload).eq("id", id);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم تحديث البرنامج!" : "Program updated!");
+      } else {
+        const { error } = await supabase.from("programs").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم نشر البرنامج بنجاح!" : "Program published successfully!");
+      }
       navigate("/dashboard/organization/my-programs");
     } catch (err: any) {
-      toast.error(err.message || "Failed to create program");
+      toast.error(err.message || "Failed to save program");
     } finally {
       setSubmitting(false);
     }
   };
+
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-organization/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
