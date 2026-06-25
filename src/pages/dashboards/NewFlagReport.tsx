@@ -162,7 +162,7 @@ const NewFlagReport = () => {
         </div>
 
         <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-ambassador text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
-          {submitting ? (lang === "ar" ? "جاري الإرسال..." : "Submitting...") : (lang === "ar" ? "إرسال البلاغ" : "Submit Report")}
+          {submitting ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : isEdit ? (lang === "ar" ? "حفظ التغييرات" : "Save Changes") : (lang === "ar" ? "إرسال البلاغ" : "Submit Report")}
         </button>
       </div>
     </div>
