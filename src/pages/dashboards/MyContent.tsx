@@ -66,6 +66,9 @@ const MyContent = () => {
               <button onClick={() => navigate(`/post/${e.id}`)} className="p-2 rounded-lg bg-role-culture-actor/10 text-role-culture-actor">
                 <Eye className="w-4 h-4" />
               </button>
+              <button onClick={() => navigate(`/dashboard/culture-actor/edit-article/${e.id}`)} className="p-2 rounded-lg bg-role-culture-actor/10 text-role-culture-actor">
+                <Pencil className="w-4 h-4" />
+              </button>
               <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
                 <Trash2 className="w-4 h-4" />
               </button>
