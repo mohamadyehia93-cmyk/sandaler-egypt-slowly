@@ -207,7 +207,7 @@ const NewProduct = () => {
         </div>
 
         <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-product-seller text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
-          {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر المنتج" : "Publish Product")}
+          {submitting ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : isEdit ? (lang === "ar" ? "حفظ التغييرات" : "Save Changes") : (lang === "ar" ? "نشر المنتج" : "Publish Product")}
         </button>
       </div>
     </div>
