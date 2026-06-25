@@ -1,23 +1,67 @@
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Bell, Plus, Calendar, MessageSquare, TrendingUp, CheckCircle, XCircle, Clock, ChevronRight } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft, Bell, Plus, Calendar, Clock, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import DailyStatusCard from "@/components/DailyStatusCard";
+
+type ProviderBooking = {
+  id: string;
+  guests: number;
+  total_amount_egp: number;
+  provider_amount_egp: number;
+  status: string;
+  created_at: string;
+  experience: { title_en: string; title_ar: string } | null;
+};
 
 const ServiceProviderDashboard = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const { data: listingsCount = 0 } = useQuery({
+    queryKey: ["sp-listings-count", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("experiences")
+        .select("*", { count: "exact", head: true })
+        .eq("provider_id", user!.id);
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+
+  const { data: bookings = [] } = useQuery({
+    queryKey: ["sp-bookings", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("bookings")
+        .select("id, guests, total_amount_egp, provider_amount_egp, status, created_at, experience:experiences(title_en, title_ar)")
+        .eq("provider_id", user!.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return data as unknown as ProviderBooking[];
+    },
+  });
+
+  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const bookingsThisWeek = bookings.filter((b) => new Date(b.created_at).getTime() >= weekAgo).length;
+  const revenue = bookings
+    .filter((b) => b.status === "confirmed")
+    .reduce((sum, b) => sum + (b.provider_amount_egp || 0), 0);
+  const pending = bookings.find((b) => b.status === "pending_payment");
 
   const overview = [
-    { value: "5", label: lang === "ar" ? "قوائم نشطة" : "Active Listings", path: "/dashboard/service-provider/my-listings" },
-    { value: "8", label: lang === "ar" ? "حجوزات هذا الأسبوع" : "Bookings This Week", path: "/inbox" },
-    { value: "4,200", label: lang === "ar" ? "إيرادات الشهر" : "Revenue This Month", suffix: lang === "ar" ? "ج.م" : "EGP", path: "/profile/impact" },
-    { value: "3", label: lang === "ar" ? "رسائل" : "Messages", path: "/inbox" },
-  ];
-
-  const bookings = [
-    { visitor: "Mohamed Yehia", date: "28 Dec", experience: lang === "ar" ? "مراقبة الطيور في بحيرة المنزلة" : "Bird Watching in Manzala Lake", group: 4, status: "pending" },
-    { visitor: "Carlie Jerde", date: "30 Dec", experience: lang === "ar" ? "طبخ دلتا تقليدي" : "Traditional Delta Cooking", group: 2, status: "confirmed" },
+    { value: String(listingsCount), label: lang === "ar" ? "قوائم نشطة" : "Active Listings", path: "/dashboard/service-provider/my-listings" },
+    { value: String(bookingsThisWeek), label: lang === "ar" ? "حجوزات هذا الأسبوع" : "Bookings This Week", path: "/dashboard/service-provider" },
+    { value: revenue.toLocaleString(), label: lang === "ar" ? "إيرادات مؤكدة" : "Confirmed Revenue", suffix: lang === "ar" ? "ج.م" : "EGP", path: "/profile/impact" },
+    { value: String(bookings.length), label: lang === "ar" ? "إجمالي الحجوزات" : "Total Bookings", path: "/dashboard/service-provider" },
   ];
 
   const bottomNav = [
@@ -26,6 +70,9 @@ const ServiceProviderDashboard = () => {
     { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false, path: "/inbox" },
     { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false, path: "/profile" },
   ];
+
+  const locale = lang === "ar" ? "ar-EG" : "en-US";
+  const title = (b: ProviderBooking) => b.experience ? (lang === "ar" ? b.experience.title_ar : b.experience.title_en) : "—";
 
   return (
     <div className="min-h-screen bg-surface pb-20">
@@ -41,7 +88,7 @@ const ServiceProviderDashboard = () => {
           <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl">⚓</div>
           <div>
             <p className="text-xs opacity-80">{lang === "ar" ? "مزود خدمة" : "Service Provider"}</p>
-            <h1 className="text-lg font-bold">{lang === "ar" ? "حسن محمود" : "Hassan Mahmoud"}</h1>
+            <h1 className="text-lg font-bold">{lang === "ar" ? "لوحة التحكم" : "Dashboard"}</h1>
           </div>
         </div>
       </header>
@@ -60,41 +107,39 @@ const ServiceProviderDashboard = () => {
         </div>
 
         {/* Pending Booking Alert */}
-        <div onClick={() => navigate("/inbox")} className="bg-warning/10 border border-warning/30 rounded-xl p-4 cursor-pointer hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-2 mb-2">
-            <Clock className="w-4 h-4 text-warning" />
-            <h3 className="text-sm font-bold text-foreground">{lang === "ar" ? "طلب حجز جديد" : "New Booking Request"}</h3>
-            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
+        {pending && (
+          <div className="bg-warning/10 border border-warning/30 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="w-4 h-4 text-warning" />
+              <h3 className="text-sm font-bold text-foreground">{lang === "ar" ? "حجز بانتظار الدفع" : "Booking Awaiting Payment"}</h3>
+            </div>
+            <p className="text-xs text-muted-foreground">{title(pending)} — {pending.guests} {lang === "ar" ? "أشخاص" : "guests"}</p>
           </div>
-          <p className="text-xs text-muted-foreground mb-3">{bookings[0].visitor} — {bookings[0].experience}</p>
-          <div className="flex gap-2">
-            <button onClick={(e) => e.stopPropagation()} className="flex-1 bg-primary text-primary-foreground rounded-lg py-2 text-xs font-semibold flex items-center justify-center gap-1">
-              <CheckCircle className="w-3.5 h-3.5" /> {lang === "ar" ? "تأكيد" : "Confirm"}
-            </button>
-            <button onClick={(e) => e.stopPropagation()} className="flex-1 border border-border text-foreground rounded-lg py-2 text-xs font-semibold flex items-center justify-center gap-1">
-              <XCircle className="w-3.5 h-3.5" /> {lang === "ar" ? "رفض" : "Decline"}
-            </button>
-          </div>
-        </div>
+        )}
 
-        {/* Upcoming Bookings */}
-        <div onClick={() => navigate("/inbox")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
+        {/* Bookings */}
+        <div className="bg-card rounded-xl shadow-card p-4">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4 text-role-service-provider" />
-            {lang === "ar" ? "الحجوزات القادمة" : "Upcoming Bookings"}
-            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
+            {lang === "ar" ? "الحجوزات" : "Bookings"}
           </h3>
-          {bookings.map((b, i) => (
-            <div key={i} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
-              <div>
-                <p className="text-xs font-semibold text-foreground">{b.experience}</p>
-                <p className="text-[10px] text-muted-foreground">{b.visitor} · {b.group} {lang === "ar" ? "أشخاص" : "guests"} · {b.date}</p>
+          {bookings.length === 0 ? (
+            <p className="text-xs text-muted-foreground py-3">{lang === "ar" ? "لا توجد حجوزات بعد" : "No bookings yet"}</p>
+          ) : (
+            bookings.slice(0, 8).map((b) => (
+              <div key={b.id} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-foreground line-clamp-1">{title(b)}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {b.guests} {lang === "ar" ? "أشخاص" : "guests"} · {new Date(b.created_at).toLocaleDateString(locale, { day: "numeric", month: "short" })}
+                  </p>
+                </div>
+                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${b.status === "confirmed" ? "bg-success/10 text-success" : b.status === "pending_payment" ? "bg-warning/10 text-warning" : "bg-muted text-muted-foreground"}`}>
+                  {b.status === "confirmed" ? (lang === "ar" ? "مؤكد" : "Confirmed") : b.status === "pending_payment" ? (lang === "ar" ? "معلق" : "Pending") : b.status}
+                </span>
               </div>
-              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${b.status === "confirmed" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
-                {b.status === "confirmed" ? (lang === "ar" ? "مؤكد" : "Confirmed") : (lang === "ar" ? "معلق" : "Pending")}
-              </span>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* Quick Action */}
