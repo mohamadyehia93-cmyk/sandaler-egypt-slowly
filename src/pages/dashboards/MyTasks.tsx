@@ -109,6 +109,9 @@ const MyTasks = () => {
                         <p className="text-[11px] text-muted-foreground">{lang === "ar" ? "الأولوية" : "Priority"}: {r.priority}</p>
                         <span className="text-[10px] font-medium text-warning">{r.status}</span>
                       </div>
+                      <button onClick={() => navigate(`/dashboard/ambassador/edit-report/${r.id}`)} className="p-2 rounded-lg bg-role-ambassador/10 text-role-ambassador">
+                        <Pencil className="w-4 h-4" />
+                      </button>
                       <button onClick={() => deleteReport(r.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
                         <Trash2 className="w-4 h-4" />
                       </button>
