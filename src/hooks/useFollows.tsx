@@ -84,13 +84,12 @@ export function useFollowerCount(targetType: string, targetId: string) {
   return useQuery({
     queryKey: ["follower_count", targetType, targetId],
     queryFn: async () => {
-      const { count, error } = await supabase
-        .from("follows")
-        .select("*", { count: "exact", head: true })
-        .eq("target_type", targetType)
-        .eq("target_id", targetId);
+      const { data, error } = await supabase.rpc("get_follower_count", {
+        _target_type: targetType,
+        _target_id: targetId,
+      });
       if (error) throw error;
-      return count ?? 0;
+      return data ?? 0;
     },
   });
 }
