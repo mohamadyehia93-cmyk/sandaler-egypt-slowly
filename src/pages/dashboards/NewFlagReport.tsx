@@ -131,8 +131,8 @@ const NewFlagReport = () => {
           </div>
         </div>
 
-        <button onClick={handleSubmit} className="w-full bg-role-ambassador text-white rounded-xl py-4 font-bold text-sm mt-4">
-          {lang === "ar" ? "إرسال البلاغ" : "Submit Report"}
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-ambassador text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
+          {submitting ? (lang === "ar" ? "جاري الإرسال..." : "Submitting...") : (lang === "ar" ? "إرسال البلاغ" : "Submit Report")}
         </button>
       </div>
     </div>
