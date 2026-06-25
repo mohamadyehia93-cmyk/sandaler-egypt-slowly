@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Plus, Trash2, Eye, FileText } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Eye, FileText, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 const MyContent = () => {
