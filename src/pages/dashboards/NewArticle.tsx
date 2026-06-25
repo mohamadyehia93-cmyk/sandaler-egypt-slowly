@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,8 +22,11 @@ const NewArticle = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -34,7 +37,28 @@ const NewArticle = () => {
     hasAudio: false,
   });
 
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("posts").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(lang === "ar" ? "تعذر تحميل المقال" : "Could not load article");
+        return;
+      }
+      setForm({
+        title: data.title_en || "",
+        body: data.body_en || "",
+        category: data.category || "",
+        location: "",
+        tags: Array.isArray(data.tags) && data.tags.length ? (data.tags as string[]) : [""],
+        hasAudio: data.content_type === "audio",
+      });
+      setExistingImages(Array.isArray(data.images) ? (data.images as string[]) : data.image ? [data.image] : []);
+    })();
+  }, [isEdit, id, lang]);
+
   const set = (key: string, value: string | boolean) => setForm((p) => ({ ...p, [key]: value }));
+
 
   const updateTag = (idx: number, value: string) => {
     setForm((p) => {
@@ -58,12 +82,13 @@ const NewArticle = () => {
     }
     setSubmitting(true);
     try {
-      const images = await uploadImages(photos, user.id);
+      const uploaded = await uploadImages(photos, user.id);
+      const images = [...existingImages, ...uploaded];
       const tags = form.tags.map((t) => t.trim()).filter(Boolean);
       const excerpt = form.body.trim().slice(0, 160);
       const readTime = Math.max(1, Math.round(form.body.trim().split(/\s+/).length / 200));
 
-      const { error } = await supabase.from("posts").insert({
+      const payload = {
         author_id: user.id,
         title_en: form.title.trim(),
         title_ar: form.title.trim(),
@@ -77,18 +102,26 @@ const NewArticle = () => {
         images,
         read_time_minutes: readTime,
         content_type: form.hasAudio ? "audio" : "article",
-        slug: slugify(form.title, user.id.slice(0, 6)),
         status: "published",
-      });
-      if (error) throw error;
-      toast.success(lang === "ar" ? "تم نشر المقال بنجاح!" : "Article published successfully!");
+      };
+
+      if (isEdit) {
+        const { error } = await supabase.from("posts").update(payload).eq("id", id);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم تحديث المقال!" : "Article updated!");
+      } else {
+        const { error } = await supabase.from("posts").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم نشر المقال بنجاح!" : "Article published successfully!");
+      }
       navigate("/dashboard/culture-actor/my-content");
     } catch (err: any) {
-      toast.error(err.message || "Failed to publish article");
+      toast.error(err.message || "Failed to save article");
     } finally {
       setSubmitting(false);
     }
   };
+
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-culture-actor/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
@@ -97,14 +130,14 @@ const NewArticle = () => {
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-role-culture-actor text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-        <h1 className="text-lg font-bold">{lang === "ar" ? "مقال جديد" : "New Article"}</h1>
+        <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل المقال" : "Edit Article") : (lang === "ar" ? "مقال جديد" : "New Article")}</h1>
       </header>
 
       <div className="px-4 py-5 space-y-5">
         {/* Cover Image */}
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "صورة الغلاف" : "Cover Image"}</label>
-          <PhotoPicker files={photos} onChange={setPhotos} max={3} hint={lang === "ar" ? "اسحب أو اضغط للرفع" : "Drag or tap to upload"} />
+          <PhotoPicker files={photos} onChange={setPhotos} max={3} hint={lang === "ar" ? "اسحب أو اضغط للرفع" : "Drag or tap to upload"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
         {/* Title */}
@@ -164,7 +197,7 @@ const NewArticle = () => {
         </div>
 
         <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-culture-actor text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
-          {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر المقال" : "Publish Article")}
+          {submitting ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : isEdit ? (lang === "ar" ? "حفظ التغييرات" : "Save Changes") : (lang === "ar" ? "نشر المقال" : "Publish Article")}
         </button>
       </div>
     </div>

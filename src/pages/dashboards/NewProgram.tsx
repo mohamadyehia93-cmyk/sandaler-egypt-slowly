@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,8 +20,11 @@ const NewProgram = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -35,7 +38,32 @@ const NewProgram = () => {
     donationTarget: "",
   });
 
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("programs").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(lang === "ar" ? "تعذر تحميل البرنامج" : "Could not load program");
+        return;
+      }
+      const goals = Array.isArray(data.goals) ? (data.goals as any[]) : [];
+      setForm({
+        title: data.title_en || "",
+        description: data.description_en || "",
+        type: data.program_type || "",
+        location: data.location_en || "",
+        startDate: data.start_date || "",
+        endDate: data.end_date || "",
+        volunteersNeeded: data.volunteers_needed != null ? String(data.volunteers_needed) : "",
+        goals: goals.length ? goals.map((g: any) => String(g)) : [""],
+        donationTarget: data.donation_target != null ? String(data.donation_target) : "",
+      });
+      setExistingImages(data.image ? [data.image] : []);
+    })();
+  }, [isEdit, id, lang]);
+
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
+
 
   const updateGoal = (idx: number, value: string) => {
     setForm((p) => { const arr = [...p.goals]; arr[idx] = value; return { ...p, goals: arr }; });
@@ -54,10 +82,11 @@ const NewProgram = () => {
     }
     setSubmitting(true);
     try {
-      const images = await uploadImages(photos, user.id);
+      const uploaded = await uploadImages(photos, user.id);
+      const images = [...existingImages, ...uploaded];
       const goals = form.goals.map((g) => g.trim()).filter(Boolean);
 
-      const { error } = await supabase.from("programs").insert({
+      const payload = {
         owner_id: user.id,
         title_en: form.title.trim(),
         title_ar: form.title.trim(),
@@ -72,18 +101,26 @@ const NewProgram = () => {
         donation_target: parseInt(form.donationTarget) || null,
         goals,
         image: images[0] || null,
-        slug: slugify(form.title, user.id.slice(0, 6)),
         status: "published",
-      });
-      if (error) throw error;
-      toast.success(lang === "ar" ? "تم نشر البرنامج بنجاح!" : "Program published successfully!");
+      };
+
+      if (isEdit) {
+        const { error } = await supabase.from("programs").update(payload).eq("id", id);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم تحديث البرنامج!" : "Program updated!");
+      } else {
+        const { error } = await supabase.from("programs").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم نشر البرنامج بنجاح!" : "Program published successfully!");
+      }
       navigate("/dashboard/organization/my-programs");
     } catch (err: any) {
-      toast.error(err.message || "Failed to create program");
+      toast.error(err.message || "Failed to save program");
     } finally {
       setSubmitting(false);
     }
   };
+
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-organization/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
@@ -92,13 +129,13 @@ const NewProgram = () => {
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-role-organization text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-        <h1 className="text-lg font-bold">{lang === "ar" ? "إضافة برنامج" : "Add Program"}</h1>
+        <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل البرنامج" : "Edit Program") : (lang === "ar" ? "إضافة برنامج" : "Add Program")}</h1>
       </header>
 
       <div className="px-4 py-5 space-y-5">
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-organization" />{lang === "ar" ? "صور البرنامج" : "Program Photos"}</label>
-          <PhotoPicker files={photos} onChange={setPhotos} max={3} hint={lang === "ar" ? "حتى ٣ صور" : "Up to 3 photos"} />
+          <PhotoPicker files={photos} onChange={setPhotos} max={3} hint={lang === "ar" ? "حتى ٣ صور" : "Up to 3 photos"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
         <div>
@@ -163,7 +200,7 @@ const NewProgram = () => {
         </div>
 
         <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-organization text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
-          {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر البرنامج" : "Publish Program")}
+          {submitting ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : isEdit ? (lang === "ar" ? "حفظ التغييرات" : "Save Changes") : (lang === "ar" ? "نشر البرنامج" : "Publish Program")}
         </button>
       </div>
     </div>

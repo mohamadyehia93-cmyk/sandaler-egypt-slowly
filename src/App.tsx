@@ -178,6 +178,7 @@ const App = () => {
             <Route path="/profile/settings" element={<Settings />} />
             <Route path="/profile/help" element={<HelpSupport />} />
             <Route path="/dashboard/culture-actor/new-article" element={<NewArticle />} />
+            <Route path="/dashboard/culture-actor/edit-article/:id" element={<NewArticle />} />
             <Route path="/dashboard/culture-actor/my-content" element={<MyContent />} />
             <Route path="/dashboard/culture-actor" element={<CultureActorDashboard />} />
             <Route path="/dashboard/service-provider/new-experience" element={<NewExperience />} />
@@ -187,26 +188,33 @@ const App = () => {
             <Route path="/dashboard/whos-who/my-sessions" element={<MySessions />} />
             <Route path="/dashboard/whos-who" element={<WhosWhoDashboard />} />
             <Route path="/dashboard/organization/new-program" element={<NewProgram />} />
+            <Route path="/dashboard/organization/edit-program/:id" element={<NewProgram />} />
             <Route path="/dashboard/organization/my-programs" element={<MyPrograms />} />
             <Route path="/dashboard/organization" element={<OrganizationDashboard />} />
             <Route path="/dashboard/ambassador/flag-issue" element={<NewFlagReport />} />
+            <Route path="/dashboard/ambassador/edit-report/:id" element={<NewFlagReport />} />
             <Route path="/dashboard/ambassador/my-tasks" element={<MyTasks />} />
             <Route path="/dashboard/ambassador" element={<AmbassadorDashboard />} />
             <Route path="/dashboard/product-seller/new-product" element={<NewProduct />} />
+            <Route path="/dashboard/product-seller/edit-product/:id" element={<NewProduct />} />
             <Route path="/dashboard/product-seller/my-products" element={<MyProducts />} />
             <Route path="/dashboard/product-seller" element={<ProductSellerDashboard />} />
             <Route path="/dashboard/trip-organizer/new-trip" element={<NewTrip />} />
+            <Route path="/dashboard/trip-organizer/edit-trip/:id" element={<NewTrip />} />
             <Route path="/dashboard/trip-organizer/my-trips" element={<MyTrips />} />
             <Route path="/dashboard/trip-organizer/new-event" element={<NewEvent />} />
             <Route path="/dashboard/trip-organizer/my-events" element={<MyEvents />} />
             <Route path="/dashboard/trip-organizer/events" element={<EventsDashboard />} />
             <Route path="/dashboard/trip-organizer" element={<TripOrganizerDashboard />} />
             <Route path="/dashboard/subject-expert/new-collection" element={<NewCollection />} />
+            <Route path="/dashboard/subject-expert/edit-collection/:id" element={<NewCollection />} />
             <Route path="/dashboard/subject-expert/my-collections" element={<MyCollections />} />
             <Route path="/dashboard/subject-expert" element={<SubjectExpertDashboard />} />
             <Route path="/dashboard/narrator/new-tour" element={<NewAudioTour />} />
+            <Route path="/dashboard/narrator/edit-tour/:id" element={<NewAudioTour />} />
             <Route path="/dashboard/narrator/my-tours" element={<MyAudioTours />} />
             <Route path="/dashboard/narrator" element={<NarratorDashboard />} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
               </Suspense>

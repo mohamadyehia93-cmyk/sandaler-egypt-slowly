@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,8 +22,11 @@ const NewCollection = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -35,7 +38,31 @@ const NewCollection = () => {
     license: "cc-by",
   });
 
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("collections").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(lang === "ar" ? "تعذر تحميل المجموعة" : "Could not load collection");
+        return;
+      }
+      const entries = Array.isArray(data.entries) ? (data.entries as any[]) : [];
+      const refs = Array.isArray(data.refs) ? (data.refs as any[]) : [];
+      setForm({
+        title: data.title_en || "",
+        abstract: data.abstract_en || "",
+        discipline: data.discipline || "",
+        region: data.region_id || "",
+        entries: entries.length ? entries.map((e: any) => ({ title: e.title || "", summary: e.summary || "" })) : [{ title: "", summary: "" }],
+        references: refs.length ? refs.map((r: any) => String(r)) : [""],
+        license: data.license || "cc-by",
+      });
+      setExistingImages(data.cover_image ? [data.cover_image] : []);
+    })();
+  }, [isEdit, id, lang]);
+
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
+
 
   const updateEntry = (idx: number, field: "title" | "summary", value: string) => {
     setForm((p) => { const arr = [...p.entries]; arr[idx] = { ...arr[idx], [field]: value }; return { ...p, entries: arr }; });
@@ -60,11 +87,12 @@ const NewCollection = () => {
     }
     setSubmitting(true);
     try {
-      const images = await uploadImages(photos, user.id);
+      const uploaded = await uploadImages(photos, user.id);
+      const images = [...existingImages, ...uploaded];
       const entries = form.entries.filter((e) => e.title.trim()).map((e) => ({ title: e.title.trim(), summary: e.summary.trim() }));
       const refs = form.references.map((r) => r.trim()).filter(Boolean);
 
-      const { error } = await supabase.from("collections").insert({
+      const payload = {
         expert_id: user.id,
         title_en: form.title.trim(),
         title_ar: form.title.trim(),
@@ -76,18 +104,26 @@ const NewCollection = () => {
         entries,
         refs,
         license: form.license,
-        slug: slugify(form.title, user.id.slice(0, 6)),
         status: "published",
-      });
-      if (error) throw error;
-      toast.success(lang === "ar" ? "تم نشر المجموعة بنجاح!" : "Collection published successfully!");
+      };
+
+      if (isEdit) {
+        const { error } = await supabase.from("collections").update(payload).eq("id", id);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم تحديث المجموعة!" : "Collection updated!");
+      } else {
+        const { error } = await supabase.from("collections").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم نشر المجموعة بنجاح!" : "Collection published successfully!");
+      }
       navigate("/dashboard/subject-expert/my-collections");
     } catch (err: any) {
-      toast.error(err.message || "Failed to create collection");
+      toast.error(err.message || "Failed to save collection");
     } finally {
       setSubmitting(false);
     }
   };
+
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-subject-expert/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
@@ -96,13 +132,13 @@ const NewCollection = () => {
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-role-subject-expert text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-        <h1 className="text-lg font-bold">{lang === "ar" ? "مجموعة جديدة" : "New Collection"}</h1>
+        <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل المجموعة" : "Edit Collection") : (lang === "ar" ? "مجموعة جديدة" : "New Collection")}</h1>
       </header>
 
       <div className="px-4 py-5 space-y-5">
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-subject-expert" />{lang === "ar" ? "صورة الغلاف" : "Cover Image"}</label>
-          <PhotoPicker files={photos} onChange={setPhotos} max={1} hint={lang === "ar" ? "صورة غلاف المجموعة" : "Collection cover image"} />
+          <PhotoPicker files={photos} onChange={setPhotos} max={1} hint={lang === "ar" ? "صورة غلاف المجموعة" : "Collection cover image"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
         <div>
@@ -165,7 +201,7 @@ const NewCollection = () => {
         </div>
 
         <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-subject-expert text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
-          {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر المجموعة" : "Publish Collection")}
+          {submitting ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : isEdit ? (lang === "ar" ? "حفظ التغييرات" : "Save Changes") : (lang === "ar" ? "نشر المجموعة" : "Publish Collection")}
         </button>
       </div>
     </div>

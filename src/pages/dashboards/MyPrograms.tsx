@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Plus, Trash2, HeartHandshake } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, HeartHandshake, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 const MyPrograms = () => {
@@ -63,6 +63,9 @@ const MyPrograms = () => {
                 <p className="text-[11px] text-muted-foreground line-clamp-1">{e.program_type}{e.start_date ? ` · ${e.start_date}` : ""}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
+              <button onClick={() => navigate(`/dashboard/organization/edit-program/${e.id}`)} className="p-2 rounded-lg bg-role-organization/10 text-role-organization">
+                <Pencil className="w-4 h-4" />
+              </button>
               <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
                 <Trash2 className="w-4 h-4" />
               </button>

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,8 +18,11 @@ const NewTrip = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -35,7 +38,36 @@ const NewTrip = () => {
     departureDate: "",
   });
 
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("trips").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(lang === "ar" ? "تعذر تحميل الرحلة" : "Could not load trip");
+        return;
+      }
+      const routeParts = (data.route_en || "").split(" → ").map((s: string) => s.trim()).filter(Boolean);
+      const itin = Array.isArray(data.itinerary_en) ? (data.itinerary_en as any[]) : [];
+      const inc = Array.isArray(data.inclusions_en) ? (data.inclusions_en as any[]) : [];
+      setForm({
+        title: data.title_en || "",
+        description: data.description_en || "",
+        tripType: data.trip_type || "",
+        days: data.duration_days != null ? String(data.duration_days) : "",
+        maxGroup: data.capacity_max != null ? String(data.capacity_max) : "",
+        price: data.price != null ? String(data.price) : "",
+        startLocation: routeParts[0] || "",
+        destinations: routeParts.length > 1 ? routeParts.slice(1) : [""],
+        itinerary: itin.length ? itin.map((i: any, idx: number) => ({ day: String(idx + 1), description: i.description || "" })) : [{ day: "1", description: "" }],
+        includes: inc.length ? inc.map((i: any) => String(i)) : [""],
+        departureDate: data.date || "",
+      });
+      setExistingImages(Array.isArray(data.images) ? (data.images as string[]) : data.image ? [data.image] : []);
+    })();
+  }, [isEdit, id, lang]);
+
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
+
 
   const updateDest = (idx: number, value: string) => {
     setForm((p) => { const arr = [...p.destinations]; arr[idx] = value; return { ...p, destinations: arr }; });
@@ -66,7 +98,8 @@ const NewTrip = () => {
     }
     setSubmitting(true);
     try {
-      const images = await uploadImages(photos, user.id);
+      const uploaded = await uploadImages(photos, user.id);
+      const images = [...existingImages, ...uploaded];
       const destinations = form.destinations.map((d) => d.trim()).filter(Boolean);
       const route = [form.startLocation.trim(), ...destinations].filter(Boolean).join(" → ");
       const itinerary = form.itinerary
@@ -74,7 +107,7 @@ const NewTrip = () => {
         .map((i, idx) => ({ day: idx + 1, description: i.description.trim() }));
       const inclusions = form.includes.map((i) => i.trim()).filter(Boolean);
 
-      const { error } = await supabase.from("trips").insert({
+      const payload = {
         organizer_id: user.id,
         title_en: form.title.trim(),
         title_ar: form.title.trim(),
@@ -93,18 +126,26 @@ const NewTrip = () => {
         inclusions_ar: inclusions,
         image: images[0] || null,
         images,
-        slug: slugify(form.title, user.id.slice(0, 6)),
         status: "published",
-      });
-      if (error) throw error;
-      toast.success(lang === "ar" ? "تم نشر الرحلة بنجاح!" : "Trip published successfully!");
+      };
+
+      if (isEdit) {
+        const { error } = await supabase.from("trips").update(payload).eq("id", id);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم تحديث الرحلة!" : "Trip updated!");
+      } else {
+        const { error } = await supabase.from("trips").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم نشر الرحلة بنجاح!" : "Trip published successfully!");
+      }
       navigate("/dashboard/trip-organizer/my-trips");
     } catch (err: any) {
-      toast.error(err.message || "Failed to create trip");
+      toast.error(err.message || "Failed to save trip");
     } finally {
       setSubmitting(false);
     }
   };
+
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-trip-organizer/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
@@ -113,13 +154,13 @@ const NewTrip = () => {
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-role-trip-organizer text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-        <h1 className="text-lg font-bold">{lang === "ar" ? "إنشاء رحلة" : "Create Trip"}</h1>
+        <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل الرحلة" : "Edit Trip") : (lang === "ar" ? "إنشاء رحلة" : "Create Trip")}</h1>
       </header>
 
       <div className="px-4 py-5 space-y-5">
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-trip-organizer" />{lang === "ar" ? "صور الرحلة" : "Trip Photos"}</label>
-          <PhotoPicker files={photos} onChange={setPhotos} max={5} hint={lang === "ar" ? "حتى ٥ صور" : "Up to 5 photos"} />
+          <PhotoPicker files={photos} onChange={setPhotos} max={5} hint={lang === "ar" ? "حتى ٥ صور" : "Up to 5 photos"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
         <div>
@@ -210,7 +251,7 @@ const NewTrip = () => {
         </div>
 
         <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-trip-organizer text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
-          {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر الرحلة" : "Publish Trip")}
+          {submitting ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : isEdit ? (lang === "ar" ? "حفظ التغييرات" : "Save Changes") : (lang === "ar" ? "نشر الرحلة" : "Publish Trip")}
         </button>
       </div>
     </div>

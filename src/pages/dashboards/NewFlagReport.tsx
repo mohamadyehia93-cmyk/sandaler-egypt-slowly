@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +25,8 @@ const NewFlagReport = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
@@ -35,6 +37,25 @@ const NewFlagReport = () => {
     description: "",
     actionTaken: "",
   });
+
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("flag_reports").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(lang === "ar" ? "تعذر تحميل البلاغ" : "Could not load report");
+        return;
+      }
+      setForm({
+        issueType: data.issue_type || "",
+        priority: data.priority || "",
+        providerName: data.provider_name || "",
+        location: data.location || "",
+        description: data.description || "",
+        actionTaken: data.action_taken || "",
+      });
+    })();
+  }, [isEdit, id, lang]);
 
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
@@ -49,7 +70,7 @@ const NewFlagReport = () => {
     }
     setSubmitting(true);
     try {
-      const { error } = await supabase.from("flag_reports").insert({
+      const payload = {
         reporter_id: user.id,
         issue_type: form.issueType,
         priority: form.priority,
@@ -57,16 +78,25 @@ const NewFlagReport = () => {
         location: form.location || null,
         description: form.description.trim(),
         action_taken: form.actionTaken || null,
-      });
-      if (error) throw error;
-      toast.success(lang === "ar" ? "تم إرسال البلاغ بنجاح!" : "Report submitted successfully!");
+      };
+      if (isEdit) {
+        const { error } = await supabase.from("flag_reports").update(payload).eq("id", id);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم تحديث البلاغ!" : "Report updated!");
+      } else {
+        const { error } = await supabase.from("flag_reports").insert(payload);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم إرسال البلاغ بنجاح!" : "Report submitted successfully!");
+      }
       navigate("/dashboard/ambassador/my-tasks");
     } catch (err: any) {
-      toast.error(err.message || "Failed to submit report");
+      toast.error(err.message || "Failed to save report");
     } finally {
       setSubmitting(false);
     }
   };
+
+
 
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-ambassador/40";
@@ -76,7 +106,7 @@ const NewFlagReport = () => {
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-role-ambassador text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-        <h1 className="text-lg font-bold">{lang === "ar" ? "إبلاغ عن مشكلة" : "Flag Issue"}</h1>
+        <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل البلاغ" : "Edit Report") : (lang === "ar" ? "إبلاغ عن مشكلة" : "Flag Issue")}</h1>
       </header>
 
       <div className="px-4 py-5 space-y-5">
@@ -132,7 +162,7 @@ const NewFlagReport = () => {
         </div>
 
         <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-ambassador text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
-          {submitting ? (lang === "ar" ? "جاري الإرسال..." : "Submitting...") : (lang === "ar" ? "إرسال البلاغ" : "Submit Report")}
+          {submitting ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : isEdit ? (lang === "ar" ? "حفظ التغييرات" : "Save Changes") : (lang === "ar" ? "إرسال البلاغ" : "Submit Report")}
         </button>
       </div>
     </div>

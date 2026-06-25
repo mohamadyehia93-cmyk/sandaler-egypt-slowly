@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,8 +21,11 @@ const NewAudioTour = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -38,7 +41,31 @@ const NewAudioTour = () => {
     { name: "", desc_en: "", desc_ar: "" },
   ]);
 
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("audio_tours").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(lang === "ar" ? "تعذر تحميل الجولة" : "Could not load tour");
+        return;
+      }
+      setForm({
+        title: data.title_en || "",
+        description: data.description_en || "",
+        city: data.city_id || "",
+        theme: "",
+        duration: data.duration_minutes != null ? String(data.duration_minutes) : "",
+        price: data.price != null ? String(data.price) : "",
+        languages: Array.isArray(data.languages) ? (data.languages as string[]) : [],
+      });
+      const dbStops = Array.isArray(data.stops) ? (data.stops as any[]) : [];
+      setStops(dbStops.length ? dbStops.map((s: any) => ({ name: s.label_en || "", desc_en: s.desc_en || "", desc_ar: s.desc_ar || "" })) : [{ name: "", desc_en: "", desc_ar: "" }]);
+      setExistingImages(data.image ? [data.image] : []);
+    })();
+  }, [isEdit, id, lang]);
+
   const set = (key: string, value: string | string[]) => setForm((p) => ({ ...p, [key]: value }));
+
 
   const toggleLang = (l: string) => {
     setForm((p) => ({
@@ -57,13 +84,14 @@ const NewAudioTour = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    if (!form.title.trim() || !form.city.trim() || !form.theme || stops.length === 0 || !stops[0].name.trim()) {
+    if (!form.title.trim() || !form.city.trim() || (!isEdit && !form.theme) || stops.length === 0 || !stops[0].name.trim()) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة وإضافة محطة واحدة على الأقل" : "Please fill required fields and add at least one stop");
       return;
     }
     setSubmitting(true);
     try {
-      const images = await uploadImages(photos, user.id);
+      const uploaded = await uploadImages(photos, user.id);
+      const images = [...existingImages, ...uploaded];
       const cleanStops = stops
         .filter((s) => s.name.trim())
         .map((s) => ({ label_en: s.name.trim(), label_ar: s.name.trim(), desc_en: s.desc_en.trim(), desc_ar: s.desc_ar.trim() }));
@@ -74,7 +102,7 @@ const NewAudioTour = () => {
         .eq("user_id", user.id)
         .maybeSingle();
 
-      const { error } = await supabase.from("audio_tours").insert({
+      const payload = {
         creator_id: user.id,
         title_en: form.title.trim(),
         title_ar: form.title.trim(),
@@ -90,18 +118,26 @@ const NewAudioTour = () => {
         narrator_name_ar: profile?.display_name || null,
         narrator_image: profile?.avatar_url || null,
         image: images[0] || null,
-        slug: slugify(form.title, user.id.slice(0, 6)),
         status: "published",
-      });
-      if (error) throw error;
-      toast.success(lang === "ar" ? "تم نشر الجولة الصوتية بنجاح!" : "Audio tour published successfully!");
+      };
+
+      if (isEdit) {
+        const { error } = await supabase.from("audio_tours").update(payload).eq("id", id);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم تحديث الجولة!" : "Audio tour updated!");
+      } else {
+        const { error } = await supabase.from("audio_tours").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم نشر الجولة الصوتية بنجاح!" : "Audio tour published successfully!");
+      }
       navigate("/dashboard/narrator/my-tours");
     } catch (err: any) {
-      toast.error(err.message || "Failed to create audio tour");
+      toast.error(err.message || "Failed to save audio tour");
     } finally {
       setSubmitting(false);
     }
   };
+
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-narrator/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
@@ -110,7 +146,7 @@ const NewAudioTour = () => {
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-role-narrator text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-        <h1 className="text-lg font-bold">{lang === "ar" ? "جولة صوتية جديدة" : "New Audio Tour"}</h1>
+        <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل الجولة" : "Edit Audio Tour") : (lang === "ar" ? "جولة صوتية جديدة" : "New Audio Tour")}</h1>
       </header>
 
       <div className="px-4 py-5 space-y-5">
@@ -165,7 +201,7 @@ const NewAudioTour = () => {
 
         <div>
           <label className={labelClass}><ImageIcon className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "صورة الغلاف" : "Cover Image"}</label>
-          <PhotoPicker files={photos} onChange={setPhotos} max={1} hint={lang === "ar" ? "اضغط لرفع صورة" : "Tap to upload image"} />
+          <PhotoPicker files={photos} onChange={setPhotos} max={1} hint={lang === "ar" ? "اضغط لرفع صورة" : "Tap to upload image"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
         {/* Stops */}
@@ -196,7 +232,7 @@ const NewAudioTour = () => {
         </div>
 
         <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-narrator text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
-          {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر الجولة" : "Publish Tour")}
+          {submitting ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : isEdit ? (lang === "ar" ? "حفظ التغييرات" : "Save Changes") : (lang === "ar" ? "نشر الجولة" : "Publish Tour")}
         </button>
       </div>
     </div>

@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Plus, Trash2, Flag, CheckCircle2, Circle, ClipboardList } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Flag, CheckCircle2, Circle, ClipboardList, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 const MyTasks = () => {
@@ -109,6 +109,9 @@ const MyTasks = () => {
                         <p className="text-[11px] text-muted-foreground">{lang === "ar" ? "الأولوية" : "Priority"}: {r.priority}</p>
                         <span className="text-[10px] font-medium text-warning">{r.status}</span>
                       </div>
+                      <button onClick={() => navigate(`/dashboard/ambassador/edit-report/${r.id}`)} className="p-2 rounded-lg bg-role-ambassador/10 text-role-ambassador">
+                        <Pencil className="w-4 h-4" />
+                      </button>
                       <button onClick={() => deleteReport(r.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
                         <Trash2 className="w-4 h-4" />
                       </button>

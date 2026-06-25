@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Plus, Trash2, Eye, FileText } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Eye, FileText, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 const MyContent = () => {
@@ -65,6 +65,9 @@ const MyContent = () => {
               </div>
               <button onClick={() => navigate(`/post/${e.id}`)} className="p-2 rounded-lg bg-role-culture-actor/10 text-role-culture-actor">
                 <Eye className="w-4 h-4" />
+              </button>
+              <button onClick={() => navigate(`/dashboard/culture-actor/edit-article/${e.id}`)} className="p-2 rounded-lg bg-role-culture-actor/10 text-role-culture-actor">
+                <Pencil className="w-4 h-4" />
               </button>
               <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
                 <Trash2 className="w-4 h-4" />

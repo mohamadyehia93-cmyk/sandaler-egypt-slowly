@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Plus, Trash2, Eye, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Eye, ShoppingBag, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 const MyProducts = () => {
@@ -65,6 +65,9 @@ const MyProducts = () => {
               </div>
               <button onClick={() => navigate(`/product/${e.id}`)} className="p-2 rounded-lg bg-role-product-seller/10 text-role-product-seller">
                 <Eye className="w-4 h-4" />
+              </button>
+              <button onClick={() => navigate(`/dashboard/product-seller/edit-product/${e.id}`)} className="p-2 rounded-lg bg-role-product-seller/10 text-role-product-seller">
+                <Pencil className="w-4 h-4" />
               </button>
               <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
                 <Trash2 className="w-4 h-4" />
