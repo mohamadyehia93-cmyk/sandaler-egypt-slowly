@@ -98,7 +98,8 @@ const NewTrip = () => {
     }
     setSubmitting(true);
     try {
-      const images = await uploadImages(photos, user.id);
+      const uploaded = await uploadImages(photos, user.id);
+      const images = [...existingImages, ...uploaded];
       const destinations = form.destinations.map((d) => d.trim()).filter(Boolean);
       const route = [form.startLocation.trim(), ...destinations].filter(Boolean).join(" → ");
       const itinerary = form.itinerary
@@ -106,7 +107,7 @@ const NewTrip = () => {
         .map((i, idx) => ({ day: idx + 1, description: i.description.trim() }));
       const inclusions = form.includes.map((i) => i.trim()).filter(Boolean);
 
-      const { error } = await supabase.from("trips").insert({
+      const payload = {
         organizer_id: user.id,
         title_en: form.title.trim(),
         title_ar: form.title.trim(),
@@ -125,18 +126,26 @@ const NewTrip = () => {
         inclusions_ar: inclusions,
         image: images[0] || null,
         images,
-        slug: slugify(form.title, user.id.slice(0, 6)),
         status: "published",
-      });
-      if (error) throw error;
-      toast.success(lang === "ar" ? "تم نشر الرحلة بنجاح!" : "Trip published successfully!");
+      };
+
+      if (isEdit) {
+        const { error } = await supabase.from("trips").update(payload).eq("id", id);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم تحديث الرحلة!" : "Trip updated!");
+      } else {
+        const { error } = await supabase.from("trips").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم نشر الرحلة بنجاح!" : "Trip published successfully!");
+      }
       navigate("/dashboard/trip-organizer/my-trips");
     } catch (err: any) {
-      toast.error(err.message || "Failed to create trip");
+      toast.error(err.message || "Failed to save trip");
     } finally {
       setSubmitting(false);
     }
   };
+
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-trip-organizer/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
