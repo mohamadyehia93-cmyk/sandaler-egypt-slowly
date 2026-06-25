@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,8 +21,11 @@ const NewAudioTour = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -38,7 +41,31 @@ const NewAudioTour = () => {
     { name: "", desc_en: "", desc_ar: "" },
   ]);
 
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("audio_tours").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(lang === "ar" ? "تعذر تحميل الجولة" : "Could not load tour");
+        return;
+      }
+      setForm({
+        title: data.title_en || "",
+        description: data.description_en || "",
+        city: data.city_id || "",
+        theme: "",
+        duration: data.duration_minutes != null ? String(data.duration_minutes) : "",
+        price: data.price != null ? String(data.price) : "",
+        languages: Array.isArray(data.languages) ? (data.languages as string[]) : [],
+      });
+      const dbStops = Array.isArray(data.stops) ? (data.stops as any[]) : [];
+      setStops(dbStops.length ? dbStops.map((s: any) => ({ name: s.label_en || "", desc_en: s.desc_en || "", desc_ar: s.desc_ar || "" })) : [{ name: "", desc_en: "", desc_ar: "" }]);
+      setExistingImages(data.image ? [data.image] : []);
+    })();
+  }, [isEdit, id, lang]);
+
   const set = (key: string, value: string | string[]) => setForm((p) => ({ ...p, [key]: value }));
+
 
   const toggleLang = (l: string) => {
     setForm((p) => ({
