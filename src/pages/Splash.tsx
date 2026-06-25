@@ -235,6 +235,7 @@ const onboardingToUserRole: Record<string, UserRole> = {
   "organization": "organization",
   "ambassador": "ambassador",
   "subject-expert": "subject-expert",
+  "narrator": "narrator",
 };
 
 const SplashPage = () => {
