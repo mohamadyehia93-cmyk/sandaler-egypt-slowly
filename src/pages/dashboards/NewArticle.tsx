@@ -82,12 +82,13 @@ const NewArticle = () => {
     }
     setSubmitting(true);
     try {
-      const images = await uploadImages(photos, user.id);
+      const uploaded = await uploadImages(photos, user.id);
+      const images = [...existingImages, ...uploaded];
       const tags = form.tags.map((t) => t.trim()).filter(Boolean);
       const excerpt = form.body.trim().slice(0, 160);
       const readTime = Math.max(1, Math.round(form.body.trim().split(/\s+/).length / 200));
 
-      const { error } = await supabase.from("posts").insert({
+      const payload = {
         author_id: user.id,
         title_en: form.title.trim(),
         title_ar: form.title.trim(),
@@ -101,18 +102,26 @@ const NewArticle = () => {
         images,
         read_time_minutes: readTime,
         content_type: form.hasAudio ? "audio" : "article",
-        slug: slugify(form.title, user.id.slice(0, 6)),
         status: "published",
-      });
-      if (error) throw error;
-      toast.success(lang === "ar" ? "تم نشر المقال بنجاح!" : "Article published successfully!");
+      };
+
+      if (isEdit) {
+        const { error } = await supabase.from("posts").update(payload).eq("id", id);
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم تحديث المقال!" : "Article updated!");
+      } else {
+        const { error } = await supabase.from("posts").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        if (error) throw error;
+        toast.success(lang === "ar" ? "تم نشر المقال بنجاح!" : "Article published successfully!");
+      }
       navigate("/dashboard/culture-actor/my-content");
     } catch (err: any) {
-      toast.error(err.message || "Failed to publish article");
+      toast.error(err.message || "Failed to save article");
     } finally {
       setSubmitting(false);
     }
   };
+
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-culture-actor/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
