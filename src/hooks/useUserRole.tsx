@@ -35,6 +35,7 @@ const roleDashboardPaths: Record<LocalRole, string> = {
   "product-seller": "/dashboard/product-seller",
   "trip-organizer": "/dashboard/trip-organizer",
   "subject-expert": "/dashboard/subject-expert",
+  "narrator": "/dashboard/narrator",
 };
 
 export const roleLabels: Record<UserRole, { en: string; ar: string }> = {
