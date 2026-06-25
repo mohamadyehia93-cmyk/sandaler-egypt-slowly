@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Plus, Trash2, Flag, CheckCircle2, Circle, ClipboardList } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Flag, CheckCircle2, Circle, ClipboardList, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 const MyTasks = () => {
