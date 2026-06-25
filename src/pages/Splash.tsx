@@ -187,6 +187,7 @@ const localRoles = [
   { key: "organization", icon: Building2, label: { en: "Organization", ar: "منظمة" }, desc: { en: "Recruit volunteers & donors", ar: "اجذب متطوعين ومتبرعين" } },
   { key: "ambassador", icon: Shield, label: { en: "Ambassador", ar: "سفير" }, desc: { en: "Verify & support providers", ar: "تحقق وادعم المقدمين" } },
   { key: "subject-expert", icon: GraduationCap, label: { en: "Subject Expert", ar: "خبير متخصص" }, desc: { en: "Curate knowledge & collections", ar: "نظّم المعرفة والمجموعات" } },
+  { key: "narrator", icon: Mic, label: { en: "Narrator", ar: "راوي" }, desc: { en: "Record & publish audio tours", ar: "سجّل وانشر جولات صوتية" } },
 ];
 
 const allRoles = [topRoles[0], ...localRoles];
