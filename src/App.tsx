@@ -50,6 +50,7 @@ const CauseSupportConsult = lazy(() => import("./pages/CauseSupportConsult.tsx")
 const Booking = lazy(() => import("./pages/Booking.tsx"));
 const BookingSuccess = lazy(() => import("./pages/BookingSuccess.tsx"));
 const BookingCancelled = lazy(() => import("./components/BookingCancelled.tsx"));
+const MyBookings = lazy(() => import("./pages/MyBookings.tsx"));
 const EventCalendar = lazy(() => import("./pages/EventCalendar.tsx"));
 const EventDetail = lazy(() => import("./pages/EventDetail.tsx"));
 const NewEvent = lazy(() => import("./pages/dashboards/NewEvent.tsx"));
