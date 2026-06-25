@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,8 +22,11 @@ const NewCollection = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -35,7 +38,31 @@ const NewCollection = () => {
     license: "cc-by",
   });
 
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("collections").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(lang === "ar" ? "تعذر تحميل المجموعة" : "Could not load collection");
+        return;
+      }
+      const entries = Array.isArray(data.entries) ? (data.entries as any[]) : [];
+      const refs = Array.isArray(data.refs) ? (data.refs as any[]) : [];
+      setForm({
+        title: data.title_en || "",
+        abstract: data.abstract_en || "",
+        discipline: data.discipline || "",
+        region: data.region_id || "",
+        entries: entries.length ? entries.map((e: any) => ({ title: e.title || "", summary: e.summary || "" })) : [{ title: "", summary: "" }],
+        references: refs.length ? refs.map((r: any) => String(r)) : [""],
+        license: data.license || "cc-by",
+      });
+      setExistingImages(data.cover_image ? [data.cover_image] : []);
+    })();
+  }, [isEdit, id, lang]);
+
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
+
 
   const updateEntry = (idx: number, field: "title" | "summary", value: string) => {
     setForm((p) => { const arr = [...p.entries]; arr[idx] = { ...arr[idx], [field]: value }; return { ...p, entries: arr }; });
