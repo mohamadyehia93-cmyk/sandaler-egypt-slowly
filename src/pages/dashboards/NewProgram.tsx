@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Upload, Plus, Trash2, FileText, Image, Tag, MapPin, Calendar, Users, Heart } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { slugify, uploadImages } from "@/lib/dashboardForms";
+import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Calendar, Users, Heart } from "lucide-react";
 import { toast } from "sonner";
 
 const programTypes = [
@@ -15,6 +19,9 @@ const programTypes = [
 const NewProgram = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -36,13 +43,46 @@ const NewProgram = () => {
   const addGoal = () => setForm((p) => ({ ...p, goals: [...p.goals, ""] }));
   const removeGoal = (idx: number) => setForm((p) => ({ ...p, goals: p.goals.filter((_, i) => i !== idx) }));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
+      return;
+    }
     if (!form.title.trim() || !form.description.trim() || !form.type) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
-    toast.success(lang === "ar" ? "تم إنشاء البرنامج بنجاح!" : "Program created successfully!");
-    navigate("/dashboard/organization");
+    setSubmitting(true);
+    try {
+      const images = await uploadImages(photos, user.id);
+      const goals = form.goals.map((g) => g.trim()).filter(Boolean);
+
+      const { error } = await supabase.from("programs").insert({
+        owner_id: user.id,
+        title_en: form.title.trim(),
+        title_ar: form.title.trim(),
+        description_en: form.description.trim(),
+        description_ar: form.description.trim(),
+        program_type: form.type,
+        location_en: form.location || null,
+        location_ar: form.location || null,
+        start_date: form.startDate || null,
+        end_date: form.endDate || null,
+        volunteers_needed: parseInt(form.volunteersNeeded) || null,
+        donation_target: parseInt(form.donationTarget) || null,
+        goals,
+        image: images[0] || null,
+        slug: slugify(form.title, user.id.slice(0, 6)),
+        status: "published",
+      });
+      if (error) throw error;
+      toast.success(lang === "ar" ? "تم نشر البرنامج بنجاح!" : "Program published successfully!");
+      navigate("/dashboard/organization/my-programs");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create program");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-organization/40";
@@ -58,10 +98,7 @@ const NewProgram = () => {
       <div className="px-4 py-5 space-y-5">
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-organization" />{lang === "ar" ? "صور البرنامج" : "Program Photos"}</label>
-          <div className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center gap-2 bg-card">
-            <Upload className="w-8 h-8 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">{lang === "ar" ? "حتى ٣ صور" : "Up to 3 photos"}</span>
-          </div>
+          <PhotoPicker files={photos} onChange={setPhotos} max={3} hint={lang === "ar" ? "حتى ٣ صور" : "Up to 3 photos"} />
         </div>
 
         <div>
@@ -125,8 +162,8 @@ const NewProgram = () => {
           </div>
         </div>
 
-        <button onClick={handleSubmit} className="w-full bg-role-organization text-white rounded-xl py-4 font-bold text-sm mt-4">
-          {lang === "ar" ? "نشر البرنامج" : "Publish Program"}
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-organization text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
+          {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر البرنامج" : "Publish Program")}
         </button>
       </div>
     </div>
