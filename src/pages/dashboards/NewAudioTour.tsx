@@ -146,7 +146,7 @@ const NewAudioTour = () => {
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-role-narrator text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
-        <h1 className="text-lg font-bold">{lang === "ar" ? "جولة صوتية جديدة" : "New Audio Tour"}</h1>
+        <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل الجولة" : "Edit Audio Tour") : (lang === "ar" ? "جولة صوتية جديدة" : "New Audio Tour")}</h1>
       </header>
 
       <div className="px-4 py-5 space-y-5">
