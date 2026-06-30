@@ -1,1 +1,10 @@
 project_id = "meacccbwpzrrcoanlojw"
+
+[functions.create-booking-checkout]
+verify_jwt = true
+
+[functions.itinerary-chat]
+verify_jwt = true
+
+[functions.backfill-stop-descriptions]
+verify_jwt = true

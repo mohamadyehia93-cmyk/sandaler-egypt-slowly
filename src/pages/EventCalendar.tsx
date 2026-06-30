@@ -2,17 +2,18 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Clock, Users, Star } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { useExperiences, useTrips } from "@/hooks/useListings";
+import { useExperiences, useTrips, useEvents } from "@/hooks/useListings";
 
 type CalendarEvent = {
   id: string;
-  type: "experience" | "trip";
+  type: "experience" | "trip" | "event";
   title: { en: string; ar: string };
   date: Date;
   price: number;
   image: string;
   region?: { en: string; ar: string };
   route?: { en: string; ar: string };
+  venue?: { en: string; ar: string };
   rating?: number;
 };
 
@@ -35,6 +36,7 @@ const EventCalendar = () => {
   const { lang, t } = useI18n();
   const { data: experiences = [] } = useExperiences();
   const { data: trips = [] } = useTrips();
+  const { data: cultureEvents = [] } = useEvents();
 
   const allEvents = useMemo<CalendarEvent[]>(() => {
     const events: CalendarEvent[] = [];
@@ -62,8 +64,20 @@ const EventCalendar = () => {
         route: tr.route_en || tr.route_ar ? { en: tr.route_en ?? "", ar: tr.route_ar ?? "" } : undefined,
       });
     });
+    (cultureEvents as any[]).forEach((ev) => {
+      const d = parseDate(ev.start_date);
+      if (d) events.push({
+        id: ev.slug || ev.id,
+        type: "event",
+        title: { en: ev.title_en, ar: ev.title_ar },
+        date: d,
+        price: ev.is_free ? 0 : (ev.price ?? 0),
+        image: ev.image,
+        venue: ev.venue_en || ev.venue_ar ? { en: ev.venue_en ?? "", ar: ev.venue_ar ?? "" } : undefined,
+      });
+    });
     return events;
-  }, [experiences, trips]);
+  }, [experiences, trips, cultureEvents]);
 
   const [currentMonth, setCurrentMonth] = useState(() => {
     // Start at earliest event month
@@ -71,6 +85,20 @@ const EventCalendar = () => {
     return sorted.length > 0 ? new Date(sorted[0].date.getFullYear(), sorted[0].date.getMonth(), 1) : new Date();
   });
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const routeFor = (ev: CalendarEvent) =>
+    ev.type === "trip" ? `/trip/${ev.id}` : ev.type === "event" ? `/event/${ev.id}` : `/experience/${ev.id}`;
+  const typeBadgeClass = (type: CalendarEvent["type"]) =>
+    type === "trip"
+      ? "bg-amber-100 text-amber-700"
+      : type === "event"
+      ? "bg-primary/15 text-primary-dark"
+      : "bg-primary/10 text-primary";
+  const typeLabel = (type: CalendarEvent["type"], short = false) => {
+    if (type === "trip") return lang === "ar" ? "رحلة" : "Trip";
+    if (type === "event") return lang === "ar" ? "فعالية" : "Event";
+    return lang === "ar" ? "تجربة" : short ? "Exp" : "Experience";
+  };
 
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
@@ -180,19 +208,13 @@ const EventCalendar = () => {
                 {selectedEvents.map((ev) => (
                   <div
                     key={`${ev.type}-${ev.id}`}
-                    onClick={() => navigate(ev.type === "trip" ? `/trip/${ev.id}` : `/experience/${ev.id}`)}
+                    onClick={() => navigate(routeFor(ev))}
                     className="flex gap-3 rounded-xl bg-card shadow-card border border-border overflow-hidden cursor-pointer"
                   >
                     <img src={ev.image} alt={ev.title[lang]} className="w-24 h-24 object-cover flex-shrink-0" />
                     <div className="py-3 pe-3 flex flex-col justify-center flex-1 min-w-0">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full self-start mb-1.5 ${
-                        ev.type === "trip"
-                          ? "bg-amber-100 text-amber-700"
-                          : "bg-primary/10 text-primary"
-                      }`}>
-                        {ev.type === "trip"
-                          ? (lang === "ar" ? "رحلة" : "Trip")
-                          : (lang === "ar" ? "تجربة" : "Experience")}
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full self-start mb-1.5 ${typeBadgeClass(ev.type)}`}>
+                        {typeLabel(ev.type)}
                       </span>
                       <h4 className="text-xs font-bold text-foreground line-clamp-2">{ev.title[lang]}</h4>
                       <div className="flex items-center gap-2 mt-1.5 text-[10px] text-muted-foreground">
@@ -204,6 +226,11 @@ const EventCalendar = () => {
                         {ev.route && (
                           <span className="flex items-center gap-0.5">
                             <MapPin className="w-3 h-3" /> {ev.route[lang]}
+                          </span>
+                        )}
+                        {ev.venue && (ev.venue[lang]) && (
+                          <span className="flex items-center gap-0.5">
+                            <MapPin className="w-3 h-3" /> {ev.venue[lang]}
                           </span>
                         )}
                         {ev.rating && (
@@ -236,18 +263,14 @@ const EventCalendar = () => {
                 .map((ev) => (
                   <div
                     key={`${ev.type}-${ev.id}`}
-                    onClick={() => navigate(ev.type === "trip" ? `/trip/${ev.id}` : `/experience/${ev.id}`)}
+                    onClick={() => navigate(routeFor(ev))}
                     className="flex gap-3 rounded-xl bg-card shadow-card border border-border overflow-hidden cursor-pointer"
                   >
                     <img src={ev.image} alt={ev.title[lang]} className="w-20 h-20 object-cover flex-shrink-0" />
                     <div className="py-2.5 pe-3 flex flex-col justify-center flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-                          ev.type === "trip"
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-primary/10 text-primary"
-                        }`}>
-                          {ev.type === "trip" ? (lang === "ar" ? "رحلة" : "Trip") : (lang === "ar" ? "تجربة" : "Exp")}
+                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${typeBadgeClass(ev.type)}`}>
+                          {typeLabel(ev.type, true)}
                         </span>
                         <span className="text-[10px] text-muted-foreground">
                           {ev.date.toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US", { month: "short", day: "numeric" })}

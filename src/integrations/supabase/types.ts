@@ -227,6 +227,78 @@ export type Database = {
           },
         ]
       }
+      bookings: {
+        Row: {
+          created_at: string
+          experience_id: string
+          guests: number
+          id: string
+          paid_at: string | null
+          platform_fee_egp: number
+          provider_amount_egp: number
+          provider_id: string | null
+          refunded_at: string | null
+          slot_id: string | null
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          total_amount_egp: number
+          updated_at: string
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          experience_id: string
+          guests: number
+          id?: string
+          paid_at?: string | null
+          platform_fee_egp: number
+          provider_amount_egp: number
+          provider_id?: string | null
+          refunded_at?: string | null
+          slot_id?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          total_amount_egp: number
+          updated_at?: string
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          experience_id?: string
+          guests?: number
+          id?: string
+          paid_at?: string | null
+          platform_fee_egp?: number
+          provider_amount_egp?: number
+          provider_id?: string | null
+          refunded_at?: string | null
+          slot_id?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          total_amount_egp?: number
+          updated_at?: string
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_slot_id_fkey"
+            columns: ["slot_id"]
+            isOneToOne: false
+            referencedRelation: "experience_slots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       causes: {
         Row: {
           category_ar: string | null
@@ -496,6 +568,87 @@ export type Database = {
           title_en?: string | null
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          category: string | null
+          city_id: string | null
+          created_at: string
+          description_ar: string | null
+          description_en: string | null
+          end_date: string | null
+          event_time: string | null
+          id: string
+          image: string | null
+          is_free: boolean
+          location_ar: string | null
+          location_en: string | null
+          organizer_id: string | null
+          price: number | null
+          region_id: string | null
+          slug: string | null
+          start_date: string
+          status: string
+          ticket_url: string | null
+          title_ar: string
+          title_en: string
+          updated_at: string
+          venue_ar: string | null
+          venue_en: string | null
+        }
+        Insert: {
+          category?: string | null
+          city_id?: string | null
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          end_date?: string | null
+          event_time?: string | null
+          id?: string
+          image?: string | null
+          is_free?: boolean
+          location_ar?: string | null
+          location_en?: string | null
+          organizer_id?: string | null
+          price?: number | null
+          region_id?: string | null
+          slug?: string | null
+          start_date: string
+          status?: string
+          ticket_url?: string | null
+          title_ar: string
+          title_en: string
+          updated_at?: string
+          venue_ar?: string | null
+          venue_en?: string | null
+        }
+        Update: {
+          category?: string | null
+          city_id?: string | null
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          end_date?: string | null
+          event_time?: string | null
+          id?: string
+          image?: string | null
+          is_free?: boolean
+          location_ar?: string | null
+          location_en?: string | null
+          organizer_id?: string | null
+          price?: number | null
+          region_id?: string | null
+          slug?: string | null
+          start_date?: string
+          status?: string
+          ticket_url?: string | null
+          title_ar?: string
+          title_en?: string
+          updated_at?: string
+          venue_ar?: string | null
+          venue_en?: string | null
         }
         Relationships: []
       }
@@ -1489,10 +1642,17 @@ export type Database = {
           color: string | null
           created_at: string
           emoji: string | null
+          governorates: string[] | null
           id: string
           image: string | null
+          is_active: boolean | null
           name_ar: string
           name_en: string
+          season_highlights_ar: string | null
+          season_highlights_en: string | null
+          sort_order: number | null
+          tagline_ar: string | null
+          tagline_en: string | null
         }
         Insert: {
           about_ar?: string | null
@@ -1500,10 +1660,17 @@ export type Database = {
           color?: string | null
           created_at?: string
           emoji?: string | null
+          governorates?: string[] | null
           id: string
           image?: string | null
+          is_active?: boolean | null
           name_ar: string
           name_en: string
+          season_highlights_ar?: string | null
+          season_highlights_en?: string | null
+          sort_order?: number | null
+          tagline_ar?: string | null
+          tagline_en?: string | null
         }
         Update: {
           about_ar?: string | null
@@ -1511,10 +1678,17 @@ export type Database = {
           color?: string | null
           created_at?: string
           emoji?: string | null
+          governorates?: string[] | null
           id?: string
           image?: string | null
+          is_active?: boolean | null
           name_ar?: string
           name_en?: string
+          season_highlights_ar?: string | null
+          season_highlights_en?: string | null
+          sort_order?: number | null
+          tagline_ar?: string | null
+          tagline_en?: string | null
         }
         Relationships: []
       }

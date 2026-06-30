@@ -51,6 +51,9 @@ const Booking = lazy(() => import("./pages/Booking.tsx"));
 const BookingSuccess = lazy(() => import("./pages/BookingSuccess.tsx"));
 const BookingCancelled = lazy(() => import("./components/BookingCancelled.tsx"));
 const EventCalendar = lazy(() => import("./pages/EventCalendar.tsx"));
+const EventDetail = lazy(() => import("./pages/EventDetail.tsx"));
+const NewEvent = lazy(() => import("./pages/dashboards/NewEvent.tsx"));
+const MyEvents = lazy(() => import("./pages/dashboards/MyEvents.tsx"));
 const ProviderProfile = lazy(() => import("./pages/ProviderProfile.tsx"));
 const CultureActorDashboard = lazy(() => import("./pages/dashboards/CultureActorDashboard.tsx"));
 const ServiceProviderDashboard = lazy(() => import("./pages/dashboards/ServiceProviderDashboard.tsx"));
@@ -112,8 +115,8 @@ const App = () => {
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <I18nProvider>
-        <UserRoleProvider>
         <AuthProvider>
+        <UserRoleProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -123,6 +126,7 @@ const App = () => {
             <Route path="/welcome" element={<Splash />} />
             <Route path="/" element={<Index />} />
             <Route path="/calendar" element={<EventCalendar />} />
+            <Route path="/event/:id" element={<EventDetail />} />
             <Route path="/experience/:id" element={<ExperienceDetail />} />
             <Route path="/trip/:id" element={<TripDetail />} />
             <Route path="/trips" element={<AllTrips />} />
@@ -188,6 +192,8 @@ const App = () => {
             <Route path="/dashboard/product-seller" element={<ProductSellerDashboard />} />
             <Route path="/dashboard/trip-organizer/new-trip" element={<NewTrip />} />
             <Route path="/dashboard/trip-organizer/my-trips" element={<MyTrips />} />
+            <Route path="/dashboard/trip-organizer/new-event" element={<NewEvent />} />
+            <Route path="/dashboard/trip-organizer/my-events" element={<MyEvents />} />
             <Route path="/dashboard/trip-organizer" element={<TripOrganizerDashboard />} />
             <Route path="/dashboard/subject-expert/new-collection" element={<NewCollection />} />
             <Route path="/dashboard/subject-expert/my-collections" element={<MyCollections />} />
@@ -200,8 +206,8 @@ const App = () => {
               </Suspense>
           </RouteGuard>
         </BrowserRouter>
-        </AuthProvider>
         </UserRoleProvider>
+        </AuthProvider>
       </I18nProvider>
     </TooltipProvider>
   </QueryClientProvider>
