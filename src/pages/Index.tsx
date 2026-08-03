@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
 import { SEO } from "@/components/SEO";
-import { useExperiences, useAudioTours, useAccommodations, useTransport, useProducts, useWhosWho } from "@/hooks/useListings";
+import { useExperiences, useAudioTours, useAccommodations, useTransport, useProducts, useWhosWho, useEvents } from "@/hooks/useListings";
 import BottomNav from "@/components/BottomNav";
 import TopTabs from "@/components/TopTabs";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -18,6 +18,7 @@ import TripCards from "@/components/TripCards";
 import AccommodationCards from "@/components/AccommodationCards";
 import TransportCards from "@/components/TransportCards";
 import HomeCausesSection from "@/components/HomeCausesSection";
+import EventsSection from "@/components/EventsSection";
 import ProductGrid from "@/components/ProductGrid";
 import MeetUpSection from "@/components/MeetUpSection";
 import Testimonials from "@/components/Testimonials";
@@ -35,6 +36,7 @@ const Index = () => {
   const [whyOpen, setWhyOpen] = useState(false);
   const navigate = useNavigate();
   const { data: dbTransport = [] } = useTransport();
+  const { data: dbEvents = [] } = useEvents();
   const { data: dbExperiences = [] } = useExperiences();
   const { data: dbAudioTours = [] } = useAudioTours();
   const { data: dbAccommodations = [] } = useAccommodations();
@@ -184,6 +186,7 @@ const Index = () => {
               <RegionScroll />
               <LatestPosts />
               <AudioTourCards />
+              <EventsSection events={dbEvents as any[]} />
               <HomeCausesSection />
 
               {/* Why Sandal? — collapsed footer */}
