@@ -120,7 +120,7 @@ const NewEvent = () => {
         price: form.is_free ? null : parseFloat(form.price) || null,
         ticket_url: form.ticket_url.trim() || null,
         image: imageUrl || null,
-        status: "published",
+        status: nextStatus,
       };
 
       if (editId) {
