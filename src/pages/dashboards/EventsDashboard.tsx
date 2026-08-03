@@ -79,7 +79,7 @@ const EventsDashboard = () => {
   const setStatus = async (id: string, status: string, notes?: string | null) => {
     const patch: Record<string, unknown> = { status };
     if (notes !== undefined) patch.review_notes = notes;
-    const { error } = await supabase.from("events").update(patch).eq("id", id);
+    const { error } = await supabase.from("events").update(patch as never).eq("id", id);
     if (error) {
       toast.error(error.message);
       return;
