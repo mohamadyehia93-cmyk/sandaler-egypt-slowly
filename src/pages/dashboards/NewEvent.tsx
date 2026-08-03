@@ -124,16 +124,31 @@ const NewEvent = () => {
       };
 
       if (editId) {
-        const { error } = await supabase.from("events").update(payload).eq("id", editId);
+        // Keep an already-published event live when the organizer just saves edits.
+        const keptStatus = currentStatus === "published" && nextStatus === "draft" ? "published" : nextStatus;
+        const { error } = await supabase
+          .from("events")
+          .update({ ...payload, status: keptStatus })
+          .eq("id", editId);
         if (error) throw error;
-        toast.success(lang === "ar" ? "تم تحديث الفعالية!" : "Event updated!");
+        setCurrentStatus(keptStatus);
+        toast.success(
+          keptStatus === "pending"
+            ? lang === "ar" ? "تم إرسال الفعالية للمراجعة!" : "Event submitted for review!"
+            : lang === "ar" ? "تم تحديث الفعالية!" : "Event updated!"
+        );
       } else {
         const { error } = await supabase
           .from("events")
           .insert({ ...payload, slug: `${slugify(form.title_en)}-${Math.random().toString(36).slice(2, 7)}` });
         if (error) throw error;
-        toast.success(lang === "ar" ? "تم نشر الفعالية!" : "Event published!");
+        toast.success(
+          nextStatus === "pending"
+            ? lang === "ar" ? "تم إرسال الفعالية للمراجعة!" : "Event submitted for review!"
+            : lang === "ar" ? "تم حفظ المسودة!" : "Draft saved!"
+        );
       }
+      queryClient.invalidateQueries({ queryKey: ["my-events"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });
       navigate("/dashboard/trip-organizer/events");
     } catch (err: any) {
