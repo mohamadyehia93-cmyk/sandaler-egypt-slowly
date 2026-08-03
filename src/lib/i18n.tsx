@@ -39,6 +39,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "event.category.market": { en: "Market", ar: "سوق" },
   "event.category.food": { en: "Food", ar: "طعام" },
   "event.category.heritage": { en: "Heritage", ar: "تراث" },
+  "event.category": { en: "Category", ar: "التصنيف" },
   "event.details": { en: "Event details", ar: "تفاصيل الفعالية" },
   "event.goodToKnow": { en: "Good to know", ar: "معلومات مفيدة" },
   "event.organizer": { en: "Organizer", ar: "المنظم" },

@@ -151,7 +151,7 @@ const EventDetail = () => {
   ];
 
   const details = [
-    { icon: Tag, label: t("section.events"), value: t(eventCategoryKey(event.category)) },
+    { icon: Tag, label: t("event.category"), value: t(eventCategoryKey(event.category)) },
     { icon: Timer, label: t("event.duration"), value: multiDay ? `${durationDays} ${t("event.days")}` : t("event.oneDay") },
     ...(event.capacity ? [{ icon: Users, label: t("event.capacity"), value: `${event.capacity} ${t("event.people")}` }] : []),
     { icon: Wallet, label: t("event.admission"), value: priceLabel },
