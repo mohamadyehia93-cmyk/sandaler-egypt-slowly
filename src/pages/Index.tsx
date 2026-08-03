@@ -186,6 +186,7 @@ const Index = () => {
               <RegionScroll />
               <LatestPosts />
               <AudioTourCards />
+              <EventsSection events={dbEvents as any[]} />
               <HomeCausesSection />
 
               {/* Why Sandal? — collapsed footer */}
