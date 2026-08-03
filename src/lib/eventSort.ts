@@ -20,6 +20,37 @@ export type EventRow = {
   price?: number | null;
   ticket_url?: string | null;
   capacity?: number | null;
+  status?: string | null;
+  review_notes?: string | null;
+  reviewed_at?: string | null;
+};
+
+export type EventStatus = "draft" | "pending" | "published" | "rejected";
+
+export const EVENT_STATUSES: EventStatus[] = ["draft", "pending", "published", "rejected"];
+
+export const eventStatusLabel = (status: string | null | undefined, lang: string): string => {
+  const map: Record<string, { en: string; ar: string }> = {
+    draft: { en: "Draft", ar: "مسودة" },
+    pending: { en: "Pending review", ar: "قيد المراجعة" },
+    published: { en: "Published", ar: "منشورة" },
+    rejected: { en: "Rejected", ar: "مرفوضة" },
+  };
+  const entry = map[status || "draft"] || map.draft;
+  return lang === "ar" ? entry.ar : entry.en;
+};
+
+export const eventStatusClasses = (status: string | null | undefined): string => {
+  switch (status) {
+    case "published":
+      return "bg-success/10 text-success";
+    case "pending":
+      return "bg-warning/10 text-warning";
+    case "rejected":
+      return "bg-destructive/10 text-destructive";
+    default:
+      return "bg-muted text-muted-foreground";
+  }
 };
 
 const startOfToday = () => new Date(new Date().toDateString()).getTime();

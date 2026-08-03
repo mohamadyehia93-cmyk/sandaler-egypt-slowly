@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCities, useRegions } from "@/hooks/useListings";
 import { ArrowLeft, Upload, FileText, Tag, MapPin, Calendar, Clock, DollarSign, Ticket, Users } from "lucide-react";
 import { toast } from "sonner";
+import { eventStatusClasses, eventStatusLabel } from "@/lib/eventSort";
 
 const CATEGORIES = ["festival", "exhibition", "concert", "workshop", "performance", "market"];
 
@@ -25,6 +26,8 @@ const NewEvent = () => {
   const { data: regions = [] } = useRegions();
 
   const [submitting, setSubmitting] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState<string>("draft");
+  const [reviewNotes, setReviewNotes] = useState<string | null>(null);
   const [photo, setPhoto] = useState<File | null>(null);
   const [form, setForm] = useState({
     title_en: "",
@@ -72,6 +75,8 @@ const NewEvent = () => {
           ticket_url: data.ticket_url || "",
           image: data.image || "",
         });
+        setCurrentStatus((data as any).status || "draft");
+        setReviewNotes((data as any).review_notes || null);
       }
     })();
   }, [editId]);
@@ -81,7 +86,7 @@ const NewEvent = () => {
     [cities, form.region_id]
   );
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (nextStatus: "draft" | "pending") => {
     if (!user) {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
@@ -120,20 +125,35 @@ const NewEvent = () => {
         price: form.is_free ? null : parseFloat(form.price) || null,
         ticket_url: form.ticket_url.trim() || null,
         image: imageUrl || null,
-        status: "published",
+        status: nextStatus,
       };
 
       if (editId) {
-        const { error } = await supabase.from("events").update(payload).eq("id", editId);
+        // Keep an already-published event live when the organizer just saves edits.
+        const keptStatus = currentStatus === "published" && nextStatus === "draft" ? "published" : nextStatus;
+        const { error } = await supabase
+          .from("events")
+          .update({ ...payload, status: keptStatus })
+          .eq("id", editId);
         if (error) throw error;
-        toast.success(lang === "ar" ? "تم تحديث الفعالية!" : "Event updated!");
+        setCurrentStatus(keptStatus);
+        toast.success(
+          keptStatus === "pending"
+            ? lang === "ar" ? "تم إرسال الفعالية للمراجعة!" : "Event submitted for review!"
+            : lang === "ar" ? "تم تحديث الفعالية!" : "Event updated!"
+        );
       } else {
         const { error } = await supabase
           .from("events")
           .insert({ ...payload, slug: `${slugify(form.title_en)}-${Math.random().toString(36).slice(2, 7)}` });
         if (error) throw error;
-        toast.success(lang === "ar" ? "تم نشر الفعالية!" : "Event published!");
+        toast.success(
+          nextStatus === "pending"
+            ? lang === "ar" ? "تم إرسال الفعالية للمراجعة!" : "Event submitted for review!"
+            : lang === "ar" ? "تم حفظ المسودة!" : "Draft saved!"
+        );
       }
+      queryClient.invalidateQueries({ queryKey: ["my-events"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });
       navigate("/dashboard/trip-organizer/events");
     } catch (err: any) {
@@ -282,13 +302,41 @@ const NewEvent = () => {
           <input className={inputClass} placeholder="https://" value={form.ticket_url} onChange={(e) => set("ticket_url", e.target.value)} />
         </div>
 
-        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-primary text-primary-foreground rounded-xl py-4 font-bold text-sm mt-2 disabled:opacity-60">
-          {submitting
-            ? lang === "ar" ? "جاري الحفظ..." : "Saving..."
-            : editId
-            ? lang === "ar" ? "حفظ التغييرات" : "Save Changes"
-            : lang === "ar" ? "نشر الفعالية" : "Publish Event"}
-        </button>
+        {editId && (
+          <div className="bg-card rounded-xl shadow-card p-3 space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-foreground">{lang === "ar" ? "الحالة" : "Status"}</span>
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${eventStatusClasses(currentStatus)}`}>
+                {eventStatusLabel(currentStatus, lang)}
+              </span>
+            </div>
+            {reviewNotes && (
+              <p className="text-[11px] text-muted-foreground">
+                {lang === "ar" ? "ملاحظات المراجعة: " : "Review notes: "}{reviewNotes}
+              </p>
+            )}
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-3 mt-2">
+          <button onClick={() => handleSubmit("draft")} disabled={submitting} className="bg-card border border-border text-foreground rounded-xl py-4 font-bold text-sm disabled:opacity-60">
+            {submitting
+              ? lang === "ar" ? "جاري الحفظ..." : "Saving..."
+              : editId
+              ? lang === "ar" ? "حفظ التغييرات" : "Save Changes"
+              : lang === "ar" ? "حفظ كمسودة" : "Save Draft"}
+          </button>
+          <button onClick={() => handleSubmit("pending")} disabled={submitting || currentStatus === "pending"} className="bg-primary text-primary-foreground rounded-xl py-4 font-bold text-sm disabled:opacity-60">
+            {currentStatus === "pending"
+              ? lang === "ar" ? "قيد المراجعة" : "In Review"
+              : lang === "ar" ? "إرسال للمراجعة" : "Submit for Review"}
+          </button>
+        </div>
+        <p className="text-[11px] text-muted-foreground text-center">
+          {lang === "ar"
+            ? "تُنشر الفعاليات بعد موافقة فريق المراجعة."
+            : "Events go live after the review team approves them."}
+        </p>
       </div>
     </div>
   );

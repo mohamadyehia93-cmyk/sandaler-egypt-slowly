@@ -685,6 +685,8 @@ export type Database = {
           organizer_id: string | null
           price: number | null
           region_id: string | null
+          review_notes: string | null
+          reviewed_at: string | null
           slug: string | null
           start_date: string
           status: string
@@ -712,6 +714,8 @@ export type Database = {
           organizer_id?: string | null
           price?: number | null
           region_id?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
           slug?: string | null
           start_date: string
           status?: string
@@ -739,6 +743,8 @@ export type Database = {
           organizer_id?: string | null
           price?: number | null
           region_id?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
           slug?: string | null
           start_date?: string
           status?: string
