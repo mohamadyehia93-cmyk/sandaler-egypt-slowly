@@ -667,6 +667,65 @@ export type Database = {
         }
         Relationships: []
       }
+      event_tickets: {
+        Row: {
+          attendee_email: string
+          attendee_name: string
+          created_at: string
+          event_id: string
+          id: string
+          payment_method: string
+          quantity: number
+          reference: string
+          service_fee_egp: number
+          status: string
+          total_egp: number
+          unit_price_egp: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attendee_email: string
+          attendee_name: string
+          created_at?: string
+          event_id: string
+          id?: string
+          payment_method?: string
+          quantity?: number
+          reference?: string
+          service_fee_egp?: number
+          status?: string
+          total_egp?: number
+          unit_price_egp?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attendee_email?: string
+          attendee_name?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          payment_method?: string
+          quantity?: number
+          reference?: string
+          service_fee_egp?: number
+          status?: string
+          total_egp?: number
+          unit_price_egp?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_tickets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           capacity: number | null

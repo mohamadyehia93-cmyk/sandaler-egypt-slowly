@@ -53,6 +53,9 @@ const BookingCancelled = lazy(() => import("./components/BookingCancelled.tsx"))
 const MyBookings = lazy(() => import("./pages/MyBookings.tsx"));
 const EventCalendar = lazy(() => import("./pages/EventCalendar.tsx"));
 const EventDetail = lazy(() => import("./pages/EventDetail.tsx"));
+const EventCheckout = lazy(() => import("./pages/EventCheckout.tsx"));
+const EventTicketReceipt = lazy(() => import("./pages/EventTicketReceipt.tsx"));
+const MyTickets = lazy(() => import("./pages/MyTickets.tsx"));
 const NewEvent = lazy(() => import("./pages/dashboards/NewEvent.tsx"));
 const MyEvents = lazy(() => import("./pages/dashboards/MyEvents.tsx"));
 const EventsDashboard = lazy(() => import("./pages/dashboards/EventsDashboard.tsx"));
@@ -170,6 +173,9 @@ const App = () => {
             <Route path="/booking/success" element={<BookingSuccess />} />
             <Route path="/booking/cancelled" element={<BookingCancelled />} />
             <Route path="/bookings" element={<MyBookings />} />
+            <Route path="/event/:id/tickets" element={<EventCheckout />} />
+            <Route path="/event-ticket/:ticketId" element={<EventTicketReceipt />} />
+            <Route path="/tickets" element={<MyTickets />} />
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile" element={<Profile />} />

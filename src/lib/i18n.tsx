@@ -30,6 +30,8 @@ const translations: Record<string, Record<Lang, string>> = {
   "event.where": { en: "Where", ar: "المكان" },
   "event.about": { en: "About this event", ar: "عن الفعالية" },
   "event.tickets": { en: "Get Tickets", ar: "احجز تذكرة" },
+  "event.reserve": { en: "Reserve Free Spot", ar: "احجز مكانك مجاناً" },
+  "event.externalTickets": { en: "Organizer site", ar: "موقع المنظم" },
   "event.noEvents": { en: "No events yet", ar: "لا توجد فعاليات بعد" },
   "event.category.festival": { en: "Festival", ar: "مهرجان" },
   "event.category.exhibition": { en: "Exhibition", ar: "معرض" },
