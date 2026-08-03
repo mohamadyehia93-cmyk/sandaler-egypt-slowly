@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCities, useRegions } from "@/hooks/useListings";
 import { ArrowLeft, Upload, FileText, Tag, MapPin, Calendar, Clock, DollarSign, Ticket, Users } from "lucide-react";
 import { toast } from "sonner";
+import { eventStatusClasses, eventStatusLabel } from "@/lib/eventSort";
 
 const CATEGORIES = ["festival", "exhibition", "concert", "workshop", "performance", "market"];
 
