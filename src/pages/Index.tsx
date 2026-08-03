@@ -36,6 +36,7 @@ const Index = () => {
   const [whyOpen, setWhyOpen] = useState(false);
   const navigate = useNavigate();
   const { data: dbTransport = [] } = useTransport();
+  const { data: dbEvents = [] } = useEvents();
   const { data: dbExperiences = [] } = useExperiences();
   const { data: dbAudioTours = [] } = useAudioTours();
   const { data: dbAccommodations = [] } = useAccommodations();
