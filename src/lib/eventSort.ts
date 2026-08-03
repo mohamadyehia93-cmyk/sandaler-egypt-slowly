@@ -47,6 +47,8 @@ const KNOWN_CATEGORIES = [
   "workshop",
   "performance",
   "market",
+  "food",
+  "heritage",
 ];
 
 /** Returns an i18n key for the category, falling back to a generic events key. */
