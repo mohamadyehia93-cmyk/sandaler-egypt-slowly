@@ -79,17 +79,20 @@ export function useToggleFollow() {
   });
 }
 
-/** Public follower count for any target. */
+/** Follower count for any target (available to signed-in users). */
 export function useFollowerCount(targetType: string, targetId: string) {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ["follower_count", targetType, targetId],
+    queryKey: ["follower_count", targetType, targetId, user?.id ?? null],
     queryFn: async () => {
+      if (!user) return 0;
       const { data, error } = await supabase.rpc("get_follower_count", {
         _target_type: targetType,
         _target_id: targetId,
       });
-      if (error) throw error;
+      if (error) return 0;
       return data ?? 0;
     },
   });
 }
+
