@@ -74,6 +74,8 @@ const NewEvent = () => {
           ticket_url: data.ticket_url || "",
           image: data.image || "",
         });
+        setCurrentStatus((data as any).status || "draft");
+        setReviewNotes((data as any).review_notes || null);
       }
     })();
   }, [editId]);
