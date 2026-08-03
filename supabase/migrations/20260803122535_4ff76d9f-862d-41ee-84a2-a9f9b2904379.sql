@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.enforce_event_status_transition() FROM PUBLIC, anon, authenticated;
