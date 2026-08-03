@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
 import { SEO } from "@/components/SEO";
-import { useExperiences, useAudioTours, useAccommodations, useTransport, useProducts, useWhosWho } from "@/hooks/useListings";
+import { useExperiences, useAudioTours, useAccommodations, useTransport, useProducts, useWhosWho, useEvents } from "@/hooks/useListings";
 import BottomNav from "@/components/BottomNav";
 import TopTabs from "@/components/TopTabs";
 import { LanguageToggle } from "@/components/LanguageToggle";
