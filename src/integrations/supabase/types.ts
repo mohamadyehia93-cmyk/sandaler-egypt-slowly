@@ -244,13 +244,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "audio_tours_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
-            referencedRelation: "providers"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "audio_tours_narrator_culture_actor_id_fkey"
             columns: ["narrator_culture_actor_id"]
             isOneToOne: false
@@ -1003,13 +996,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "experiences_provider_id_fkey"
-            columns: ["provider_id"]
-            isOneToOne: false
-            referencedRelation: "providers"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "experiences_region_id_fkey"
             columns: ["region_id"]
             isOneToOne: false
@@ -1548,13 +1534,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "posts_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "providers"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "posts_city_id_fkey"
             columns: ["city_id"]
             isOneToOne: false
@@ -1677,13 +1656,6 @@ export type Database = {
             columns: ["region_id"]
             isOneToOne: false
             referencedRelation: "regions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "products_seller_id_fkey"
-            columns: ["seller_id"]
-            isOneToOne: false
-            referencedRelation: "providers"
             referencedColumns: ["id"]
           },
         ]
@@ -2236,13 +2208,6 @@ export type Database = {
             columns: ["city_id"]
             isOneToOne: false
             referencedRelation: "cities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trips_organizer_id_fkey"
-            columns: ["organizer_id"]
-            isOneToOne: false
-            referencedRelation: "providers"
             referencedColumns: ["id"]
           },
           {
