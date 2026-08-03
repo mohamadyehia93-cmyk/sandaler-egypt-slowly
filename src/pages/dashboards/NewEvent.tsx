@@ -301,13 +301,41 @@ const NewEvent = () => {
           <input className={inputClass} placeholder="https://" value={form.ticket_url} onChange={(e) => set("ticket_url", e.target.value)} />
         </div>
 
-        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-primary text-primary-foreground rounded-xl py-4 font-bold text-sm mt-2 disabled:opacity-60">
-          {submitting
-            ? lang === "ar" ? "جاري الحفظ..." : "Saving..."
-            : editId
-            ? lang === "ar" ? "حفظ التغييرات" : "Save Changes"
-            : lang === "ar" ? "نشر الفعالية" : "Publish Event"}
-        </button>
+        {editId && (
+          <div className="bg-card rounded-xl shadow-card p-3 space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-foreground">{lang === "ar" ? "الحالة" : "Status"}</span>
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${eventStatusClasses(currentStatus)}`}>
+                {eventStatusLabel(currentStatus, lang)}
+              </span>
+            </div>
+            {reviewNotes && (
+              <p className="text-[11px] text-muted-foreground">
+                {lang === "ar" ? "ملاحظات المراجعة: " : "Review notes: "}{reviewNotes}
+              </p>
+            )}
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-3 mt-2">
+          <button onClick={() => handleSubmit("draft")} disabled={submitting} className="bg-card border border-border text-foreground rounded-xl py-4 font-bold text-sm disabled:opacity-60">
+            {submitting
+              ? lang === "ar" ? "جاري الحفظ..." : "Saving..."
+              : editId
+              ? lang === "ar" ? "حفظ التغييرات" : "Save Changes"
+              : lang === "ar" ? "حفظ كمسودة" : "Save Draft"}
+          </button>
+          <button onClick={() => handleSubmit("pending")} disabled={submitting || currentStatus === "pending"} className="bg-primary text-primary-foreground rounded-xl py-4 font-bold text-sm disabled:opacity-60">
+            {currentStatus === "pending"
+              ? lang === "ar" ? "قيد المراجعة" : "In Review"
+              : lang === "ar" ? "إرسال للمراجعة" : "Submit for Review"}
+          </button>
+        </div>
+        <p className="text-[11px] text-muted-foreground text-center">
+          {lang === "ar"
+            ? "تُنشر الفعاليات بعد موافقة فريق المراجعة."
+            : "Events go live after the review team approves them."}
+        </p>
       </div>
     </div>
   );
