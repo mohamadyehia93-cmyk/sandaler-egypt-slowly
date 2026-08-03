@@ -213,7 +213,7 @@ export async function runStorageCycle() {
 
   for (const bucket of BUCKETS) {
     const objectPath = `${user.id}/e2e-${token}.bin`;
-    const { error: uploadError } = await sb.storage.from(bucket).upload(objectPath, body, { upsert: true });
+    const { error: uploadError } = await sb.storage.from(bucket).upload(objectPath, body);
     if (uploadError) throw new Error(`upload to ${bucket} failed: ${uploadError.message}`);
 
     const { data: pub } = sb.storage.from(bucket).getPublicUrl(objectPath);
