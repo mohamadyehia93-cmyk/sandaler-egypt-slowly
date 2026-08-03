@@ -81,7 +81,7 @@ const NewEvent = () => {
     [cities, form.region_id]
   );
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (nextStatus: "draft" | "pending") => {
     if (!user) {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
