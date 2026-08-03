@@ -113,8 +113,17 @@ function client() {
   });
 }
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 async function signUpAndIn(sb, email, password) {
-  const { error: signUpError } = await sb.auth.signUp({ password, email });
+  // The auth API rate-limits bursts of sign-ups; back off and retry.
+  let signUpError = null;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    ({ error: signUpError } = await sb.auth.signUp({ password, email }));
+    if (!signUpError) break;
+    if (!/rate limit/i.test(signUpError.message)) break;
+    await sleep(3000 * (attempt + 1));
+  }
   if (signUpError) throw new Error(`sign-up failed: ${signUpError.message}`);
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
   if (error) throw new Error(`sign-in failed: ${error.message}`);
