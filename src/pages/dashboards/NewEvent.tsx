@@ -25,6 +25,8 @@ const NewEvent = () => {
   const { data: regions = [] } = useRegions();
 
   const [submitting, setSubmitting] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState<string>("draft");
+  const [reviewNotes, setReviewNotes] = useState<string | null>(null);
   const [photo, setPhoto] = useState<File | null>(null);
   const [form, setForm] = useState({
     title_en: "",
