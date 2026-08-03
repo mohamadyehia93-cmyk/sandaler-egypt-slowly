@@ -369,18 +369,28 @@ const EventDetail = () => {
           <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{t("event.admission")}</p>
           <p className="text-lg font-bold text-primary-dark leading-tight">{priceLabel}</p>
         </div>
-        {event.ticket_url && !past ? (
-          <a
-            href={event.ticket_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 bg-primary text-primary-foreground rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2"
-          >
-            <Ticket className="w-4 h-4" /> {t("event.tickets")}
-          </a>
+        {!past ? (
+          <div className="flex-1 flex items-center gap-2">
+            <button
+              onClick={() => navigate(`/event/${event.slug || event.id}/tickets`)}
+              className="flex-1 bg-primary text-primary-foreground rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2"
+            >
+              <Ticket className="w-4 h-4" /> {event.is_free ? t("event.reserve") : t("event.tickets")}
+            </button>
+            {event.ticket_url && (
+              <a
+                href={event.ticket_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-3 rounded-xl border border-border text-[11px] font-semibold text-muted-foreground"
+              >
+                {t("event.externalTickets")}
+              </a>
+            )}
+          </div>
         ) : (
           <p className="flex-1 text-[11px] text-muted-foreground text-center leading-snug">
-            {past ? t("event.ended") : t("event.noTickets")}
+            {t("event.ended")}
           </p>
         )}
       </div>
