@@ -45,7 +45,7 @@ export const eventStatusClasses = (status: string | null | undefined): string =>
     case "published":
       return "bg-success/10 text-success";
     case "pending":
-      return "bg-amber/10 text-amber";
+      return "bg-warning/10 text-warning";
     case "rejected":
       return "bg-destructive/10 text-destructive";
     default:
