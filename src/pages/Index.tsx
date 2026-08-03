@@ -18,6 +18,7 @@ import TripCards from "@/components/TripCards";
 import AccommodationCards from "@/components/AccommodationCards";
 import TransportCards from "@/components/TransportCards";
 import HomeCausesSection from "@/components/HomeCausesSection";
+import EventsSection from "@/components/EventsSection";
 import ProductGrid from "@/components/ProductGrid";
 import MeetUpSection from "@/components/MeetUpSection";
 import Testimonials from "@/components/Testimonials";
