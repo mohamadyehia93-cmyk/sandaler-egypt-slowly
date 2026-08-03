@@ -86,7 +86,7 @@ const EventDetail = () => {
     ? t("event.today")
     : daysAway === 1
     ? t("event.tomorrow")
-    : t("event.inDays", { days: String(daysAway) });
+    : t("event.inDays").replace("{days}", String(daysAway));
   const durationDays = multiDay
     ? Math.round((end!.getTime() - start.getTime()) / dayMs) + 1
     : 1;
@@ -353,12 +353,13 @@ const EventDetail = () => {
       {/* Nearby events */}
       {nearby.length > 0 && (
         <div className="mt-6">
-          <SectionHeader title={t("event.moreInCity")} onSeeAll={() => navigate("/calendar")} />
-          <div className="grid grid-cols-3 gap-3 px-4">
-            {nearby.map((e) => (
-              <EventCard key={e.id} event={e} onClick={() => navigate(`/event/${e.slug || e.id}`)} />
-            ))}
-          </div>
+          <SectionHeader titleKey="event.moreInCity" onSeeAll={() => navigate("/calendar")}>
+            <div className="grid grid-cols-3 gap-3 px-4">
+              {nearby.map((e) => (
+                <EventCard key={e.id} event={e} onClick={() => navigate(`/event/${e.slug || e.id}`)} />
+              ))}
+            </div>
+          </SectionHeader>
         </div>
       )}
 
