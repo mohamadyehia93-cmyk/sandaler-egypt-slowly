@@ -14,7 +14,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "icons:generate": "node scripts/generate-icons.mjs",
-    "i18n:check": "node scripts/check-i18n.mjs"
+    "i18n:check": "node scripts/check-i18n.mjs",
+    "test:roles": "RUN_BACKEND_E2E=1 vitest run --config vitest.integration.config.ts",
+    "roles:cycle": "node scripts/role-cycle-e2e.mjs"
   },
   "reactSnap": {
     "source": "dist",
@@ -22,7 +24,10 @@
       "collapseWhitespace": false,
       "removeComments": false
     },
-    "puppeteerArgs": ["--no-sandbox", "--disable-setuid-sandbox"],
+    "puppeteerArgs": [
+      "--no-sandbox",
+      "--disable-setuid-sandbox"
+    ],
     "include": [
       "/",
       "/audio-tours",
