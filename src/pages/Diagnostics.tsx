@@ -27,6 +27,7 @@ const Diagnostics = () => {
   const [session, setSession] = useState<string>("checking…");
 
   useEffect(() => {
+    setSnap({ ...getSnapshot() });
     const unsubscribe = subscribe(() => setSnap({ ...getSnapshot() }));
     return () => {
       unsubscribe();
