@@ -2,10 +2,12 @@ import { createRoot, hydrateRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { initSentry } from '@/lib/monitoring/sentry';
 import { initAnalytics } from '@/lib/analytics/posthog';
+import { installDiagnostics } from '@/lib/diagnostics';
 import "./i18n/config";
 import App from "./App.tsx";
 import "./index.css";
 
+installDiagnostics();
 initSentry();
 initAnalytics();
 

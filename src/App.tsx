@@ -10,6 +10,8 @@ import { UserRoleProvider } from "@/hooks/useUserRole";
 import { AuthProvider } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import RouteGuard from "@/components/RouteGuard";
+import RouteTracker from "@/components/RouteTracker";
+import Diagnostics from "./pages/Diagnostics.tsx";
 
 // Eager — first paint critical
 import Index from "./pages/Index.tsx";
@@ -126,6 +128,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <RouteTracker />
             <RouteGuard>
               <Suspense fallback={<RouteFallback />}>
               <Routes>
@@ -221,6 +224,7 @@ const App = () => {
             <Route path="/dashboard/narrator/my-tours" element={<MyAudioTours />} />
             <Route path="/dashboard/narrator" element={<NarratorDashboard />} />
 
+            <Route path="/diagnostics" element={<Diagnostics />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
               </Suspense>
