@@ -6,6 +6,8 @@ import { clearDiagnostics, getSnapshot, subscribe, type DiagEntry } from "@/lib/
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Download } from "lucide-react";
+
 
 type ApiCheck = {
   name: string;
@@ -103,6 +105,35 @@ const Diagnostics = () => {
 
   const errors = snap.entries.filter((e) => e.kind !== "route");
 
+  const reportIssue = () => {
+    const report = {
+      generatedAt: new Date().toISOString(),
+      app: "Sandaler",
+      url: window.location.href,
+      currentRoute: snap.routes[0]?.path ?? null,
+      user: session,
+      environment: {
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        viewport: { width: window.innerWidth, height: window.innerHeight },
+        devicePixelRatio: window.devicePixelRatio,
+        online: navigator.onLine,
+      },
+      apiChecks: checks,
+      routeHistory: snap.routes,
+      errors,
+    };
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `sandaler-diagnostics-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-background pb-24">
       <Helmet>
@@ -114,7 +145,12 @@ const Diagnostics = () => {
       <header className="border-b border-border px-4 py-4">
         <h1 className="text-xl font-bold text-foreground">Diagnostics</h1>
         <p className="text-sm text-muted-foreground">Runtime health of this browser session.</p>
+        <Button size="sm" className="mt-3" onClick={reportIssue}>
+          <Download className="me-2 h-4 w-4" />
+          Report this issue
+        </Button>
       </header>
+
 
       <main className="space-y-4 p-4">
         <Card className="p-4">
