@@ -26,7 +26,12 @@ const Diagnostics = () => {
   const [checks, setChecks] = useState<ApiCheck[]>([]);
   const [session, setSession] = useState<string>("checking…");
 
-  useEffect(() => subscribe(() => setSnap({ ...getSnapshot() })), []);
+  useEffect(() => {
+    const unsubscribe = subscribe(() => setSnap({ ...getSnapshot() }));
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const runChecks = async () => {
     const tasks: { name: string; run: () => Promise<string> }[] = [
