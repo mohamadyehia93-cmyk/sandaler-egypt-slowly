@@ -17,7 +17,6 @@ const recoverFromStaleModule = () => {
 
 // Vite emits this when a browser still references a module from an older build.
 window.addEventListener("vite:preloadError", recoverFromStaleModule);
-window.addEventListener("pageshow", () => sessionStorage.removeItem(RECOVERY_KEY), { once: true });
 
 installDiagnostics();
 initSentry();
@@ -37,3 +36,5 @@ if (rootEl.hasChildNodes()) {
 } else {
   createRoot(rootEl).render(app);
 }
+
+window.setTimeout(() => sessionStorage.removeItem(RECOVERY_KEY), 5_000);
