@@ -16,6 +16,8 @@ export default defineConfig(() => ({
   },
   plugins: [
     react(),
+    mcpPlugin(),
+
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "robots.txt", "apple-touch-icon.png"],
