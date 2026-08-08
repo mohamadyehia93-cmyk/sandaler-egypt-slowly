@@ -7,11 +7,24 @@ import "./i18n/config";
 import App from "./App.tsx";
 import "./index.css";
 
+const RECOVERY_KEY = "sandal-module-recovery";
+
+const recoverFromStaleModule = () => {
+  if (sessionStorage.getItem(RECOVERY_KEY)) return;
+  sessionStorage.setItem(RECOVERY_KEY, "1");
+  window.location.reload();
+};
+
+// Vite emits this when a browser still references a module from an older build.
+window.addEventListener("vite:preloadError", recoverFromStaleModule);
+window.addEventListener("pageshow", () => sessionStorage.removeItem(RECOVERY_KEY), { once: true });
+
 installDiagnostics();
 initSentry();
 initAnalytics();
 
-const rootEl = document.getElementById("root")!;
+const rootEl = document.getElementById("root");
+if (!rootEl) throw new Error("Application root element is missing");
 const app = (
   <HelmetProvider>
     <App />
