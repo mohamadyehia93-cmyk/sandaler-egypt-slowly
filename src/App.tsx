@@ -12,6 +12,8 @@ import { useLanguage } from "@/hooks/useLanguage";
 import RouteGuard from "@/components/RouteGuard";
 import RouteTracker from "@/components/RouteTracker";
 import Diagnostics from "./pages/Diagnostics.tsx";
+import OAuthConsent from "./pages/OAuthConsent.tsx";
+
 
 // Eager — first paint critical
 import Index from "./pages/Index.tsx";
@@ -224,7 +226,9 @@ const App = () => {
             <Route path="/dashboard/narrator/my-tours" element={<MyAudioTours />} />
             <Route path="/dashboard/narrator" element={<NarratorDashboard />} />
 
+            <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
             <Route path="/diagnostics" element={<Diagnostics />} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
               </Suspense>
