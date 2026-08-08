@@ -1,0 +1,256 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://meacccbwpzrrcoanlojw.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "remix-of-sandal-journeys",
+      "version": "0.1.0",
+      "title": "Remix of Sandal Journeys"
+    },
+    "tools": [
+      {
+        "name": "search_experiences",
+        "title": "Search experiences",
+        "description": "Search bookable Egypt experiences by keyword, theme, or maximum price. Returns title, region, theme, price in EGP and rating.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Keyword matched against the English title."
+            },
+            "theme": {
+              "type": "string",
+              "description": "Theme filter, e.g. culture, nature, food."
+            },
+            "max_price": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Maximum price in EGP."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10,
+              "description": "Maximum results to return."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_upcoming_events",
+        "title": "List upcoming events",
+        "description": "List published upcoming events, optionally filtered by keyword, category, or free-only, ordered by start date.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Keyword matched against the English event title."
+            },
+            "category": {
+              "type": "string",
+              "description": "Event category filter."
+            },
+            "free_only": {
+              "type": "boolean",
+              "description": "Only return free events."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10,
+              "description": "Maximum results to return."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_trips",
+        "title": "List trips",
+        "description": "List multi-day Egypt trips with route, duration in days, price in EGP and rating.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Keyword matched against the English trip title."
+            },
+            "theme": {
+              "type": "string",
+              "description": "Trip theme filter."
+            },
+            "max_days": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "description": "Maximum trip duration in days."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10,
+              "description": "Maximum results to return."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "my_bookings",
+        "title": "My bookings",
+        "description": "List the signed-in user's experience bookings with status, guests and amounts in EGP.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Filter by booking status, e.g. paid or pending."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "description": "Maximum results to return."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "my_event_tickets",
+        "title": "My event tickets",
+        "description": "List the signed-in user's event ticket orders with reference code, quantity and total in EGP.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "description": "Maximum results to return."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_saved_itineraries",
+        "title": "List saved itineraries",
+        "description": "List the signed-in user's saved trip itineraries (title, destination, duration).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "description": "Maximum results to return."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "save_itinerary",
+        "title": "Save itinerary",
+        "description": "Save a trip itinerary to the signed-in user's account so it appears in the app's Trip Planner.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120,
+              "description": "Short itinerary title."
+            },
+            "plan": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The itinerary content, Markdown allowed."
+            },
+            "destination": {
+              "type": "string",
+              "description": "Main destination, e.g. Luxor."
+            },
+            "duration_days": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60,
+              "description": "Trip length in days."
+            }
+          },
+          "required": [
+            "title",
+            "plan"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
