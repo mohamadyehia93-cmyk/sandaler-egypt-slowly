@@ -12,7 +12,9 @@ const allowedProviderRoutes = [
   "/profile/help",
   "/dashboard",
   "/booking",
+  "/.lovable/oauth/consent",
 ];
+
 
 /**
  * Redirects provider users away from visitor-only pages
