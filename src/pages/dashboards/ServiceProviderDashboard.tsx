@@ -80,6 +80,35 @@ const ServiceProviderDashboard = () => {
   const locale = lang === "ar" ? "ar-EG" : "en-US";
   const title = (b: ProviderBooking) => b.experience ? (lang === "ar" ? b.experience.title_ar : b.experience.title_en) : "—";
 
+  const RESOLVED = ["confirmed", "cancelled", "completed", "refunded", "expired"];
+
+  const updateBookingStatus = async (id: string, status: "confirmed" | "cancelled") => {
+    setSavingId(id);
+    const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
+    setSavingId(null);
+    if (error) {
+      toast.error(lang === "ar" ? "تعذر تحديث الحجز" : "Could not update booking");
+      return;
+    }
+    toast.success(
+      status === "confirmed"
+        ? (lang === "ar" ? "تم تأكيد الحجز" : "Booking accepted")
+        : (lang === "ar" ? "تم رفض الحجز" : "Booking declined")
+    );
+    queryClient.invalidateQueries({ queryKey: ["sp-bookings"] });
+  };
+
+  const statusLabel = (s: string) => {
+    if (s === "confirmed") return lang === "ar" ? "مؤكد" : "Confirmed";
+    if (s === "pending_payment") return lang === "ar" ? "معلق" : "Pending";
+    if (s === "cancelled") return lang === "ar" ? "مرفوض" : "Declined";
+    if (s === "completed") return lang === "ar" ? "مكتمل" : "Completed";
+    if (s === "refunded") return lang === "ar" ? "مسترد" : "Refunded";
+    if (s === "expired") return lang === "ar" ? "منتهي" : "Expired";
+    return s;
+  };
+
+
   return (
     <div className="min-h-screen bg-surface pb-20">
       <header className="bg-role-service-provider text-white px-4 py-4">
