@@ -2293,6 +2293,69 @@ export type Database = {
         }
         Relationships: []
       }
+      volunteer_applications: {
+        Row: {
+          applicant_id: string
+          availability: string | null
+          cause_id: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          message: string | null
+          org_owner_id: string | null
+          program_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id?: string
+          availability?: string | null
+          cause_id?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          message?: string | null
+          org_owner_id?: string | null
+          program_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          availability?: string | null
+          cause_id?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          message?: string | null
+          org_owner_id?: string | null
+          program_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "volunteer_applications_cause_id_fkey"
+            columns: ["cause_id"]
+            isOneToOne: false
+            referencedRelation: "causes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "volunteer_applications_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       whos_who: {
         Row: {
           bio_ar: string | null
