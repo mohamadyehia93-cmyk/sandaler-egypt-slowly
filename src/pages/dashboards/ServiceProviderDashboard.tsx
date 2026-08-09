@@ -1,11 +1,14 @@
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Bell, Plus, Calendar, Clock, ChevronRight } from "lucide-react";
+import { ArrowLeft, Bell, Plus, Calendar, Clock, ChevronRight, Check, X } from "lucide-react";
+import { toast } from "sonner";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import DailyStatusCard from "@/components/DailyStatusCard";
+
 
 type ProviderBooking = {
   id: string;
