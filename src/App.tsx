@@ -184,6 +184,7 @@ const App = () => {
             <Route path="/event-ticket/:ticketId" element={<EventTicketReceipt />} />
             <Route path="/tickets" element={<MyTickets />} />
             <Route path="/orders" element={<MyOrders />} />
+            <Route path="/applications" element={<MyApplications />} />
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile" element={<Profile />} />
