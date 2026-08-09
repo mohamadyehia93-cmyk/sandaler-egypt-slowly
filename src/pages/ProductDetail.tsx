@@ -1,8 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, MapPin, ShoppingCart, Leaf, Package } from "lucide-react";
+import { ArrowLeft, MapPin, ShoppingCart, Leaf, Package, Minus, Plus, X } from "lucide-react";
+import { toast } from "sonner";
 import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,12 +16,19 @@ const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
+  const { user } = useAuth();
+  const ar = lang === "ar";
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [qty, setQty] = useState(1);
+  const [note, setNote] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
     queryFn: () => fetchByIdOrSlug("products", id!),
     enabled: !!id,
   });
+
 
   if (isLoading) {
     return (
