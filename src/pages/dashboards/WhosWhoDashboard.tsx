@@ -3,6 +3,7 @@ import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, User, MessageSquare, Calendar, ToggleRight, Clock, Plus, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import DailyStatusCard from "@/components/DailyStatusCard";
+import SessionRequestsList from "@/components/SessionRequestsList";
 
 const WhosWhoDashboard = () => {
   const { lang } = useI18n();
