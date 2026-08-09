@@ -303,16 +303,73 @@ const SplashPage = () => {
     "narrator": "/dashboard/narrator",
   };
 
-  const persistPersonalization = () => {
+  const persistPersonalization = async () => {
+    // localStorage stays for anonymous/offline use; the DB is the source of
+    // truth once the visitor is signed in.
     if (selectedInterests.length > 0) localStorage.setItem("sandal-interests", JSON.stringify(selectedInterests));
     if (selectedStyle) localStorage.setItem("sandal-travel-style", selectedStyle);
     if (selectedBudget) localStorage.setItem("sandal-budget", selectedBudget);
     if (selectedCities.length > 0) localStorage.setItem("sandal-cities", JSON.stringify(selectedCities));
     localStorage.setItem("sandal-onboarded", "true");
+
+    if (!user) return;
+    await supabase
+      .from("profiles")
+      .update({
+        interests: selectedInterests.length ? selectedInterests : null,
+        travel_style: selectedStyle,
+        budget: selectedBudget,
+        cities: selectedCities.length ? selectedCities : null,
+      })
+      .eq("user_id", user.id);
   };
 
-  const completeProvider = async (role: LocalRole) => {
-    const { error } = await becomeProvider(role);
+  /** Flatten the role-specific quiz answers into a specialties list. */
+  const roleAnswerKeys = () =>
+    Object.values(selectedRoleAnswers).flat().filter(Boolean);
+
+  const narratedLanguages = () => {
+    const map: Record<string, string> = {
+      "narrate-ar": "Arabic",
+      "narrate-en": "English",
+      "narrate-fr": "French",
+      "narrate-de": "German",
+    };
+    const langs = roleAnswerKeys().map((k) => map[k]).filter(Boolean);
+    return langs.length ? langs.join(", ") : null;
+  };
+
+  const completeProvider = async (role: LocalRole, withDetails = true) => {
+    let avatarUrl: string | null = null;
+    if (withDetails && avatarFiles.length > 0 && user) {
+      try {
+        const [url] = await uploadImages(avatarFiles, user.id, "profile-photos");
+        avatarUrl = url ?? null;
+      } catch {
+        toast.error(lang === "ar" ? "تعذّر تحميل الصورة" : "Could not upload your photo");
+      }
+    }
+
+    const city = selectedCities[0] ? citiesList.find((c) => c.id === selectedCities[0]) : null;
+    const region = selectedRegion ? regionsList.find((r) => r.id === selectedRegion) : null;
+
+    const { error } = await becomeProvider(
+      role,
+      withDetails
+        ? {
+            nameEn: name,
+            nameAr,
+            bioEn: bio,
+            cityEn: city?.name_en ?? null,
+            cityAr: city?.name_ar ?? null,
+            regionEn: region?.name_en ?? null,
+            regionAr: region?.name_ar ?? null,
+            avatar: avatarUrl,
+            specialties: roleAnswerKeys(),
+            languages: narratedLanguages(),
+          }
+        : undefined
+    );
     if (error) {
       toast.error(lang === "ar" ? "تعذّر إنشاء ملف المزوّد" : "Could not set up your provider profile");
       return false;
