@@ -141,7 +141,42 @@ const EditProfile = () => {
 
   const set = (k: keyof typeof f, v: string) => setF((p) => ({ ...p, [k]: v }));
 
+  /** Load the role's satellite row (if the role has one) alongside the provider. */
+  const loadSatellite = async (role: string | null) => {
+    const r = (role || "") as SatelliteRole;
+    if (!user || !SATELLITE_TABLE[r]) {
+      setSatRole(null);
+      return;
+    }
+    setSatRole(r);
+    const { data } = await supabase
+      .from(SATELLITE_TABLE[r])
+      .select("*")
+      .eq(OWNER_COL[r], user.id)
+      .maybeSingle();
+    const row = (data || null) as Record<string, unknown> | null;
+    setSatExists(!!row);
+    const str = (k: string) => (typeof row?.[k] === "string" ? (row[k] as string) : "");
+    setSat({
+      missionEn: str("mission_en"),
+      missionAr: str("mission_ar"),
+      orgWebsite: str("website"),
+      roleEn: str("role_en"),
+      roleAr: str("role_ar"),
+      meetingTimesEn: str("meeting_times_en"),
+      meetingTimesAr: str("meeting_times_ar"),
+      quoteEn: str("quote_en"),
+      quoteAr: str("quote_ar"),
+    });
+    setSatLogo((row?.logo as string) || (row?.image as string) || null);
+    setFocusAreas(asStringArray(row?.focus_areas_en));
+    setInterests(asStringArray(row?.interests_en));
+    setExpertise(asStringArray(row?.expertise_en));
+    setSatSocial(asSocial(row?.social_links));
+  };
+
   const load = async () => {
+
     if (!user) return;
     setLoading(true);
     const [{ data: prov }, { data: prof }] = await Promise.all([
