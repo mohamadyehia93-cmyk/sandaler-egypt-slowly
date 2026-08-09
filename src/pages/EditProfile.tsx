@@ -20,7 +20,9 @@ import { Button } from "@/components/ui/button";
 
 type ProviderRow = {
   id: string;
+  role: string | null;
   name_en: string | null;
+
   name_ar: string | null;
   tagline_en: string | null;
   tagline_ar: string | null;
