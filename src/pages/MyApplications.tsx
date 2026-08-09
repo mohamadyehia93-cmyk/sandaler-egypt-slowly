@@ -104,11 +104,8 @@ const MyApplications = () => {
           applications.map((a) => {
             const target = a.cause ?? a.program;
             const title = target ? (ar ? target.title_ar : target.title_en) : "—";
-            const link = a.cause
-              ? `/cause/${a.cause.slug || a.cause.id}`
-              : a.program
-                ? `/program/${a.program.slug || a.program.id}`
-                : null;
+            // Programs have no public detail route yet, so only causes are linkable.
+            const link = a.cause ? `/cause/${a.cause.slug || a.cause.id}` : null;
             return (
               <div key={a.id} className="bg-card rounded-xl shadow-card p-3 flex gap-3 items-start">
                 <button
