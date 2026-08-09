@@ -67,6 +67,10 @@ const mount = async () => {
   } else {
     createRoot(rootEl).render(app);
   }
+
+  void registerServiceWorker().catch((error) =>
+    console.warn("Service worker registration skipped", error),
+  );
 };
 
 void mount().catch((error) => {
