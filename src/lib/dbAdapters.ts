@@ -80,7 +80,8 @@ export interface LegacyPost {
 
 const bi = (en: string | null | undefined, ar: string | null | undefined): Bilingual => ({
   en: en ?? "",
-  ar: ar ?? "",
+  // Fall back to the English value when no Arabic value was provided.
+  ar: ar ?? en ?? "",
 });
 const biList = (
   en: string[] | null | undefined,
