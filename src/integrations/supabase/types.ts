@@ -1285,6 +1285,8 @@ export type Database = {
           description_ar: string | null
           description_en: string | null
           donations_total: number | null
+          focus_areas_ar: string[] | null
+          focus_areas_en: string[] | null
           id: string
           image: string | null
           location_ar: string | null
@@ -1310,6 +1312,8 @@ export type Database = {
           description_ar?: string | null
           description_en?: string | null
           donations_total?: number | null
+          focus_areas_ar?: string[] | null
+          focus_areas_en?: string[] | null
           id?: string
           image?: string | null
           location_ar?: string | null
@@ -1335,6 +1339,8 @@ export type Database = {
           description_ar?: string | null
           description_en?: string | null
           donations_total?: number | null
+          focus_areas_ar?: string[] | null
+          focus_areas_en?: string[] | null
           id?: string
           image?: string | null
           location_ar?: string | null
@@ -1360,13 +1366,6 @@ export type Database = {
             columns: ["city_id"]
             isOneToOne: false
             referencedRelation: "cities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "organizations_owner_id_fkey"
-            columns: ["owner_id"]
-            isOneToOne: false
-            referencedRelation: "providers"
             referencedColumns: ["id"]
           },
           {
