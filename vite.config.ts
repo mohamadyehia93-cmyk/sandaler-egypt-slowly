@@ -1,12 +1,35 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { VitePWA } from "vite-plugin-pwa";
 import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/supabase/vite";
 
+// Public backend values (protected by RLS). Used as build-time fallbacks so a build
+// running without the VITE_SUPABASE_* env vars still produces a working bundle
+// instead of a blank page.
+const FALLBACK_SUPABASE_PROJECT_ID = "meacccbwpzrrcoanlojw";
+const FALLBACK_SUPABASE_URL = `https://${FALLBACK_SUPABASE_PROJECT_ID}.supabase.co`;
+const FALLBACK_SUPABASE_PUBLISHABLE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYWNjY2J3cHpycmNvYW5sb2p3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MjI1OTIsImV4cCI6MjA5MDk5ODU5Mn0.0tiOl8gFP5JEwp8apSWNSDLHHCI-4P1EOQeuAxljV-w";
+
+const pick = (value: string | undefined, fallback: string) =>
+  value && value.trim() !== "" && value !== "undefined" ? value : fallback;
 
 // https://vitejs.dev/config/
-export default defineConfig(() => ({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  return {
+  define: {
+    "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
+      pick(env.VITE_SUPABASE_URL, FALLBACK_SUPABASE_URL),
+    ),
+    "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
+      pick(env.VITE_SUPABASE_PUBLISHABLE_KEY, FALLBACK_SUPABASE_PUBLISHABLE_KEY),
+    ),
+    "import.meta.env.VITE_SUPABASE_PROJECT_ID": JSON.stringify(
+      pick(env.VITE_SUPABASE_PROJECT_ID, FALLBACK_SUPABASE_PROJECT_ID),
+    ),
+  },
   server: {
     host: "::",
     port: 8080,
@@ -84,4 +107,5 @@ export default defineConfig(() => ({
     },
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime"],
   },
-}));
+  };
+});
