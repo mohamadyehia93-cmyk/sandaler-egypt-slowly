@@ -541,10 +541,10 @@ const CauseSupportVolunteer = () => {
                 {lang === "ar" ? "عودة للقضية" : "Back to Cause"}
               </button>
               <button
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/applications")}
                 className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
               >
-                {lang === "ar" ? "الرئيسية" : "Home"}
+                {lang === "ar" ? "طلبات التطوع" : "My Applications"}
               </button>
             </div>
           </div>
