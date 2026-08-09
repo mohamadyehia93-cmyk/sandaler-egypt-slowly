@@ -80,7 +80,7 @@ const SellerOrdersList = () => {
         <p className="text-xs text-muted-foreground py-3">{ar ? "لا توجد طلبات بعد" : "No orders yet"}</p>
       ) : (
         orders.map((o) => {
-          const resolved = RESOLVED.includes(o.status);
+          const terminal = TERMINAL.includes(o.status);
           const name = o.product ? (ar ? o.product.name_ar : o.product.name_en) : "—";
           return (
             <div key={o.id} className="py-2.5 border-b border-border last:border-0">
@@ -91,6 +91,13 @@ const SellerOrdersList = () => {
                     {(o.total_egp ?? 0).toLocaleString(locale)} {ar ? "ج.م" : "EGP"} ·{" "}
                     {new Date(o.created_at).toLocaleDateString(locale, { day: "numeric", month: "short" })}
                   </p>
+                  {(o.contact_name || o.contact_phone) && (
+                    <p className="text-[10px] text-muted-foreground" dir={o.contact_phone ? "auto" : undefined}>
+                      {o.contact_name}
+                      {o.contact_name && o.contact_phone ? " · " : ""}
+                      {o.contact_phone}
+                    </p>
+                  )}
                 </div>
                 <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${orderStatusClasses(o.status)}`}>
                   {orderStatusLabel(o.status, ar)}
@@ -99,27 +106,40 @@ const SellerOrdersList = () => {
 
               {o.buyer_note && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{o.buyer_note}</p>}
 
-              {!resolved && (
+              {!terminal && (
                 <div className="flex items-center gap-2 mt-2">
-                  <button
-                    disabled={savingId === o.id}
-                    onClick={() => updateStatus(o.id, "confirmed")}
-                    className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-role-product-seller text-white flex items-center justify-center gap-1 disabled:opacity-50"
-                  >
-                    <Check className="w-3.5 h-3.5" /> {ar ? "قبول" : "Accept"}
-                  </button>
-                  <button
-                    disabled={savingId === o.id}
-                    onClick={() => updateStatus(o.id, "cancelled")}
-                    className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
-                  >
-                    <X className="w-3.5 h-3.5" /> {ar ? "رفض" : "Decline"}
-                  </button>
+                  {o.status === "pending" ? (
+                    <>
+                      <button
+                        disabled={savingId === o.id}
+                        onClick={() => updateStatus(o.id, "confirmed")}
+                        className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-primary text-primary-foreground flex items-center justify-center gap-1 disabled:opacity-50"
+                      >
+                        <Check className="w-3.5 h-3.5" /> {ar ? "تأكيد" : "Confirm"}
+                      </button>
+                      <button
+                        disabled={savingId === o.id}
+                        onClick={() => updateStatus(o.id, "declined")}
+                        className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
+                      >
+                        <X className="w-3.5 h-3.5" /> {ar ? "رفض" : "Decline"}
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      disabled={savingId === o.id}
+                      onClick={() => updateStatus(o.id, "fulfilled")}
+                      className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-primary text-primary-foreground flex items-center justify-center gap-1 disabled:opacity-50"
+                    >
+                      <Check className="w-3.5 h-3.5" /> {ar ? "تم التسليم" : "Mark fulfilled"}
+                    </button>
+                  )}
                 </div>
               )}
             </div>
           );
         })
+
       )}
     </div>
   );
