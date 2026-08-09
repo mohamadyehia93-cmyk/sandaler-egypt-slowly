@@ -48,6 +48,44 @@ const ProductDetail = () => {
   const originStory = lang === "ar" ? product.origin_story_ar : product.origin_story_en;
   const sellerName = lang === "ar" ? product.seller_name_ar : product.seller_name_en;
   const sellerVillage = lang === "ar" ? product.seller_village_ar : product.seller_village_en;
+  const unitPrice = Number(product.price) || 0;
+  const total = unitPrice * qty;
+
+  const openOrder = () => {
+    if (!user) {
+      toast.error(ar ? "يرجى تسجيل الدخول لإتمام الطلب" : "Please sign in to place an order");
+      navigate("/login");
+      return;
+    }
+    setQty(1);
+    setNote("");
+    setSheetOpen(true);
+  };
+
+  const submitOrder = async () => {
+    if (!user) return;
+    setSubmitting(true);
+    const { error } = await supabase.from("orders").insert({
+      product_id: product.id,
+      buyer_id: user.id,
+      seller_id: product.seller_id,
+      quantity: qty,
+      unit_price_egp: unitPrice,
+      total_egp: total,
+      buyer_note: note.trim() || null,
+      status: "pending",
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error(ar ? "تعذر إنشاء الطلب" : "Could not place the order");
+      return;
+    }
+    setSheetOpen(false);
+    toast.success(ar ? "تم إرسال طلبك للبائع" : "Your order was sent to the seller");
+    navigate("/orders");
+  };
+
+
 
   return (
     <div className="min-h-screen bg-background pb-24">
