@@ -10,6 +10,7 @@ import WishlistButton from "@/components/WishlistButton";
 import { contentTypeConfig } from "@/components/LatestPosts";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
+import PostComments from "@/components/PostComments";
 
 /* ─── Audio Player ─── */
 const AudioPlayer = ({ title, author, image, lang }: { title: string; author: string; image: string; lang: string }) => {
@@ -422,6 +423,9 @@ const PostDetail = () => {
           </div>
         </div>
       )}
+
+      {/* Comments */}
+      <PostComments postKey={post.id} />
     </div>
   );
 };
