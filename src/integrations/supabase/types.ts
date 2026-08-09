@@ -2028,6 +2028,56 @@ export type Database = {
         }
         Relationships: []
       }
+      session_requests: {
+        Row: {
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          expert_owner_id: string | null
+          id: string
+          meetup_id: string
+          message: string | null
+          preferred_date: string | null
+          requester_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          expert_owner_id?: string | null
+          id?: string
+          meetup_id: string
+          message?: string | null
+          preferred_date?: string | null
+          requester_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          expert_owner_id?: string | null
+          id?: string
+          meetup_id?: string
+          message?: string | null
+          preferred_date?: string | null
+          requester_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_requests_meetup_id_fkey"
+            columns: ["meetup_id"]
+            isOneToOne: false
+            referencedRelation: "meetups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transport: {
         Row: {
           capacity: number | null
