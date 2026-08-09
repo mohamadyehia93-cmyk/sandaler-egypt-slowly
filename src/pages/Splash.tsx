@@ -389,7 +389,7 @@ const SplashPage = () => {
       const ok = await completeProvider(pending);
       sessionStorage.removeItem("sandal-pending-role");
       if (ok) {
-        persistPersonalization();
+        await persistPersonalization();
         navigate(roleDashboardPaths[pending] || "/");
       }
     })();
@@ -401,7 +401,7 @@ const SplashPage = () => {
 
     // Visitor: no provider profile needed.
     if (mappedRole === "visitor") {
-      persistPersonalization();
+      await persistPersonalization();
       navigate("/");
       return;
     }
@@ -416,7 +416,7 @@ const SplashPage = () => {
 
     const ok = await completeProvider(mappedRole as LocalRole);
     if (!ok) return;
-    persistPersonalization();
+    await persistPersonalization();
     navigate(roleDashboardPaths[mappedRole] || "/");
   };
 
