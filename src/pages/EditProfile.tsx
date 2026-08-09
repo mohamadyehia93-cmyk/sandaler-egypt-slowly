@@ -175,9 +175,12 @@ const EditProfile = () => {
       setAvatarUrl(p.avatar);
       setCoverUrl(p.cover_image);
       setStatus(p.status || "draft");
+      await loadSatellite(p.role);
     } else {
       setProvider(null);
+      setSatRole(null);
     }
+
 
     setVName(prof?.display_name || "");
     setVBio(prof?.bio || "");
