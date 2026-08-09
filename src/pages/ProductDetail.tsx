@@ -229,6 +229,22 @@ const ProductDetail = () => {
               </div>
             </div>
 
+            <input
+              value={contactName}
+              onChange={(e) => setContactName(e.target.value)}
+              placeholder={ar ? "الاسم" : "Contact name"}
+              className="w-full rounded-xl border border-border bg-surface p-3 text-sm text-foreground placeholder:text-muted-foreground"
+            />
+
+            <input
+              value={contactPhone}
+              onChange={(e) => setContactPhone(e.target.value)}
+              type="tel"
+              dir="ltr"
+              placeholder={ar ? "رقم الهاتف (اختياري)" : "Phone number (optional)"}
+              className="w-full rounded-xl border border-border bg-surface p-3 text-sm text-foreground placeholder:text-muted-foreground"
+            />
+
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
@@ -236,6 +252,7 @@ const ProductDetail = () => {
               placeholder={ar ? "ملاحظة للبائع (اختياري)" : "Note for the seller (optional)"}
               className="w-full rounded-xl border border-border bg-surface p-3 text-sm text-foreground placeholder:text-muted-foreground"
             />
+
 
             <div className="flex items-center justify-between border-t border-border pt-3">
               <span className="text-sm text-muted-foreground">{ar ? "الإجمالي" : "Total"}</span>
