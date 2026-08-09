@@ -101,6 +101,7 @@ const Profile = () => {
 
   const menuItems = [
     { label: lang === "ar" ? "تذاكري" : "My Tickets", path: "/tickets" },
+    { label: lang === "ar" ? "طلباتي" : "My Orders", path: "/orders" },
     { label: t("profile.impact_dashboard"), path: "/profile/impact" },
     { label: t("profile.badges_quests"), path: "/profile/badges" },
     { label: t("profile.settings"), path: "/profile/settings" },
