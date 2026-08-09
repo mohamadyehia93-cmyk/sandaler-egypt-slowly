@@ -185,5 +185,8 @@ export async function becomeProvider(
     .from("providers")
     .upsert(payload as never, { onConflict: "user_id" });
 
+  if (!error) await upsertSatellite(role, user.id, displayName, slug, details);
+
   return { error: error?.message ?? null };
 }
+
