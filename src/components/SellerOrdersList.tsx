@@ -35,8 +35,10 @@ const SellerOrdersList = () => {
       const { data, error } = await supabase
         .from("orders")
         .select("id, quantity, unit_price_egp, total_egp, status, buyer_note, created_at, product:products(name_en, name_ar)")
+        .eq("seller_id", user!.id)
         .order("created_at", { ascending: false })
         .limit(20);
+
       if (error) throw error;
       return (data || []) as unknown as SellerOrder[];
     },
