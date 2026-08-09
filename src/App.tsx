@@ -187,6 +187,8 @@ const App = () => {
             <Route path="/tickets" element={<MyTickets />} />
             <Route path="/orders" element={<MyOrders />} />
             <Route path="/applications" element={<MyApplications />} />
+            <Route path="/sessions" element={<Sessions />} />
+            <Route path="/session-requests" element={<MySessionRequests />} />
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile" element={<Profile />} />
