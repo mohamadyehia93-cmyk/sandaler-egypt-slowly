@@ -24,6 +24,9 @@ const ServiceProviderDashboard = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [savingId, setSavingId] = useState<string | null>(null);
+
 
   const { data: listingsCount = 0 } = useQuery({
     queryKey: ["sp-listings-count", user?.id],
