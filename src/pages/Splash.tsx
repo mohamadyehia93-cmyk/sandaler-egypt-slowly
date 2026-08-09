@@ -377,14 +377,18 @@ const SplashPage = () => {
             bioEn: bio,
             cityEn: city?.name_en ?? null,
             cityAr: city?.name_ar ?? null,
+            cityId: city?.id ?? null,
             regionEn: region?.name_en ?? null,
             regionAr: region?.name_ar ?? null,
+            regionId: region?.id ?? city?.region_id ?? null,
             avatar: avatarUrl,
             specialties: roleAnswerKeys(),
+            answerLabels: roleAnswerLabels(),
             languages: narratedLanguages(),
           }
         : undefined
     );
+
     if (error) {
       toast.error(lang === "ar" ? "تعذّر إنشاء ملف المزوّد" : "Could not set up your provider profile");
       return false;
