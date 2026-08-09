@@ -149,11 +149,11 @@ const EditProfile = () => {
       return;
     }
     setSatRole(r);
-    const { data } = await supabase
-      .from(SATELLITE_TABLE[r])
+    const { data } = await satQuery(SATELLITE_TABLE[r])
       .select("*")
       .eq(OWNER_COL[r], user.id)
       .maybeSingle();
+
     const row = (data || null) as Record<string, unknown> | null;
     setSatExists(!!row);
     const str = (k: string) => (typeof row?.[k] === "string" ? (row[k] as string) : "");
