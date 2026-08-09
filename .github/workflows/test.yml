@@ -53,11 +53,19 @@ jobs:
 
       - name: Build (Vite only — react-snap skipped in CI)
         run: npm run sitemap && npx vite build --mode production
+        env:
+          # Without these the bundle throws before React mounts and every page
+          # renders blank. Falls back to placeholders so forks without secrets
+          # still build something that boots.
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY || 'placeholder-anon-key' }}
 
       - name: Run E2E tests
         run: npx playwright test
         env:
           CI: true
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY || 'placeholder-anon-key' }}
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4

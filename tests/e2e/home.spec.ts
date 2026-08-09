@@ -1,5 +1,54 @@
 import { test, expect } from "@playwright/test";
 
+/**
+ * These guard the one failure the rest of this file cannot see: when the app
+ * crashes before React mounts (a missing VITE_SUPABASE_* var is the usual
+ * cause), every page still returns 200 and still carries the <title> from the
+ * static index.html — so title and status-code assertions all pass against a
+ * completely blank page. Assert on React-rendered output instead.
+ */
+test.describe("App boot", () => {
+  const renderingRoutes = ["/", "/trips", "/audio-tours", "/login"];
+
+  for (const route of renderingRoutes) {
+    test(`${route} mounts the app and renders content`, async ({ page }) => {
+      await page.goto(route);
+
+      // Ordered deliberately: the boot-error screen is itself rendered
+      // content, so checking for it first keeps the length assertion below
+      // from passing on a failed boot.
+      await expect(
+        page.getByTestId("boot-error"),
+        `${route} rendered the boot-error screen`,
+      ).toHaveCount(0);
+
+      const root = page.locator("#root");
+      await expect(root).not.toBeEmpty();
+
+      // Chrome rendered by React, independent of any backend data.
+      const text = (await root.innerText()).trim();
+      expect(text.length).toBeGreaterThan(20);
+    });
+  }
+
+  // Data-backed routes render only a spinner when the backend is unreachable,
+  // so assert the weaker property: the bundle mounted at all.
+  test("/regions/:slug mounts without a boot failure", async ({ page }) => {
+    await page.goto("/regions/nile-delta");
+    await expect(page.getByTestId("boot-error")).toHaveCount(0);
+  });
+
+  test("home page loads without an uncaught page error", async ({ page }) => {
+    const pageErrors: string[] = [];
+    page.on("pageerror", (error) => pageErrors.push(error.message));
+
+    await page.goto("/");
+    await expect(page.locator("#root")).not.toBeEmpty();
+
+    expect(pageErrors).toEqual([]);
+  });
+});
+
 test.describe("Home page", () => {
   test("loads and shows Sandal branding", async ({ page }) => {
     await page.goto("/");
