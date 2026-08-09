@@ -179,12 +179,75 @@ const ProductDetail = () => {
         <div>
           <span className="text-lg font-bold text-primary-dark">{product.price} {t("common.egp")}</span>
         </div>
-        <button onClick={() => navigate(`/booking?type=product&id=${product.id}`)} className="flex items-center gap-2 px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated">
+        <button onClick={openOrder} className="flex items-center gap-2 px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated">
           <ShoppingCart className="w-4 h-4" />
-          {lang === "ar" ? "أضف للسلة" : "Add to Cart"}
+          {ar ? "اطلب الآن" : "Order Now"}
         </button>
       </div>
+
+      {/* Order Sheet */}
+      {sheetOpen && (
+        <div className="fixed inset-0 z-[60] flex items-end bg-foreground/40" onClick={() => setSheetOpen(false)}>
+          <div className="w-full bg-background rounded-t-2xl p-4 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-foreground">{ar ? "إتمام الطلب" : "Place Order"}</h3>
+              <button onClick={() => setSheetOpen(false)} className="p-1 text-muted-foreground">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-sm font-semibold text-foreground line-clamp-1">{name}</p>
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">{ar ? "الكمية" : "Quantity"}</span>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center text-foreground"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <span className="text-base font-bold text-foreground w-6 text-center">{qty}</span>
+                <button
+                  onClick={() => setQty((q) => q + 1)}
+                  className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={3}
+              placeholder={ar ? "ملاحظة للبائع (اختياري)" : "Note for the seller (optional)"}
+              className="w-full rounded-xl border border-border bg-surface p-3 text-sm text-foreground placeholder:text-muted-foreground"
+            />
+
+            <div className="flex items-center justify-between border-t border-border pt-3">
+              <span className="text-sm text-muted-foreground">{ar ? "الإجمالي" : "Total"}</span>
+              <span className="text-lg font-bold text-primary-dark">{total.toLocaleString(ar ? "ar-EG" : "en-US")} {t("common.egp")}</span>
+            </div>
+
+            <p className="text-[11px] text-muted-foreground">
+              {ar
+                ? "سيتم إرسال الطلب كغير مدفوع بانتظار تأكيد البائع، ويتم الدفع لاحقاً."
+                : "The order is sent as unpaid and pending seller confirmation. Payment is handled later."}
+            </p>
+
+            <button
+              disabled={submitting}
+              onClick={submitOrder}
+              className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm disabled:opacity-50"
+            >
+              {submitting ? (ar ? "جاري الإرسال..." : "Sending...") : (ar ? "تأكيد الطلب" : "Confirm Order")}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
+
   );
 };
 
