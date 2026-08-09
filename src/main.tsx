@@ -4,6 +4,7 @@ import { initSentry } from '@/lib/monitoring/sentry';
 import { initAnalytics } from '@/lib/analytics/posthog';
 import { installDiagnostics } from '@/lib/diagnostics';
 import { isSupabaseConfigured } from '@/lib/supabaseConfig';
+import { registerServiceWorker } from '@/lib/pwa/registerServiceWorker';
 import "./i18n/config";
 import "./index.css";
 
@@ -66,6 +67,10 @@ const mount = async () => {
   } else {
     createRoot(rootEl).render(app);
   }
+
+  void registerServiceWorker().catch((error) =>
+    console.warn("Service worker registration skipped", error),
+  );
 };
 
 void mount().catch((error) => {
