@@ -74,9 +74,10 @@ const MyOrders = () => {
           <div className="text-center py-16">
             <Package className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <p className="text-sm text-muted-foreground">{ar ? "لا توجد طلبات بعد" : "No orders yet"}</p>
-            <button onClick={() => navigate("/market")} className="mt-4 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold">
+            <button onClick={() => navigate("/")} className="mt-4 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold">
               {ar ? "تسوّق المنتجات" : "Browse products"}
             </button>
+
           </div>
         ) : (
           orders.map((o) => {
