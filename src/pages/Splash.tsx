@@ -280,6 +280,9 @@ const SplashPage = () => {
   const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
   const [selectedBudget, setSelectedBudget] = useState<string | null>(null);
   const [name, setName] = useState("");
+  const [nameAr, setNameAr] = useState("");
+  const [bio, setBio] = useState("");
+  const [avatarFiles, setAvatarFiles] = useState<File[]>([]);
   const [selectedRoleAnswers, setSelectedRoleAnswers] = useState<Record<number, string[]>>({});
   const [roleQuestionIdx, setRoleQuestionIdx] = useState(0);
 
