@@ -3,6 +3,7 @@ import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, Plus, Users, Heart, Calendar, TrendingUp, CheckCircle, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import DailyStatusCard from "@/components/DailyStatusCard";
+import OrgApplicationsList from "@/components/OrgApplicationsList";
 
 const OrganizationDashboard = () => {
   const { lang } = useI18n();
@@ -73,6 +74,9 @@ const OrganizationDashboard = () => {
             <div><span className="text-lg font-bold text-foreground">32K</span><p className="text-[10px] text-muted-foreground">{lang === "ar" ? "تبرعات" : "Donations"}</p></div>
           </div>
         </div>
+
+        {/* Volunteer Applications */}
+        <OrgApplicationsList />
 
         {/* Quick Actions */}
         <div className="space-y-2">
