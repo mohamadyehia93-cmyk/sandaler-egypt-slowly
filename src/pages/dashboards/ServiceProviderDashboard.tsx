@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Bell, Plus, Calendar, Clock, ChevronRight, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
+import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
 
 
@@ -115,6 +116,7 @@ const ServiceProviderDashboard = () => {
         <div className="flex items-center justify-between mb-3">
           <button onClick={() => navigate("/profile")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
           <div className="flex items-center gap-2">
+            <EditProfileHeaderButton />
             <VisitorModeHeaderToggle />
             <button onClick={() => navigate("/inbox")} className="relative p-1"><Bell className="w-5 h-5" /><span className="absolute top-0 right-0 w-2 h-2 bg-destructive rounded-full" /></button>
           </div>
