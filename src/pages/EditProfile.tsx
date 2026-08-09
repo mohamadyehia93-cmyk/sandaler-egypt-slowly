@@ -65,6 +65,22 @@ const asStringArray = (v: unknown): string[] =>
 const asSocial = (v: unknown): Social =>
   v && typeof v === "object" && !Array.isArray(v) ? (v as Social) : {};
 
+/**
+ * The three satellite tables have different shapes, so the generated union type
+ * can't narrow a dynamic table name. Query them through a loose shape instead.
+ */
+type LooseRow = Record<string, unknown>;
+type LooseQuery = {
+  select: (cols: string) => {
+    eq: (col: string, val: string) => { maybeSingle: () => Promise<{ data: LooseRow | null }> };
+  };
+  update: (values: LooseRow) => { eq: (col: string, val: string) => Promise<{ error: { message: string } | null }> };
+  insert: (values: LooseRow) => Promise<{ error: { message: string } | null }>;
+};
+const satQuery = (table: "organizations" | "whos_who" | "culture_actors"): LooseQuery =>
+  supabase.from(table) as unknown as LooseQuery;
+
+
 
 const EditProfile = () => {
   const navigate = useNavigate();
