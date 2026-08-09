@@ -3,6 +3,8 @@ import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, Plus, Package, AlertTriangle, TrendingUp, ShoppingCart, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import DailyStatusCard from "@/components/DailyStatusCard";
+import SellerOrdersList from "@/components/SellerOrdersList";
+
 
 const ProductSellerDashboard = () => {
   const { lang } = useI18n();
@@ -73,18 +75,9 @@ const ProductSellerDashboard = () => {
           ))}
         </div>
 
-        {/* New Orders */}
-        <div onClick={() => navigate("/inbox")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
-          <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-            <ShoppingCart className="w-4 h-4 text-role-product-seller" />
-            {lang === "ar" ? "طلبات جديدة" : "New Orders"}
-            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
-          </h3>
-          <div className="border border-border rounded-lg p-3">
-            <p className="text-xs font-semibold text-foreground">{lang === "ar" ? "مجوهرات بحرية × ٢" : "Sea Jewelry × 2"}</p>
-            <p className="text-[10px] text-muted-foreground">Mohamed Yehia · {lang === "ar" ? "استلام: ٣٠ ديسمبر" : "Pickup: Dec 30"}</p>
-          </div>
-        </div>
+        {/* Incoming Orders (real) */}
+        <SellerOrdersList />
+
 
         <button onClick={() => navigate("/dashboard/product-seller/new-product")} className="w-full bg-role-product-seller text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
           <Plus className="w-4 h-4" /> {lang === "ar" ? "إضافة منتج" : "Add Product"}
