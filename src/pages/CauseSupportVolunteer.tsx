@@ -61,6 +61,7 @@ const CauseSupportVolunteer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang } = useI18n();
+  const { user } = useAuth();
 
   const cause = causes.find((c) => c.id === id);
 
