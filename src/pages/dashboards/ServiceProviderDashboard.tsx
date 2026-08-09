@@ -1,11 +1,14 @@
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Bell, Plus, Calendar, Clock, ChevronRight } from "lucide-react";
+import { ArrowLeft, Bell, Plus, Calendar, Clock, ChevronRight, Check, X } from "lucide-react";
+import { toast } from "sonner";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import DailyStatusCard from "@/components/DailyStatusCard";
+
 
 type ProviderBooking = {
   id: string;
@@ -21,6 +24,9 @@ const ServiceProviderDashboard = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [savingId, setSavingId] = useState<string | null>(null);
+
 
   const { data: listingsCount = 0 } = useQuery({
     queryKey: ["sp-listings-count", user?.id],
@@ -74,6 +80,35 @@ const ServiceProviderDashboard = () => {
   const locale = lang === "ar" ? "ar-EG" : "en-US";
   const title = (b: ProviderBooking) => b.experience ? (lang === "ar" ? b.experience.title_ar : b.experience.title_en) : "—";
 
+  const RESOLVED = ["confirmed", "cancelled", "completed", "refunded", "expired"];
+
+  const updateBookingStatus = async (id: string, status: "confirmed" | "cancelled") => {
+    setSavingId(id);
+    const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
+    setSavingId(null);
+    if (error) {
+      toast.error(lang === "ar" ? "تعذر تحديث الحجز" : "Could not update booking");
+      return;
+    }
+    toast.success(
+      status === "confirmed"
+        ? (lang === "ar" ? "تم تأكيد الحجز" : "Booking accepted")
+        : (lang === "ar" ? "تم رفض الحجز" : "Booking declined")
+    );
+    queryClient.invalidateQueries({ queryKey: ["sp-bookings"] });
+  };
+
+  const statusLabel = (s: string) => {
+    if (s === "confirmed") return lang === "ar" ? "مؤكد" : "Confirmed";
+    if (s === "pending_payment") return lang === "ar" ? "معلق" : "Pending";
+    if (s === "cancelled") return lang === "ar" ? "مرفوض" : "Declined";
+    if (s === "completed") return lang === "ar" ? "مكتمل" : "Completed";
+    if (s === "refunded") return lang === "ar" ? "مسترد" : "Refunded";
+    if (s === "expired") return lang === "ar" ? "منتهي" : "Expired";
+    return s;
+  };
+
+
   return (
     <div className="min-h-screen bg-surface pb-20">
       <header className="bg-role-service-provider text-white px-4 py-4">
@@ -126,19 +161,44 @@ const ServiceProviderDashboard = () => {
           {bookings.length === 0 ? (
             <p className="text-xs text-muted-foreground py-3">{lang === "ar" ? "لا توجد حجوزات بعد" : "No bookings yet"}</p>
           ) : (
-            bookings.slice(0, 8).map((b) => (
-              <div key={b.id} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold text-foreground line-clamp-1">{title(b)}</p>
-                  <p className="text-[10px] text-muted-foreground">
-                    {b.guests} {lang === "ar" ? "أشخاص" : "guests"} · {new Date(b.created_at).toLocaleDateString(locale, { day: "numeric", month: "short" })}
-                  </p>
+            bookings.slice(0, 8).map((b) => {
+              const resolved = RESOLVED.includes(b.status);
+              return (
+                <div key={b.id} className="py-2.5 border-b border-border last:border-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-foreground line-clamp-1">{title(b)}</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {b.guests} {lang === "ar" ? "أشخاص" : "guests"} · {new Date(b.created_at).toLocaleDateString(locale, { day: "numeric", month: "short" })}
+                      </p>
+                    </div>
+                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${b.status === "confirmed" ? "bg-success/10 text-success" : b.status === "pending_payment" ? "bg-warning/10 text-warning" : "bg-muted text-muted-foreground"}`}>
+                      {statusLabel(b.status)}
+                    </span>
+                  </div>
+
+                  {!resolved && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <button
+                        disabled={savingId === b.id}
+                        onClick={() => updateBookingStatus(b.id, "confirmed")}
+                        className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-role-service-provider text-white flex items-center justify-center gap-1 disabled:opacity-50"
+                      >
+                        <Check className="w-3.5 h-3.5" /> {lang === "ar" ? "قبول" : "Accept"}
+                      </button>
+                      <button
+                        disabled={savingId === b.id}
+                        onClick={() => updateBookingStatus(b.id, "cancelled")}
+                        className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
+                      >
+                        <X className="w-3.5 h-3.5" /> {lang === "ar" ? "رفض" : "Decline"}
+                      </button>
+                    </div>
+                  )}
                 </div>
-                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${b.status === "confirmed" ? "bg-success/10 text-success" : b.status === "pending_payment" ? "bg-warning/10 text-warning" : "bg-muted text-muted-foreground"}`}>
-                  {b.status === "confirmed" ? (lang === "ar" ? "مؤكد" : "Confirmed") : b.status === "pending_payment" ? (lang === "ar" ? "معلق" : "Pending") : b.status}
-                </span>
-              </div>
-            ))
+              );
+            })
+
           )}
         </div>
 

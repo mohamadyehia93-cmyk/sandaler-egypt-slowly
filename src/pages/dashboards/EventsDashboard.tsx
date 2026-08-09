@@ -6,15 +6,17 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ArrowLeft, Plus, Pencil, Trash2, Calendar, Users, MapPin, Clock,
-  CalendarCheck, CalendarClock, Send, CheckCircle2, XCircle, FileEdit,
+  CalendarCheck, CalendarClock, Send, CheckCircle2, XCircle, FileEdit, ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   EventRow, isPastEvent, sortEventsUpcomingFirst, eventCategoryKey,
   eventStatusClasses, eventStatusLabel,
 } from "@/lib/eventSort";
+import EventAttendees from "@/components/EventAttendees";
 
 type Filter = "all" | "draft" | "pending" | "published" | "rejected";
+
 
 const EventsDashboard = () => {
   const { lang, t } = useI18n();
@@ -23,6 +25,8 @@ const EventsDashboard = () => {
   const queryClient = useQueryClient();
   const locale = lang === "ar" ? "ar-EG" : "en-US";
   const [filter, setFilter] = useState<Filter>("all");
+  const [openAttendees, setOpenAttendees] = useState<string | null>(null);
+
 
   const { data: isAdmin = false } = useQuery({
     queryKey: ["is-admin", user?.id],
@@ -249,11 +253,23 @@ const EventsDashboard = () => {
                       </button>
                     )}
 
+                    <button
+                      onClick={() => setOpenAttendees(openAttendees === e.id ? null : e.id)}
+                      className="text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-secondary text-foreground flex items-center gap-1"
+                    >
+                      <Users className="w-3.5 h-3.5" />
+                      {lang === "ar" ? "الحضور" : "Attendees"}
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openAttendees === e.id ? "rotate-180" : ""}`} />
+                    </button>
+
                     <button onClick={() => handleDelete(e.id)} className="ms-auto p-2 rounded-lg bg-destructive/10 text-destructive">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
+
+                  {openAttendees === e.id && <EventAttendees eventId={e.id} />}
                 </div>
+
               );
             })
           )}
