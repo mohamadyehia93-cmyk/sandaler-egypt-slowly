@@ -1226,24 +1226,28 @@ export type Database = {
         Row: {
           buyer_id: string
           buyer_note: string | null
+          contact_name: string | null
+          contact_phone: string | null
           created_at: string
           id: string
-          product_id: string | null
+          product_id: string
           quantity: number
-          seller_id: string | null
+          seller_id: string
           status: string
           total_egp: number | null
           unit_price_egp: number | null
           updated_at: string
         }
         Insert: {
-          buyer_id: string
+          buyer_id?: string
           buyer_note?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string
           id?: string
-          product_id?: string | null
+          product_id: string
           quantity?: number
-          seller_id?: string | null
+          seller_id: string
           status?: string
           total_egp?: number | null
           unit_price_egp?: number | null
@@ -1252,11 +1256,13 @@ export type Database = {
         Update: {
           buyer_id?: string
           buyer_note?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string
           id?: string
-          product_id?: string | null
+          product_id?: string
           quantity?: number
-          seller_id?: string | null
+          seller_id?: string
           status?: string
           total_egp?: number | null
           unit_price_egp?: number | null
