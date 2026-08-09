@@ -21,7 +21,10 @@ const ProductDetail = () => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [qty, setQty] = useState(1);
   const [note, setNote] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -59,31 +62,40 @@ const ProductDetail = () => {
     }
     setQty(1);
     setNote("");
+    setContactName(((user.user_metadata as Record<string, unknown>)?.display_name as string) || "");
+    setContactPhone("");
     setSheetOpen(true);
   };
 
+  // Unpaid order request: the seller confirms/declines/fulfils it.
+  // Payment (Stripe) can be layered on later without changing this flow.
+  // seller_id / unit_price_egp / total_egp are set server-side by the
+  // orders_insert_integrity trigger, so they are never trusted from the client.
   const submitOrder = async () => {
     if (!user) return;
+    if (!contactName.trim()) {
+      toast.error(ar ? "يرجى إدخال الاسم" : "Please enter your name");
+      return;
+    }
     setSubmitting(true);
     const { error } = await supabase.from("orders").insert({
       product_id: product.id,
       buyer_id: user.id,
-      seller_id: product.seller_id,
       quantity: qty,
-      unit_price_egp: unitPrice,
-      total_egp: total,
       buyer_note: note.trim() || null,
-      status: "pending",
-    });
+      contact_name: contactName.trim(),
+      contact_phone: contactPhone.trim() || null,
+    } as never);
     setSubmitting(false);
     if (error) {
       toast.error(ar ? "تعذر إنشاء الطلب" : "Could not place the order");
       return;
     }
     setSheetOpen(false);
-    toast.success(ar ? "تم إرسال طلبك للبائع" : "Your order was sent to the seller");
+    toast.success(ar ? "تم إرسال طلبك للبائع" : "Your order request was sent to the seller");
     navigate("/orders");
   };
+
 
 
 
@@ -217,6 +229,22 @@ const ProductDetail = () => {
               </div>
             </div>
 
+            <input
+              value={contactName}
+              onChange={(e) => setContactName(e.target.value)}
+              placeholder={ar ? "الاسم" : "Contact name"}
+              className="w-full rounded-xl border border-border bg-surface p-3 text-sm text-foreground placeholder:text-muted-foreground"
+            />
+
+            <input
+              value={contactPhone}
+              onChange={(e) => setContactPhone(e.target.value)}
+              type="tel"
+              dir="ltr"
+              placeholder={ar ? "رقم الهاتف (اختياري)" : "Phone number (optional)"}
+              className="w-full rounded-xl border border-border bg-surface p-3 text-sm text-foreground placeholder:text-muted-foreground"
+            />
+
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
@@ -224,6 +252,7 @@ const ProductDetail = () => {
               placeholder={ar ? "ملاحظة للبائع (اختياري)" : "Note for the seller (optional)"}
               className="w-full rounded-xl border border-border bg-surface p-3 text-sm text-foreground placeholder:text-muted-foreground"
             />
+
 
             <div className="flex items-center justify-between border-t border-border pt-3">
               <span className="text-sm text-muted-foreground">{ar ? "الإجمالي" : "Total"}</span>

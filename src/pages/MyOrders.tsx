@@ -21,6 +21,8 @@ export const orderStatusLabel = (status: string, ar: boolean) => {
   switch (status) {
     case "pending": return ar ? "بانتظار التأكيد" : "Pending";
     case "confirmed": return ar ? "مؤكد" : "Confirmed";
+    case "declined": return ar ? "مرفوض" : "Declined";
+    case "fulfilled": return ar ? "تم التسليم" : "Fulfilled";
     case "shipped": return ar ? "تم الشحن" : "Shipped";
     case "completed": return ar ? "مكتمل" : "Completed";
     case "cancelled": return ar ? "ملغي" : "Cancelled";
@@ -29,9 +31,10 @@ export const orderStatusLabel = (status: string, ar: boolean) => {
 };
 
 export const orderStatusClasses = (status: string) => {
-  if (status === "confirmed" || status === "completed") return "bg-success/10 text-success";
+  if (status === "confirmed" || status === "completed" || status === "fulfilled") return "bg-success/10 text-success";
   if (status === "shipped") return "bg-primary/10 text-primary";
   if (status === "pending") return "bg-warning/10 text-warning";
+  if (status === "declined") return "bg-destructive/10 text-destructive";
   return "bg-muted text-muted-foreground";
 };
 
