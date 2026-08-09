@@ -106,6 +106,33 @@ const EditProfile = () => {
   const [coverFiles, setCoverFiles] = useState<File[]>([]);
   const [status, setStatus] = useState<string>("draft");
 
+  // role-specific satellite row (organization / whos-who / culture-actor)
+  const [satRole, setSatRole] = useState<SatelliteRole | null>(null);
+  const [satExists, setSatExists] = useState(false);
+  const [sat, setSat] = useState({
+    missionEn: "",
+    missionAr: "",
+    orgWebsite: "",
+    roleEn: "",
+    roleAr: "",
+    meetingTimesEn: "",
+    meetingTimesAr: "",
+    quoteEn: "",
+    quoteAr: "",
+  });
+  const [satLogo, setSatLogo] = useState<string | null>(null);
+  const [satLogoFiles, setSatLogoFiles] = useState<File[]>([]);
+  const [focusAreas, setFocusAreas] = useState<string[]>([]);
+  const [focusDraft, setFocusDraft] = useState("");
+  const [interests, setInterests] = useState<string[]>([]);
+  const [interestDraft, setInterestDraft] = useState("");
+  const [expertise, setExpertise] = useState<string[]>([]);
+  const [expertiseDraft, setExpertiseDraft] = useState("");
+  const [satSocial, setSatSocial] = useState<Social>({});
+
+  const setS = (k: keyof typeof sat, v: string) => setSat((p) => ({ ...p, [k]: v }));
+
+
   // visitor form
   const [vName, setVName] = useState("");
   const [vBio, setVBio] = useState("");
