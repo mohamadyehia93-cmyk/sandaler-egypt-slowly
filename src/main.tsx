@@ -30,11 +30,18 @@ const renderConfigError = () => {
     <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Cairo,sans-serif;background:#FAFAF8;color:#1A1A1A;text-align:center">
       <div style="max-width:420px">
         <h1 style="font-size:20px;font-weight:700;margin:0 0 8px">Backend configuration missing</h1>
-        <p style="font-size:14px;line-height:1.6;margin:0 0 16px">
+        <p style="font-size:14px;line-height:1.6;margin:0 0 16px;color:#4A4A4A">
           This build is missing its backend URL or key, so the app cannot start.
           Re-publish the project to restore the configuration.
         </p>
-        <button onclick="window.location.reload()" style="background:#2BBFB3;color:#fff;border:0;border-radius:12px;padding:10px 20px;font-size:14px;font-weight:600">Reload</button>
+        <div dir="rtl" style="border-top:1px solid #E5E3DE;padding-top:16px;margin-bottom:16px">
+          <h2 style="font-size:18px;font-weight:700;margin:0 0 8px">إعدادات الخدمة الخلفية غير متوفرة</h2>
+          <p style="font-size:14px;line-height:1.7;margin:0;color:#4A4A4A">
+            هذه النسخة تفتقد رابط أو مفتاح الخدمة الخلفية، لذلك لا يمكن تشغيل التطبيق.
+            أعد نشر المشروع لاستعادة الإعدادات.
+          </p>
+        </div>
+        <button onclick="window.location.reload()" style="background:#2BBFB3;color:#fff;border:0;border-radius:12px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer">Reload · إعادة التحميل</button>
       </div>
     </div>`;
 };
