@@ -31,6 +31,7 @@ const OrganizationDetail = lazy(() => import("./pages/OrganizationDetail.tsx"));
 const Wishlists = lazy(() => import("./pages/Wishlists.tsx"));
 const Inbox = lazy(() => import("./pages/Inbox.tsx"));
 const Profile = lazy(() => import("./pages/Profile.tsx"));
+const EditProfile = lazy(() => import("./pages/EditProfile.tsx"));
 const RegionDetail = lazy(() => import("./pages/RegionDetail.tsx"));
 const RegionPage = lazy(() => import("./pages/RegionPage.tsx"));
 const CityDetail = lazy(() => import("./pages/CityDetail.tsx"));
@@ -192,6 +193,7 @@ const App = () => {
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/edit-profile" element={<EditProfile />} />
             <Route path="/profile/impact" element={<ImpactDashboard />} />
             <Route path="/profile/badges" element={<BadgesQuests />} />
             <Route path="/profile/settings" element={<Settings />} />

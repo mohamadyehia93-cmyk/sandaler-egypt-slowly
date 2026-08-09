@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, MapPin, ChevronRight, LogOut, LogIn, Bookmark, Briefcase } from "lucide-react";
+import { User, MapPin, ChevronRight, LogOut, LogIn, Bookmark, Briefcase, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -142,6 +142,13 @@ const Profile = () => {
             <span className="w-2 h-2 rounded-full bg-primary" />
             <span className="text-xs font-medium text-primary">{roleLabels[role]?.[lang] || t("profile.explorer")}</span>
           </div>
+          <button
+            onClick={() => navigate("/edit-profile")}
+            className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-primary border border-primary/30 rounded-full px-3 py-1.5"
+          >
+            <Pencil className="w-3 h-3" />
+            {lang === "ar" ? "تعديل الملف الشخصي" : "Edit profile"}
+          </button>
         </div>
 
         <VisitorModeProfileToggle />

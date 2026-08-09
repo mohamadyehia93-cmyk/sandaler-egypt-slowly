@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, Plus, Users, Heart, Calendar, TrendingUp, CheckCircle, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
+import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
 import OrgApplicationsList from "@/components/OrgApplicationsList";
 
@@ -29,6 +30,7 @@ const OrganizationDashboard = () => {
         <div className="flex items-center justify-between mb-3">
           <button onClick={() => navigate("/profile")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
           <div className="flex items-center gap-2">
+            <EditProfileHeaderButton />
             <VisitorModeHeaderToggle />
             <button onClick={() => navigate("/inbox")} className="relative p-1"><Bell className="w-5 h-5" /></button>
           </div>
