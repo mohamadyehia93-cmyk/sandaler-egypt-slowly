@@ -82,7 +82,10 @@ const MyBookings = () => {
                   : b.status === "pending_payment" ? (lang === "ar" ? "بانتظار الدفع" : "Pending")
                   : b.status === "refunded" ? (lang === "ar" ? "مسترد" : "Refunded")
                   : b.status === "expired" ? (lang === "ar" ? "منتهٍ" : "Expired")
+                  : b.status === "cancelled" ? (lang === "ar" ? "مرفوض" : "Declined")
+                  : b.status === "completed" ? (lang === "ar" ? "مكتمل" : "Completed")
                   : b.status}
+
               </span>
             </div>
           ))
