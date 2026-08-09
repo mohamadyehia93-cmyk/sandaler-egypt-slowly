@@ -1720,27 +1720,39 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          budget: string | null
+          cities: string[] | null
           created_at: string
           display_name: string | null
           id: string
+          interests: string[] | null
+          travel_style: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          budget?: string | null
+          cities?: string[] | null
           created_at?: string
           display_name?: string | null
           id?: string
+          interests?: string[] | null
+          travel_style?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          budget?: string | null
+          cities?: string[] | null
           created_at?: string
           display_name?: string | null
           id?: string
+          interests?: string[] | null
+          travel_style?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1858,6 +1870,8 @@ export type Database = {
           bio_en: string | null
           city_ar: string | null
           city_en: string | null
+          contact_email: string | null
+          contact_phone: string | null
           cover_image: string | null
           created_at: string
           followers: number | null
@@ -1871,6 +1885,7 @@ export type Database = {
           review_count: number | null
           role: string
           slug: string | null
+          social_links: Json | null
           specialties: Json | null
           status: string | null
           tagline_ar: string | null
@@ -1878,6 +1893,8 @@ export type Database = {
           updated_at: string
           user_id: string | null
           verified: boolean | null
+          website: string | null
+          whatsapp: string | null
           years_active: number | null
         }
         Insert: {
@@ -1886,6 +1903,8 @@ export type Database = {
           bio_en?: string | null
           city_ar?: string | null
           city_en?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
           cover_image?: string | null
           created_at?: string
           followers?: number | null
@@ -1899,6 +1918,7 @@ export type Database = {
           review_count?: number | null
           role?: string
           slug?: string | null
+          social_links?: Json | null
           specialties?: Json | null
           status?: string | null
           tagline_ar?: string | null
@@ -1906,6 +1926,8 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
           verified?: boolean | null
+          website?: string | null
+          whatsapp?: string | null
           years_active?: number | null
         }
         Update: {
@@ -1914,6 +1936,8 @@ export type Database = {
           bio_en?: string | null
           city_ar?: string | null
           city_en?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
           cover_image?: string | null
           created_at?: string
           followers?: number | null
@@ -1927,6 +1951,7 @@ export type Database = {
           review_count?: number | null
           role?: string
           slug?: string | null
+          social_links?: Json | null
           specialties?: Json | null
           status?: string | null
           tagline_ar?: string | null
@@ -1934,6 +1959,8 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
           verified?: boolean | null
+          website?: string | null
+          whatsapp?: string | null
           years_active?: number | null
         }
         Relationships: []
