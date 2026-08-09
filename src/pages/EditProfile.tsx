@@ -735,7 +735,147 @@ const EditProfile = () => {
                 </div>
               ))}
             </div>
+
+            {/* Role-specific profile (only for roles that own a satellite row) */}
+            {satRole === "organization" && (
+              <div className={cardClass}>
+                <p className="text-sm font-semibold text-foreground">
+                  {ar ? "ملف المنظمة" : "Organization profile"}
+                </p>
+                <div>
+                  <label className={labelClass}>{ar ? "شعار المنظمة" : "Organization logo"}</label>
+                  <PhotoPicker
+                    files={satLogoFiles}
+                    onChange={setSatLogoFiles}
+                    max={1}
+                    hint={ar ? "صورة واحدة" : "One photo"}
+                    existing={satLogo ? [satLogo] : []}
+                    onRemoveExisting={() => setSatLogo(null)}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "الرسالة (إنجليزي)" : "Mission (English)"}</label>
+                  <textarea className={`${inputClass} min-h-[80px] resize-none`} value={sat.missionEn} onChange={(e) => setS("missionEn", e.target.value)} maxLength={600} />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "الرسالة (عربي)" : "Mission (Arabic)"}</label>
+                  <textarea className={`${inputClass} min-h-[80px] resize-none`} value={sat.missionAr} onChange={(e) => setS("missionAr", e.target.value)} maxLength={600} dir="rtl" />
+                </div>
+                <div>
+                  <label className={labelClass}><Globe className="w-3.5 h-3.5 text-primary" />{ar ? "موقع المنظمة" : "Organization website"}</label>
+                  <input className={inputClass} placeholder="https://" dir="ltr" value={sat.orgWebsite} onChange={(e) => setS("orgWebsite", e.target.value)} />
+                </div>
+                <ChipEditor
+                  label={ar ? "مجالات التركيز" : "Focus areas"}
+                  placeholder={ar ? "أضف مجالاً" : "Add a focus area"}
+                  items={focusAreas}
+                  setItems={setFocusAreas}
+                  draft={focusDraft}
+                  setDraft={setFocusDraft}
+                  ar={ar}
+                />
+              </div>
+            )}
+
+            {satRole === "whos-who" && (
+              <div className={cardClass}>
+                <p className="text-sm font-semibold text-foreground">
+                  {ar ? "ملف دليل الأهالي" : "Who's Who entry"}
+                </p>
+                <div>
+                  <label className={labelClass}>{ar ? "الصورة" : "Photo"}</label>
+                  <PhotoPicker
+                    files={satLogoFiles}
+                    onChange={setSatLogoFiles}
+                    max={1}
+                    hint={ar ? "صورة واحدة" : "One photo"}
+                    existing={satLogo ? [satLogo] : []}
+                    onRemoveExisting={() => setSatLogo(null)}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "الدور / المسمى (إنجليزي)" : "Role / title (English)"}</label>
+                  <input className={inputClass} value={sat.roleEn} onChange={(e) => setS("roleEn", e.target.value)} maxLength={120} />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "الدور / المسمى (عربي)" : "Role / title (Arabic)"}</label>
+                  <input className={inputClass} value={sat.roleAr} onChange={(e) => setS("roleAr", e.target.value)} maxLength={120} dir="rtl" />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "أوقات اللقاء (إنجليزي)" : "Meeting times (English)"}</label>
+                  <input className={inputClass} placeholder={ar ? "مثال: أيام الجمعة صباحاً" : "e.g. Friday mornings"} value={sat.meetingTimesEn} onChange={(e) => setS("meetingTimesEn", e.target.value)} />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "أوقات اللقاء (عربي)" : "Meeting times (Arabic)"}</label>
+                  <input className={inputClass} value={sat.meetingTimesAr} onChange={(e) => setS("meetingTimesAr", e.target.value)} dir="rtl" />
+                </div>
+                <ChipEditor
+                  label={ar ? "الاهتمامات" : "Interests"}
+                  placeholder={ar ? "أضف اهتماماً" : "Add an interest"}
+                  items={interests}
+                  setItems={setInterests}
+                  draft={interestDraft}
+                  setDraft={setInterestDraft}
+                  ar={ar}
+                />
+              </div>
+            )}
+
+            {satRole === "culture-actor" && (
+              <div className={cardClass}>
+                <p className="text-sm font-semibold text-foreground">
+                  {ar ? "ملف فاعل الثقافة" : "Culture actor profile"}
+                </p>
+                <div>
+                  <label className={labelClass}>{ar ? "الصورة" : "Photo"}</label>
+                  <PhotoPicker
+                    files={satLogoFiles}
+                    onChange={setSatLogoFiles}
+                    max={1}
+                    hint={ar ? "صورة واحدة" : "One photo"}
+                    existing={satLogo ? [satLogo] : []}
+                    onRemoveExisting={() => setSatLogo(null)}
+                  />
+                </div>
+                <ChipEditor
+                  label={ar ? "مجالات الخبرة" : "Expertise"}
+                  placeholder={ar ? "أضف مجال خبرة" : "Add an expertise"}
+                  items={expertise}
+                  setItems={setExpertise}
+                  draft={expertiseDraft}
+                  setDraft={setExpertiseDraft}
+                  ar={ar}
+                />
+                <div>
+                  <label className={labelClass}>{ar ? "اقتباس (إنجليزي)" : "Quote (English)"}</label>
+                  <textarea className={`${inputClass} min-h-[70px] resize-none`} value={sat.quoteEn} onChange={(e) => setS("quoteEn", e.target.value)} maxLength={300} />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "اقتباس (عربي)" : "Quote (Arabic)"}</label>
+                  <textarea className={`${inputClass} min-h-[70px] resize-none`} value={sat.quoteAr} onChange={(e) => setS("quoteAr", e.target.value)} maxLength={300} dir="rtl" />
+                </div>
+                <p className="text-xs text-muted-foreground">{ar ? "روابط التواصل الخاصة بملف الثقافة" : "Social links for this culture profile"}</p>
+                {([
+                  ["instagram", "Instagram", Instagram],
+                  ["facebook", "Facebook", Facebook],
+                  ["youtube", "YouTube", Youtube],
+                  ["x", "X", Globe],
+                ] as const).map(([key, label, Icon]) => (
+                  <div key={key}>
+                    <label className={labelClass}><Icon className="w-3.5 h-3.5 text-primary" />{label}</label>
+                    <input
+                      className={inputClass}
+                      placeholder="https://"
+                      dir="ltr"
+                      value={satSocial[key] || ""}
+                      onChange={(e) => setSatSocial((p) => ({ ...p, [key]: e.target.value }))}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </>
+
         ) : (
           /* Visitor variant — same route, lighter form on the profiles row */
           <div className={cardClass}>
