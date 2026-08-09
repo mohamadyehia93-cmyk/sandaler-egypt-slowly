@@ -3,6 +3,7 @@ import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, Plus, BookOpen, GraduationCap, Library, TrendingUp, Download, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import DailyStatusCard from "@/components/DailyStatusCard";
+import SessionRequestsList from "@/components/SessionRequestsList";
 
 const SubjectExpertDashboard = () => {
   const { lang } = useI18n();
