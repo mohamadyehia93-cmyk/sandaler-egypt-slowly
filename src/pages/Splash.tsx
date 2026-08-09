@@ -171,6 +171,32 @@ const roleQuestions: Record<string, RoleQuestion[]> = {
       multi: true,
     },
   ],
+  "narrator": [
+    {
+      title: { en: "What do you narrate?", ar: "ماذا تروي؟" },
+      subtitle: { en: "Select your audio topics", ar: "اختر مواضيعك الصوتية" },
+      options: [
+        { key: "heritage-audio", icon: Landmark, label: { en: "Heritage & History", ar: "تراث وتاريخ" } },
+        { key: "city-walks", icon: Compass, label: { en: "City Walks", ar: "مشي في المدينة" } },
+        { key: "nature-audio", icon: Leaf, label: { en: "Nature Trails", ar: "مسارات طبيعية" } },
+        { key: "folklore-audio", icon: Music, label: { en: "Folklore & Music", ar: "فلكلور وموسيقى" } },
+        { key: "food-audio", icon: UtensilsCrossed, label: { en: "Food Stories", ar: "قصص الطعام" } },
+        { key: "oral-history", icon: Mic, label: { en: "Oral Histories", ar: "تاريخ شفوي" } },
+      ],
+      multi: true,
+    },
+    {
+      title: { en: "Which languages do you narrate in?", ar: "بأي لغات تروي؟" },
+      subtitle: { en: "Select all that apply", ar: "اختر كل ما ينطبق" },
+      options: [
+        { key: "narrate-ar", icon: Globe, label: { en: "Arabic", ar: "العربية" } },
+        { key: "narrate-en", icon: Globe, label: { en: "English", ar: "الإنجليزية" } },
+        { key: "narrate-fr", icon: Globe, label: { en: "French", ar: "الفرنسية" } },
+        { key: "narrate-de", icon: Globe, label: { en: "German", ar: "الألمانية" } },
+      ],
+      multi: true,
+    },
+  ],
 };
 
 const topRoles = [
