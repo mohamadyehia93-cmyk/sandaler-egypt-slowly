@@ -3,6 +3,7 @@ import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, User, MessageSquare, Calendar, ToggleRight, Clock, Plus, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import DailyStatusCard from "@/components/DailyStatusCard";
+import SessionRequestsList from "@/components/SessionRequestsList";
 
 const WhosWhoDashboard = () => {
   const { lang } = useI18n();
@@ -36,6 +37,8 @@ const WhosWhoDashboard = () => {
 
       <div className="px-4 py-4 space-y-4">
         <DailyStatusCard accentBg="bg-role-whos-who" accentText="text-role-whos-who" />
+
+        <SessionRequestsList accentText="text-role-whos-who" />
 
         {/* Profile Completeness */}
         <div onClick={() => navigate("/profile")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">

@@ -103,6 +103,7 @@ const Profile = () => {
     { label: lang === "ar" ? "تذاكري" : "My Tickets", path: "/tickets" },
     { label: lang === "ar" ? "طلباتي" : "My Orders", path: "/orders" },
     { label: lang === "ar" ? "طلبات التطوع" : "My Applications", path: "/applications" },
+    { label: lang === "ar" ? "طلبات الجلسات" : "My Session Requests", path: "/session-requests" },
     { label: t("profile.impact_dashboard"), path: "/profile/impact" },
     { label: t("profile.badges_quests"), path: "/profile/badges" },
     { label: t("profile.settings"), path: "/profile/settings" },

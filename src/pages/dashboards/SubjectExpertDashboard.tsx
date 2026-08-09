@@ -3,6 +3,7 @@ import { useI18n } from "@/lib/i18n";
 import { ArrowLeft, Bell, Plus, BookOpen, GraduationCap, Library, TrendingUp, Download, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import DailyStatusCard from "@/components/DailyStatusCard";
+import SessionRequestsList from "@/components/SessionRequestsList";
 
 const SubjectExpertDashboard = () => {
   const { lang } = useI18n();
@@ -73,20 +74,9 @@ const SubjectExpertDashboard = () => {
           <span className="text-xs font-medium text-foreground">{lang === "ar" ? "اتفاقية الترخيص نشطة" : "Licensing Agreement Active"}</span>
         </div>
 
-        {/* Collaboration Inbox */}
-        <div onClick={() => navigate("/inbox")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
-          <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-            {lang === "ar" ? "طلبات تعاون" : "Collaboration Requests"}
-            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
-          </h3>
-          <div className="border border-border rounded-lg p-3">
-            <p className="text-xs font-semibold text-foreground">{lang === "ar" ? "أحمد حسن يريد التعاون في مجموعة عن رشيد" : "Ahmed Hassan wants to co-author a Rosetta collection"}</p>
-            <div className="flex gap-2 mt-2">
-              <button onClick={(e) => e.stopPropagation()} className="text-[10px] font-semibold bg-role-subject-expert text-white px-3 py-1.5 rounded-md">{lang === "ar" ? "قبول" : "Accept"}</button>
-              <button onClick={(e) => e.stopPropagation()} className="text-[10px] font-semibold border border-border text-foreground px-3 py-1.5 rounded-md">{lang === "ar" ? "رفض" : "Decline"}</button>
-            </div>
-          </div>
-        </div>
+        {/* Session Requests */}
+        <SessionRequestsList accentText="text-role-subject-expert" />
+
 
         <div className="space-y-2">
           <button onClick={() => navigate("/dashboard/subject-expert/new-collection")} className="w-full bg-role-subject-expert text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
