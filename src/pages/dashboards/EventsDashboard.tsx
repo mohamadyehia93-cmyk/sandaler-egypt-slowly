@@ -25,6 +25,8 @@ const EventsDashboard = () => {
   const queryClient = useQueryClient();
   const locale = lang === "ar" ? "ar-EG" : "en-US";
   const [filter, setFilter] = useState<Filter>("all");
+  const [openAttendees, setOpenAttendees] = useState<string | null>(null);
+
 
   const { data: isAdmin = false } = useQuery({
     queryKey: ["is-admin", user?.id],
