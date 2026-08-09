@@ -16,14 +16,21 @@ import {
   useFollowerCount,
 } from "@/hooks/useFollows";
 
-const OrganizationDetail = () => {
-  const { id } = useParams();
+type Cause = (typeof causes)[number];
+
+/**
+ * Split from the route component so that every hook below runs on every
+ * render. Previously the "organization not found" early return sat above
+ * useIsFollowing/useToggleFollow/useFollowerCount, so navigating from a valid
+ * organization to an unknown id re-rendered this component with fewer hooks
+ * than the previous render and React threw "Rendered fewer hooks than
+ * expected" instead of showing the not-found view.
+ */
+const OrganizationDetailView = ({ cause }: { cause: Cause }) => {
   const navigate = useNavigate();
   const { lang, t } = useI18n();
   const { user } = useAuth();
 
-  const cause = causes.find((c) => c.id === id);
-  if (!cause) return <NotFoundView context="organization" />;
   const region = regions.find((r) => r.id === cause.regionId);
   const org = cause.org;
 
@@ -410,6 +417,16 @@ const OrganizationDetail = () => {
       </div>
     </div>
   );
+};
+
+const OrganizationDetail = () => {
+  const { id } = useParams();
+  const cause = causes.find((c) => c.id === id);
+  if (!cause) return <NotFoundView context="organization" />;
+
+  // key: remount the view when switching organizations, so its follow-state
+  // hooks re-initialise against the new target rather than carrying over.
+  return <OrganizationDetailView key={cause.id} cause={cause} />;
 };
 
 export default OrganizationDetail;
