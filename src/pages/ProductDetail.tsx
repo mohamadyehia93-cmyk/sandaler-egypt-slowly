@@ -21,7 +21,10 @@ const ProductDetail = () => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [qty, setQty] = useState(1);
   const [note, setNote] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
