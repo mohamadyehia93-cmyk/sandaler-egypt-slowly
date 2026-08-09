@@ -73,8 +73,39 @@ export default defineConfig(({ mode }) => {
       },
       workbox: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        // Precache hashed build assets only — never the HTML shell.
+        globPatterns: ["**/*.{js,css,woff,woff2,png,svg,ico}"],
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        // Navigations must always hit the network first so a new publish is picked up.
+        navigateFallback: null,
         runtimeCaching: [
           {
+            // App shell / navigations: network-first, cache only as offline fallback.
+            urlPattern: ({ request, url }) =>
+              request.mode === "navigate" && !url.pathname.startsWith("/~oauth"),
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "html-shell-cache",
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 20 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // Hashed JS/CSS: safe to serve from cache for speed.
+            urlPattern: ({ request, sameOrigin }) =>
+              sameOrigin && (request.destination === "script" || request.destination === "style"),
+            handler: "CacheFirst",
+            options: {
+              cacheName: "static-assets-cache",
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "CacheFirst",
             options: {
