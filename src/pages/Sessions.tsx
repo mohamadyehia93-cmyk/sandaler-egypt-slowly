@@ -6,7 +6,7 @@ import { useMeetups } from "@/hooks/useListings";
 import BottomNav from "@/components/BottomNav";
 import SessionRequestForm from "@/components/SessionRequestForm";
 import { Skeleton } from "@/components/ui/skeleton";
-import SEO from "@/components/SEO";
+import { SEO } from "@/components/SEO";
 
 const Sessions = () => {
   const { lang } = useI18n();
