@@ -62,6 +62,8 @@ const EventTicketReceipt = lazy(() => import("./pages/EventTicketReceipt.tsx"));
 const MyTickets = lazy(() => import("./pages/MyTickets.tsx"));
 const MyOrders = lazy(() => import("./pages/MyOrders.tsx"));
 const MyApplications = lazy(() => import("./pages/MyApplications.tsx"));
+const Sessions = lazy(() => import("./pages/Sessions.tsx"));
+const MySessionRequests = lazy(() => import("./pages/MySessionRequests.tsx"));
 const NewEvent = lazy(() => import("./pages/dashboards/NewEvent.tsx"));
 const MyEvents = lazy(() => import("./pages/dashboards/MyEvents.tsx"));
 const EventsDashboard = lazy(() => import("./pages/dashboards/EventsDashboard.tsx"));
