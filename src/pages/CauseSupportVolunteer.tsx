@@ -111,6 +111,11 @@ const CauseSupportVolunteer = () => {
   };
 
   const handleExpress = (index: number) => {
+    if (!user) {
+      toast.error(lang === "ar" ? "يرجى تسجيل الدخول للتطوع" : "Please sign in to volunteer");
+      navigate("/login");
+      return;
+    }
     setSelectedOpp(index);
     setStep("form");
   };
@@ -120,13 +125,49 @@ const CauseSupportVolunteer = () => {
     setStep("review");
   };
 
-  const handleConfirm = () => {
+  // The organization owner (org_owner_id) and status are set server-side by the
+  // volunteer_applications_insert_integrity trigger, so they are never trusted
+  // from the client.
+  const handleConfirm = async () => {
+    if (!user || !opp) return;
     setSubmitting(true);
-    setTimeout(() => {
+
+    // The route param is the cause slug; resolve it to the real causes row id.
+    const { data: causeRow, error: causeError } = await supabase
+      .from("causes")
+      .select("id")
+      .or(`slug.eq.${id},id.eq.${id}`)
+      .maybeSingle();
+
+    if (causeError || !causeRow) {
       setSubmitting(false);
-      setStep("success");
-    }, 2000);
+      toast.error(lang === "ar" ? "تعذر العثور على القضية" : "Could not find this cause");
+      return;
+    }
+
+    const skillsLine = selectedSkills.length
+      ? `\n${lang === "ar" ? "المهارات" : "Skills"}: ${selectedSkills.join(", ")}`
+      : "";
+
+    const { error } = await supabase.from("volunteer_applications").insert({
+      cause_id: causeRow.id,
+      applicant_id: user.id,
+      full_name: fullName.trim(),
+      contact_email: email.trim(),
+      contact_phone: phone.trim(),
+      availability: `${startDate} · ${opp.duration[lang]}`,
+      message: `${opp.title[lang]}\n${motivation.trim()}${skillsLine}`,
+    });
+
+    setSubmitting(false);
+    if (error) {
+      toast.error(lang === "ar" ? "تعذر إرسال الطلب" : "Could not submit your application");
+      return;
+    }
+    toast.success(lang === "ar" ? "تم إرسال طلب التطوع" : "Volunteer application sent");
+    setStep("success");
   };
+
 
   const handleBack = () => {
     if (step === "form") { setStep("browse"); setSelectedOpp(null); }
