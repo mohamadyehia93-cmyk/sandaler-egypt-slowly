@@ -423,6 +423,9 @@ const PostDetail = () => {
           </div>
         </div>
       )}
+
+      {/* Comments */}
+      <PostComments postKey={post.id} />
     </div>
   );
 };
