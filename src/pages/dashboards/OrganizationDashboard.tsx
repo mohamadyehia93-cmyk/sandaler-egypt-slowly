@@ -75,6 +75,9 @@ const OrganizationDashboard = () => {
           </div>
         </div>
 
+        {/* Volunteer Applications */}
+        <OrgApplicationsList />
+
         {/* Quick Actions */}
         <div className="space-y-2">
           <button onClick={() => navigate("/dashboard/organization/new-program")} className="w-full bg-role-organization text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
