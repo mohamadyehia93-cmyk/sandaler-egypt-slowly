@@ -80,6 +80,73 @@ type LooseQuery = {
 const satQuery = (table: "organizations" | "whos_who" | "culture_actors"): LooseQuery =>
   supabase.from(table) as unknown as LooseQuery;
 
+const chipInputClass =
+  "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40";
+
+/** Small add/remove tag editor, matching the specialties chips in this screen. */
+const ChipEditor = ({
+  label,
+  placeholder,
+  items,
+  setItems,
+  draft,
+  setDraft,
+  ar,
+}: {
+  label: string;
+  placeholder: string;
+  items: string[];
+  setItems: React.Dispatch<React.SetStateAction<string[]>>;
+  draft: string;
+  setDraft: (v: string) => void;
+  ar: boolean;
+}) => {
+  const add = () => {
+    const v = draft.trim();
+    if (!v || items.includes(v)) return setDraft("");
+    setItems((p) => [...p, v]);
+    setDraft("");
+  };
+  return (
+    <div className="space-y-2">
+      <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+        <Sparkles className="w-3.5 h-3.5 text-primary" />
+        {label}
+      </label>
+      {items.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {items.map((s) => (
+            <span key={s} className="flex items-center gap-1 bg-primary/10 text-primary text-xs font-medium rounded-full px-3 py-1.5">
+              {s}
+              <button type="button" onClick={() => setItems((p) => p.filter((x) => x !== s))} aria-label={ar ? "إزالة" : "Remove"}>
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="flex gap-2">
+        <input
+          className={chipInputClass}
+          placeholder={placeholder}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              add();
+            }
+          }}
+        />
+        <Button type="button" variant="outline" size="icon" onClick={add} aria-label={ar ? "إضافة" : "Add"}>
+          <Plus className="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+
 
 
 const EditProfile = () => {
