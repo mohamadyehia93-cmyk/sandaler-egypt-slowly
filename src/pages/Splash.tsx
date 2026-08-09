@@ -6,6 +6,9 @@ import { type UserRole, type LocalRole } from "@/hooks/useUserRole";
 import { useRegions, useCities } from "@/hooks/useListings";
 import { useAuth } from "@/hooks/useAuth";
 import { becomeProvider } from "@/lib/becomeProvider";
+import { uploadImages } from "@/lib/dashboardForms";
+import { supabase } from "@/integrations/supabase/client";
+import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import { toast } from "sonner";
 import {
   User, Pen, Briefcase, Home, Truck, Map, ShoppingBag, Building2, Shield,
