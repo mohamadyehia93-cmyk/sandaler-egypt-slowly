@@ -281,7 +281,73 @@ const EditProfile = () => {
 
   const canPublish = !!(f.bioEn.trim() || f.bioAr.trim() || avatarUrl || avatarFiles.length);
 
+  /** Upsert the satellite row for this role; returns an error message or null. */
+  const saveSatellite = async (r: SatelliteRole, providerAvatar: string | null): Promise<string | null> => {
+    if (!user) return null;
+    let logo = satLogo;
+    if (satLogoFiles.length) {
+      const [url] = await uploadImages(satLogoFiles, user.id, "profile-photos");
+      logo = url || logo;
+    }
+    const nameEn = f.nameEn.trim();
+    const nameAr = f.nameAr.trim() || nameEn; // satellite tables require name_ar
+
+    let values: LooseRow = {};
+    if (r === "organization") {
+      values = {
+        name_en: nameEn,
+        name_ar: nameAr,
+        logo: logo || providerAvatar || null,
+        mission_en: sat.missionEn.trim() || null,
+        mission_ar: sat.missionAr.trim() || null,
+        website: sat.orgWebsite.trim() || null,
+        focus_areas_en: focusAreas,
+        location_en: f.cityEn || null,
+        location_ar: f.cityAr || null,
+      };
+    } else if (r === "whos-who") {
+      values = {
+        name_en: nameEn,
+        name_ar: nameAr,
+        image: logo || providerAvatar || null,
+        role_en: sat.roleEn.trim() || null,
+        role_ar: sat.roleAr.trim() || null,
+        meeting_times_en: sat.meetingTimesEn.trim() || null,
+        meeting_times_ar: sat.meetingTimesAr.trim() || null,
+        interests_en: interests,
+        bio_en: f.bioEn.trim() || null,
+        bio_ar: f.bioAr.trim() || null,
+      };
+    } else {
+      values = {
+        name_en: nameEn,
+        name_ar: nameAr,
+        image: logo || providerAvatar || null,
+        expertise_en: expertise,
+        quote_en: sat.quoteEn.trim() || null,
+        quote_ar: sat.quoteAr.trim() || null,
+        social_links: satSocial,
+        bio_en: f.bioEn.trim() || null,
+        bio_ar: f.bioAr.trim() || null,
+      };
+    }
+
+    const table = SATELLITE_TABLE[r];
+    const owner = OWNER_COL[r];
+    if (satExists) {
+      const { error } = await satQuery(table).update(values).eq(owner, user.id);
+      return error?.message ?? null;
+    }
+    const { error } = await satQuery(table).insert({
+      ...values,
+      [owner]: user.id,
+      status: "published",
+    });
+    return error?.message ?? null;
+  };
+
   const saveProvider = async (nextStatus?: string) => {
+
     if (!user || !provider) return;
     if (!f.nameEn.trim()) {
       toast.error(ar ? "الاسم مطلوب" : "Name is required");
