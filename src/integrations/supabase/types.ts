@@ -2340,6 +2340,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_experience_provider: {
+        Args: { _experience_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
