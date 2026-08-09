@@ -6,15 +6,17 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ArrowLeft, Plus, Pencil, Trash2, Calendar, Users, MapPin, Clock,
-  CalendarCheck, CalendarClock, Send, CheckCircle2, XCircle, FileEdit,
+  CalendarCheck, CalendarClock, Send, CheckCircle2, XCircle, FileEdit, ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   EventRow, isPastEvent, sortEventsUpcomingFirst, eventCategoryKey,
   eventStatusClasses, eventStatusLabel,
 } from "@/lib/eventSort";
+import EventAttendees from "@/components/EventAttendees";
 
 type Filter = "all" | "draft" | "pending" | "published" | "rejected";
+
 
 const EventsDashboard = () => {
   const { lang, t } = useI18n();
