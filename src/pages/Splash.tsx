@@ -331,6 +331,17 @@ const SplashPage = () => {
   const roleAnswerKeys = () =>
     Object.values(selectedRoleAnswers).flat().filter(Boolean);
 
+  /** Readable labels for the same answers — used to seed satellite profiles. */
+  const roleAnswerLabels = () => {
+    if (!selectedRole) return [];
+    const questions = roleQuestions[selectedRole] || [];
+    const keys = new Set(roleAnswerKeys());
+    return questions
+      .flatMap((q) => q.options)
+      .filter((o) => keys.has(o.key))
+      .map((o) => o.label.en);
+  };
+
   const narratedLanguages = () => {
     const map: Record<string, string> = {
       "narrate-ar": "Arabic",
@@ -341,6 +352,7 @@ const SplashPage = () => {
     const langs = roleAnswerKeys().map((k) => map[k]).filter(Boolean);
     return langs.length ? langs.join(", ") : null;
   };
+
 
   const completeProvider = async (role: LocalRole, withDetails = true) => {
     let avatarUrl: string | null = null;
@@ -365,14 +377,18 @@ const SplashPage = () => {
             bioEn: bio,
             cityEn: city?.name_en ?? null,
             cityAr: city?.name_ar ?? null,
+            cityId: city?.id ?? null,
             regionEn: region?.name_en ?? null,
             regionAr: region?.name_ar ?? null,
+            regionId: region?.id ?? city?.region_id ?? null,
             avatar: avatarUrl,
             specialties: roleAnswerKeys(),
+            answerLabels: roleAnswerLabels(),
             languages: narratedLanguages(),
           }
         : undefined
     );
+
     if (error) {
       toast.error(lang === "ar" ? "تعذّر إنشاء ملف المزوّد" : "Could not set up your provider profile");
       return false;

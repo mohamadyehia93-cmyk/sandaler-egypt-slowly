@@ -19,12 +19,97 @@ export type ProviderDetails = {
   taglineAr?: string | null;
   cityEn?: string | null;
   cityAr?: string | null;
+  cityId?: string | null;
   regionEn?: string | null;
   regionAr?: string | null;
+  regionId?: string | null;
   avatar?: string | null;
   specialties?: string[] | null;
   languages?: string | null;
+  /** Human-readable labels for the role quiz answers, used to seed satellites. */
+  answerLabels?: string[] | null;
 };
+
+/**
+ * Three roles have their own richer "satellite" profile table. Onboarding
+ * seeds a row there so those directories are never empty for a new provider,
+ * and — for organizations — so causes/programs have a real owner.
+ * Keyed on the owner column (partial unique index) so re-running onboarding
+ * updates instead of duplicating. Failures never block provider creation.
+ */
+async function upsertSatellite(
+  role: LocalRole,
+  userId: string,
+  nameEn: string,
+  slug: string,
+  details?: ProviderDetails
+): Promise<void> {
+  const nameAr = details?.nameAr?.trim() || nameEn; // these tables require name_ar
+  const labels = (details?.answerLabels || []).filter(Boolean);
+  const bioEn = details?.bioEn?.trim() || null;
+  const avatar = details?.avatar || null;
+
+  try {
+    if (role === "organization") {
+      await supabase.from("organizations").upsert(
+        {
+          owner_id: userId,
+          name_en: nameEn,
+          name_ar: nameAr,
+          slug: `org-${slug}`,
+          logo: avatar,
+          description_en: bioEn,
+          city_id: details?.cityId || null,
+          region_id: details?.regionId || null,
+          location_en: details?.cityEn || null,
+          location_ar: details?.cityAr || null,
+          focus_areas_en: labels.length ? labels : null,
+          status: "published",
+        } as never,
+        { onConflict: "owner_id" }
+      );
+    } else if (role === "whos-who") {
+      await supabase.from("whos_who").upsert(
+        {
+          user_id: userId,
+          name_en: nameEn,
+          name_ar: nameAr,
+          slug: `ww-${slug}`,
+          role_en: labels[0] || null,
+          bio_en: bioEn,
+          image: avatar,
+          city_id: details?.cityId || null,
+          region_id: details?.regionId || null,
+          interests_en: labels.length ? labels : null,
+          languages_en: details?.languages
+            ? details.languages.split(",").map((l) => l.trim()).filter(Boolean)
+            : null,
+          status: "published",
+        } as never,
+        { onConflict: "user_id" }
+      );
+    } else if (role === "culture-actor") {
+      await supabase.from("culture_actors").upsert(
+        {
+          user_id: userId,
+          name_en: nameEn,
+          name_ar: nameAr,
+          slug: `ca-${slug}`,
+          title_en: labels[0] || null,
+          bio_en: bioEn,
+          image: avatar,
+          region_id: details?.regionId || null,
+          expertise_en: labels.length ? labels : null,
+          status: "published",
+        } as never,
+        { onConflict: "user_id" }
+      );
+    }
+  } catch {
+    // soft-fail: the provider row is what matters for the role to work
+  }
+}
+
 
 /**
  * Creates (or updates) the current user's provider profile so that the
@@ -100,5 +185,8 @@ export async function becomeProvider(
     .from("providers")
     .upsert(payload as never, { onConflict: "user_id" });
 
+  if (!error) await upsertSatellite(role, user.id, displayName, slug, details);
+
   return { error: error?.message ?? null };
 }
+

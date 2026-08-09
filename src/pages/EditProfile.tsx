@@ -20,7 +20,9 @@ import { Button } from "@/components/ui/button";
 
 type ProviderRow = {
   id: string;
+  role: string | null;
   name_en: string | null;
+
   name_ar: string | null;
   tagline_en: string | null;
   tagline_ar: string | null;
@@ -44,11 +46,108 @@ type ProviderRow = {
 
 type Social = { instagram?: string; facebook?: string; youtube?: string; x?: string };
 
+/** The three roles that own a richer, role-specific ("satellite") profile row. */
+type SatelliteRole = "organization" | "whos-who" | "culture-actor";
+const SATELLITE_TABLE: Record<SatelliteRole, "organizations" | "whos_who" | "culture_actors"> = {
+  organization: "organizations",
+  "whos-who": "whos_who",
+  "culture-actor": "culture_actors",
+};
+const OWNER_COL: Record<SatelliteRole, "owner_id" | "user_id"> = {
+  organization: "owner_id",
+  "whos-who": "user_id",
+  "culture-actor": "user_id",
+};
+
 const asStringArray = (v: unknown): string[] =>
   Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
 
 const asSocial = (v: unknown): Social =>
   v && typeof v === "object" && !Array.isArray(v) ? (v as Social) : {};
+
+/**
+ * The three satellite tables have different shapes, so the generated union type
+ * can't narrow a dynamic table name. Query them through a loose shape instead.
+ */
+type LooseRow = Record<string, unknown>;
+type LooseQuery = {
+  select: (cols: string) => {
+    eq: (col: string, val: string) => { maybeSingle: () => Promise<{ data: LooseRow | null }> };
+  };
+  update: (values: LooseRow) => { eq: (col: string, val: string) => Promise<{ error: { message: string } | null }> };
+  insert: (values: LooseRow) => Promise<{ error: { message: string } | null }>;
+};
+const satQuery = (table: "organizations" | "whos_who" | "culture_actors"): LooseQuery =>
+  supabase.from(table) as unknown as LooseQuery;
+
+const chipInputClass =
+  "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40";
+
+/** Small add/remove tag editor, matching the specialties chips in this screen. */
+const ChipEditor = ({
+  label,
+  placeholder,
+  items,
+  setItems,
+  draft,
+  setDraft,
+  ar,
+}: {
+  label: string;
+  placeholder: string;
+  items: string[];
+  setItems: React.Dispatch<React.SetStateAction<string[]>>;
+  draft: string;
+  setDraft: (v: string) => void;
+  ar: boolean;
+}) => {
+  const add = () => {
+    const v = draft.trim();
+    if (!v || items.includes(v)) return setDraft("");
+    setItems((p) => [...p, v]);
+    setDraft("");
+  };
+  return (
+    <div className="space-y-2">
+      <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+        <Sparkles className="w-3.5 h-3.5 text-primary" />
+        {label}
+      </label>
+      {items.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {items.map((s) => (
+            <span key={s} className="flex items-center gap-1 bg-primary/10 text-primary text-xs font-medium rounded-full px-3 py-1.5">
+              {s}
+              <button type="button" onClick={() => setItems((p) => p.filter((x) => x !== s))} aria-label={ar ? "إزالة" : "Remove"}>
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="flex gap-2">
+        <input
+          className={chipInputClass}
+          placeholder={placeholder}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              add();
+            }
+          }}
+        />
+        <Button type="button" variant="outline" size="icon" onClick={add} aria-label={ar ? "إضافة" : "Add"}>
+          <Plus className="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+
+
 
 const EditProfile = () => {
   const navigate = useNavigate();
@@ -90,6 +189,33 @@ const EditProfile = () => {
   const [coverFiles, setCoverFiles] = useState<File[]>([]);
   const [status, setStatus] = useState<string>("draft");
 
+  // role-specific satellite row (organization / whos-who / culture-actor)
+  const [satRole, setSatRole] = useState<SatelliteRole | null>(null);
+  const [satExists, setSatExists] = useState(false);
+  const [sat, setSat] = useState({
+    missionEn: "",
+    missionAr: "",
+    orgWebsite: "",
+    roleEn: "",
+    roleAr: "",
+    meetingTimesEn: "",
+    meetingTimesAr: "",
+    quoteEn: "",
+    quoteAr: "",
+  });
+  const [satLogo, setSatLogo] = useState<string | null>(null);
+  const [satLogoFiles, setSatLogoFiles] = useState<File[]>([]);
+  const [focusAreas, setFocusAreas] = useState<string[]>([]);
+  const [focusDraft, setFocusDraft] = useState("");
+  const [interests, setInterests] = useState<string[]>([]);
+  const [interestDraft, setInterestDraft] = useState("");
+  const [expertise, setExpertise] = useState<string[]>([]);
+  const [expertiseDraft, setExpertiseDraft] = useState("");
+  const [satSocial, setSatSocial] = useState<Social>({});
+
+  const setS = (k: keyof typeof sat, v: string) => setSat((p) => ({ ...p, [k]: v }));
+
+
   // visitor form
   const [vName, setVName] = useState("");
   const [vBio, setVBio] = useState("");
@@ -98,7 +224,42 @@ const EditProfile = () => {
 
   const set = (k: keyof typeof f, v: string) => setF((p) => ({ ...p, [k]: v }));
 
+  /** Load the role's satellite row (if the role has one) alongside the provider. */
+  const loadSatellite = async (role: string | null) => {
+    const r = (role || "") as SatelliteRole;
+    if (!user || !SATELLITE_TABLE[r]) {
+      setSatRole(null);
+      return;
+    }
+    setSatRole(r);
+    const { data } = await satQuery(SATELLITE_TABLE[r])
+      .select("*")
+      .eq(OWNER_COL[r], user.id)
+      .maybeSingle();
+
+    const row = (data || null) as Record<string, unknown> | null;
+    setSatExists(!!row);
+    const str = (k: string) => (typeof row?.[k] === "string" ? (row[k] as string) : "");
+    setSat({
+      missionEn: str("mission_en"),
+      missionAr: str("mission_ar"),
+      orgWebsite: str("website"),
+      roleEn: str("role_en"),
+      roleAr: str("role_ar"),
+      meetingTimesEn: str("meeting_times_en"),
+      meetingTimesAr: str("meeting_times_ar"),
+      quoteEn: str("quote_en"),
+      quoteAr: str("quote_ar"),
+    });
+    setSatLogo((row?.logo as string) || (row?.image as string) || null);
+    setFocusAreas(asStringArray(row?.focus_areas_en));
+    setInterests(asStringArray(row?.interests_en));
+    setExpertise(asStringArray(row?.expertise_en));
+    setSatSocial(asSocial(row?.social_links));
+  };
+
   const load = async () => {
+
     if (!user) return;
     setLoading(true);
     const [{ data: prov }, { data: prof }] = await Promise.all([
@@ -132,9 +293,12 @@ const EditProfile = () => {
       setAvatarUrl(p.avatar);
       setCoverUrl(p.cover_image);
       setStatus(p.status || "draft");
+      await loadSatellite(p.role);
     } else {
       setProvider(null);
+      setSatRole(null);
     }
+
 
     setVName(prof?.display_name || "");
     setVBio(prof?.bio || "");
@@ -184,7 +348,73 @@ const EditProfile = () => {
 
   const canPublish = !!(f.bioEn.trim() || f.bioAr.trim() || avatarUrl || avatarFiles.length);
 
+  /** Upsert the satellite row for this role; returns an error message or null. */
+  const saveSatellite = async (r: SatelliteRole, providerAvatar: string | null): Promise<string | null> => {
+    if (!user) return null;
+    let logo = satLogo;
+    if (satLogoFiles.length) {
+      const [url] = await uploadImages(satLogoFiles, user.id, "profile-photos");
+      logo = url || logo;
+    }
+    const nameEn = f.nameEn.trim();
+    const nameAr = f.nameAr.trim() || nameEn; // satellite tables require name_ar
+
+    let values: LooseRow = {};
+    if (r === "organization") {
+      values = {
+        name_en: nameEn,
+        name_ar: nameAr,
+        logo: logo || providerAvatar || null,
+        mission_en: sat.missionEn.trim() || null,
+        mission_ar: sat.missionAr.trim() || null,
+        website: sat.orgWebsite.trim() || null,
+        focus_areas_en: focusAreas,
+        location_en: f.cityEn || null,
+        location_ar: f.cityAr || null,
+      };
+    } else if (r === "whos-who") {
+      values = {
+        name_en: nameEn,
+        name_ar: nameAr,
+        image: logo || providerAvatar || null,
+        role_en: sat.roleEn.trim() || null,
+        role_ar: sat.roleAr.trim() || null,
+        meeting_times_en: sat.meetingTimesEn.trim() || null,
+        meeting_times_ar: sat.meetingTimesAr.trim() || null,
+        interests_en: interests,
+        bio_en: f.bioEn.trim() || null,
+        bio_ar: f.bioAr.trim() || null,
+      };
+    } else {
+      values = {
+        name_en: nameEn,
+        name_ar: nameAr,
+        image: logo || providerAvatar || null,
+        expertise_en: expertise,
+        quote_en: sat.quoteEn.trim() || null,
+        quote_ar: sat.quoteAr.trim() || null,
+        social_links: satSocial,
+        bio_en: f.bioEn.trim() || null,
+        bio_ar: f.bioAr.trim() || null,
+      };
+    }
+
+    const table = SATELLITE_TABLE[r];
+    const owner = OWNER_COL[r];
+    if (satExists) {
+      const { error } = await satQuery(table).update(values).eq(owner, user.id);
+      return error?.message ?? null;
+    }
+    const { error } = await satQuery(table).insert({
+      ...values,
+      [owner]: user.id,
+      status: "published",
+    });
+    return error?.message ?? null;
+  };
+
   const saveProvider = async (nextStatus?: string) => {
+
     if (!user || !provider) return;
     if (!f.nameEn.trim()) {
       toast.error(ar ? "الاسم مطلوب" : "Name is required");
@@ -244,10 +474,19 @@ const EditProfile = () => {
         .eq("user_id", user.id);
       if (error) throw error;
 
+      // Save the role-specific satellite row in the same action. A failure here
+      // must not lose the provider edits, so it only warns.
+      if (satRole) {
+        const satErr = await saveSatellite(satRole, avatar);
+        if (satErr) toast.warning(ar ? "تم حفظ الملف، لكن تعذّر حفظ بيانات الدور" : `Profile saved, but role details failed: ${satErr}`);
+      }
+
       setAvatarFiles([]);
       setCoverFiles([]);
+      setSatLogoFiles([]);
       toast.success(ar ? "تم حفظ الملف الشخصي" : "Profile saved");
       await load();
+
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : ar ? "فشل الحفظ" : "Failed to save");
     } finally {
@@ -563,7 +802,147 @@ const EditProfile = () => {
                 </div>
               ))}
             </div>
+
+            {/* Role-specific profile (only for roles that own a satellite row) */}
+            {satRole === "organization" && (
+              <div className={cardClass}>
+                <p className="text-sm font-semibold text-foreground">
+                  {ar ? "ملف المنظمة" : "Organization profile"}
+                </p>
+                <div>
+                  <label className={labelClass}>{ar ? "شعار المنظمة" : "Organization logo"}</label>
+                  <PhotoPicker
+                    files={satLogoFiles}
+                    onChange={setSatLogoFiles}
+                    max={1}
+                    hint={ar ? "صورة واحدة" : "One photo"}
+                    existing={satLogo ? [satLogo] : []}
+                    onRemoveExisting={() => setSatLogo(null)}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "الرسالة (إنجليزي)" : "Mission (English)"}</label>
+                  <textarea className={`${inputClass} min-h-[80px] resize-none`} value={sat.missionEn} onChange={(e) => setS("missionEn", e.target.value)} maxLength={600} />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "الرسالة (عربي)" : "Mission (Arabic)"}</label>
+                  <textarea className={`${inputClass} min-h-[80px] resize-none`} value={sat.missionAr} onChange={(e) => setS("missionAr", e.target.value)} maxLength={600} dir="rtl" />
+                </div>
+                <div>
+                  <label className={labelClass}><Globe className="w-3.5 h-3.5 text-primary" />{ar ? "موقع المنظمة" : "Organization website"}</label>
+                  <input className={inputClass} placeholder="https://" dir="ltr" value={sat.orgWebsite} onChange={(e) => setS("orgWebsite", e.target.value)} />
+                </div>
+                <ChipEditor
+                  label={ar ? "مجالات التركيز" : "Focus areas"}
+                  placeholder={ar ? "أضف مجالاً" : "Add a focus area"}
+                  items={focusAreas}
+                  setItems={setFocusAreas}
+                  draft={focusDraft}
+                  setDraft={setFocusDraft}
+                  ar={ar}
+                />
+              </div>
+            )}
+
+            {satRole === "whos-who" && (
+              <div className={cardClass}>
+                <p className="text-sm font-semibold text-foreground">
+                  {ar ? "ملف دليل الأهالي" : "Who's Who entry"}
+                </p>
+                <div>
+                  <label className={labelClass}>{ar ? "الصورة" : "Photo"}</label>
+                  <PhotoPicker
+                    files={satLogoFiles}
+                    onChange={setSatLogoFiles}
+                    max={1}
+                    hint={ar ? "صورة واحدة" : "One photo"}
+                    existing={satLogo ? [satLogo] : []}
+                    onRemoveExisting={() => setSatLogo(null)}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "الدور / المسمى (إنجليزي)" : "Role / title (English)"}</label>
+                  <input className={inputClass} value={sat.roleEn} onChange={(e) => setS("roleEn", e.target.value)} maxLength={120} />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "الدور / المسمى (عربي)" : "Role / title (Arabic)"}</label>
+                  <input className={inputClass} value={sat.roleAr} onChange={(e) => setS("roleAr", e.target.value)} maxLength={120} dir="rtl" />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "أوقات اللقاء (إنجليزي)" : "Meeting times (English)"}</label>
+                  <input className={inputClass} placeholder={ar ? "مثال: أيام الجمعة صباحاً" : "e.g. Friday mornings"} value={sat.meetingTimesEn} onChange={(e) => setS("meetingTimesEn", e.target.value)} />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "أوقات اللقاء (عربي)" : "Meeting times (Arabic)"}</label>
+                  <input className={inputClass} value={sat.meetingTimesAr} onChange={(e) => setS("meetingTimesAr", e.target.value)} dir="rtl" />
+                </div>
+                <ChipEditor
+                  label={ar ? "الاهتمامات" : "Interests"}
+                  placeholder={ar ? "أضف اهتماماً" : "Add an interest"}
+                  items={interests}
+                  setItems={setInterests}
+                  draft={interestDraft}
+                  setDraft={setInterestDraft}
+                  ar={ar}
+                />
+              </div>
+            )}
+
+            {satRole === "culture-actor" && (
+              <div className={cardClass}>
+                <p className="text-sm font-semibold text-foreground">
+                  {ar ? "ملف فاعل الثقافة" : "Culture actor profile"}
+                </p>
+                <div>
+                  <label className={labelClass}>{ar ? "الصورة" : "Photo"}</label>
+                  <PhotoPicker
+                    files={satLogoFiles}
+                    onChange={setSatLogoFiles}
+                    max={1}
+                    hint={ar ? "صورة واحدة" : "One photo"}
+                    existing={satLogo ? [satLogo] : []}
+                    onRemoveExisting={() => setSatLogo(null)}
+                  />
+                </div>
+                <ChipEditor
+                  label={ar ? "مجالات الخبرة" : "Expertise"}
+                  placeholder={ar ? "أضف مجال خبرة" : "Add an expertise"}
+                  items={expertise}
+                  setItems={setExpertise}
+                  draft={expertiseDraft}
+                  setDraft={setExpertiseDraft}
+                  ar={ar}
+                />
+                <div>
+                  <label className={labelClass}>{ar ? "اقتباس (إنجليزي)" : "Quote (English)"}</label>
+                  <textarea className={`${inputClass} min-h-[70px] resize-none`} value={sat.quoteEn} onChange={(e) => setS("quoteEn", e.target.value)} maxLength={300} />
+                </div>
+                <div>
+                  <label className={labelClass}>{ar ? "اقتباس (عربي)" : "Quote (Arabic)"}</label>
+                  <textarea className={`${inputClass} min-h-[70px] resize-none`} value={sat.quoteAr} onChange={(e) => setS("quoteAr", e.target.value)} maxLength={300} dir="rtl" />
+                </div>
+                <p className="text-xs text-muted-foreground">{ar ? "روابط التواصل الخاصة بملف الثقافة" : "Social links for this culture profile"}</p>
+                {([
+                  ["instagram", "Instagram", Instagram],
+                  ["facebook", "Facebook", Facebook],
+                  ["youtube", "YouTube", Youtube],
+                  ["x", "X", Globe],
+                ] as const).map(([key, label, Icon]) => (
+                  <div key={key}>
+                    <label className={labelClass}><Icon className="w-3.5 h-3.5 text-primary" />{label}</label>
+                    <input
+                      className={inputClass}
+                      placeholder="https://"
+                      dir="ltr"
+                      value={satSocial[key] || ""}
+                      onChange={(e) => setSatSocial((p) => ({ ...p, [key]: e.target.value }))}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </>
+
         ) : (
           /* Visitor variant — same route, lighter form on the profiles row */
           <div className={cardClass}>
