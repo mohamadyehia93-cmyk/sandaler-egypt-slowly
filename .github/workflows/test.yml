@@ -24,6 +24,9 @@ jobs:
       - name: TypeScript
         run: npx tsc --noEmit
 
+      - name: Lint (no new errors vs baseline)
+        run: npm run lint:baseline
+
       - name: Unit tests
         run: npm test
 
