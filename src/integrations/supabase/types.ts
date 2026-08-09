@@ -1222,6 +1222,56 @@ export type Database = {
           },
         ]
       }
+      orders: {
+        Row: {
+          buyer_id: string
+          buyer_note: string | null
+          created_at: string
+          id: string
+          product_id: string | null
+          quantity: number
+          seller_id: string | null
+          status: string
+          total_egp: number | null
+          unit_price_egp: number | null
+          updated_at: string
+        }
+        Insert: {
+          buyer_id: string
+          buyer_note?: string | null
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          quantity?: number
+          seller_id?: string | null
+          status?: string
+          total_egp?: number | null
+          unit_price_egp?: number | null
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          buyer_note?: string | null
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          quantity?: number
+          seller_id?: string | null
+          status?: string
+          total_egp?: number | null
+          unit_price_egp?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           city_id: string | null
@@ -2342,6 +2392,10 @@ export type Database = {
       }
       is_experience_provider: {
         Args: { _experience_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_order_seller: {
+        Args: { _seller_id: string; _user_id: string }
         Returns: boolean
       }
     }
