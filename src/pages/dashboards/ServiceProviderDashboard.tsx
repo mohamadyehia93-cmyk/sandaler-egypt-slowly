@@ -161,19 +161,44 @@ const ServiceProviderDashboard = () => {
           {bookings.length === 0 ? (
             <p className="text-xs text-muted-foreground py-3">{lang === "ar" ? "لا توجد حجوزات بعد" : "No bookings yet"}</p>
           ) : (
-            bookings.slice(0, 8).map((b) => (
-              <div key={b.id} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold text-foreground line-clamp-1">{title(b)}</p>
-                  <p className="text-[10px] text-muted-foreground">
-                    {b.guests} {lang === "ar" ? "أشخاص" : "guests"} · {new Date(b.created_at).toLocaleDateString(locale, { day: "numeric", month: "short" })}
-                  </p>
+            bookings.slice(0, 8).map((b) => {
+              const resolved = RESOLVED.includes(b.status);
+              return (
+                <div key={b.id} className="py-2.5 border-b border-border last:border-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-foreground line-clamp-1">{title(b)}</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {b.guests} {lang === "ar" ? "أشخاص" : "guests"} · {new Date(b.created_at).toLocaleDateString(locale, { day: "numeric", month: "short" })}
+                      </p>
+                    </div>
+                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${b.status === "confirmed" ? "bg-success/10 text-success" : b.status === "pending_payment" ? "bg-warning/10 text-warning" : "bg-muted text-muted-foreground"}`}>
+                      {statusLabel(b.status)}
+                    </span>
+                  </div>
+
+                  {!resolved && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <button
+                        disabled={savingId === b.id}
+                        onClick={() => updateBookingStatus(b.id, "confirmed")}
+                        className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-role-service-provider text-white flex items-center justify-center gap-1 disabled:opacity-50"
+                      >
+                        <Check className="w-3.5 h-3.5" /> {lang === "ar" ? "قبول" : "Accept"}
+                      </button>
+                      <button
+                        disabled={savingId === b.id}
+                        onClick={() => updateBookingStatus(b.id, "cancelled")}
+                        className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
+                      >
+                        <X className="w-3.5 h-3.5" /> {lang === "ar" ? "رفض" : "Decline"}
+                      </button>
+                    </div>
+                  )}
                 </div>
-                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${b.status === "confirmed" ? "bg-success/10 text-success" : b.status === "pending_payment" ? "bg-warning/10 text-warning" : "bg-muted text-muted-foreground"}`}>
-                  {b.status === "confirmed" ? (lang === "ar" ? "مؤكد" : "Confirmed") : b.status === "pending_payment" ? (lang === "ar" ? "معلق" : "Pending") : b.status}
-                </span>
-              </div>
-            ))
+              );
+            })
+
           )}
         </div>
 
