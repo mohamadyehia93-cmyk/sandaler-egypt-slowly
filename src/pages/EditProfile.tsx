@@ -353,7 +353,7 @@ const EditProfile = () => {
                 {status === "published" ? (
                   <Eye className="w-4 h-4 text-primary" />
                 ) : (
-                  <EyeOff className="w-4 h-4 text-amber" />
+                  <EyeOff className="w-4 h-4 text-warning" />
                 )}
                 <p className="text-sm font-semibold text-foreground">
                   {status === "published"
