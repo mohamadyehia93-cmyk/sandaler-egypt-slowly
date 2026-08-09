@@ -1126,26 +1126,54 @@ const SplashPage = () => {
             </header>
 
             <div className="flex-1 overflow-y-auto px-4 py-6 space-y-5">
-              {/* Avatar placeholder */}
-              <div className="flex flex-col items-center">
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                  <User className="w-10 h-10 text-primary" />
-                </div>
-                <button className="text-xs text-primary font-semibold">
-                  {lang === "ar" ? "إضافة صورة" : "Add Photo"}
-                </button>
+              {/* Avatar */}
+              <div className="max-w-xs mx-auto w-full">
+                <PhotoPicker
+                  files={avatarFiles}
+                  onChange={setAvatarFiles}
+                  max={1}
+                  hint={lang === "ar" ? "إضافة صورة" : "Add Photo"}
+                />
               </div>
 
-              {/* Name */}
+              {/* Name (EN) */}
               <div>
                 <label className="text-sm font-semibold text-foreground block mb-1.5">
-                  {lang === "ar" ? "الاسم" : "Name"}
+                  {lang === "ar" ? "الاسم (بالإنجليزية)" : "Name (English)"}
                 </label>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={lang === "ar" ? "أدخل اسمك" : "Enter your name"}
                   className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
+              {/* Name (AR) — optional */}
+              <div>
+                <label className="text-sm font-semibold text-foreground block mb-1.5">
+                  {lang === "ar" ? "الاسم بالعربية (اختياري)" : "Arabic name (optional)"}
+                </label>
+                <input
+                  value={nameAr}
+                  onChange={(e) => setNameAr(e.target.value)}
+                  dir="rtl"
+                  placeholder={lang === "ar" ? "أدخل اسمك بالعربية" : "اسمك بالعربية"}
+                  className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+
+              {/* Short bio — optional */}
+              <div>
+                <label className="text-sm font-semibold text-foreground block mb-1.5">
+                  {lang === "ar" ? "نبذة قصيرة (اختياري)" : "Short bio (optional)"}
+                </label>
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  rows={3}
+                  placeholder={lang === "ar" ? "اكتب سطرين عن نفسك" : "A line or two about yourself"}
+                  className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
                 />
               </div>
 
