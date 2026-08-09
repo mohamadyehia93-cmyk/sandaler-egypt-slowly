@@ -42,11 +42,19 @@ const PostComments = ({ postKey }: Props) => {
     author_avatar: null,
   });
 
-  const fmt = (iso: string) =>
-    new Date(iso).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US", {
-      month: "short",
-      day: "numeric",
-    });
+  const fmt = (iso: string) => {
+    const ar = lang === "ar";
+    const diff = Math.max(0, Date.now() - new Date(iso).getTime());
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return ar ? "الآن" : "just now";
+    if (mins < 60) return ar ? `منذ ${mins} د` : `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return ar ? `منذ ${hrs} س` : `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    if (days < 7) return ar ? `منذ ${days} ي` : `${days}d ago`;
+    return new Date(iso).toLocaleDateString(ar ? "ar-EG" : "en-US", { month: "short", day: "numeric" });
+  };
+
 
   const initials = (name: string) =>
     name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
