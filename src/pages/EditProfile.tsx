@@ -341,10 +341,19 @@ const EditProfile = () => {
         .eq("user_id", user.id);
       if (error) throw error;
 
+      // Save the role-specific satellite row in the same action. A failure here
+      // must not lose the provider edits, so it only warns.
+      if (satRole) {
+        const satErr = await saveSatellite(satRole, avatar);
+        if (satErr) toast.warning(ar ? "تم حفظ الملف، لكن تعذّر حفظ بيانات الدور" : `Profile saved, but role details failed: ${satErr}`);
+      }
+
       setAvatarFiles([]);
       setCoverFiles([]);
+      setSatLogoFiles([]);
       toast.success(ar ? "تم حفظ الملف الشخصي" : "Profile saved");
       await load();
+
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : ar ? "فشل الحفظ" : "Failed to save");
     } finally {
