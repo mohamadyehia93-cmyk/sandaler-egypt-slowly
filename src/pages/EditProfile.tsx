@@ -44,11 +44,25 @@ type ProviderRow = {
 
 type Social = { instagram?: string; facebook?: string; youtube?: string; x?: string };
 
+/** The three roles that own a richer, role-specific ("satellite") profile row. */
+type SatelliteRole = "organization" | "whos-who" | "culture-actor";
+const SATELLITE_TABLE: Record<SatelliteRole, "organizations" | "whos_who" | "culture_actors"> = {
+  organization: "organizations",
+  "whos-who": "whos_who",
+  "culture-actor": "culture_actors",
+};
+const OWNER_COL: Record<SatelliteRole, "owner_id" | "user_id"> = {
+  organization: "owner_id",
+  "whos-who": "user_id",
+  "culture-actor": "user_id",
+};
+
 const asStringArray = (v: unknown): string[] =>
   Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
 
 const asSocial = (v: unknown): Social =>
   v && typeof v === "object" && !Array.isArray(v) ? (v as Social) : {};
+
 
 const EditProfile = () => {
   const navigate = useNavigate();
