@@ -43,6 +43,8 @@ export default defineConfig(({ mode }) => {
 
     VitePWA({
       registerType: "autoUpdate",
+      injectRegister: null,
+      filename: "sw.js",
       includeAssets: ["favicon.ico", "robots.txt", "apple-touch-icon.png"],
       manifest: {
         name: "Sandal — Discover Egypt Slowly",
