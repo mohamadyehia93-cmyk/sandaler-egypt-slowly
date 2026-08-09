@@ -14,11 +14,13 @@ type SellerOrder = {
   total_egp: number | null;
   status: string;
   buyer_note: string | null;
+  contact_name: string | null;
+  contact_phone: string | null;
   created_at: string;
   product: { name_en: string; name_ar: string } | null;
 };
 
-const RESOLVED = ["confirmed", "shipped", "completed", "cancelled"];
+const TERMINAL = ["declined", "fulfilled", "cancelled", "completed"];
 
 const SellerOrdersList = () => {
   const { lang } = useI18n();
@@ -34,7 +36,7 @@ const SellerOrdersList = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("orders")
-        .select("id, quantity, unit_price_egp, total_egp, status, buyer_note, created_at, product:products(name_en, name_ar)")
+        .select("id, quantity, unit_price_egp, total_egp, status, buyer_note, contact_name, contact_phone, created_at, product:products(name_en, name_ar)")
         .eq("seller_id", user!.id)
         .order("created_at", { ascending: false })
         .limit(20);
@@ -44,9 +46,9 @@ const SellerOrdersList = () => {
     },
   });
 
-  const updateStatus = async (id: string, status: "confirmed" | "cancelled") => {
+  const updateStatus = async (id: string, status: "confirmed" | "declined" | "fulfilled") => {
     setSavingId(id);
-    const { error } = await supabase.from("orders").update({ status }).eq("id", id);
+    const { error } = await supabase.from("orders").update({ status } as never).eq("id", id);
     setSavingId(null);
     if (error) {
       toast.error(ar ? "تعذر تحديث الطلب" : "Could not update order");
@@ -54,11 +56,14 @@ const SellerOrdersList = () => {
     }
     toast.success(
       status === "confirmed"
-        ? (ar ? "تم تأكيد الطلب" : "Order accepted")
-        : (ar ? "تم رفض الطلب" : "Order declined")
+        ? (ar ? "تم تأكيد الطلب" : "Order confirmed")
+        : status === "fulfilled"
+          ? (ar ? "تم تسليم الطلب" : "Order marked fulfilled")
+          : (ar ? "تم رفض الطلب" : "Order declined")
     );
     queryClient.invalidateQueries({ queryKey: ["seller-orders"] });
   };
+
 
   return (
     <div className="bg-card rounded-xl shadow-card p-4">
