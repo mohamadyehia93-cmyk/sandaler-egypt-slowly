@@ -38,6 +38,8 @@ const WhosWhoDashboard = () => {
       <div className="px-4 py-4 space-y-4">
         <DailyStatusCard accentBg="bg-role-whos-who" accentText="text-role-whos-who" />
 
+        <SessionRequestsList accentText="text-role-whos-who" />
+
         {/* Profile Completeness */}
         <div onClick={() => navigate("/profile")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-2">
