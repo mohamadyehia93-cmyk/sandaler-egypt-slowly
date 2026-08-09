@@ -3,6 +3,9 @@ import { ArrowLeft, UserCheck, Calendar, MapPin, Clock, CheckCircle2, Users, Che
 import { useI18n } from "@/lib/i18n";
 import { causes } from "@/lib/sampleData";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import NotFoundView from "@/components/NotFound";
 
 const opportunities = [
