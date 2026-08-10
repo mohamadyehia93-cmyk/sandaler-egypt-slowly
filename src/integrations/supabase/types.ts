@@ -1015,6 +1015,9 @@ export type Database = {
           priority: string
           provider_name: string | null
           reporter_id: string
+          resolution_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string
           updated_at: string
         }
@@ -1028,6 +1031,9 @@ export type Database = {
           priority: string
           provider_name?: string | null
           reporter_id: string
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           updated_at?: string
         }
@@ -1041,6 +1047,9 @@ export type Database = {
           priority?: string
           provider_name?: string | null
           reporter_id?: string
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           updated_at?: string
         }
@@ -2661,6 +2670,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_first_admin: { Args: never; Returns: boolean }
       get_follower_count: {
         Args: { _target_id: string; _target_type: string }
         Returns: number
