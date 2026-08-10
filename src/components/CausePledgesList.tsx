@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import MessageUserButton from "@/components/MessageUserButton";
 
 type PledgeRow = {
   id: string;
@@ -16,9 +17,11 @@ type PledgeRow = {
   contact_email: string | null;
   contact_phone: string | null;
   status: string;
+  supporter_id: string | null;
   created_at: string;
   cause: { title_en: string; title_ar: string } | null;
 };
+
 
 export const pledgeKindLabel = (kind: string, ar: boolean) => {
   switch (kind) {
@@ -65,7 +68,7 @@ const CausePledgesList = () => {
       const { data, error } = await supabase
         .from("support_pledges")
         .select(
-          "id, kind, amount, currency, message, contact_name, contact_email, contact_phone, status, created_at, cause:causes(title_en, title_ar)"
+          "id, kind, amount, currency, message, contact_name, contact_email, contact_phone, status, supporter_id, created_at, cause:causes(title_en, title_ar)"
         )
         .eq("owner_id", user!.id)
         .order("created_at", { ascending: false });
@@ -135,33 +138,37 @@ const CausePledgesList = () => {
 
               {p.message && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-3">{p.message}</p>}
 
-              {!terminal && (
-                <div className="flex items-center gap-2 mt-2">
-                  {p.status === "pending" && (
+              <div className="flex items-center gap-2 mt-2">
+                {!terminal && (
+                  <>
+                    {p.status === "pending" && (
+                      <button
+                        disabled={savingId === p.id}
+                        onClick={() => updateStatus(p.id, "contacted")}
+                        className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-primary/10 text-primary disabled:opacity-50"
+                      >
+                        {ar ? "تم التواصل" : "Mark contacted"}
+                      </button>
+                    )}
                     <button
                       disabled={savingId === p.id}
-                      onClick={() => updateStatus(p.id, "contacted")}
-                      className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-primary/10 text-primary disabled:opacity-50"
+                      onClick={() => updateStatus(p.id, "completed")}
+                      className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-role-organization text-white flex items-center justify-center gap-1 disabled:opacity-50"
                     >
-                      {ar ? "تم التواصل" : "Mark contacted"}
+                      <Check className="w-3.5 h-3.5" /> {ar ? "مكتمل" : "Complete"}
                     </button>
-                  )}
-                  <button
-                    disabled={savingId === p.id}
-                    onClick={() => updateStatus(p.id, "completed")}
-                    className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-role-organization text-white flex items-center justify-center gap-1 disabled:opacity-50"
-                  >
-                    <Check className="w-3.5 h-3.5" /> {ar ? "مكتمل" : "Complete"}
-                  </button>
-                  <button
-                    disabled={savingId === p.id}
-                    onClick={() => updateStatus(p.id, "declined")}
-                    className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
-                  >
-                    <X className="w-3.5 h-3.5" /> {ar ? "رفض" : "Decline"}
-                  </button>
-                </div>
-              )}
+                    <button
+                      disabled={savingId === p.id}
+                      onClick={() => updateStatus(p.id, "declined")}
+                      className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
+                    >
+                      <X className="w-3.5 h-3.5" /> {ar ? "رفض" : "Decline"}
+                    </button>
+                  </>
+                )}
+                <MessageUserButton userId={p.supporter_id} />
+              </div>
+
             </div>
           );
         })

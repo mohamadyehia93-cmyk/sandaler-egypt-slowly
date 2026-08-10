@@ -11,6 +11,7 @@ import {
   commissionStatusLabel,
   feeDisclaimer,
 } from "@/lib/commissions";
+import MessageUserButton from "@/components/MessageUserButton";
 
 type Commission = {
   id: string;
@@ -169,7 +170,9 @@ const ActorCommissionsList = () => {
                     {c.deadline}
                   </span>
                 )}
+                <MessageUserButton userId={c.commissioner_id} className="ms-auto" />
               </div>
+
 
               {c.status === "pending" && (
                 <div className="flex gap-2 mt-3">
