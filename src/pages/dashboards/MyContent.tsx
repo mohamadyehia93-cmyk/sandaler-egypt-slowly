@@ -74,7 +74,7 @@ const MyContent = () => {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground line-clamp-1">{lang === "ar" ? e.title_ar : e.title_en}</p>
                 <p className="text-[11px] text-muted-foreground line-clamp-1">{e.category}</p>
-                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${e.status === "published" ? "bg-success/10 text-success" : "bg-amber/10 text-amber"}`}>
+                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${e.status === "published" ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
                   {e.status === "published"
                     ? lang === "ar" ? "منشور" : "Published"
                     : lang === "ar" ? "مسودة" : "Draft"}
