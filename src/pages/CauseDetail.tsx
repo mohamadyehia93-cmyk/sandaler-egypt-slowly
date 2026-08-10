@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { causes, regions } from "@/lib/sampleData";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
+import { supabase } from "@/integrations/supabase/client";
 import { dbToLegacyCause } from "@/lib/dbAdapters";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import DetailTestimonials from "@/components/DetailTestimonials";
@@ -28,10 +29,28 @@ const CauseDetail = () => {
     enabled: !!id,
   });
 
+  // Resolve the real owning organization (if any) so we never link to a non-existent one.
+  const ownerId = (dbCause as any)?.owner_id ?? null;
+  const { data: ownerOrg } = useQuery({
+    queryKey: ["cause-owner-org", ownerId],
+    enabled: !!ownerId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("organizations")
+        .select("id, slug, name_en, name_ar, logo, status")
+        .eq("owner_id", ownerId)
+        .eq("status", "published")
+        .limit(1);
+      return data?.[0] ?? null;
+    },
+  });
+
   const cause = dbToLegacyCause(dbCause) || causes.find((c) => c.id === id);
   if (!cause) return <NotFoundView context="cause" />;
   const region = regions.find((r) => r.id === cause.regionId);
   const progress = Math.round((cause.raised / cause.goal) * 100);
+  const orgHref = ownerOrg ? `/organization/${(ownerOrg as any).slug || (ownerOrg as any).id}` : null;
+
 
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -84,27 +103,35 @@ const CauseDetail = () => {
 
         {/* Organization */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "المنظمة" : "The Organization"}</h2>
-        <button
-          onClick={() => navigate(`/organization/${id}`)}
-          className="w-full text-start bg-surface rounded-xl p-4 mb-6 border border-border hover:border-primary transition-colors"
-        >
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center text-2xl">{cause.org.logo}</div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-foreground">{cause.org.name[lang]}</p>
-              <p className="text-xs text-muted-foreground">
-                {lang === "ar" ? `تأسست ${cause.org.founded}` : `Founded ${cause.org.founded}`} · {cause.org.members} {lang === "ar" ? "عضو" : "members"}
-              </p>
-            </div>
-            <span className="text-[10px] text-primary font-semibold">
-              {lang === "ar" ? "عرض الملف" : "View profile"} →
-            </span>
-          </div>
-          <div className="flex gap-2">
-            <span className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium">✅ {lang === "ar" ? "موثّقة" : "Verified"}</span>
-            <span className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium">📋 {lang === "ar" ? "مسجلة رسمياً" : "Registered NGO"}</span>
-          </div>
-        </button>
+        {(() => {
+          const Wrapper: any = orgHref ? "button" : "div";
+          return (
+            <Wrapper
+              {...(orgHref ? { onClick: () => navigate(orgHref) } : {})}
+              className={`w-full text-start bg-surface rounded-xl p-4 mb-6 border border-border ${orgHref ? "hover:border-primary transition-colors" : ""}`}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center text-2xl">{cause.org.logo}</div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-foreground">{cause.org.name[lang]}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {lang === "ar" ? `تأسست ${cause.org.founded}` : `Founded ${cause.org.founded}`} · {cause.org.members} {lang === "ar" ? "عضو" : "members"}
+                  </p>
+                </div>
+                {orgHref && (
+                  <span className="text-[10px] text-primary font-semibold">
+                    {lang === "ar" ? "عرض الملف" : "View profile"} →
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <span className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium">✅ {lang === "ar" ? "موثّقة" : "Verified"}</span>
+                <span className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium">📋 {lang === "ar" ? "مسجلة رسمياً" : "Registered NGO"}</span>
+              </div>
+            </Wrapper>
+          );
+        })()}
+
 
         {/* How to Support */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "كيف تدعم" : "How to Support"}</h2>

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
-import { cityData, experiences, audioTours, accommodation, products, whosWho, causes, latestPosts, trips } from "@/lib/sampleData";
+import { cityData, experiences, audioTours, accommodation, products, causes, latestPosts, trips } from "@/lib/sampleData";
 import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
@@ -182,15 +182,18 @@ const CityDetail = () => {
     ...products.filter((p) => p.cityId === cityId),
   ]);
   const cityPeople = dedupe([
-    ...(dbWhosWho as any[]).filter((w) => w.city_id === cityId).map((w) => ({
-      id: w.slug || w.id, slug: w.slug,
-      name: { en: w.name_en, ar: w.name_ar },
-      role: { en: w.role_en || "", ar: w.role_ar || "" },
-      bio: { en: w.bio_en || "", ar: w.bio_ar || "" },
-      image: w.image, cityId: w.city_id,
-    })),
-    ...whosWho.filter((w) => w.cityId === cityId),
+    ...(dbWhosWho as any[])
+      .filter((w) => w.city_id === cityId && (w.status ?? "published") === "published")
+      .map((w) => ({
+        id: w.slug || w.id, slug: w.slug,
+        name: { en: w.name_en, ar: w.name_ar },
+        role: { en: w.role_en || "", ar: w.role_ar || "" },
+        bio: { en: w.bio_en || "", ar: w.bio_ar || "" },
+        image: w.image, cityId: w.city_id,
+        latitude: w.latitude, longitude: w.longitude,
+      })),
   ]);
+
   const cityCauses = causes.filter((c) => c.cityId === cityId);
   const cityPosts = dedupe([
     ...(dbPosts as any[]).filter((p) => p.city_id === cityId).map((p) => ({
