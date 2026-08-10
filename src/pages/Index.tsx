@@ -30,8 +30,6 @@ const Index = () => {
   const { lang } = useLanguage();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "explore");
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const navigate = useNavigate();
@@ -53,40 +51,6 @@ const Index = () => {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const searchResults = useMemo(() => {
-    if (!searchQuery.trim()) return [];
-    const q = searchQuery.toLowerCase();
-    const results: { id: string; title: string; type: string; route: string }[] = [];
-    const pick = (en: string, ar: string) => (lang === "ar" ? ar : en);
-
-    dbExperiences.forEach((e: any) => {
-      const title = pick(e.title_en, e.title_ar);
-      if (title?.toLowerCase().includes(q)) results.push({ id: e.id, title, type: t("explore.result_type_experience"), route: `/experience/${e.slug || e.id}` });
-    });
-    dbAudioTours.forEach((a: any) => {
-      const title = pick(a.title_en, a.title_ar);
-      if (title?.toLowerCase().includes(q)) results.push({ id: a.id, title, type: t("explore.result_type_audio_tour"), route: `/audio-tour/${a.slug || a.id}` });
-    });
-    dbAccommodations.forEach((ac: any) => {
-      const title = pick(ac.name_en, ac.name_ar);
-      if (title?.toLowerCase().includes(q)) results.push({ id: ac.id, title, type: t("explore.result_type_stay"), route: `/stay/${ac.slug || ac.id}` });
-    });
-    dbWhosWho.forEach((w: any) => {
-      const title = pick(w.name_en, w.name_ar);
-      if (title?.toLowerCase().includes(q)) results.push({ id: w.id, title, type: t("explore.result_type_person"), route: `/person/${w.slug || w.id}` });
-    });
-    dbProducts.forEach((p: any) => {
-      const title = pick(p.name_en, p.name_ar);
-      if (title?.toLowerCase().includes(q)) results.push({ id: p.id, title, type: t("explore.result_type_product"), route: `/product/${p.slug || p.id}` });
-    });
-    dbTransport.forEach((tr: any) => {
-      const title = pick(tr.name_en, tr.name_ar);
-      if (title?.toLowerCase().includes(q)) results.push({ id: tr.id, title, type: t("explore.result_type_transport"), route: `/transport/${tr.slug || tr.id}` });
-    });
-
-    return results.slice(0, 8);
-  }, [searchQuery, lang, t, dbTransport, dbExperiences, dbAudioTours, dbAccommodations, dbProducts, dbWhosWho]);
 
   const headerTextClass = scrolled ? "text-foreground" : "text-primary-foreground";
 
@@ -113,10 +77,10 @@ const Index = () => {
             />
             <button
               className={`p-2 transition-colors ${headerTextClass}`}
-              onClick={() => { setSearchOpen(!searchOpen); setSearchQuery(""); }}
+              onClick={() => navigate("/search")}
               aria-label={t("common.search")}
             >
-              {searchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
+              <Search className="w-5 h-5" />
             </button>
             <button
               className={`p-2 transition-colors ${headerTextClass}`}
@@ -136,41 +100,6 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Search Bar */}
-        {searchOpen && (
-          <div className="px-4 py-2 bg-background border-b border-border relative">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                autoFocus
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t("explore.search_placeholder")}
-                className="pl-9 pr-3 h-9 text-sm bg-secondary border-none"
-              />
-            </div>
-            {searchQuery.trim() && (
-              <div className="absolute left-4 right-4 top-full z-50 bg-background border border-border rounded-lg shadow-lg mt-1 max-h-72 overflow-y-auto">
-                {searchResults.length === 0 ? (
-                  <div className="p-4 text-sm text-muted-foreground text-center">
-                    {t("explore.no_results")}
-                  </div>
-                ) : (
-                  searchResults.map((r) => (
-                    <button
-                      key={r.id}
-                      onClick={() => { navigate(r.route); setSearchOpen(false); setSearchQuery(""); }}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-accent/50 transition-colors text-left border-b border-border last:border-0"
-                    >
-                      <span className="text-sm font-medium text-foreground truncate">{r.title}</span>
-                      <span className="text-xs text-muted-foreground ml-2 shrink-0">{r.type}</span>
-                    </button>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
-        )}
       </header>
 
       {/* Feed */}
