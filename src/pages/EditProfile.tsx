@@ -274,6 +274,14 @@ const EditProfile = () => {
     if (prov) {
       const p = prov as unknown as ProviderRow;
       setProvider(p);
+      // Private contact details are not readable through the table any more;
+      // the owner reads them back through the guarded RPC.
+      const { data: contactRows } = await supabase.rpc("get_provider_contact", {
+        _provider_id: p.id,
+      });
+      const contact = (Array.isArray(contactRows) ? contactRows[0] : contactRows) as
+        | ProviderContact
+        | undefined;
       setF({
         nameEn: p.name_en || "",
         nameAr: p.name_ar || "",
@@ -287,11 +295,12 @@ const EditProfile = () => {
         regionEn: p.region_en || "",
         regionAr: p.region_ar || "",
         languages: p.languages || "",
-        contactEmail: p.contact_email || "",
-        contactPhone: p.contact_phone || "",
-        whatsapp: p.whatsapp || "",
+        contactEmail: contact?.contact_email || "",
+        contactPhone: contact?.contact_phone || "",
+        whatsapp: contact?.whatsapp || "",
         website: p.website || "",
       });
+
       setSocial(asSocial(p.social_links));
       setSpecialties(asStringArray(p.specialties));
       setAvatarUrl(p.avatar);
