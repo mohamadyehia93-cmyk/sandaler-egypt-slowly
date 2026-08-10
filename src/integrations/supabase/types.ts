@@ -1068,6 +1068,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "experiences_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "experiences_region_id_fkey"
             columns: ["region_id"]
             isOneToOne: false
@@ -2820,6 +2827,10 @@ export type Database = {
       }
       is_order_seller: {
         Args: { _seller_id: string; _user_id: string }
+        Returns: boolean
+      }
+      owns_provider_record: {
+        Args: { _provider_id: string; _user_id: string }
         Returns: boolean
       }
       resolve_owner_user_id: { Args: { _owner: string }; Returns: string }
