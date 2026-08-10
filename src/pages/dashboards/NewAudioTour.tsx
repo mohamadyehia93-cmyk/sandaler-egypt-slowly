@@ -146,7 +146,7 @@ const NewAudioTour = () => {
 
       // Per-stop clips
       const named = stops.filter((s) => s.name.trim());
-      const cleanStops: Record<string, unknown>[] = [];
+      const cleanStops: any[] = [];
       for (let i = 0; i < named.length; i++) {
         const s = named[i];
         setUploadStage(`stop-audio-${i + 1}`);
