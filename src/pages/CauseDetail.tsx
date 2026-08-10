@@ -46,7 +46,7 @@ const CauseDetail = () => {
           <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
             <Share2 className="w-5 h-5 text-foreground" />
           </button>
-          <WishlistButton itemType="cause" itemId={row?.id} />
+          <WishlistButton itemType="cause" itemId={dbCause?.id} />
         </div>
         <div className="absolute bottom-4 left-4 right-4">
           <span className="bg-primary/90 text-primary-foreground px-2.5 py-0.5 rounded-full text-xs font-medium mb-2 inline-block">
