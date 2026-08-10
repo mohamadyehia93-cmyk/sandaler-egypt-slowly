@@ -12,6 +12,8 @@ type Region = { id: string; name_en: string; name_ar: string; emoji: string | nu
 type Actor = {
   id: string;
   slug: string | null;
+  user_id: string | null;
+
   name_en: string; name_ar: string;
   title_en: string | null; title_ar: string | null;
   image: string | null;
@@ -59,14 +61,19 @@ const CultureActorDetail = () => {
           if (!cancelled) setRegion(r as Region | null);
         }
         if (a?.id) {
-          const [{ data: p }, { data: tours }] = await Promise.all([
-            supabase
-              .from("posts")
-              .select("id, slug, title_en, title_ar, category, image, read_time_minutes")
-              .eq("author_id", a.id)
-              .eq("status", "published")
-              .order("created_at", { ascending: false })
-              .limit(10),
+          // Articles are authored with posts.author_id = auth.uid(), so we match on
+          // the actor's linked account. Seeded actors have user_id = null and
+          // therefore legitimately show no articles.
+          const [postsRes, toursRes] = await Promise.all([
+            a.user_id
+              ? supabase
+                  .from("posts")
+                  .select("id, slug, title_en, title_ar, category, image, read_time_minutes")
+                  .eq("author_id", a.user_id)
+                  .eq("status", "published")
+                  .order("created_at", { ascending: false })
+                  .limit(10)
+              : Promise.resolve({ data: [] as Post[] }),
             supabase
               .from("audio_tours")
               .select("id, slug, title_en, title_ar, image, duration_minutes, stops_count")
@@ -76,10 +83,11 @@ const CultureActorDetail = () => {
               .limit(10),
           ]);
           if (!cancelled) {
-            setAuthorPosts((p as Post[]) ?? []);
-            setAudioTours((tours as AudioTour[]) ?? []);
+            setAuthorPosts((postsRes.data as Post[]) ?? []);
+            setAudioTours((toursRes.data as AudioTour[]) ?? []);
           }
         }
+
       } finally {
         if (!cancelled) setLoading(false);
       }

@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
-import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Mic } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin } from "lucide-react";
 import { toast } from "sonner";
 
 const categories = [
@@ -34,7 +34,6 @@ const NewArticle = () => {
     category: "",
     location: "",
     tags: [""],
-    hasAudio: false,
   });
 
   useEffect(() => {
@@ -51,7 +50,6 @@ const NewArticle = () => {
         category: data.category || "",
         location: "",
         tags: Array.isArray(data.tags) && data.tags.length ? (data.tags as string[]) : [""],
-        hasAudio: data.content_type === "audio",
       });
       setExistingImages(Array.isArray(data.images) ? (data.images as string[]) : data.image ? [data.image] : []);
     })();
@@ -71,7 +69,7 @@ const NewArticle = () => {
   const addTag = () => setForm((p) => ({ ...p, tags: [...p.tags, ""] }));
   const removeTag = (idx: number) => setForm((p) => ({ ...p, tags: p.tags.filter((_, i) => i !== idx) }));
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (status: "draft" | "published") => {
     if (!user) {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
@@ -101,18 +99,18 @@ const NewArticle = () => {
         image: images[0] || null,
         images,
         read_time_minutes: readTime,
-        content_type: form.hasAudio ? "audio" : "article",
-        status: "published",
+        content_type: "article",
+        status,
       };
 
       if (isEdit) {
         const { error } = await supabase.from("posts").update(payload).eq("id", id);
         if (error) throw error;
-        toast.success(lang === "ar" ? "تم تحديث المقال!" : "Article updated!");
+        toast.success(status === "draft" ? (lang === "ar" ? "تم حفظ المسودة" : "Draft saved") : (lang === "ar" ? "تم تحديث المقال!" : "Article updated!"));
       } else {
         const { error } = await supabase.from("posts").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
         if (error) throw error;
-        toast.success(lang === "ar" ? "تم نشر المقال بنجاح!" : "Article published successfully!");
+        toast.success(status === "draft" ? (lang === "ar" ? "تم حفظ المسودة" : "Draft saved") : (lang === "ar" ? "تم نشر المقال بنجاح!" : "Article published successfully!"));
       }
       navigate("/dashboard/culture-actor/my-content");
     } catch (err: any) {
@@ -185,20 +183,15 @@ const NewArticle = () => {
           </div>
         </div>
 
-        {/* Audio toggle */}
-        <div className="flex items-center justify-between bg-card rounded-xl shadow-card p-4">
-          <div className="flex items-center gap-2">
-            <Mic className="w-4 h-4 text-role-culture-actor" />
-            <span className="text-sm font-medium text-foreground">{lang === "ar" ? "إضافة سرد صوتي" : "Add Audio Narration"}</span>
-          </div>
-          <button onClick={() => set("hasAudio", !form.hasAudio)} className={`w-10 h-6 rounded-full relative transition-colors ${form.hasAudio ? "bg-role-culture-actor" : "bg-border"}`}>
-            <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${form.hasAudio ? "right-0.5" : "left-0.5"}`} />
+        <div className="space-y-2 mt-4">
+          <button onClick={() => handleSubmit("published")} disabled={submitting} className="w-full bg-role-culture-actor text-white rounded-xl py-4 font-bold text-sm disabled:opacity-60">
+            {submitting ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : isEdit ? (lang === "ar" ? "حفظ ونشر" : "Save & Publish") : (lang === "ar" ? "نشر المقال" : "Publish Article")}
+          </button>
+          <button onClick={() => handleSubmit("draft")} disabled={submitting} className="w-full border-2 border-role-culture-actor text-role-culture-actor rounded-xl py-3 font-semibold text-sm disabled:opacity-60">
+            {lang === "ar" ? "حفظ كمسودة" : "Save as draft"}
           </button>
         </div>
 
-        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-culture-actor text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
-          {submitting ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : isEdit ? (lang === "ar" ? "حفظ التغييرات" : "Save Changes") : (lang === "ar" ? "نشر المقال" : "Publish Article")}
-        </button>
       </div>
     </div>
   );
