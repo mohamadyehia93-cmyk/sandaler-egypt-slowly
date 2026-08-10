@@ -1,3 +1,4 @@
+import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -183,7 +184,12 @@ const ProductDetail = () => {
 
       {/* Seller Bio */}
       {product.seller_id && (
+        <>
         <ProviderBioCard providerId={product.seller_id} roleLabel={{ en: "Artisan / Seller", ar: "الحرفي / البائع" }} />
+        <div className="mx-4 mt-3 flex">
+          <MessageOwnerButton ownerId={product.seller_id} kind="provider" label={lang === "ar" ? "مراسلة البائع" : "Message seller"} />
+        </div>
+        </>
       )}
 
       {/* Sticky Bottom */}

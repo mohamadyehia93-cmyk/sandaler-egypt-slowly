@@ -1,3 +1,4 @@
+import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, BookOpen, Layers, MapPin, Scale, User, ChevronRight } from "lucide-react";
@@ -131,6 +132,13 @@ const CollectionDetail = () => {
               </div>
             )
           )}
+
+          {collection.expert_id && (
+            <div className="mt-3 flex">
+              <MessageOwnerButton ownerId={collection.expert_id} kind="user" label={lang === "ar" ? "مراسلة الخبير" : "Message expert"} />
+            </div>
+          )}
+
 
           <div className="flex items-center gap-3 mt-3 flex-wrap text-[11px] text-muted-foreground">
             <span className="flex items-center gap-1">

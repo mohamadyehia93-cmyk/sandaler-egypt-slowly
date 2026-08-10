@@ -1,3 +1,4 @@
+import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { ArrowLeft, Share2, MapPin, Clock, Users, Calendar, MapPinned, Sparkles, Backpack, Navigation2, ShieldCheck, HelpCircle, Mountain, Languages, Award, AlertTriangle, ChevronDown } from "lucide-react";
 import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
@@ -104,6 +105,12 @@ const TripDetail = () => {
 
         {/* Organizer Bio */}
         {trip.organizer_id && <ProviderBioCard providerId={trip.organizer_id} roleLabel={{ en: "Trip Organizer", ar: "منظم الرحلة" }} />}
+        {trip.organizer_id && (
+          <div className="mt-3 flex">
+            <MessageOwnerButton ownerId={trip.organizer_id} kind="provider" label={lang === "ar" ? "مراسلة المنظم" : "Message organizer"} />
+          </div>
+        )}
+
 
         {/* Itinerary */}
         {(() => {

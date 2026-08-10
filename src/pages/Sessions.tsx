@@ -1,3 +1,4 @@
+import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, CalendarClock, Users } from "lucide-react";
@@ -71,6 +72,11 @@ const Sessions = () => {
               >
                 {openId === m.id ? (ar ? "إغلاق" : "Close") : ar ? "طلب جلسة" : "Request session"}
               </button>
+              {m.organizer_id && (
+                <div className="mt-2 flex">
+                  <MessageOwnerButton ownerId={m.organizer_id} kind="auto" label={ar ? "مراسلة المضيف" : "Message host"} />
+                </div>
+              )}
               {openId === m.id && (
                 <div className="mt-3 border-t border-border pt-3">
                   <SessionRequestForm

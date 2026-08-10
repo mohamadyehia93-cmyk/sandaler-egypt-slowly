@@ -1,3 +1,4 @@
+import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -378,6 +379,14 @@ const PostDetail = () => {
           <span className="text-xs">{post.readTime} {timeLabel}</span>
         </div>
       </div>
+
+      {/* Message the author — never for Sandal editorial bylines (author_id NULL) */}
+      {!post.isEditorial && post.authorId && (
+        <div className="px-4 pt-3 flex">
+          <MessageOwnerButton ownerId={post.authorId} kind="auto" label={lang === "ar" ? "مراسلة الكاتب" : "Message author"} />
+        </div>
+      )}
+
 
       {/* Body */}
       <article className="px-4 pt-5 space-y-4">

@@ -1,3 +1,4 @@
+import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -349,6 +350,15 @@ const EventDetail = () => {
         providerId={(event as any).organizer_id || undefined}
         roleLabel={{ en: "Organizer", ar: "المنظم" }}
       />
+      {(event as any).organizer_id && (
+        <div className="mx-4 mt-3 flex">
+          <MessageOwnerButton
+            ownerId={(event as any).organizer_id}
+            kind="auto"
+            label={lang === "ar" ? "مراسلة المنظم" : "Message organizer"}
+          />
+        </div>
+      )}
 
       {/* Nearby events */}
       {nearby.length > 0 && (

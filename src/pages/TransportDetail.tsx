@@ -1,3 +1,4 @@
+import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Clock, MapPin, Route, ArrowRight, Users, Calendar, Star,
@@ -344,6 +345,12 @@ const TransportDetail = () => {
       </div>
 
       {item.provider_id && <ProviderBioCard providerId={item.provider_id} roleLabel={{ en: "Transport Provider", ar: "مقدم النقل" }} />}
+      {item.provider_id && (
+        <div className="mx-4 mt-3 flex">
+          <MessageOwnerButton ownerId={item.provider_id} kind="provider" label={isAr ? "مراسلة المزود" : "Message provider"} />
+        </div>
+      )}
+
 
       {/* Similar transport */}
       {similar && similar.length > 0 && (
