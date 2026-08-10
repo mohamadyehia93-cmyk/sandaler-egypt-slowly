@@ -45,7 +45,7 @@ const ConversationList = ({ conversations, loading, onSelect }: ConversationList
   return (
     <div className="divide-y divide-border">
       {conversations.map((c) => {
-        const name = c.otherUser?.display_name || "User";
+        const name = c.otherUser?.display_name || (lang === "ar" ? "عضو" : "Member");
         const avatar = c.otherUser?.avatar_url;
         return (
           <button

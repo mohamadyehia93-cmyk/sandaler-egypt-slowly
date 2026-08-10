@@ -135,7 +135,7 @@ const PersonDetail = () => {
               className="flex-1"
             />
             <button
-              onClick={() => navigate(`/inbox?personId=${person.id}&name=${encodeURIComponent(person.name.en)}&nameAr=${encodeURIComponent(person.name.ar)}&image=${encodeURIComponent(person.image)}`)}
+              onClick={() => navigate(`/inbox?personId=${person.id}&kind=auto`)}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors"
             >
               <MessageCircle className="w-4 h-4" />

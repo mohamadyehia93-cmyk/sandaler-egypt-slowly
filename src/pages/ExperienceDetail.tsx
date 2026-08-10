@@ -363,7 +363,7 @@ const ExperienceDetail = () => {
             ))}
           </div>
           <button
-            onClick={() => navigate(`/inbox?personId=${providerId || exp.provider_id || ""}&name=${encodeURIComponent(hostName || "")}`)}
+            onClick={() => navigate(`/inbox?personId=${providerId || exp.provider_id || ""}&kind=provider`)}
             className="w-full h-10 rounded-lg border border-primary text-primary text-xs font-semibold mb-1.5"
           >
             {t("experience.message_host", { name: hostName?.split(" ")[0] || t("experience.default_host_name") })}

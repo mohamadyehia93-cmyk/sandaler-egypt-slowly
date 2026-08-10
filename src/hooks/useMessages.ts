@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { resolveUserIdForMessaging, type MessagingTargetKind } from "@/lib/messagingTarget";
 import type { Tables } from "@/integrations/supabase/types";
 
 type DbConversation = Tables<"conversations">;
@@ -59,24 +60,36 @@ export const useConversations = () => {
     return () => { supabase.removeChannel(channel); };
   }, [user, fetchConversations]);
 
-  const findOrCreateConversation = useCallback(async (otherUserId: string): Promise<string | null> => {
-    if (!user) return null;
+  /**
+   * `targetId` may be an auth user id, a providers.id or a culture_actors.id.
+   * It is always resolved to an auth user id before insert — see messagingTarget.ts.
+   */
+  const findOrCreateConversation = useCallback(async (
+    targetId: string,
+    kind: MessagingTargetKind = "auto",
+  ): Promise<{ conversationId: string | null; reason?: "unclaimed" | "unresolved" }> => {
+    if (!user) return { conversationId: null, reason: "unresolved" };
+
+    const { userId: otherUserId, unclaimed } = await resolveUserIdForMessaging(targetId, kind);
+    if (!otherUserId) return { conversationId: null, reason: unclaimed ? "unclaimed" : "unresolved" };
+    if (otherUserId === user.id) return { conversationId: null, reason: "unresolved" };
+
     // Check existing
     const { data: existing } = await supabase
       .from("conversations")
       .select("id")
       .or(`and(participant_1.eq.${user.id},participant_2.eq.${otherUserId}),and(participant_1.eq.${otherUserId},participant_2.eq.${user.id})`)
       .maybeSingle();
-    if (existing) return existing.id;
+    if (existing) return { conversationId: existing.id };
 
     const { data: created, error } = await supabase
       .from("conversations")
       .insert({ participant_1: user.id, participant_2: otherUserId })
       .select("id")
       .single();
-    if (error || !created) return null;
+    if (error || !created) return { conversationId: null, reason: "unresolved" };
     await fetchConversations();
-    return created.id;
+    return { conversationId: created.id };
   }, [user, fetchConversations]);
 
   return { conversations, loading, findOrCreateConversation, refetch: fetchConversations };

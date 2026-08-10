@@ -153,7 +153,7 @@ const CultureActorDetail = () => {
         <div className="flex gap-2 mt-4">
           <FollowButton targetType="culture_actor" targetId={actor.id} variant="primary" className="flex-1" />
           <button
-            onClick={() => navigate(`/inbox?personId=${actor.id}&name=${encodeURIComponent(actor.name_en)}&nameAr=${encodeURIComponent(actor.name_ar)}&image=${encodeURIComponent(actor.image ?? "")}`)}
+            onClick={() => navigate(`/inbox?personId=${actor.id}&kind=culture_actor`)}
             className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-card border border-border text-foreground hover:bg-secondary transition-colors"
           >
             <MessageCircle className="w-4 h-4 text-primary" />
