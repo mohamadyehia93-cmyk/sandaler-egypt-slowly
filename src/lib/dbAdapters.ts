@@ -162,9 +162,10 @@ export function dbToLegacyPost(r: Row<"posts"> | null | undefined): LegacyPost |
     image: r.image,
     regionId: r.region_id,
     cityId: r.city_id,
-    author: bi(r.author_name_en, r.author_name_ar),
+    author: bylineNames(r),
     authorId: r.author_id,
-    authorImage: r.author_image,
+    authorImage: isEditorialPost(r) ? SANDAL_MARK : r.author_image,
+
     authorRole: r.author_role,
     date: r.created_at,
     readTime: r.read_time_minutes,
