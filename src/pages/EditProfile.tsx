@@ -8,7 +8,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useRegions, useCities } from "@/hooks/useListings";
 import { uploadImages } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
-import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
+import { PROVIDER_PUBLIC_COLUMNS, type ProviderContact } from "@/lib/providerColumns";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -37,9 +37,6 @@ type ProviderRow = {
   cover_image: string | null;
   specialties: unknown;
   languages: string | null;
-  contact_email: string | null;
-  contact_phone: string | null;
-  whatsapp: string | null;
   website: string | null;
   social_links: unknown;
   status: string | null;
