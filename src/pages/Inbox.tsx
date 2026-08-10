@@ -69,7 +69,7 @@ const Inbox = () => {
     return (
       <ChatView
         conversationId={activeConvo.id}
-        otherName={activeConvo.otherUser?.display_name || "User"}
+        otherName={activeConvo.otherUser?.display_name || (lang === "ar" ? "عضو" : "Member")}
         otherAvatar={activeConvo.otherUser?.avatar_url || null}
         onBack={() => setActiveId(null)}
       />
@@ -81,6 +81,11 @@ const Inbox = () => {
       <header className="px-4 py-4 bg-background sticky top-0 z-40">
         <h1 className="text-xl font-bold text-foreground">{t("nav.inbox")}</h1>
       </header>
+      {notice && (
+        <div className="mx-4 mb-2 rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+          {notice}
+        </div>
+      )}
       <ConversationList
         conversations={conversations}
         loading={loading}
