@@ -458,8 +458,9 @@ const SplashPage = () => {
       return;
     }
 
-    const ok = await completeProvider(mappedRole as LocalRole);
-    if (!ok) return;
+    const status = await completeProvider(mappedRole as LocalRole);
+    if (status !== "ok") return;
+
     await persistPersonalization();
     navigate(roleDashboardPaths[mappedRole] || "/");
   };
