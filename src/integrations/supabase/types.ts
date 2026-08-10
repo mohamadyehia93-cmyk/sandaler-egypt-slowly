@@ -266,6 +266,7 @@ export type Database = {
           guests: number
           id: string
           paid_at: string | null
+          payment_status: string
           platform_fee_egp: number
           provider_amount_egp: number
           provider_id: string | null
@@ -284,6 +285,7 @@ export type Database = {
           guests: number
           id?: string
           paid_at?: string | null
+          payment_status?: string
           platform_fee_egp: number
           provider_amount_egp: number
           provider_id?: string | null
@@ -302,6 +304,7 @@ export type Database = {
           guests?: number
           id?: string
           paid_at?: string | null
+          payment_status?: string
           platform_fee_egp?: number
           provider_amount_egp?: number
           provider_id?: string | null
