@@ -141,7 +141,11 @@ const Booking = () => {
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h1 className="text-lg font-bold text-foreground">
-          {step === "details" ? t("booking.booking_details_title") : t("booking.payment_title")}
+          {step === "details"
+            ? t("booking.booking_details_title")
+            : isExperience
+            ? t("booking.payment_title")
+            : ar ? "تأكيد الطلب" : "Confirm request"}
         </h1>
       </header>
 
@@ -156,8 +160,13 @@ const Booking = () => {
                 {i + 1}
               </div>
               <span className={`text-xs font-medium ${step === s ? "text-foreground" : "text-muted-foreground"}`}>
-                {i === 0 ? t("booking.details_step") : t("booking.payment_step")}
+                {i === 0
+                  ? t("booking.details_step")
+                  : isExperience
+                  ? t("booking.payment_step")
+                  : ar ? "الطلب" : "Request"}
               </span>
+
               {i === 0 && <div className="flex-1 h-0.5 bg-border mx-1" />}
             </div>
           ))}
