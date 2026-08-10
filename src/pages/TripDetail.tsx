@@ -67,7 +67,7 @@ const TripDetail = () => {
           <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
             <Share2 className="w-5 h-5 text-foreground" />
           </button>
-          <WishlistButton />
+          <WishlistButton itemType="trip" itemId={trip?.id} />
         </div>
       </div>
 

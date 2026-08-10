@@ -123,7 +123,7 @@ const TransportDetail = () => {
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h1 className="text-lg font-bold text-foreground flex-1 truncate">{name}</h1>
-        <WishlistButton className="p-1.5 rounded-full hover:bg-secondary" />
+        <WishlistButton itemType="transport" itemId={item?.id} className="p-1.5 rounded-full hover:bg-secondary" />
       </header>
 
       {/* Hero */}

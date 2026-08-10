@@ -198,7 +198,7 @@ const AudioTourDetail = () => {
           <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
             <Share2 className="w-5 h-5 text-foreground" />
           </button>
-          <WishlistButton />
+          <WishlistButton itemType="audio_tour" itemId={tour?.id} />
         </div>
         <div className="absolute bottom-3 left-4 flex gap-2">
           <span className="bg-primary/90 text-primary-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">

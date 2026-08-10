@@ -172,7 +172,7 @@ const EventDetail = () => {
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h1 className="flex-1 text-lg font-bold text-foreground line-clamp-1">{title}</h1>
-        <WishlistButton className="p-1.5 rounded-full hover:bg-secondary" />
+        <WishlistButton itemType="event" itemId={event?.id} className="p-1.5 rounded-full hover:bg-secondary" />
         <button onClick={share} className="p-1.5 rounded-full hover:bg-secondary" aria-label={t("event.share")}>
           <Share2 className="w-5 h-5 text-foreground" />
         </button>

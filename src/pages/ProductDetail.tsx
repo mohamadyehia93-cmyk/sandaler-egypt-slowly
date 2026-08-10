@@ -107,7 +107,7 @@ const ProductDetail = () => {
         <button onClick={() => navigate(-1)} className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-sm">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
-        <WishlistButton />
+        <WishlistButton itemType="product" itemId={product?.id} />
         {product.badges && product.badges.length > 0 && (
           <div className="absolute bottom-3 left-4 flex gap-1.5">
             {product.badges.map((badge, i) => (
