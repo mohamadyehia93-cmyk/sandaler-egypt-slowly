@@ -22,6 +22,12 @@ const ProviderContactCard = ({ providerId }: { providerId?: string }) => {
     if (!providerId) return;
     let active = true;
     (async () => {
+      // The RPC is only executable by signed-in users; skip it for guests.
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session) {
+        if (active) setLoading(false);
+        return;
+      }
       const { data } = await supabase.rpc("get_provider_contact", { _provider_id: providerId });
       if (!active) return;
       const row = (Array.isArray(data) ? data[0] : data) as ProviderContact | undefined;
