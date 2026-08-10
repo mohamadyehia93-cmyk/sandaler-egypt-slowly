@@ -4,6 +4,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchMyProviderId } from "@/lib/providerRecord";
+
 import { ArrowLeft, Bell, Plus, Calendar, Clock, ChevronRight, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
@@ -34,14 +36,18 @@ const ServiceProviderDashboard = () => {
     queryKey: ["sp-listings-count", user?.id],
     enabled: !!user,
     queryFn: async () => {
+      // experiences.provider_id holds providers.id (see src/lib/providerRecord.ts)
+      const providerId = await fetchMyProviderId(user!.id);
+      if (!providerId) return 0;
       const { count, error } = await supabase
         .from("experiences")
         .select("*", { count: "exact", head: true })
-        .eq("provider_id", user!.id);
+        .eq("provider_id", providerId);
       if (error) throw error;
       return count ?? 0;
     },
   });
+
 
   const { data: bookings = [] } = useQuery({
     queryKey: ["sp-bookings", user?.id],
