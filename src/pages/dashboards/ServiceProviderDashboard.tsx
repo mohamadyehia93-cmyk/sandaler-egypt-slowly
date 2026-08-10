@@ -184,9 +184,10 @@ const ServiceProviderDashboard = () => {
                       <p className="text-xs font-semibold text-foreground line-clamp-1">{title(b)}</p>
                       <p className="text-[10px] text-muted-foreground">
                         {b.guests} {lang === "ar" ? "أشخاص" : "guests"} · {new Date(b.created_at).toLocaleDateString(locale, { day: "numeric", month: "short" })}
+                        {b.payment_status === "unpaid" && ` · ${lang === "ar" ? "غير مدفوع" : "Unpaid"}`}
                       </p>
                     </div>
-                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${b.status === "confirmed" ? "bg-success/10 text-success" : b.status === "pending_payment" ? "bg-warning/10 text-warning" : "bg-muted text-muted-foreground"}`}>
+                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${b.status === "confirmed" ? "bg-success/10 text-success" : b.status === "pending" || b.status === "pending_payment" ? "bg-warning/10 text-warning" : "bg-muted text-muted-foreground"}`}>
                       {statusLabel(b.status)}
                     </span>
                   </div>
@@ -202,7 +203,8 @@ const ServiceProviderDashboard = () => {
                       </button>
                       <button
                         disabled={savingId === b.id}
-                        onClick={() => updateBookingStatus(b.id, "cancelled")}
+                        onClick={() => updateBookingStatus(b.id, "declined")}
+
                         className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
                       >
                         <X className="w-3.5 h-3.5" /> {lang === "ar" ? "رفض" : "Decline"}
