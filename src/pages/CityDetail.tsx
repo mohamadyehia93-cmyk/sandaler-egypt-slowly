@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { bylineNames } from "@/lib/postByline";
 import { cityData, experiences, audioTours, accommodation, products, whosWho, causes, latestPosts, trips } from "@/lib/sampleData";
 import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
@@ -196,7 +197,7 @@ const CityDetail = () => {
       id: p.slug || p.id, slug: p.slug,
       title: { en: p.title_en, ar: p.title_ar },
       category: { en: p.category || "Article", ar: p.category || "مقال" },
-      author: { en: p.author_name_en || "", ar: p.author_name_ar || "" },
+      author: bylineNames(p),
       image: p.image, readTime: p.read_time_minutes ?? 5,
       cityId: p.city_id, regionId: p.region_id,
     })) as any[],

@@ -1,6 +1,7 @@
 import { ArrowLeft, Bookmark, Mic, Film, Camera, MessageSquare, ChefHat, ClipboardList, Map, FileText, Search, SlidersHorizontal, X as XIcon, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
+import { bylineNames } from "@/lib/postByline";
 import { usePosts, useRegions } from "@/hooks/useListings";
 import { contentTypeConfig } from "@/components/LatestPosts";
 import CityBadge from "@/components/CityBadge";
@@ -47,7 +48,7 @@ const AllPosts = () => {
         regionId: p.region_id,
         cityId: p.city_id,
         category: { en: p.category ?? "General", ar: p.category ?? "عام" },
-        author: { en: p.author_name_en ?? "", ar: p.author_name_ar ?? "" },
+        author: bylineNames(p),
         readTime: p.read_time_minutes ?? 5,
         contentType: (p as any).content_type ?? null,
       })),

@@ -5,6 +5,9 @@ import { ArrowLeft, Clock, Share2, User, MapPin, Play, Pause, SkipBack, SkipForw
 import { useI18n } from "@/lib/i18n";
 import { cultureActors, cityData } from "@/lib/sampleData";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
+import { supabase } from "@/integrations/supabase/client";
+import { bylineNames, isEditorialPost, SANDAL_BYLINE, SANDAL_MARK } from "@/lib/postByline";
+
 import { usePosts } from "@/hooks/useListings";
 import WishlistButton from "@/components/WishlistButton";
 import { contentTypeConfig } from "@/components/LatestPosts";
@@ -199,6 +202,22 @@ const PostDetail = () => {
   });
   const { data: allPosts } = usePosts();
 
+  // Real (signed-up) authors: resolve their live profile name + avatar.
+  const realAuthorId = (row as any)?.author_id as string | null | undefined;
+  const { data: authorProfile } = useQuery({
+    queryKey: ["post-author-profile", realAuthorId],
+    enabled: !!realAuthorId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("display_name, avatar_url")
+        .eq("user_id", realAuthorId!)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+
   if (isLoading) return <DetailSkeleton variant="city" />;
   if (!row) return <NotFoundView context="post" />;
 
@@ -210,8 +229,11 @@ const PostDetail = () => {
     title: { en: row.title_en, ar: row.title_ar },
     body: { en: row.body_en || "", ar: row.body_ar || "" },
     category: { en: row.category || "", ar: row.category || "" },
-    author: { en: row.author_name_en || "", ar: row.author_name_ar || row.author_name_en || "" },
+    author: bylineNames(row),
     authorId: row.author_id,
+    isEditorial: isEditorialPost(row),
+    authorImage: row.author_image,
+
     date: row.created_at,
     readTime: row.read_time_minutes ?? 5,
     regionId: row.region_id,
@@ -301,28 +323,56 @@ const PostDetail = () => {
 
       {/* Meta */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-4 border-b border-border">
-        <div
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => {
-            const actor = cultureActors.find((a) => a.id === post.authorId);
-            if (actor) navigate(`/culture-actor/${actor.id}`);
-          }}
-        >
-          {(() => {
-            const actor = cultureActors.find((a) => a.id === post.authorId);
-            return actor ? (
-              <img src={actor.image} alt={actor.name[lang]} className="w-8 h-8 rounded-full object-cover" />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <User className="w-4 h-4 text-primary" />
-              </div>
-            );
-          })()}
-          <div>
-            <p className="text-xs font-semibold text-primary">{post.author[lang]}</p>
-            <p className="text-[10px] text-muted-foreground">{formattedDate}</p>
+        {post.isEditorial ? (
+          <div className="flex items-center gap-2" data-testid="post-byline">
+            <img
+              src={SANDAL_MARK}
+              alt={SANDAL_BYLINE[lang]}
+              className="w-8 h-8 rounded-lg object-contain bg-primary/10 p-0.5"
+            />
+            <div>
+              <p className="text-xs font-semibold text-primary flex items-center gap-1.5">
+                {SANDAL_BYLINE[lang]}
+                <span className="text-[9px] font-medium bg-primary/10 text-primary px-1.5 py-px rounded uppercase tracking-wide">
+                  {lang === "ar" ? "التحرير" : "Editorial"}
+                </span>
+              </p>
+              <p className="text-[10px] text-muted-foreground">{formattedDate}</p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            data-testid="post-byline"
+            onClick={() => {
+              const actor = cultureActors.find((a) => a.id === post.authorId);
+              if (actor) navigate(`/culture-actor/${actor.id}`);
+              else if (post.authorId) navigate(`/visitor/${post.authorId}`);
+            }}
+          >
+            {(() => {
+              const actor = cultureActors.find((a) => a.id === post.authorId);
+              const img = actor?.image || authorProfile?.avatar_url || post.authorImage;
+              const name = actor?.name[lang] || authorProfile?.display_name || post.author[lang];
+              return img ? (
+                <img src={img} alt={name} className="w-8 h-8 rounded-full object-cover" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="w-4 h-4 text-primary" />
+                </div>
+              );
+            })()}
+            <div>
+              <p className="text-xs font-semibold text-primary">
+                {cultureActors.find((a) => a.id === post.authorId)?.name[lang] ||
+                  authorProfile?.display_name ||
+                  post.author[lang]}
+              </p>
+              <p className="text-[10px] text-muted-foreground">{formattedDate}</p>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center gap-1 text-muted-foreground ms-auto">
           {ct && CtIcon ? <CtIcon className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
           <span className="text-xs">{post.readTime} {timeLabel}</span>
