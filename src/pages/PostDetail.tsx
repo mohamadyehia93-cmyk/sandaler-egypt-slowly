@@ -199,6 +199,22 @@ const PostDetail = () => {
   });
   const { data: allPosts } = usePosts();
 
+  // Real (signed-up) authors: resolve their live profile name + avatar.
+  const realAuthorId = (row as any)?.author_id as string | null | undefined;
+  const { data: authorProfile } = useQuery({
+    queryKey: ["post-author-profile", realAuthorId],
+    enabled: !!realAuthorId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("display_name, avatar_url")
+        .eq("user_id", realAuthorId!)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+
   if (isLoading) return <DetailSkeleton variant="city" />;
   if (!row) return <NotFoundView context="post" />;
 
