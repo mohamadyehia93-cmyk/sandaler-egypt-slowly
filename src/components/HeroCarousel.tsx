@@ -63,8 +63,9 @@ const HeroCarousel = () => {
                 e.stopPropagation();
                 navigate("/credits");
               }}
-              aria-label={lang === "ar" ? "حقوق الصور" : "Image credits"}
-              className="absolute top-3 end-3 z-10 w-6 h-6 rounded-full bg-foreground/35 backdrop-blur-sm text-primary-foreground/90 text-[11px] leading-none flex items-center justify-center"
+              aria-label={lang === "ar" ? "حقوق صورة هذه الصورة" : "Photo credit for this image"}
+              className="absolute bottom-4 end-4 z-10 w-6 h-6 rounded-full bg-foreground/35 backdrop-blur-sm text-primary-foreground/90 text-[11px] leading-none flex items-center justify-center"
+
             >
               ©
             </button>
