@@ -296,6 +296,41 @@ const CauseSupportDonate = () => {
               ))}
             </div>
 
+            {/* Contact details for the organisation to reach the supporter */}
+            <div className="rounded-xl bg-card border border-border shadow-card p-4 mb-5 space-y-2.5">
+              <p className="text-sm font-bold text-foreground">
+                {ar ? "بيانات التواصل" : "Your contact details"}
+              </p>
+              <input
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                placeholder={ar ? "الاسم" : "Full name"}
+                className="w-full bg-surface border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
+              />
+              <input
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                placeholder={ar ? "رقم الهاتف" : "Phone number"}
+                dir="ltr"
+                className="w-full bg-surface border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
+              />
+              <input
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                placeholder={ar ? "البريد الإلكتروني" : "Email"}
+                dir="ltr"
+                className="w-full bg-surface border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
+              />
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={3}
+                placeholder={ar ? "رسالة للمنظمة (اختياري)" : "Message to the organisation (optional)"}
+                className="w-full bg-surface border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary resize-none"
+              />
+            </div>
+
+
             {/* Impact */}
             <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 mb-5">
               <div className="flex items-center gap-2 mb-1.5">
