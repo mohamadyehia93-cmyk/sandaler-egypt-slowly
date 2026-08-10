@@ -92,6 +92,15 @@ const Booking = () => {
 
   const ar = lang === "ar";
 
+  // reservation_requests.item_type vocabulary (differs from the route's `type` param)
+  const requestItemType = ({
+    trip: "trip",
+    stay: "accommodation",
+    transport: "transport",
+    product: "product",
+  } as Record<string, string>)[type] || "trip";
+
+
   if (step === "confirmed") {
     return (
       <div className="min-h-screen bg-surface flex flex-col items-center justify-center px-6 text-center">
