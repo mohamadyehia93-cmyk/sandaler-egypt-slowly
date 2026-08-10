@@ -12,6 +12,8 @@ type Region = { id: string; name_en: string; name_ar: string; emoji: string | nu
 type Actor = {
   id: string;
   slug: string | null;
+  user_id: string | null;
+
   name_en: string; name_ar: string;
   title_en: string | null; title_ar: string | null;
   image: string | null;
