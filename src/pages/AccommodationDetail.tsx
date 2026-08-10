@@ -1,3 +1,4 @@
+import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Star, MapPin, Users, Clock, DoorOpen, Check, CalendarIcon } from "lucide-react";
 import { useState, useMemo } from "react";
@@ -84,6 +85,12 @@ const AccommodationDetail = () => {
 
         {/* Host Bio */}
         {place.host_id && <ProviderBioCard providerId={place.host_id} roleLabel={{ en: "Your Host", ar: "مضيفك" }} />}
+        {place.host_id && (
+          <div className="mt-3 flex">
+            <MessageOwnerButton ownerId={place.host_id} kind="provider" label={lang === "ar" ? "مراسلة المضيف" : "Message host"} />
+          </div>
+        )}
+
 
         {/* Description */}
         {description && (

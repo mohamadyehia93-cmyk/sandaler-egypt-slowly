@@ -1,3 +1,4 @@
+import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { ArrowLeft, Share2, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle, ChevronRight, Feather } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
@@ -354,6 +355,18 @@ const AudioTourDetail = () => {
             </Wrapper>
           );
         })()}
+
+        {/* Message the narrator: the linked culture actor when set, else the tour creator */}
+        {(narratorActorId || (tour as any).creator_id) && (
+          <div className="-mt-3 mb-6 flex">
+            <MessageOwnerButton
+              ownerId={narratorActorId || (tour as any).creator_id}
+              kind={narratorActorId ? "culture_actor" : "auto"}
+              label={lang === "ar" ? "مراسلة الراوي" : "Message narrator"}
+            />
+          </div>
+        )}
+
 
         {/* Description */}
         {description && (

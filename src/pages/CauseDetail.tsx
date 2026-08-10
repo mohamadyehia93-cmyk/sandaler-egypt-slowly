@@ -1,3 +1,4 @@
+import MessageOwnerButton from "@/components/MessageOwnerButton";
 import WishlistButton from "@/components/WishlistButton";
 import { ArrowLeft, Heart, Share2, Users, Calendar, MapPin, ExternalLink, Gift, HandHeart, UserCheck, MessageCircle } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -131,6 +132,13 @@ const CauseDetail = () => {
             </Wrapper>
           );
         })()}
+
+        {ownerId && (
+          <div className="-mt-3 mb-6 flex">
+            <MessageOwnerButton ownerId={ownerId} kind="auto" label={lang === "ar" ? "مراسلة المنظمة" : "Message organization"} />
+          </div>
+        )}
+
 
 
         {/* How to Support */}
