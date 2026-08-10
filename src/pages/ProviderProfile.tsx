@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import NotFoundView from "@/components/NotFound";
 import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
+import ProviderContactCard from "@/components/ProviderContactCard";
 
 type ProviderRole =
   | "culture-actor" | "service-provider" | "accommodation-host"
@@ -202,6 +203,8 @@ const ProviderProfile = () => {
           {lang === "ar" ? "رسالة" : "Message"}
         </button>
       </div>
+
+      <ProviderContactCard providerId={provider.id} />
 
       {/* Stats Row */}
       <div className="flex mx-4 mt-4 bg-card rounded-xl shadow-card overflow-hidden">
