@@ -36,7 +36,7 @@ const MyCommissions = () => {
     },
   });
 
-  const update = async (id: string, patch: Record<string, unknown>, okMsg: string) => {
+  const update = async (id: string, patch: { status?: string }, okMsg: string) => {
     setBusyId(id);
     const { error } = await supabase.from("commissions").update(patch).eq("id", id);
     setBusyId(null);

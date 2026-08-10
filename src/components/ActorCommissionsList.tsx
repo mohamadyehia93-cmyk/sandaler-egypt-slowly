@@ -75,7 +75,14 @@ const ActorCommissionsList = () => {
     },
   });
 
-  const update = async (id: string, patch: Record<string, unknown>, okMsg: string) => {
+  type CommissionPatch = {
+    status?: string;
+    decline_reason?: string | null;
+    deliverable_url?: string | null;
+    deliverable_post_id?: string | null;
+  };
+
+  const update = async (id: string, patch: CommissionPatch, okMsg: string) => {
     setBusyId(id);
     const { error } = await supabase.from("commissions").update(patch).eq("id", id);
     setBusyId(null);
