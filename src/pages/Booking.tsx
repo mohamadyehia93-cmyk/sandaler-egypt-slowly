@@ -156,10 +156,11 @@ const Booking = () => {
         <h1 className="text-lg font-bold text-foreground">
           {step === "details"
             ? t("booking.booking_details_title")
-            : isExperience
+            : paidPath
             ? t("booking.payment_title")
             : ar ? "تأكيد الطلب" : "Confirm request"}
         </h1>
+
       </header>
 
       {/* Progress Steps */}
@@ -175,9 +176,10 @@ const Booking = () => {
               <span className={`text-xs font-medium ${step === s ? "text-foreground" : "text-muted-foreground"}`}>
                 {i === 0
                   ? t("booking.details_step")
-                  : isExperience
+                  : paidPath
                   ? t("booking.payment_step")
                   : ar ? "الطلب" : "Request"}
+
               </span>
 
               {i === 0 && <div className="flex-1 h-0.5 bg-border mx-1" />}
@@ -262,7 +264,7 @@ const Booking = () => {
 
         {step === "payment" && (
           <>
-            {isExperience ? (
+            {paidPath ? (
               <>
                 {/* Payment Methods */}
                 <h2 className="text-sm font-semibold text-foreground mb-3">
@@ -345,7 +347,7 @@ const Booking = () => {
               </div>
               <div className="border-t border-border pt-2 flex justify-between">
                 <span className="text-sm font-bold text-foreground">
-                  {isExperience ? t("booking.total") : ar ? "الإجمالي التقديري" : "Estimated total"}
+                  {paidPath ? t("booking.total") : ar ? "الإجمالي التقديري" : "Estimated total"}
                 </span>
                 <span className="text-base font-bold text-primary">{total} {t("common.egp")}</span>
               </div>
@@ -355,7 +357,7 @@ const Booking = () => {
             <div className="flex items-center gap-2 p-3 rounded-lg bg-surface border border-border mb-5">
               <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
               <p className="text-[10px] text-muted-foreground">
-                {isExperience
+                {paidPath
                   ? t("booking.secure_notice")
                   : ar
                   ? "لن يُطلب منك أي دفع في هذه الخطوة."
@@ -367,12 +369,7 @@ const Booking = () => {
         )}
       </div>
 
-      {/* Inline checkout notices (experience flow only) */}
-      {isExperience && !slotId && step === "payment" && (
-        <div className="mx-4 mb-3 p-3 rounded-lg bg-warning/10 border border-warning text-sm">
-          {t("booking.slot_required_warning")}
-        </div>
-      )}
+
       {(bookingError || requestError) && (
         <div className="mx-4 mb-3 p-3 rounded-lg bg-destructive/10 border border-destructive text-sm text-destructive">
           {bookingError || requestError}
