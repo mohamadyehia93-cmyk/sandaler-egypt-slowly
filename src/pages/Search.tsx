@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Search as SearchIcon, X, ArrowLeft, Compass, Route as RouteIcon, CalendarDays,
   FileText, Headphones, ShoppingBag, BedDouble, Bus, HandHeart, Users, Palette,
-  Building2, Store, MapPin, Map, Clock,
+  Building2, Store, MapPin, Map as MapIcon, Clock,
 } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { useI18n } from "@/lib/i18n";
@@ -44,7 +44,7 @@ const TYPE_CONFIG: Record<string, TypeConfig> = {
   organization: { route: "/organization", icon: Building2, label: { en: "Organizations", ar: "المنظمات" } },
   provider: { route: "/provider", icon: Store, label: { en: "Providers", ar: "مقدمو الخدمات" } },
   city: { route: "/city", icon: MapPin, label: { en: "Cities", ar: "المدن" } },
-  region: { route: "/region", icon: Map, label: { en: "Regions", ar: "المناطق" } },
+  region: { route: "/region", icon: MapIcon, label: { en: "Regions", ar: "المناطق" } },
 };
 
 const ORDER = [
