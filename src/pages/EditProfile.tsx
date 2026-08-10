@@ -8,6 +8,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useRegions, useCities } from "@/hooks/useListings";
 import { uploadImages } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import { PROVIDER_PUBLIC_COLUMNS, type ProviderContact } from "@/lib/providerColumns";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -36,9 +37,6 @@ type ProviderRow = {
   cover_image: string | null;
   specialties: unknown;
   languages: string | null;
-  contact_email: string | null;
-  contact_phone: string | null;
-  whatsapp: string | null;
   website: string | null;
   social_links: unknown;
   status: string | null;
@@ -266,13 +264,21 @@ const EditProfile = () => {
     }
     setLoading(true);
     const [{ data: prov }, { data: prof }] = await Promise.all([
-      supabase.from("providers").select("*").eq("user_id", user.id).maybeSingle(),
+      supabase.from("providers").select(PROVIDER_PUBLIC_COLUMNS).eq("user_id", user.id).maybeSingle(),
       supabase.from("profiles").select("display_name, avatar_url, bio").eq("user_id", user.id).maybeSingle(),
     ]);
 
     if (prov) {
       const p = prov as unknown as ProviderRow;
       setProvider(p);
+      // Private contact details are not readable through the table any more;
+      // the owner reads them back through the guarded RPC.
+      const { data: contactRows } = await supabase.rpc("get_provider_contact", {
+        _provider_id: p.id,
+      });
+      const contact = (Array.isArray(contactRows) ? contactRows[0] : contactRows) as
+        | ProviderContact
+        | undefined;
       setF({
         nameEn: p.name_en || "",
         nameAr: p.name_ar || "",
@@ -286,11 +292,12 @@ const EditProfile = () => {
         regionEn: p.region_en || "",
         regionAr: p.region_ar || "",
         languages: p.languages || "",
-        contactEmail: p.contact_email || "",
-        contactPhone: p.contact_phone || "",
-        whatsapp: p.whatsapp || "",
+        contactEmail: contact?.contact_email || "",
+        contactPhone: contact?.contact_phone || "",
+        whatsapp: contact?.whatsapp || "",
         website: p.website || "",
       });
+
       setSocial(asSocial(p.social_links));
       setSpecialties(asStringArray(p.specialties));
       setAvatarUrl(p.avatar);

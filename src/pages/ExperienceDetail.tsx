@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import NotFoundView from "@/components/NotFound";
+import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
 
 /* ── static fallbacks ────────────────────────────────────────── */
 const fallbackTags = [
@@ -83,7 +84,7 @@ const ExperienceDetail = () => {
   const { data: provider } = useQuery({
     queryKey: ["provider", providerId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("providers").select("*").eq("id", providerId).maybeSingle();
+      const { data, error } = await supabase.from("providers").select(PROVIDER_PUBLIC_COLUMNS).eq("id", providerId).maybeSingle();
       if (error) throw error;
       return data;
     },

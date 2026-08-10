@@ -2528,6 +2528,14 @@ export type Database = {
         Args: { _target_id: string; _target_type: string }
         Returns: number
       }
+      get_provider_contact: {
+        Args: { _provider_id: string }
+        Returns: {
+          contact_email: string
+          contact_phone: string
+          whatsapp: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
