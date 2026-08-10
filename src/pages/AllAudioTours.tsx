@@ -161,9 +161,11 @@ const AllAudioTours = () => {
                     </div>
                     <div className="p-3 flex items-center justify-between">
                       {a.city_id && <CityBadge cityId={a.city_id} />}
+                      {/* Payments aren't live for tours yet — listening is free. */}
                       <span className="text-sm font-bold text-primary-dark">
-                        {a.price === 0 ? t("common.free") : `${a.price} ${t("common.egp")}`}
+                        {lang === "ar" ? "مجاني للاستماع" : "Free to listen"}
                       </span>
+
                     </div>
                   </div>
                 ))}

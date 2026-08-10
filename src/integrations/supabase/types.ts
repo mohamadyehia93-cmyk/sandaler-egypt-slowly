@@ -158,6 +158,7 @@ export type Database = {
       }
       audio_tours: {
         Row: {
+          audio_url: string | null
           city_id: string | null
           created_at: string
           creator_id: string | null
@@ -184,6 +185,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          audio_url?: string | null
           city_id?: string | null
           created_at?: string
           creator_id?: string | null
@@ -210,6 +212,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          audio_url?: string | null
           city_id?: string | null
           created_at?: string
           creator_id?: string | null

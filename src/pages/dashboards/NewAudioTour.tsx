@@ -3,9 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { slugify, uploadImages } from "@/lib/dashboardForms";
+import { slugify, uploadImages, uploadAudio } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
-import { ArrowLeft, FileText, MapPin, Clock, Tag, Languages, DollarSign, Plus, Trash2, Mic, Image as ImageIcon } from "lucide-react";
+import AudioPicker from "@/components/dashboard/AudioPicker";
+import { ArrowLeft, FileText, MapPin, Clock, Tag, Languages, DollarSign, Plus, Trash2, Mic, Image as ImageIcon, Navigation } from "lucide-react";
 import { toast } from "sonner";
 
 const themes = [
@@ -17,6 +18,28 @@ const themes = [
   { en: "Nature", ar: "طبيعة" },
 ];
 
+type StopDraft = {
+  name: string;
+  desc_en: string;
+  desc_ar: string;
+  lat: string;
+  lng: string;
+  /** Newly picked clip, uploaded on save. */
+  audioFile: File | null;
+  /** Already-uploaded clip URL (edit mode). */
+  audioUrl: string | null;
+};
+
+const emptyStop = (): StopDraft => ({
+  name: "",
+  desc_en: "",
+  desc_ar: "",
+  lat: "",
+  lng: "",
+  audioFile: null,
+  audioUrl: null,
+});
+
 const NewAudioTour = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
@@ -24,8 +47,13 @@ const NewAudioTour = () => {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
+  const [uploadStage, setUploadStage] = useState<string | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+
+  // Tour-level narration (the continuous track the player maps to stop progress)
+  const [tourAudioFile, setTourAudioFile] = useState<File | null>(null);
+  const [existingTourAudio, setExistingTourAudio] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     title: "",
@@ -37,9 +65,7 @@ const NewAudioTour = () => {
     languages: [] as string[],
   });
 
-  const [stops, setStops] = useState<{ name: string; desc_en: string; desc_ar: string }[]>([
-    { name: "", desc_en: "", desc_ar: "" },
-  ]);
+  const [stops, setStops] = useState<StopDraft[]>([emptyStop()]);
 
   useEffect(() => {
     if (!isEdit) return;
@@ -59,13 +85,25 @@ const NewAudioTour = () => {
         languages: Array.isArray(data.languages) ? (data.languages as string[]) : [],
       });
       const dbStops = Array.isArray(data.stops) ? (data.stops as any[]) : [];
-      setStops(dbStops.length ? dbStops.map((s: any) => ({ name: s.label_en || "", desc_en: s.desc_en || "", desc_ar: s.desc_ar || "" })) : [{ name: "", desc_en: "", desc_ar: "" }]);
+      setStops(
+        dbStops.length
+          ? dbStops.map((s: any) => ({
+              name: s.label_en || "",
+              desc_en: s.desc_en || "",
+              desc_ar: s.desc_ar || "",
+              lat: s.lat != null ? String(s.lat) : "",
+              lng: s.lng != null ? String(s.lng) : "",
+              audioFile: null,
+              audioUrl: s.audio_url || null,
+            }))
+          : [emptyStop()]
+      );
       setExistingImages(data.image ? [data.image] : []);
+      setExistingTourAudio((data as any).audio_url || null);
     })();
   }, [isEdit, id, lang]);
 
   const set = (key: string, value: string | string[]) => setForm((p) => ({ ...p, [key]: value }));
-
 
   const toggleLang = (l: string) => {
     setForm((p) => ({
@@ -74,10 +112,17 @@ const NewAudioTour = () => {
     }));
   };
 
-  const addStop = () => setStops((s) => [...s, { name: "", desc_en: "", desc_ar: "" }]);
+  const addStop = () => setStops((s) => [...s, emptyStop()]);
   const removeStop = (i: number) => setStops((s) => s.filter((_, idx) => idx !== i));
-  const updateStop = (i: number, key: "name" | "desc_en" | "desc_ar", v: string) =>
+  const updateStop = <K extends keyof StopDraft>(i: number, key: K, v: StopDraft[K]) =>
     setStops((s) => s.map((stop, idx) => (idx === i ? { ...stop, [key]: v } : stop)));
+
+  /** Parse a coordinate field; returns null when blank or out of range. */
+  const parseCoord = (raw: string, max: number): number | null => {
+    const n = parseFloat(raw);
+    if (!raw.trim() || Number.isNaN(n) || Math.abs(n) > max) return null;
+    return n;
+  };
 
   const handleSubmit = async () => {
     if (!user) {
@@ -90,15 +135,46 @@ const NewAudioTour = () => {
     }
     setSubmitting(true);
     try {
+      setUploadStage("image");
       const uploaded = await uploadImages(photos, user.id);
       const images = [...existingImages, ...uploaded];
-      const cleanStops = stops
-        .filter((s) => s.name.trim())
-        .map((s) => ({ label_en: s.name.trim(), label_ar: s.name.trim(), desc_en: s.desc_en.trim(), desc_ar: s.desc_ar.trim() }));
+
+      // Tour narration
+      setUploadStage("tour-audio");
+      let tourAudioUrl = existingTourAudio;
+      if (tourAudioFile) tourAudioUrl = await uploadAudio(tourAudioFile, user.id);
+
+      // Per-stop clips
+      const named = stops.filter((s) => s.name.trim());
+      const cleanStops: any[] = [];
+      for (let i = 0; i < named.length; i++) {
+        const s = named[i];
+        setUploadStage(`stop-audio-${i + 1}`);
+        let stopAudio = s.audioUrl;
+        if (s.audioFile) stopAudio = await uploadAudio(s.audioFile, user.id);
+        cleanStops.push({
+          label_en: s.name.trim(),
+          label_ar: s.name.trim(),
+          desc_en: s.desc_en.trim(),
+          desc_ar: s.desc_ar.trim(),
+          lat: parseCoord(s.lat, 90),
+          lng: parseCoord(s.lng, 180),
+          audio_url: stopAudio || null,
+        });
+      }
+      setUploadStage(null);
 
       const { data: profile } = await supabase
         .from("profiles")
         .select("display_name, avatar_url")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      // Credit the narrator's culture-actor profile when the creator has one;
+      // otherwise leave it null and fall back to the profile display name.
+      const { data: actor } = await supabase
+        .from("culture_actors")
+        .select("id, name_en, name_ar, image")
         .eq("user_id", user.id)
         .maybeSingle();
 
@@ -114,9 +190,11 @@ const NewAudioTour = () => {
         stops: cleanStops,
         price: parseInt(form.price) || 0,
         languages: form.languages.length > 0 ? form.languages : ["ar"],
-        narrator_name_en: profile?.display_name || null,
-        narrator_name_ar: profile?.display_name || null,
-        narrator_image: profile?.avatar_url || null,
+        audio_url: tourAudioUrl || null,
+        narrator_culture_actor_id: actor?.id ?? null,
+        narrator_name_en: actor?.name_en || profile?.display_name || null,
+        narrator_name_ar: actor?.name_ar || profile?.display_name || null,
+        narrator_image: actor?.image || profile?.avatar_url || null,
         image: images[0] || null,
         status: "published",
       };
@@ -134,13 +212,21 @@ const NewAudioTour = () => {
     } catch (err: any) {
       toast.error(err.message || "Failed to save audio tour");
     } finally {
+      setUploadStage(null);
       setSubmitting(false);
     }
   };
 
-
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-narrator/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
+
+  const submitLabel = submitting
+    ? uploadStage === "tour-audio" || uploadStage?.startsWith("stop-audio")
+      ? lang === "ar" ? "جارٍ رفع الصوت..." : "Uploading audio..."
+      : lang === "ar" ? "جاري الحفظ..." : "Saving..."
+    : isEdit
+    ? lang === "ar" ? "حفظ التغييرات" : "Save Changes"
+    : lang === "ar" ? "نشر الجولة" : "Publish Tour";
 
   return (
     <div className="min-h-screen bg-surface pb-10">
@@ -171,6 +257,23 @@ const NewAudioTour = () => {
           </div>
         </div>
 
+        {/* Tour narration file */}
+        <div>
+          <AudioPicker
+            label={lang === "ar" ? "التسجيل الكامل للجولة" : "Full Tour Narration"}
+            file={tourAudioFile}
+            onChange={setTourAudioFile}
+            existingUrl={existingTourAudio}
+            onRemoveExisting={() => setExistingTourAudio(null)}
+            uploading={submitting && uploadStage === "tour-audio"}
+          />
+          <p className="text-[10px] text-muted-foreground mt-1">
+            {lang === "ar"
+              ? "هذا هو التسجيل الرئيسي. بدونه ستظهر الجولة كـ«الصوت قادم قريباً»."
+              : "This is the main recording. Without it the tour shows as “Audio coming soon”."}
+          </p>
+        </div>
+
         <div>
           <label className={labelClass}><Tag className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "الموضوع *" : "Theme *"}</label>
           <div className="flex flex-wrap gap-2">
@@ -194,9 +297,13 @@ const NewAudioTour = () => {
         </div>
 
         <div>
-          <label className={labelClass}><DollarSign className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "السعر (ج.م)" : "Price (EGP)"}</label>
-          <input type="number" className={inputClass} placeholder="0 = مجاني / Free" value={form.price} onChange={(e) => set("price", e.target.value)} min="0" />
-          <p className="text-[10px] text-muted-foreground mt-1">{lang === "ar" ? "تحتفظ بـ 85% من السعر" : "You keep 85% of the price"}</p>
+          <label className={labelClass}><DollarSign className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "السعر الإرشادي (ج.م)" : "Indicative Price (EGP)"}</label>
+          <input type="number" className={inputClass} placeholder="0" value={form.price} onChange={(e) => set("price", e.target.value)} min="0" />
+          <p className="text-[10px] text-muted-foreground mt-1">
+            {lang === "ar"
+              ? "الدفع غير مُفعّل بعد — كل الجولات مجانية للاستماع حالياً، وهذا السعر إرشادي فقط."
+              : "Payments aren't live yet — all tours are free to listen to for now, so this is indicative only."}
+          </p>
         </div>
 
         <div>
@@ -226,13 +333,43 @@ const NewAudioTour = () => {
                 <input className={inputClass} placeholder={lang === "ar" ? "اسم المكان" : "Place name"} value={s.name} onChange={(e) => updateStop(i, "name", e.target.value)} />
                 <textarea dir="ltr" className={`${inputClass} min-h-[56px] resize-none`} placeholder="Short description (English) — what the visitor sees/hears here" value={s.desc_en} onChange={(e) => updateStop(i, "desc_en", e.target.value)} maxLength={200} />
                 <textarea dir="rtl" className={`${inputClass} min-h-[56px] resize-none text-right`} placeholder="وصف مختصر (عربي) — ما يراه الزائر ويسمعه هنا" value={s.desc_ar} onChange={(e) => updateStop(i, "desc_ar", e.target.value)} maxLength={200} />
+
+                {/* Coordinates — used by the player's GPS proximity + route map */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[10px] font-semibold text-muted-foreground mb-1 flex items-center gap-1">
+                      <Navigation className="w-2.5 h-2.5" />
+                      {lang === "ar" ? "خط العرض" : "Latitude"}
+                    </label>
+                    <input dir="ltr" type="number" step="any" className={inputClass} placeholder="30.0444" value={s.lat} onChange={(e) => updateStop(i, "lat", e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-semibold text-muted-foreground mb-1 flex items-center gap-1">
+                      <Navigation className="w-2.5 h-2.5" />
+                      {lang === "ar" ? "خط الطول" : "Longitude"}
+                    </label>
+                    <input dir="ltr" type="number" step="any" className={inputClass} placeholder="31.2357" value={s.lng} onChange={(e) => updateStop(i, "lng", e.target.value)} />
+                  </div>
+                </div>
+
+                {/* Optional per-stop clip */}
+                <AudioPicker
+                  compact
+                  label={lang === "ar" ? "مقطع صوتي للمحطة (اختياري)" : "Stop audio clip (optional)"}
+                  file={s.audioFile}
+                  onChange={(f) => updateStop(i, "audioFile", f)}
+                  existingUrl={s.audioUrl}
+                  onRemoveExisting={() => updateStop(i, "audioUrl", null)}
+                  uploading={submitting && uploadStage === `stop-audio-${i + 1}`}
+                />
               </div>
             ))}
           </div>
         </div>
 
-        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-narrator text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
-          {submitting ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : isEdit ? (lang === "ar" ? "حفظ التغييرات" : "Save Changes") : (lang === "ar" ? "نشر الجولة" : "Publish Tour")}
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-narrator text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60 flex items-center justify-center gap-2">
+          {submitting && <Mic className="w-4 h-4 animate-pulse" />}
+          {submitLabel}
         </button>
       </div>
     </div>

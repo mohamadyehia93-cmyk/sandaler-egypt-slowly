@@ -18,7 +18,6 @@ import NotFoundView from "@/components/NotFound";
 
 const NEAR_THRESHOLD_M = 50; // when within 50m, mark stop as "near you"
 
-const SAMPLE_AUDIO_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
 
 const formatTime = (seconds: number) => {
   const m = Math.floor(seconds / 60);
@@ -66,7 +65,7 @@ const AudioTourDetail = () => {
     },
   });
 
-  const dbStops = (tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string }> | undefined) || [];
+  const dbStops = (tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string; audio_url?: string | null }> | undefined) || [];
   const stopsCount = dbStops.length || tour?.stops_count || 5;
   const mapStops = dbStops.map((s) => ({
     label: { en: s.label_en, ar: s.label_ar },
@@ -74,8 +73,23 @@ const AudioTourDetail = () => {
     lng: s.lng,
   }));
 
+  // This tour's OWN narration: the tour-level track, else the first stop clip.
+  // Never fall back to another tour's audio — when there is none we say so.
+  const audioSrc =
+    ((tour as any)?.audio_url as string | null | undefined) ||
+    dbStops.find((s) => !!s.audio_url)?.audio_url ||
+    null;
+
   useEffect(() => {
-    const audio = new Audio(SAMPLE_AUDIO_URL);
+    if (!audioSrc) {
+      audioRef.current = null;
+      setIsLoaded(false);
+      setIsPlaying(false);
+      setDuration(0);
+      setCurrentTime(0);
+      return;
+    }
+    const audio = new Audio(audioSrc);
     audio.preload = "metadata";
     audioRef.current = audio;
 
@@ -94,7 +108,8 @@ const AudioTourDetail = () => {
       audio.removeEventListener("ended", onEnded);
       audio.src = "";
     };
-  }, [tour?.id]);
+  }, [tour?.id, audioSrc]);
+
 
   // Distances from user to each stop (with valid lat/lng)
   const stopDistances = useMemo(() => {
@@ -243,7 +258,8 @@ const AudioTourDetail = () => {
         )}
 
         {/* Download for offline */}
-        {mapStops.length > 0 && (
+        {audioSrc && mapStops.length > 0 && (
+
           <div className="mb-4">
             {offline.downloaded ? (
               <div className="flex items-center justify-between gap-2 rounded-xl bg-success/10 border border-success/30 px-3 py-2">
@@ -283,7 +299,7 @@ const AudioTourDetail = () => {
               <button
                 onClick={async () => {
                   toast.info(lang === "ar" ? "بدء تحميل الجولة..." : "Starting download...");
-                  await offline.download(SAMPLE_AUDIO_URL, mapStops.map((s) => ({ lat: s.lat, lng: s.lng })));
+                  await offline.download(audioSrc, mapStops.map((s) => ({ lat: s.lat, lng: s.lng })));
                   toast.success(lang === "ar" ? "الجولة متاحة الآن بدون إنترنت" : "Tour saved for offline use");
                 }}
                 disabled={!isOnline}
@@ -447,25 +463,44 @@ const AudioTourDetail = () => {
         <DetailTestimonials />
       </div>
 
-      {/* Audio Player */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-[10px] text-muted-foreground w-10 text-right">{formatTime(currentTime)}</span>
-          <Slider value={[progressPercent]} max={100} step={0.1} onValueChange={handleSeek} className="flex-1" />
-          <span className="text-[10px] text-muted-foreground w-10">{formatTime(duration)}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <button onClick={cycleSpeed} className="text-[10px] font-bold text-muted-foreground w-10">{playbackRate}x</button>
-          <div className="flex items-center gap-4">
-            <button onClick={skipBackward}><SkipBack className="w-5 h-5 text-foreground" /></button>
-            <button onClick={togglePlay} className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
-            </button>
-            <button onClick={skipForward}><SkipForward className="w-5 h-5 text-foreground" /></button>
+      {/* Audio Player — only when this tour has its own narration */}
+      {audioSrc ? (
+        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-[10px] text-muted-foreground w-10 text-right">{formatTime(currentTime)}</span>
+            <Slider value={[progressPercent]} max={100} step={0.1} onValueChange={handleSeek} className="flex-1" />
+            <span className="text-[10px] text-muted-foreground w-10">{formatTime(duration)}</span>
           </div>
-          <button onClick={toggleMute}>{isMuted ? <VolumeX className="w-5 h-5 text-muted-foreground" /> : <Volume2 className="w-5 h-5 text-foreground" />}</button>
+          <div className="flex items-center justify-between">
+            <button onClick={cycleSpeed} className="text-[10px] font-bold text-muted-foreground w-10">{playbackRate}x</button>
+            <div className="flex items-center gap-4">
+              <button onClick={skipBackward}><SkipBack className="w-5 h-5 text-foreground" /></button>
+              <button onClick={togglePlay} className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
+              </button>
+              <button onClick={skipForward}><SkipForward className="w-5 h-5 text-foreground" /></button>
+            </div>
+            <button onClick={toggleMute}>{isMuted ? <VolumeX className="w-5 h-5 text-muted-foreground" /> : <Volume2 className="w-5 h-5 text-foreground" />}</button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
+          <div className="flex items-start gap-2 text-muted-foreground">
+            <Headphones className="w-4 h-4 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                {lang === "ar" ? "الصوت قادم قريباً" : "Audio coming soon"}
+              </p>
+              <p className="text-[11px] leading-snug">
+                {lang === "ar"
+                  ? "لم يقم الراوي برفع تسجيل هذه الجولة بعد. يمكنك استعراض المحطات والمسار الآن."
+                  : "The narrator hasn't uploaded this tour's recording yet. You can still browse the stops and route."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
