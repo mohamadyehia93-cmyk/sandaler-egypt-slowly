@@ -12,16 +12,20 @@ type BookingRow = {
   guests: number;
   total_amount_egp: number;
   status: string;
+  payment_status: string;
   created_at: string;
   experience: { id: string; title_en: string; title_ar: string; image: string | null } | null;
 };
 
 const statusStyles: Record<string, string> = {
   confirmed: "bg-success/10 text-success",
+  pending: "bg-warning/10 text-warning",
   pending_payment: "bg-warning/10 text-warning",
+  declined: "bg-destructive/10 text-destructive",
   expired: "bg-muted text-muted-foreground",
   refunded: "bg-destructive/10 text-destructive",
 };
+
 
 const MyBookings = () => {
   const { lang } = useI18n();
@@ -34,7 +38,7 @@ const MyBookings = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("id, guests, total_amount_egp, status, created_at, experience:experiences(id, title_en, title_ar, image)")
+        .select("id, guests, total_amount_egp, status, payment_status, created_at, experience:experiences(id, title_en, title_ar, image)")
         .eq("visitor_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -79,17 +83,26 @@ const MyBookings = () => {
                 <p className="text-[11px] text-muted-foreground">
                   {new Date(b.created_at).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" })} · {b.guests} {lang === "ar" ? "أشخاص" : "guests"} · {b.total_amount_egp} {lang === "ar" ? "ج.م" : "EGP"}
                 </p>
+                {b.payment_status === "unpaid" && (
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    {lang === "ar"
+                      ? "لم يتم دفع أي مبلغ — يُرتّب الدفع مع المضيف."
+                      : "No payment taken — payment is arranged with the host."}
+                  </p>
+                )}
               </div>
               <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyles[b.status] || "bg-muted text-muted-foreground"}`}>
                 {b.status === "confirmed" ? (lang === "ar" ? "مؤكد" : "Confirmed")
-                  : b.status === "pending_payment" ? (lang === "ar" ? "بانتظار الدفع" : "Pending")
+                  : b.status === "pending" ? (lang === "ar" ? "بانتظار المضيف" : "Awaiting host")
+                  : b.status === "pending_payment" ? (lang === "ar" ? "بانتظار الدفع" : "Pending payment")
                   : b.status === "refunded" ? (lang === "ar" ? "مسترد" : "Refunded")
                   : b.status === "expired" ? (lang === "ar" ? "منتهٍ" : "Expired")
-                  : b.status === "cancelled" ? (lang === "ar" ? "مرفوض" : "Declined")
+                  : b.status === "declined" ? (lang === "ar" ? "مرفوض" : "Declined")
+                  : b.status === "cancelled" ? (lang === "ar" ? "ملغي" : "Cancelled")
                   : b.status === "completed" ? (lang === "ar" ? "مكتمل" : "Completed")
                   : b.status}
-
               </span>
+
             </div>
           ))
         )}

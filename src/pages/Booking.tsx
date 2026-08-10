@@ -77,6 +77,10 @@ const Booking = () => {
   const isExperience = type === "experience";
   const serviceFee = Math.round(subtotal * (isExperience ? 0.10 : 0.05));
   const total = subtotal + serviceFee;
+  // A paid checkout is only conceivable for an experience with a chosen slot. Everything else
+  // (and any Stripe failure) resolves to the unpaid "request to book" path.
+  const paidPath = isExperience && !!slotId;
+
 
   const priceLabel = isStay
     ? `${unitPrice} ${t("common.egp")} × ${nights} ${t("booking.nights")}`
@@ -152,10 +156,11 @@ const Booking = () => {
         <h1 className="text-lg font-bold text-foreground">
           {step === "details"
             ? t("booking.booking_details_title")
-            : isExperience
+            : paidPath
             ? t("booking.payment_title")
             : ar ? "تأكيد الطلب" : "Confirm request"}
         </h1>
+
       </header>
 
       {/* Progress Steps */}
@@ -171,9 +176,10 @@ const Booking = () => {
               <span className={`text-xs font-medium ${step === s ? "text-foreground" : "text-muted-foreground"}`}>
                 {i === 0
                   ? t("booking.details_step")
-                  : isExperience
+                  : paidPath
                   ? t("booking.payment_step")
                   : ar ? "الطلب" : "Request"}
+
               </span>
 
               {i === 0 && <div className="flex-1 h-0.5 bg-border mx-1" />}
@@ -258,7 +264,7 @@ const Booking = () => {
 
         {step === "payment" && (
           <>
-            {isExperience ? (
+            {paidPath ? (
               <>
                 {/* Payment Methods */}
                 <h2 className="text-sm font-semibold text-foreground mb-3">
@@ -341,7 +347,7 @@ const Booking = () => {
               </div>
               <div className="border-t border-border pt-2 flex justify-between">
                 <span className="text-sm font-bold text-foreground">
-                  {isExperience ? t("booking.total") : ar ? "الإجمالي التقديري" : "Estimated total"}
+                  {paidPath ? t("booking.total") : ar ? "الإجمالي التقديري" : "Estimated total"}
                 </span>
                 <span className="text-base font-bold text-primary">{total} {t("common.egp")}</span>
               </div>
@@ -351,7 +357,7 @@ const Booking = () => {
             <div className="flex items-center gap-2 p-3 rounded-lg bg-surface border border-border mb-5">
               <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
               <p className="text-[10px] text-muted-foreground">
-                {isExperience
+                {paidPath
                   ? t("booking.secure_notice")
                   : ar
                   ? "لن يُطلب منك أي دفع في هذه الخطوة."
@@ -363,12 +369,7 @@ const Booking = () => {
         )}
       </div>
 
-      {/* Inline checkout notices (experience flow only) */}
-      {isExperience && !slotId && step === "payment" && (
-        <div className="mx-4 mb-3 p-3 rounded-lg bg-warning/10 border border-warning text-sm">
-          {t("booking.slot_required_warning")}
-        </div>
-      )}
+
       {(bookingError || requestError) && (
         <div className="mx-4 mb-3 p-3 rounded-lg bg-destructive/10 border border-destructive text-sm text-destructive">
           {bookingError || requestError}
@@ -380,7 +381,7 @@ const Booking = () => {
         <div>
           <span className="text-lg font-bold text-foreground">{total} {t("common.egp")}</span>
           <span className="text-xs text-muted-foreground block">
-            {isExperience ? t("booking.total_label") : ar ? "تقديري" : "Estimated"}
+            {paidPath ? t("booking.total_label") : ar ? "تقديري" : "Estimated"}
           </span>
         </div>
         {step === "details" ? (
@@ -388,7 +389,7 @@ const Booking = () => {
             onClick={() => setStep("payment")}
             className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
           >
-            {isExperience
+            {paidPath
               ? t("booking.continue_to_payment")
               : ar ? "متابعة" : "Continue"}
           </button>
@@ -400,15 +401,19 @@ const Booking = () => {
                 return;
               }
               if (isExperience) {
-                if (!slotId) return; // Surfaced inline above; no-op so user can read the notice
-                await startBookingCheckout({
-                  experienceId: id,
-                  slotId,
-                  guests,
-                  totalAmountEgp: total,
-                  visitorEmail: user.email || "",
-                });
-                // On success the browser redirects to Stripe. On failure bookingError is set.
+                // Tries paid checkout when a slot is chosen and falls back silently to an
+                // unpaid booking REQUEST. status/payment_status are forced server-side.
+                const outcome = await startBookingCheckout(
+                  {
+                    experienceId: id,
+                    slotId,
+                    guests,
+                    totalAmountEgp: total,
+                    visitorEmail: user.email || "",
+                  },
+                  ar
+                );
+                if (outcome === "requested") setStep("confirmed");
                 return;
               }
 
@@ -439,17 +444,24 @@ const Booking = () => {
             disabled={
               isProcessing ||
               submitting ||
-              (isExperience ? !paymentMethod || !slotId : !contactName.trim() || contactPhone.trim().length < 8)
+              (isExperience
+                ? paidPath && !paymentMethod
+                : !contactName.trim() || contactPhone.trim().length < 8)
             }
             className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-50"
           >
             {isExperience
-              ? (isProcessing ? t("booking.processing") : t("booking.pay_now"))
+              ? (isProcessing
+                  ? t("booking.processing")
+                  : paidPath
+                  ? t("booking.pay_now")
+                  : ar ? "إرسال الطلب" : "Send request")
               : submitting
               ? (ar ? "جاري الإرسال..." : "Sending...")
               : (ar ? "إرسال الطلب" : "Send request")}
           </button>
         )}
+
       </div>
 
     </div>

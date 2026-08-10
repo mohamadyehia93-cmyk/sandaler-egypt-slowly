@@ -20,9 +20,11 @@ type ProviderBooking = {
   total_amount_egp: number;
   provider_amount_egp: number;
   status: string;
+  payment_status: string;
   created_at: string;
   experience: { title_en: string; title_ar: string } | null;
 };
+
 
 const ServiceProviderDashboard = () => {
   const { lang } = useI18n();
@@ -55,7 +57,7 @@ const ServiceProviderDashboard = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("id, guests, total_amount_egp, provider_amount_egp, status, created_at, experience:experiences(title_en, title_ar)")
+        .select("id, guests, total_amount_egp, provider_amount_egp, status, payment_status, created_at, experience:experiences(title_en, title_ar)")
         .eq("provider_id", user!.id)
         .order("created_at", { ascending: false })
         .limit(20);
@@ -69,7 +71,7 @@ const ServiceProviderDashboard = () => {
   const revenue = bookings
     .filter((b) => b.status === "confirmed")
     .reduce((sum, b) => sum + (b.provider_amount_egp || 0), 0);
-  const pending = bookings.find((b) => b.status === "pending_payment");
+  const pending = bookings.find((b) => b.status === "pending" || b.status === "pending_payment");
 
   const overview = [
     { value: String(listingsCount), label: lang === "ar" ? "قوائم نشطة" : "Active Listings", path: "/dashboard/service-provider/my-listings" },
@@ -88,9 +90,9 @@ const ServiceProviderDashboard = () => {
   const locale = lang === "ar" ? "ar-EG" : "en-US";
   const title = (b: ProviderBooking) => b.experience ? (lang === "ar" ? b.experience.title_ar : b.experience.title_en) : "—";
 
-  const RESOLVED = ["confirmed", "cancelled", "completed", "refunded", "expired"];
+  const RESOLVED = ["confirmed", "declined", "cancelled", "completed", "refunded", "expired"];
 
-  const updateBookingStatus = async (id: string, status: "confirmed" | "cancelled") => {
+  const updateBookingStatus = async (id: string, status: "confirmed" | "declined") => {
     setSavingId(id);
     const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
     setSavingId(null);
@@ -100,21 +102,24 @@ const ServiceProviderDashboard = () => {
     }
     toast.success(
       status === "confirmed"
-        ? (lang === "ar" ? "تم تأكيد الحجز" : "Booking accepted")
-        : (lang === "ar" ? "تم رفض الحجز" : "Booking declined")
+        ? (lang === "ar" ? "تم تأكيد الطلب" : "Request accepted")
+        : (lang === "ar" ? "تم رفض الطلب" : "Request declined")
     );
     queryClient.invalidateQueries({ queryKey: ["sp-bookings"] });
   };
 
   const statusLabel = (s: string) => {
     if (s === "confirmed") return lang === "ar" ? "مؤكد" : "Confirmed";
-    if (s === "pending_payment") return lang === "ar" ? "معلق" : "Pending";
-    if (s === "cancelled") return lang === "ar" ? "مرفوض" : "Declined";
+    if (s === "pending") return lang === "ar" ? "طلب جديد" : "New request";
+    if (s === "pending_payment") return lang === "ar" ? "بانتظار الدفع" : "Pending payment";
+    if (s === "declined") return lang === "ar" ? "مرفوض" : "Declined";
+    if (s === "cancelled") return lang === "ar" ? "ملغي" : "Cancelled";
     if (s === "completed") return lang === "ar" ? "مكتمل" : "Completed";
     if (s === "refunded") return lang === "ar" ? "مسترد" : "Refunded";
     if (s === "expired") return lang === "ar" ? "منتهي" : "Expired";
     return s;
   };
+
 
 
   return (
@@ -179,9 +184,10 @@ const ServiceProviderDashboard = () => {
                       <p className="text-xs font-semibold text-foreground line-clamp-1">{title(b)}</p>
                       <p className="text-[10px] text-muted-foreground">
                         {b.guests} {lang === "ar" ? "أشخاص" : "guests"} · {new Date(b.created_at).toLocaleDateString(locale, { day: "numeric", month: "short" })}
+                        {b.payment_status === "unpaid" && ` · ${lang === "ar" ? "غير مدفوع" : "Unpaid"}`}
                       </p>
                     </div>
-                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${b.status === "confirmed" ? "bg-success/10 text-success" : b.status === "pending_payment" ? "bg-warning/10 text-warning" : "bg-muted text-muted-foreground"}`}>
+                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${b.status === "confirmed" ? "bg-success/10 text-success" : b.status === "pending" || b.status === "pending_payment" ? "bg-warning/10 text-warning" : "bg-muted text-muted-foreground"}`}>
                       {statusLabel(b.status)}
                     </span>
                   </div>
@@ -197,7 +203,8 @@ const ServiceProviderDashboard = () => {
                       </button>
                       <button
                         disabled={savingId === b.id}
-                        onClick={() => updateBookingStatus(b.id, "cancelled")}
+                        onClick={() => updateBookingStatus(b.id, "declined")}
+
                         className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
                       >
                         <X className="w-3.5 h-3.5" /> {lang === "ar" ? "رفض" : "Decline"}
