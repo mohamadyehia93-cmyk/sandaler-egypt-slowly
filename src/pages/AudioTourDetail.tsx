@@ -65,7 +65,7 @@ const AudioTourDetail = () => {
     },
   });
 
-  const dbStops = (tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string }> | undefined) || [];
+  const dbStops = (tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string; audio_url?: string | null }> | undefined) || [];
   const stopsCount = dbStops.length || tour?.stops_count || 5;
   const mapStops = dbStops.map((s) => ({
     label: { en: s.label_en, ar: s.label_ar },
@@ -73,8 +73,23 @@ const AudioTourDetail = () => {
     lng: s.lng,
   }));
 
+  // This tour's OWN narration: the tour-level track, else the first stop clip.
+  // Never fall back to another tour's audio — when there is none we say so.
+  const audioSrc =
+    ((tour as any)?.audio_url as string | null | undefined) ||
+    dbStops.find((s) => !!s.audio_url)?.audio_url ||
+    null;
+
   useEffect(() => {
-    const audio = new Audio(SAMPLE_AUDIO_URL);
+    if (!audioSrc) {
+      audioRef.current = null;
+      setIsLoaded(false);
+      setIsPlaying(false);
+      setDuration(0);
+      setCurrentTime(0);
+      return;
+    }
+    const audio = new Audio(audioSrc);
     audio.preload = "metadata";
     audioRef.current = audio;
 
@@ -93,7 +108,8 @@ const AudioTourDetail = () => {
       audio.removeEventListener("ended", onEnded);
       audio.src = "";
     };
-  }, [tour?.id]);
+  }, [tour?.id, audioSrc]);
+
 
   // Distances from user to each stop (with valid lat/lng)
   const stopDistances = useMemo(() => {
