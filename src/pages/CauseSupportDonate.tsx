@@ -229,13 +229,13 @@ const CauseSupportDonate = () => {
               ))}
             </div>
 
-            {/* Trust */}
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-surface border border-border">
-              <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
+            {/* Honest framing */}
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-warning/5 border border-warning/30">
+              <Info className="w-4 h-4 text-warning flex-shrink-0 mt-0.5" />
               <p className="text-[10px] text-muted-foreground">
                 {lang === "ar"
-                  ? "جميع التبرعات آمنة ومشفرة. 100% من مساهمتك تذهب للقضية."
-                  : "All donations are secure and encrypted. 100% of your contribution goes to the cause."}
+                  ? "لن يتم الدفع داخل التطبيق. اختر الطريقة التي تفضّلها وستستخدمها المنظمة عند التواصل معك."
+                  : "No payment happens in the app. Pick the method you'd prefer and the organisation will use it when they contact you."}
               </p>
             </div>
           </>
