@@ -39,6 +39,7 @@ const TYPE_CONFIG: Record<string, TypeConfig> = {
   product: { route: "/product", icon: ShoppingBag, label: { en: "Products", ar: "المنتجات" } },
   cause: { route: "/cause", icon: HandHeart, label: { en: "Causes", ar: "القضايا" } },
   post: { route: "/post", icon: FileText, label: { en: "Articles", ar: "المقالات" } },
+  collection: { route: "/collection", icon: BookOpen, label: { en: "Collections", ar: "المجموعات" } },
   person: { route: "/person", icon: Users, label: { en: "People", ar: "الأشخاص" } },
   culture_actor: { route: "/culture-actor", icon: Palette, label: { en: "Culture figures", ar: "رواد الثقافة" } },
   organization: { route: "/organization", icon: Building2, label: { en: "Organizations", ar: "المنظمات" } },
@@ -49,7 +50,7 @@ const TYPE_CONFIG: Record<string, TypeConfig> = {
 
 const ORDER = [
   "city", "region", "experience", "trip", "event", "audio_tour", "accommodation",
-  "transport", "product", "cause", "post", "person", "culture_actor",
+  "transport", "product", "cause", "post", "collection", "person", "culture_actor",
   "organization", "provider",
 ];
 
