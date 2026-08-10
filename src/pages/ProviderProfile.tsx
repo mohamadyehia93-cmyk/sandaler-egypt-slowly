@@ -198,7 +198,7 @@ const ProviderProfile = () => {
           className="flex-1"
         />
         <button
-          onClick={() => navigate("/inbox")}
+          onClick={() => navigate(`/inbox?personId=${provider.id}&kind=provider`)}
           className="flex-1 py-2.5 rounded-xl border-2 border-border text-foreground font-semibold text-sm flex items-center justify-center gap-1.5 bg-card"
         >
           <MessageSquare className="w-4 h-4" />
