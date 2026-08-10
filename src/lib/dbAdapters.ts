@@ -2,6 +2,7 @@
 // Strongly typed against the generated Supabase row types so merged results
 // (DB + sample fallbacks) stay type-safe across the app.
 import type { Database } from "@/integrations/supabase/types";
+import { bylineNames, isEditorialPost, SANDAL_MARK } from "@/lib/postByline";
 
 type Row<T extends keyof Database["public"]["Tables"]> =
   Database["public"]["Tables"][T]["Row"];
