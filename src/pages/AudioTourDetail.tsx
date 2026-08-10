@@ -463,25 +463,44 @@ const AudioTourDetail = () => {
         <DetailTestimonials />
       </div>
 
-      {/* Audio Player */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-[10px] text-muted-foreground w-10 text-right">{formatTime(currentTime)}</span>
-          <Slider value={[progressPercent]} max={100} step={0.1} onValueChange={handleSeek} className="flex-1" />
-          <span className="text-[10px] text-muted-foreground w-10">{formatTime(duration)}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <button onClick={cycleSpeed} className="text-[10px] font-bold text-muted-foreground w-10">{playbackRate}x</button>
-          <div className="flex items-center gap-4">
-            <button onClick={skipBackward}><SkipBack className="w-5 h-5 text-foreground" /></button>
-            <button onClick={togglePlay} className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
-            </button>
-            <button onClick={skipForward}><SkipForward className="w-5 h-5 text-foreground" /></button>
+      {/* Audio Player — only when this tour has its own narration */}
+      {audioSrc ? (
+        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-[10px] text-muted-foreground w-10 text-right">{formatTime(currentTime)}</span>
+            <Slider value={[progressPercent]} max={100} step={0.1} onValueChange={handleSeek} className="flex-1" />
+            <span className="text-[10px] text-muted-foreground w-10">{formatTime(duration)}</span>
           </div>
-          <button onClick={toggleMute}>{isMuted ? <VolumeX className="w-5 h-5 text-muted-foreground" /> : <Volume2 className="w-5 h-5 text-foreground" />}</button>
+          <div className="flex items-center justify-between">
+            <button onClick={cycleSpeed} className="text-[10px] font-bold text-muted-foreground w-10">{playbackRate}x</button>
+            <div className="flex items-center gap-4">
+              <button onClick={skipBackward}><SkipBack className="w-5 h-5 text-foreground" /></button>
+              <button onClick={togglePlay} className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
+              </button>
+              <button onClick={skipForward}><SkipForward className="w-5 h-5 text-foreground" /></button>
+            </div>
+            <button onClick={toggleMute}>{isMuted ? <VolumeX className="w-5 h-5 text-muted-foreground" /> : <Volume2 className="w-5 h-5 text-foreground" />}</button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
+          <div className="flex items-start gap-2 text-muted-foreground">
+            <Headphones className="w-4 h-4 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                {lang === "ar" ? "الصوت قادم قريباً" : "Audio coming soon"}
+              </p>
+              <p className="text-[11px] leading-snug">
+                {lang === "ar"
+                  ? "لم يقم الراوي برفع تسجيل هذه الجولة بعد. يمكنك استعراض المحطات والمسار الآن."
+                  : "The narrator hasn't uploaded this tour's recording yet. You can still browse the stops and route."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
