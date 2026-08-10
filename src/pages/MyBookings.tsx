@@ -52,6 +52,7 @@ const MyBookings = () => {
       </header>
 
       <div className="px-4 py-5 space-y-3">
+        <ReservationRequestsList />
         {!user ? (
           <p className="text-center text-sm text-muted-foreground py-12">{lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in"}</p>
         ) : isLoading ? (
