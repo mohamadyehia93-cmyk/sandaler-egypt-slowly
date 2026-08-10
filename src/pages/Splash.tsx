@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useI18n } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { type UserRole, type LocalRole } from "@/hooks/useUserRole";
+import { roleLabels, type UserRole, type LocalRole } from "@/hooks/useUserRole";
 import { useRegions, useCities } from "@/hooks/useListings";
 import { useAuth } from "@/hooks/useAuth";
 import { becomeProvider } from "@/lib/becomeProvider";
@@ -353,8 +353,18 @@ const SplashPage = () => {
     return langs.length ? langs.join(", ") : null;
   };
 
+  // Sandal supports one role per account: if the signed-in user already has a
+  // different role we surface this confirmation instead of overwriting.
+  const [roleConflict, setRoleConflict] = useState<
+    { nextRole: LocalRole; currentRole: LocalRole } | null
+  >(null);
 
-  const completeProvider = async (role: LocalRole, withDetails = true) => {
+
+  const completeProvider = async (
+    role: LocalRole,
+    withDetails = true,
+    force = false
+  ): Promise<"ok" | "failed" | "role-exists"> => {
     let avatarUrl: string | null = null;
     if (withDetails && avatarFiles.length > 0 && user) {
       try {
@@ -368,7 +378,7 @@ const SplashPage = () => {
     const city = selectedCities[0] ? citiesList.find((c) => c.id === selectedCities[0]) : null;
     const region = selectedRegion ? regionsList.find((r) => r.id === selectedRegion) : null;
 
-    const { error } = await becomeProvider(
+    const result = await becomeProvider(
       role,
       withDetails
         ? {
@@ -386,14 +396,31 @@ const SplashPage = () => {
             answerLabels: roleAnswerLabels(),
             languages: narratedLanguages(),
           }
-        : undefined
+        : undefined,
+      { force }
     );
 
-    if (error) {
-      toast.error(lang === "ar" ? "تعذّر إنشاء ملف المزوّد" : "Could not set up your provider profile");
-      return false;
+    if (result.status === "role-exists") {
+      setRoleConflict({ nextRole: role, currentRole: result.currentRole });
+      return "role-exists";
     }
-    return true;
+
+    if (result.status === "error") {
+      toast.error(lang === "ar" ? "تعذّر إنشاء ملف المزوّد" : "Could not set up your provider profile");
+      return "failed";
+    }
+    return "ok";
+  };
+
+  /** Explicit confirmation of a role switch — the only path that overwrites. */
+  const confirmRoleSwitch = async () => {
+    if (!roleConflict) return;
+    const { nextRole } = roleConflict;
+    setRoleConflict(null);
+    const status = await completeProvider(nextRole, true, true);
+    if (status !== "ok") return;
+    await persistPersonalization();
+    navigate(roleDashboardPaths[nextRole] || "/");
   };
 
   // If the user returns to onboarding already authenticated with a pending
@@ -402,15 +429,16 @@ const SplashPage = () => {
     const pending = sessionStorage.getItem("sandal-pending-role") as LocalRole | null;
     if (!pending || !user) return;
     (async () => {
-      const ok = await completeProvider(pending);
+      const status = await completeProvider(pending);
       sessionStorage.removeItem("sandal-pending-role");
-      if (ok) {
+      if (status === "ok") {
         await persistPersonalization();
         navigate(roleDashboardPaths[pending] || "/");
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
 
   const handleFinish = async () => {
     const mappedRole = selectedRole ? (onboardingToUserRole[selectedRole] || "visitor") : "visitor";
@@ -430,8 +458,9 @@ const SplashPage = () => {
       return;
     }
 
-    const ok = await completeProvider(mappedRole as LocalRole);
-    if (!ok) return;
+    const status = await completeProvider(mappedRole as LocalRole);
+    if (status !== "ok") return;
+
     await persistPersonalization();
     navigate(roleDashboardPaths[mappedRole] || "/");
   };
@@ -1300,7 +1329,49 @@ const SplashPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {roleConflict && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center">
+          <div className="w-full max-w-sm rounded-2xl bg-background p-5 shadow-elevated">
+            <h2 className="text-base font-bold text-foreground">
+              {lang === "ar" ? "هذا الحساب مسجَّل بالفعل" : "This account already has a role"}
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              {lang === "ar"
+                ? `حسابك مسجَّل حاليًا بصفة «${roleLabels[roleConflict.currentRole].ar}». يدعم سندال دورًا واحدًا لكل حساب حاليًا، لذا التحويل إلى «${roleLabels[roleConflict.nextRole].ar}» سيستبدل دورك الحالي. سيتم إخفاء ملفك العام السابق (وليس حذفه).`
+                : `Your account is currently registered as a ${roleLabels[roleConflict.currentRole].en}. Sandal supports one role per account today, so switching to ${roleLabels[roleConflict.nextRole].en} will replace your current role. Your previous public profile will be unpublished, not deleted.`}
+            </p>
+            <div className="mt-4 space-y-2">
+              <button
+                onClick={() => {
+                  const path = roleDashboardPaths[roleConflict.currentRole] || "/";
+                  setRoleConflict(null);
+                  navigate(path);
+                }}
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm"
+              >
+                {lang === "ar" ? "الذهاب إلى لوحتي الحالية" : "Go to my current dashboard"}
+              </button>
+              <button
+                onClick={confirmRoleSwitch}
+                className="w-full py-3 rounded-xl border border-border text-sm font-semibold text-foreground"
+              >
+                {lang === "ar"
+                  ? `نعم، حوّلني إلى «${roleLabels[roleConflict.nextRole].ar}»`
+                  : `Yes, switch me to ${roleLabels[roleConflict.nextRole].en}`}
+              </button>
+              <button
+                onClick={() => setRoleConflict(null)}
+                className="w-full py-2.5 text-sm text-muted-foreground font-medium"
+              >
+                {lang === "ar" ? "إلغاء" : "Cancel"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+
   );
 };
 
