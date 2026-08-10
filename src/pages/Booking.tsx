@@ -331,7 +331,9 @@ const Booking = () => {
                 <span className="text-sm text-foreground">{serviceFee} {t("common.egp")}</span>
               </div>
               <div className="border-t border-border pt-2 flex justify-between">
-                <span className="text-sm font-bold text-foreground">{t("booking.total")}</span>
+                <span className="text-sm font-bold text-foreground">
+                  {isExperience ? t("booking.total") : ar ? "الإجمالي التقديري" : "Estimated total"}
+                </span>
                 <span className="text-base font-bold text-primary">{total} {t("common.egp")}</span>
               </div>
             </div>
@@ -340,9 +342,14 @@ const Booking = () => {
             <div className="flex items-center gap-2 p-3 rounded-lg bg-surface border border-border mb-5">
               <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
               <p className="text-[10px] text-muted-foreground">
-                {t("booking.secure_notice")}
+                {isExperience
+                  ? t("booking.secure_notice")
+                  : ar
+                  ? "لن يُطلب منك أي دفع في هذه الخطوة."
+                  : "You will not be charged at this step."}
               </p>
             </div>
+
           </>
         )}
       </div>
