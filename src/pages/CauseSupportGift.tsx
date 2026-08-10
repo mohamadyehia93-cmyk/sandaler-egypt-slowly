@@ -660,7 +660,9 @@ const CauseSupportGift = () => {
         <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
           <div>
             <span className="text-lg font-bold text-foreground">{pkg?.price} {t("common.egp")}</span>
-            <span className="text-[10px] text-muted-foreground block">{pkg?.name[lang]}</span>
+            <span className="text-[10px] text-muted-foreground block">
+              {ar ? "تعهد — لا يتم الدفع الآن" : "pledge — no payment now"}
+            </span>
           </div>
           <button disabled={submitting} onClick={handleConfirm}
             className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-70"
