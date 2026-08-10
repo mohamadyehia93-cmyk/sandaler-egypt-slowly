@@ -1196,6 +1196,45 @@ export type Database = {
         }
         Relationships: []
       }
+      image_credits: {
+        Row: {
+          artist: string | null
+          created_at: string
+          file_title: string | null
+          id: string
+          image_url: string
+          license: string | null
+          license_url: string | null
+          source_url: string | null
+          updated_at: string
+          used_for: string | null
+        }
+        Insert: {
+          artist?: string | null
+          created_at?: string
+          file_title?: string | null
+          id?: string
+          image_url: string
+          license?: string | null
+          license_url?: string | null
+          source_url?: string | null
+          updated_at?: string
+          used_for?: string | null
+        }
+        Update: {
+          artist?: string | null
+          created_at?: string
+          file_title?: string | null
+          id?: string
+          image_url?: string
+          license?: string | null
+          license_url?: string | null
+          source_url?: string | null
+          updated_at?: string
+          used_for?: string | null
+        }
+        Relationships: []
+      }
       meetups: {
         Row: {
           attendees_count: number | null

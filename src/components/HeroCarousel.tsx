@@ -56,6 +56,21 @@ const HeroCarousel = () => {
           className="absolute inset-0"
         >
           <img src={image} alt={title} className="w-full h-full object-cover" />
+          {/* Tiny attribution affordance — CC BY-SA hero images require visible credit. */}
+          {typeof image === "string" && image.includes("wikimedia.org") && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate("/credits");
+              }}
+              aria-label={lang === "ar" ? "حقوق صورة هذه الصورة" : "Photo credit for this image"}
+              className="absolute bottom-4 end-4 z-10 w-6 h-6 rounded-full bg-foreground/35 backdrop-blur-sm text-primary-foreground/90 text-[11px] leading-none flex items-center justify-center"
+
+            >
+              ©
+            </button>
+          )}
+
           <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-foreground/40" />
           <div className="absolute bottom-12 left-5 right-5">
             <h2 className="text-3xl font-bold text-primary-foreground mb-2 leading-tight drop-shadow-lg">

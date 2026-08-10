@@ -112,6 +112,8 @@ const MyCollections = lazy(() => import("./pages/dashboards/MyCollections.tsx"))
 const MyTasks = lazy(() => import("./pages/dashboards/MyTasks.tsx"));
 const MySessions = lazy(() => import("./pages/dashboards/MySessions.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
+const Credits = lazy(() => import("./pages/Credits.tsx"));
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -206,6 +208,8 @@ const App = () => {
             <Route path="/profile/settings" element={<Settings />} />
             <Route path="/profile/help" element={<HelpSupport />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/credits" element={<Credits />} />
+
             <Route path="/dashboard/culture-actor/new-article" element={<NewArticle />} />
             <Route path="/dashboard/culture-actor/edit-article/:id" element={<NewArticle />} />
             <Route path="/dashboard/culture-actor/my-content" element={<MyContent />} />

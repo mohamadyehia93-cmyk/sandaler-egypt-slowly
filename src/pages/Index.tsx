@@ -127,7 +127,18 @@ const Index = () => {
                     <Certifications />
                   </div>
                 )}
+                {/* Footer links — image credits must stay reachable from the home page
+                    because CC BY-SA hero images appear here. */}
+                <div className="mt-4 flex items-center justify-center">
+                  <button
+                    onClick={() => navigate("/credits")}
+                    className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors underline underline-offset-4"
+                  >
+                    {t("common.image_credits")}
+                  </button>
+                </div>
               </section>
+
             </>
           )}
           {activeTab === "experiences" && <ExperienceCards />}
