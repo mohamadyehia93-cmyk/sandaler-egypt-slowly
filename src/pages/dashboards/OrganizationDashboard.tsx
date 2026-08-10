@@ -5,6 +5,8 @@ import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
 import OrgApplicationsList from "@/components/OrgApplicationsList";
+import OwnerReservationRequests from "@/components/OwnerReservationRequests";
+import CausePledgesList from "@/components/CausePledgesList";
 
 const OrganizationDashboard = () => {
   const { lang } = useI18n();
@@ -79,6 +81,8 @@ const OrganizationDashboard = () => {
 
         {/* Volunteer Applications */}
         <OrgApplicationsList />
+
+        <CausePledgesList />
 
         {/* Quick Actions */}
         <div className="space-y-2">

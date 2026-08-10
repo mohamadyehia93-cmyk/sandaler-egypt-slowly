@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
+import OwnerReservationRequests from "@/components/OwnerReservationRequests";
 
 
 type ProviderBooking = {
