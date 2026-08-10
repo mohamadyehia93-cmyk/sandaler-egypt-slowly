@@ -12,6 +12,7 @@ import {
   Heart, Globe, Clock, ChevronRight, Users
 } from "lucide-react";
 import NotFoundView from "@/components/NotFound";
+import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
 
 type ProviderRole =
   | "culture-actor" | "service-provider" | "accommodation-host"

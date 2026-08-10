@@ -8,6 +8,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useRegions, useCities } from "@/hooks/useListings";
 import { uploadImages } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
 import { Button } from "@/components/ui/button";
 
 /**
