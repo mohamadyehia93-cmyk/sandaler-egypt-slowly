@@ -436,7 +436,7 @@ const CauseSupportDonate = () => {
           <div>
             <span className="text-lg font-bold text-foreground">{finalAmount} {t("common.egp")}</span>
             <span className="text-xs text-muted-foreground block">
-              {recurring ? (lang === "ar" ? "شهرياً" : "monthly") : (lang === "ar" ? "مرة واحدة" : "one-time")}
+              {ar ? "تعهد — بدون دفع" : "pledge — no payment"}
             </span>
           </div>
           {step === "amount" && (
@@ -461,13 +461,14 @@ const CauseSupportDonate = () => {
             <button
               disabled={processing}
               onClick={handleDonate}
-              className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-70 flex items-center gap-2"
+              className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-70 flex items-center gap-2"
             >
               {processing
-                ? (lang === "ar" ? "جاري المعالجة..." : "Processing...")
-                : (lang === "ar" ? "تأكيد التبرع" : "Confirm Donation")}
+                ? (ar ? "جاري الإرسال..." : "Sending...")
+                : (ar ? "تسجيل التعهد" : "Register pledge")}
             </button>
           )}
+
         </div>
       )}
     </div>
