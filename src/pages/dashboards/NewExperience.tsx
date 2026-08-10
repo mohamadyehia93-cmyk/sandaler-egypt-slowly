@@ -1,9 +1,10 @@
-import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useCallback, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyProviderId } from "@/lib/providerRecord";
+import { generateSlotDrafts } from "@/lib/experienceSlots";
 
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
@@ -23,11 +24,71 @@ import StepReview from "@/components/experience-wizard/StepReview";
 
 const NewExperience = () => {
   const { lang } = useI18n();
+  const ar = lang === "ar";
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { id: editId } = useParams();
+  const isEdit = !!editId;
+  const { user, loading: authLoading } = useAuth();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<ExperienceFormData>(defaultFormData);
   const [submitting, setSubmitting] = useState(false);
+  const [loadState, setLoadState] = useState<"idle" | "loading" | "ok" | "signed-out" | "denied" | "missing">(
+    isEdit ? "loading" : "ok"
+  );
+
+  // ── Edit mode: load the existing listing and prefill every persisted field ──
+  useEffect(() => {
+    if (!isEdit || authLoading) return;
+    let cancelled = false;
+    (async () => {
+      if (!user) {
+        setLoadState("signed-out");
+        return;
+      }
+      try {
+        // Ownership uses providers.id (see src/lib/providerRecord.ts), never auth.uid()
+        const providerId = await fetchMyProviderId(user.id);
+        const { data, error } = await supabase
+          .from("experiences")
+          .select("*")
+          .eq("id", editId)
+          .maybeSingle();
+        if (cancelled) return;
+        if (error || !data) {
+          setLoadState("missing");
+          return;
+        }
+        if (!providerId || data.provider_id !== providerId) {
+          setLoadState("denied");
+          return;
+        }
+        const mins = data.duration_minutes ?? 0;
+        setForm({
+          ...defaultFormData,
+          title_en: data.title_en ?? "",
+          title_ar: data.title_ar ?? "",
+          description_en: data.description_en ?? "",
+          description_ar: data.description_ar ?? "",
+          category: data.theme ?? "",
+          price: data.price != null ? String(data.price) : "",
+          duration: mins ? String(mins / 60) : "",
+          durationUnit: "hours",
+          groupSizeMin: data.capacity_min != null ? String(data.capacity_min) : "1",
+          groupSizeMax: data.capacity_max != null ? String(data.capacity_max) : "10",
+          photoPreviewUrls: (data.images as string[] | null) ?? (data.image ? [data.image] : []),
+          meetingPointName: data.meeting_point_name ?? "",
+          meetingPointLat: data.meeting_point_lat != null ? String(data.meeting_point_lat) : "",
+          meetingPointLng: data.meeting_point_lng != null ? String(data.meeting_point_lng) : "",
+        });
+        setLoadState("ok");
+      } catch {
+        if (!cancelled) setLoadState("missing");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isEdit, editId, user, authLoading]);
 
   const set = useCallback((key: string, value: string) => {
     setForm((p) => ({ ...p, [key]: value }));
@@ -91,9 +152,7 @@ const NewExperience = () => {
         ? Math.round(parseFloat(form.duration || "0") * 60)
         : Math.round(parseFloat(form.duration || "0") * 24 * 60);
 
-      const { error } = await supabase.from("experiences").insert({
-        provider_id: providerId,
-
+      const payload = {
         title_en: form.title_en.trim(),
         title_ar: form.title_ar.trim(),
         description_en: form.description_en.trim(),
@@ -108,12 +167,58 @@ const NewExperience = () => {
         meeting_point_name: form.meetingPointName || null,
         meeting_point_lat: form.meetingPointLat ? parseFloat(form.meetingPointLat) : null,
         meeting_point_lng: form.meetingPointLng ? parseFloat(form.meetingPointLng) : null,
-        status: "published",
-      });
+      };
+
+      if (isEdit) {
+        const update: Record<string, unknown> = { ...payload };
+        // keep the existing photos when the host didn't upload new ones
+        if (imageUrls.length > 0) {
+          update.image = imageUrl;
+          update.images = imageUrls;
+        } else {
+          delete update.image;
+          delete update.images;
+        }
+        const { error } = await supabase.from("experiences").update(update).eq("id", editId);
+        if (error) throw error;
+        toast.success(ar ? "تم تحديث التجربة" : "Listing updated");
+        navigate("/dashboard/service-provider/my-listings");
+        return;
+      }
+
+      const { data: created, error } = await supabase
+        .from("experiences")
+        .insert({ ...payload, provider_id: providerId, status: "published" })
+        .select("id")
+        .single();
 
       if (error) throw error;
-      toast.success(lang === "ar" ? "تم نشر التجربة بنجاح!" : "Experience published successfully!");
-      navigate("/dashboard/service-provider");
+
+      // The availability step used to be decorative — publish real slots from it.
+      const drafts = generateSlotDrafts({
+        days: form.availableDays,
+        startTime: form.startTime,
+        endTime: form.endTime,
+        from: form.seasonStart,
+        to: form.seasonEnd,
+        price: parseInt(form.price) || 0,
+        spots: parseInt(form.groupSizeMax) || 10,
+      });
+      if (created?.id && drafts.length > 0) {
+        const { error: slotError } = await supabase
+          .from("experience_slots")
+          .insert(drafts.map((d) => ({ ...d, experience_id: created.id })));
+        if (slotError) {
+          toast.error(
+            ar
+              ? "تم نشر التجربة، لكن تعذّر إنشاء المواعيد. أضفها من إدارة المواعيد."
+              : "Listing published, but slots could not be created. Add them from Manage availability."
+          );
+        }
+      }
+
+      toast.success(ar ? "تم نشر التجربة بنجاح!" : "Experience published successfully!");
+      navigate("/dashboard/service-provider/my-listings");
     } catch (err: any) {
       toast.error(err.message || "Failed to create experience");
     } finally {
@@ -139,6 +244,36 @@ const NewExperience = () => {
 
   const isLastStep = step === steps.length - 1;
 
+  if (isEdit && loadState !== "ok") {
+    const message =
+      loadState === "signed-out"
+        ? ar
+          ? "يرجى تسجيل الدخول لتعديل هذه التجربة."
+          : "Please sign in to edit this listing."
+        : loadState === "denied"
+        ? ar
+          ? "هذه التجربة ليست ملكك، لذلك لا يمكنك تعديلها."
+          : "This listing is not yours, so you cannot edit it."
+        : loadState === "missing"
+        ? ar
+          ? "لم يتم العثور على هذه التجربة."
+          : "This listing could not be found."
+        : ar
+        ? "جاري التحميل..."
+        : "Loading...";
+    return (
+      <div className="min-h-screen bg-surface">
+        <header className="bg-role-service-provider text-white px-4 py-4 flex items-center gap-3">
+          <button onClick={() => navigate(-1)} className="p-1" aria-label={ar ? "رجوع" : "Back"}>
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-lg font-bold">{ar ? "تعديل التجربة" : "Edit Listing"}</h1>
+        </header>
+        <p className="text-center text-sm text-muted-foreground px-6 py-16">{message}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-surface pb-28">
       {/* Header */}
@@ -146,7 +281,9 @@ const NewExperience = () => {
         <button onClick={() => (step > 0 ? prev() : navigate(-1))} className="p-1">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-lg font-bold">{lang === "ar" ? "تجربة جديدة" : "New Experience"}</h1>
+        <h1 className="text-lg font-bold">
+          {isEdit ? (ar ? "تعديل التجربة" : "Edit Listing") : ar ? "تجربة جديدة" : "New Experience"}
+        </h1>
       </header>
 
       <WizardProgress currentStep={step} />
@@ -171,9 +308,11 @@ const NewExperience = () => {
           }`}
         >
           {submitting
-            ? (lang === "ar" ? "جاري النشر..." : "Publishing...")
+            ? (ar ? "جاري الحفظ..." : "Saving...")
             : isLastStep
-            ? (lang === "ar" ? "نشر التجربة" : "Publish Experience")
+            ? isEdit
+              ? (ar ? "حفظ التعديلات" : "Save Changes")
+              : (ar ? "نشر التجربة" : "Publish Experience")
             : (lang === "ar" ? "التالي" : "Next")}
           {!isLastStep && <ChevronRight className="w-4 h-4" />}
         </button>
