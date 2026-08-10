@@ -1,5 +1,5 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Calendar, Users, CreditCard, ShieldCheck, CheckCircle2, Minus, Plus } from "lucide-react";
+import { ArrowLeft, Calendar, Users, CreditCard, ShieldCheck, CheckCircle2, Minus, Plus, Clock, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useState } from "react";
@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import NotFoundView from "@/components/NotFound";
 import { useAuth } from "@/hooks/useAuth";
 import { useBooking } from "@/hooks/useBooking";
+import { supabase } from "@/integrations/supabase/client";
+
 
 type BookingType = "experience" | "trip" | "stay" | "transport" | "product";
 
