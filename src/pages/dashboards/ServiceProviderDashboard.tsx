@@ -20,9 +20,11 @@ type ProviderBooking = {
   total_amount_egp: number;
   provider_amount_egp: number;
   status: string;
+  payment_status: string;
   created_at: string;
   experience: { title_en: string; title_ar: string } | null;
 };
+
 
 const ServiceProviderDashboard = () => {
   const { lang } = useI18n();
@@ -55,7 +57,7 @@ const ServiceProviderDashboard = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("id, guests, total_amount_egp, provider_amount_egp, status, created_at, experience:experiences(title_en, title_ar)")
+        .select("id, guests, total_amount_egp, provider_amount_egp, status, payment_status, created_at, experience:experiences(title_en, title_ar)")
         .eq("provider_id", user!.id)
         .order("created_at", { ascending: false })
         .limit(20);
@@ -69,7 +71,7 @@ const ServiceProviderDashboard = () => {
   const revenue = bookings
     .filter((b) => b.status === "confirmed")
     .reduce((sum, b) => sum + (b.provider_amount_egp || 0), 0);
-  const pending = bookings.find((b) => b.status === "pending_payment");
+  const pending = bookings.find((b) => b.status === "pending" || b.status === "pending_payment");
 
   const overview = [
     { value: String(listingsCount), label: lang === "ar" ? "قوائم نشطة" : "Active Listings", path: "/dashboard/service-provider/my-listings" },
@@ -88,9 +90,9 @@ const ServiceProviderDashboard = () => {
   const locale = lang === "ar" ? "ar-EG" : "en-US";
   const title = (b: ProviderBooking) => b.experience ? (lang === "ar" ? b.experience.title_ar : b.experience.title_en) : "—";
 
-  const RESOLVED = ["confirmed", "cancelled", "completed", "refunded", "expired"];
+  const RESOLVED = ["confirmed", "declined", "cancelled", "completed", "refunded", "expired"];
 
-  const updateBookingStatus = async (id: string, status: "confirmed" | "cancelled") => {
+  const updateBookingStatus = async (id: string, status: "confirmed" | "declined") => {
     setSavingId(id);
     const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
     setSavingId(null);
@@ -100,21 +102,24 @@ const ServiceProviderDashboard = () => {
     }
     toast.success(
       status === "confirmed"
-        ? (lang === "ar" ? "تم تأكيد الحجز" : "Booking accepted")
-        : (lang === "ar" ? "تم رفض الحجز" : "Booking declined")
+        ? (lang === "ar" ? "تم تأكيد الطلب" : "Request accepted")
+        : (lang === "ar" ? "تم رفض الطلب" : "Request declined")
     );
     queryClient.invalidateQueries({ queryKey: ["sp-bookings"] });
   };
 
   const statusLabel = (s: string) => {
     if (s === "confirmed") return lang === "ar" ? "مؤكد" : "Confirmed";
-    if (s === "pending_payment") return lang === "ar" ? "معلق" : "Pending";
-    if (s === "cancelled") return lang === "ar" ? "مرفوض" : "Declined";
+    if (s === "pending") return lang === "ar" ? "طلب جديد" : "New request";
+    if (s === "pending_payment") return lang === "ar" ? "بانتظار الدفع" : "Pending payment";
+    if (s === "declined") return lang === "ar" ? "مرفوض" : "Declined";
+    if (s === "cancelled") return lang === "ar" ? "ملغي" : "Cancelled";
     if (s === "completed") return lang === "ar" ? "مكتمل" : "Completed";
     if (s === "refunded") return lang === "ar" ? "مسترد" : "Refunded";
     if (s === "expired") return lang === "ar" ? "منتهي" : "Expired";
     return s;
   };
+
 
 
   return (
