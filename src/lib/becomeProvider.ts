@@ -129,14 +129,14 @@ async function unpublishSatellite(oldRole: LocalRole, userId: string): Promise<v
   const sat = SATELLITE_BY_ROLE[oldRole];
   if (!sat) return;
   try {
-    await supabase
-      .from(sat.table)
-      .update({ status: "draft" } as never)
+    await (supabase.from(sat.table) as any)
+      .update({ status: "draft" })
       .eq(sat.ownerCol, userId);
   } catch {
     // soft-fail; the role switch itself is what matters
   }
 }
+
 
 export type BecomeProviderResult =
   | { status: "ok"; error: null }
