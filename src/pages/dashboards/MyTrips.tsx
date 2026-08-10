@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchMyProviderId } from "@/lib/providerRecord";
 import { ArrowLeft, Plus, Trash2, Eye, Map, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
@@ -16,10 +17,13 @@ const MyTrips = () => {
     queryKey: ["my-trips", user?.id],
     enabled: !!user,
     queryFn: async () => {
+      // trips.organizer_id holds providers.id; legacy rows may hold the auth user id
+      const providerId = await fetchMyProviderId(user!.id);
+      const owners = [user!.id, ...(providerId ? [providerId] : [])];
       const { data, error } = await supabase
         .from("trips")
         .select("id, title_en, title_ar, image, price, status, date, created_at")
-        .eq("organizer_id", user!.id)
+        .in("organizer_id", owners)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;

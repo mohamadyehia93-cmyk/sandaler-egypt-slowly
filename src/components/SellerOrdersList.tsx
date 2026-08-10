@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchMyProviderId } from "@/lib/providerRecord";
 import { ShoppingCart, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { orderStatusLabel, orderStatusClasses } from "@/pages/MyOrders";
@@ -34,10 +35,13 @@ const SellerOrdersList = () => {
     queryKey: ["seller-orders", user?.id],
     enabled: !!user,
     queryFn: async () => {
+      // orders.seller_id mirrors products.seller_id (providers.id); legacy rows hold the auth user id
+      const providerId = await fetchMyProviderId(user!.id);
+      const owners = [user!.id, ...(providerId ? [providerId] : [])];
       const { data, error } = await supabase
         .from("orders")
         .select("id, quantity, unit_price_egp, total_egp, status, buyer_note, contact_name, contact_phone, created_at, product:products(name_en, name_ar)")
-        .eq("seller_id", user!.id)
+        .in("seller_id", owners)
         .order("created_at", { ascending: false })
         .limit(20);
 

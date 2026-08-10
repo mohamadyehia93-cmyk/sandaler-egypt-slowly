@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages } from "@/lib/dashboardForms";
+import { fetchMyProviderId } from "@/lib/providerRecord";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, DollarSign, Package } from "lucide-react";
 import { toast } from "sonner";
@@ -86,6 +87,13 @@ const NewProduct = () => {
     }
     setSubmitting(true);
     try {
+      // ownership convention: products.seller_id holds providers.id
+      const providerId = await fetchMyProviderId(user.id);
+      if (!providerId) {
+        toast.error(lang === "ar" ? "أكمل ملف المزود أولاً" : "Complete your provider profile first");
+        setSubmitting(false);
+        return;
+      }
       const uploaded = await uploadImages(photos, user.id);
       const images = [...existingImages, ...uploaded];
       const originStory = [form.material && `${lang === "ar" ? "المادة" : "Material"}: ${form.material}`, form.dimensions && `${lang === "ar" ? "الأبعاد" : "Dimensions"}: ${form.dimensions}`, ...form.shippingOptions.filter(Boolean)]
@@ -93,7 +101,7 @@ const NewProduct = () => {
         .join(" · ");
 
       const payload = {
-        seller_id: user.id,
+        seller_id: providerId,
         name_en: form.name.trim(),
         name_ar: form.name.trim(),
         description_en: form.description.trim(),

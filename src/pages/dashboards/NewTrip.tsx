@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages } from "@/lib/dashboardForms";
+import { fetchMyProviderId } from "@/lib/providerRecord";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Clock, Users, DollarSign, Calendar, ListChecks } from "lucide-react";
 import { toast } from "sonner";
@@ -98,6 +99,13 @@ const NewTrip = () => {
     }
     setSubmitting(true);
     try {
+      // ownership convention: trips.organizer_id holds providers.id
+      const providerId = await fetchMyProviderId(user.id);
+      if (!providerId) {
+        toast.error(lang === "ar" ? "أكمل ملف المزود أولاً" : "Complete your provider profile first");
+        setSubmitting(false);
+        return;
+      }
       const uploaded = await uploadImages(photos, user.id);
       const images = [...existingImages, ...uploaded];
       const destinations = form.destinations.map((d) => d.trim()).filter(Boolean);
@@ -108,7 +116,7 @@ const NewTrip = () => {
       const inclusions = form.includes.map((i) => i.trim()).filter(Boolean);
 
       const payload = {
-        organizer_id: user.id,
+        organizer_id: providerId,
         title_en: form.title.trim(),
         title_ar: form.title.trim(),
         description_en: form.description.trim(),
