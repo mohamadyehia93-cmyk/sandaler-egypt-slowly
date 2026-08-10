@@ -90,29 +90,49 @@ const Booking = () => {
     { id: "cash", emoji: "💵", label: t("booking.pay_on_arrival") },
   ];
 
+  const ar = lang === "ar";
+
   if (step === "confirmed") {
     return (
       <div className="min-h-screen bg-surface flex flex-col items-center justify-center px-6 text-center">
-        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-5">
-          <CheckCircle2 className="w-10 h-10 text-primary" />
+        <div className="w-20 h-20 rounded-full bg-warning/10 flex items-center justify-center mb-5">
+          <Clock className="w-10 h-10 text-warning" />
         </div>
         <h1 className="text-2xl font-bold text-foreground mb-2">
-          {t("booking.booking_confirmed_alt")}
+          {ar ? "تم إرسال طلبك" : "Request sent"}
         </h1>
         <p className="text-sm text-muted-foreground mb-2">{itemTitle}</p>
-        <p className="text-lg font-bold text-primary mb-1">{total} {t("common.egp")}</p>
-        <p className="text-xs text-muted-foreground mb-8">
-          {t("booking.confirmation_message")}
+        <p className="text-sm font-semibold text-foreground mb-1">
+          {ar ? "بانتظار تأكيد المضيف" : "Awaiting the host's confirmation"}
         </p>
-        <button
-          onClick={() => navigate("/")}
-          className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm"
-        >
-          {t("booking.back_to_home")}
-        </button>
+        <p className="text-xs text-muted-foreground mb-2">
+          {ar
+            ? `المبلغ التقديري ${total} ج.م — لم يتم دفع أي مبلغ.`
+            : `Estimated ${total} EGP — no payment has been taken.`}
+        </p>
+        <p className="text-xs text-muted-foreground mb-8 max-w-xs">
+          {ar
+            ? "هذا ليس حجزاً مؤكداً. سيقوم المضيف بمراجعة طلبك والتواصل معك لترتيب الدفع."
+            : "This is not a confirmed booking. The host will review your request and contact you to arrange payment."}
+        </p>
+        <div className="flex flex-col gap-2 w-full max-w-xs">
+          <button
+            onClick={() => navigate("/bookings")}
+            className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm"
+          >
+            {ar ? "عرض طلباتي" : "View my requests"}
+          </button>
+          <button
+            onClick={() => navigate("/")}
+            className="px-8 py-3 rounded-xl bg-card border border-border text-foreground font-bold text-sm"
+          >
+            {t("booking.back_to_home")}
+          </button>
+        </div>
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-surface pb-28">
