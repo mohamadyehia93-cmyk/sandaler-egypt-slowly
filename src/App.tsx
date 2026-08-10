@@ -63,6 +63,7 @@ const EventTicketReceipt = lazy(() => import("./pages/EventTicketReceipt.tsx"));
 const MyTickets = lazy(() => import("./pages/MyTickets.tsx"));
 const MyOrders = lazy(() => import("./pages/MyOrders.tsx"));
 const MyApplications = lazy(() => import("./pages/MyApplications.tsx"));
+const MyPledges = lazy(() => import("./pages/MyPledges.tsx"));
 const Sessions = lazy(() => import("./pages/Sessions.tsx"));
 const MySessionRequests = lazy(() => import("./pages/MySessionRequests.tsx"));
 const NewEvent = lazy(() => import("./pages/dashboards/NewEvent.tsx"));
@@ -188,6 +189,7 @@ const App = () => {
             <Route path="/tickets" element={<MyTickets />} />
             <Route path="/orders" element={<MyOrders />} />
             <Route path="/applications" element={<MyApplications />} />
+            <Route path="/pledges" element={<MyPledges />} />
             <Route path="/sessions" element={<Sessions />} />
             <Route path="/session-requests" element={<MySessionRequests />} />
             <Route path="/wishlists" element={<Wishlists />} />
