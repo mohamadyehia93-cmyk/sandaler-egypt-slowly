@@ -45,6 +45,12 @@ const Booking = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [step, setStep] = useState<"details" | "payment" | "confirmed">("details");
+  const [contactName, setContactName] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [note, setNote] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [requestError, setRequestError] = useState<string | null>(null);
+
 
   if (isLoading) return (
     <div className="min-h-screen bg-surface p-4 space-y-4">
