@@ -24,6 +24,8 @@ const CauseSupportDonate = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
+  const { user } = useAuth();
+  const ar = lang === "ar";
   const [selected, setSelected] = useState<number>(100);
   const [customAmount, setCustomAmount] = useState("");
   const [showCustom, setShowCustom] = useState(false);
@@ -31,6 +33,11 @@ const CauseSupportDonate = () => {
   const [step, setStep] = useState<Step>("amount");
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [contactName, setContactName] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [note, setNote] = useState("");
+
 
   const cause = causes.find((c) => c.id === id);
   if (!cause) return <NotFoundView context="cause" />;
