@@ -1,9 +1,11 @@
-import { ArrowLeft, MessageCircle, Search, Users } from "lucide-react";
+import { ArrowLeft, Search, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useWhosWho } from "@/hooks/useListings";
 import { Skeleton } from "@/components/ui/skeleton";
+import MessageUserButton from "@/components/MessageUserButton";
+
 
 const AllPeople = () => {
   const { lang } = useI18n();
@@ -87,16 +89,13 @@ const AllPeople = () => {
                       </span>
                     ))}
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate("/inbox");
-                  }}
-                  className="mt-auto w-full flex items-center justify-center gap-1 text-[10px] font-semibold text-primary-foreground bg-primary rounded-md py-1.5"
-                >
-                  <MessageCircle className="w-3 h-3" />
-                  {lang === "ar" ? "تواصل" : "Contact"}
-                </button>
+                <MessageUserButton
+                  userId={person.user_id}
+                  showUnavailable
+                  label={lang === "ar" ? "تواصل" : "Contact"}
+                  className="mt-auto w-full justify-center"
+                />
+
               </div>
             ))}
       </div>

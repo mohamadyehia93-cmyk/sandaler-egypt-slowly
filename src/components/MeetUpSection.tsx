@@ -1,9 +1,10 @@
-import { MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useWhosWho } from "@/hooks/useListings";
 import SectionHeader from "./SectionHeader";
 import { Skeleton } from "./ui/skeleton";
+import MessageUserButton from "./MessageUserButton";
+
 
 const MeetUpSection = () => {
   const { lang } = useI18n();
@@ -48,16 +49,13 @@ const MeetUpSection = () => {
                       </span>
                     ))}
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate("/inbox");
-                  }}
-                  className="mt-auto w-full flex items-center justify-center gap-1 text-[10px] font-semibold text-primary-foreground bg-primary rounded-md py-1.5"
-                >
-                  <MessageCircle className="w-3 h-3" />
-                  {lang === "ar" ? "تواصل" : "Contact"}
-                </button>
+                <MessageUserButton
+                  userId={person.user_id}
+                  showUnavailable
+                  label={lang === "ar" ? "تواصل" : "Contact"}
+                  className="mt-auto w-full justify-center"
+                />
+
               </div>
             ))}
       </div>
