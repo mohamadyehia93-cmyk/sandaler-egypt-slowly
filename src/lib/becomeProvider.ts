@@ -233,8 +233,16 @@ export async function becomeProvider(
     .from("providers")
     .upsert(payload as never, { onConflict: "user_id" });
 
-  if (!error) await upsertSatellite(role, user.id, displayName, slug, details);
+  if (error) return { status: "error", error: error.message };
 
-  return { error: error?.message ?? null };
+  await upsertSatellite(role, user.id, displayName, slug, details);
+
+  // A confirmed switch must not leave the previous role's profile public.
+  if (currentRole && currentRole !== role) {
+    await unpublishSatellite(currentRole, user.id);
+  }
+
+  return { status: "ok", error: null };
+
 }
 
