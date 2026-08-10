@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchMyProviderId } from "@/lib/providerRecord";
+
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
@@ -60,6 +62,17 @@ const NewExperience = () => {
 
     setSubmitting(true);
     try {
+      // experiences.provider_id holds providers.id (see src/lib/providerRecord.ts)
+      const providerId = await fetchMyProviderId(user.id);
+      if (!providerId) {
+        toast.error(
+          lang === "ar"
+            ? "لا يوجد ملف مزود خدمة لحسابك. أكمل إعداد حساب المزود أولاً."
+            : "No provider profile found for your account. Finish provider setup first."
+        );
+        return;
+      }
+
       let imageUrl: string | null = null;
       const imageUrls: string[] = [];
 
@@ -79,7 +92,8 @@ const NewExperience = () => {
         : Math.round(parseFloat(form.duration || "0") * 24 * 60);
 
       const { error } = await supabase.from("experiences").insert({
-        provider_id: user.id,
+        provider_id: providerId,
+
         title_en: form.title_en.trim(),
         title_ar: form.title_ar.trim(),
         description_en: form.description_en.trim(),

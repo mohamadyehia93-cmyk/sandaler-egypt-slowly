@@ -98,8 +98,22 @@ serve(async (req) => {
       });
     }
 
-    const experience = (slot as unknown as { experiences: { id: string; title_en: string; provider_id: string } }).experiences;
+    const experience = (slot as unknown as { experiences: { id: string; title_en: string; provider_id: string | null } }).experiences;
+
+    // experiences.provider_id holds providers.id, but bookings.provider_id has a FK to
+    // auth.users — resolve the owning provider's user id before writing the booking.
+    let providerUserId: string | null = null;
+    if (experience.provider_id) {
+      const { data: providerRow } = await supabase
+        .from('providers')
+        .select('user_id')
+        .eq('id', experience.provider_id)
+        .maybeSingle();
+      providerUserId = (providerRow as { user_id: string | null } | null)?.user_id ?? null;
+    }
+
     const expectedTotal = slot.price * guests;
+
     // 10% platform fee for experiences is intentional — covers Ambassador verification + content
     // production overhead. Stays/products/trips/transport use 5% (handled in their own checkout
     // flows when wired). Do not "standardize" these — the differential is by design.
