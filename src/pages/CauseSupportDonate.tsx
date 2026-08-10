@@ -357,26 +357,34 @@ const CauseSupportDonate = () => {
         {/* ── STEP 4: Success ── */}
         {step === "success" && (
           <div className="flex flex-col items-center text-center pt-8">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-5">
-              <Check className="w-10 h-10 text-primary" />
+            <div className="w-20 h-20 rounded-full bg-warning/10 flex items-center justify-center mb-5">
+              <Clock className="w-10 h-10 text-warning" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
-              {lang === "ar" ? "تم التبرع بنجاح!" : "Donation Successful!"}
+              {ar ? "تم تسجيل تعهدك" : "Pledge registered"}
             </h2>
-            <p className="text-sm text-muted-foreground mb-6 max-w-[280px]">
-              {lang === "ar"
-                ? `شكراً لتبرعك بمبلغ ${finalAmount} ${t("common.egp")} لدعم "${cause.title[lang]}"`
-                : `Thank you for donating ${finalAmount} ${t("common.egp")} to support "${cause.title[lang]}"`}
+            <p className="text-sm text-muted-foreground mb-1 max-w-[300px]">
+              {ar
+                ? `تعهدت بمبلغ ${finalAmount} ${t("common.egp")} لدعم "${cause.title[lang]}".`
+                : `You pledged ${finalAmount} ${t("common.egp")} towards "${cause.title[lang]}".`}
+            </p>
+            <p className="text-sm font-semibold text-foreground mb-1">
+              {ar ? "لم يتم تحصيل أي مبلغ" : "No payment has been taken"}
+            </p>
+            <p className="text-xs text-muted-foreground mb-6 max-w-[300px]">
+              {ar
+                ? "ستتواصل معك المنظمة لترتيب الدفع. يمكنك متابعة أو إلغاء تعهدك من صفحة تعهداتي."
+                : "The organisation will contact you to arrange payment. You can track or cancel it from My Pledges."}
             </p>
 
-            {/* Receipt card */}
+            {/* Pledge summary */}
             <div className="w-full rounded-xl bg-card border border-border shadow-card p-4 mb-6 text-start space-y-3">
-              <p className="text-xs text-muted-foreground font-medium">{lang === "ar" ? "ملخص الإيصال" : "Receipt Summary"}</p>
+              <p className="text-xs text-muted-foreground font-medium">{ar ? "ملخص التعهد" : "Pledge Summary"}</p>
               {[
-                { label: { en: "Amount", ar: "المبلغ" }, value: `${finalAmount} ${t("common.egp")}` },
-                { label: { en: "Frequency", ar: "التكرار" }, value: recurring ? (lang === "ar" ? "شهرياً" : "Monthly") : (lang === "ar" ? "مرة واحدة" : "One-time") },
-                { label: { en: "Payment", ar: "الدفع" }, value: selectedPayment?.label[lang] || "" },
-                { label: { en: "Reference", ar: "المرجع" }, value: `#DON-${Date.now().toString(36).toUpperCase().slice(-6)}` },
+                { label: { en: "Amount pledged", ar: "المبلغ المتعهد به" }, value: `${finalAmount} ${t("common.egp")}` },
+                { label: { en: "Frequency", ar: "التكرار" }, value: recurring ? (ar ? "شهرياً" : "Monthly") : (ar ? "مرة واحدة" : "One-time") },
+                { label: { en: "Preferred method", ar: "الطريقة المفضلة" }, value: selectedPayment?.label[lang] || "" },
+                { label: { en: "Status", ar: "الحالة" }, value: ar ? "بانتظار تواصل المنظمة" : "Awaiting contact" },
               ].map((row, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">{row.label[lang]}</span>
@@ -386,15 +394,23 @@ const CauseSupportDonate = () => {
             </div>
 
             {/* Impact */}
-            <div className="w-full rounded-xl bg-primary/5 border border-primary/20 p-4 mb-6">
+            <div className="w-full rounded-xl bg-primary/5 border border-primary/20 p-4 mb-4">
               <div className="flex items-center gap-2 mb-1.5">
                 <TrendingUp className="w-4 h-4 text-primary" />
                 <span className="text-xs font-semibold text-primary">
-                  {lang === "ar" ? "أثرك" : "Your Impact"}
+                  {ar ? "الأثر المتوقع" : "Potential Impact"}
                 </span>
               </div>
               <p className="text-sm text-foreground">{currentImpact.text[lang]}</p>
             </div>
+
+            <button
+              onClick={() => navigate("/pledges")}
+              className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated mb-3"
+            >
+              {ar ? "تعهداتي" : "My Pledges"}
+            </button>
+
 
             <div className="flex gap-3 w-full">
               <button
