@@ -1,20 +1,53 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  ArrowLeft, Share2, MapPin, Users, Calendar, CheckCircle, ShieldCheck,
-  Mail, Globe, Heart, Sparkles, Target, ChevronRight, UserPlus, UserCheck,
+  ArrowLeft, Share2, MapPin, Users, Globe, Heart, Sparkles, Target,
+  Mail, Building2, HandCoins,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { causes, regions } from "@/lib/sampleData";
+import { supabase } from "@/integrations/supabase/client";
+import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import ProviderStatusView from "@/components/ProviderStatusView";
 import DailyStatusCard from "@/components/DailyStatusCard";
 import { useAuth } from "@/hooks/useAuth";
 import NotFoundView from "@/components/NotFound";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
-import {
-  useIsFollowing,
-  useToggleFollow,
-  useFollowerCount,
-} from "@/hooks/useFollows";
+import { useIsFollowing, useToggleFollow, useFollowerCount } from "@/hooks/useFollows";
+import { UserPlus, UserCheck } from "lucide-react";
+
+type Region = { id: string; name_en: string; name_ar: string; emoji: string | null; color: string | null };
+type Org = {
+  id: string;
+  slug: string | null;
+  owner_id: string | null;
+  name_en: string; name_ar: string;
+  description_en: string | null; description_ar: string | null;
+  mission_en: string | null; mission_ar: string | null;
+  org_type: string | null;
+  region_id: string | null; city_id: string | null;
+  location_en: string | null; location_ar: string | null;
+  logo: string | null; image: string | null;
+  website: string | null;
+  volunteers_count: number | null;
+  donations_total: number | null;
+  focus_areas_en: string[] | null; focus_areas_ar: string[] | null;
+  status: string | null;
+};
+type Program = {
+  id: string; slug: string | null;
+  title_en: string; title_ar: string;
+  description_en: string | null; description_ar: string | null;
+  image: string | null; status: string;
+};
+type Cause = {
+  id: string; slug: string | null;
+  title_en: string; title_ar: string;
+  summary_en: string | null; summary_ar: string | null;
+  image: string | null; raised: number | null; goal: number | null;
+};
+
+const isImageUrl = (v: string | null) => !!v && /^(https?:|\/)/.test(v);
 
 const OrganizationDetail = () => {
   const { id } = useParams();
@@ -22,31 +55,66 @@ const OrganizationDetail = () => {
   const { lang, t } = useI18n();
   const { user } = useAuth();
 
-  const cause = causes.find((c) => c.id === id);
-  if (!cause) return <NotFoundView context="organization" />;
-  const region = regions.find((r) => r.id === cause.regionId);
-  const org = cause.org;
+  const [org, setOrg] = useState<Org | null>(null);
+  const [region, setRegion] = useState<Region | null>(null);
+  const [cityName, setCityName] = useState<string | null>(null);
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [causes, setCauses] = useState<Cause[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Other programs by the same organization (matched by name)
-  const otherPrograms = causes.filter(
-    (c) => c.org.name.en === org.name.en && c.id !== cause.id
-  );
-  const allPrograms = [cause, ...otherPrograms];
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!id) return;
+      setLoading(true);
+      try {
+        const o = (await fetchByIdOrSlug("organizations", id)) as Org | null;
+        if (cancelled) return;
+        setOrg(o);
+        if (o?.region_id) {
+          const { data: r } = await supabase.from("regions").select("*").eq("id", o.region_id).maybeSingle();
+          if (!cancelled) setRegion((r as Region) ?? null);
+        }
+        if (o?.city_id) {
+          const { data: c } = await supabase.from("cities").select("name_en, name_ar").eq("id", o.city_id).maybeSingle();
+          if (!cancelled && c) setCityName(lang === "ar" ? c.name_ar : c.name_en);
+        }
+        if (o?.owner_id) {
+          // Both programs.owner_id and causes.owner_id are resolved to the owning
+          // account, so the org's work can be listed by its owner id.
+          const [pRes, cRes] = await Promise.all([
+            supabase
+              .from("programs")
+              .select("id, slug, title_en, title_ar, description_en, description_ar, image, status")
+              .eq("owner_id", o.owner_id)
+              .order("created_at", { ascending: false }),
+            supabase
+              .from("causes")
+              .select("id, slug, title_en, title_ar, summary_en, summary_ar, image, raised, goal")
+              .eq("owner_id", o.owner_id)
+              .order("created_at", { ascending: false }),
+          ]);
+          if (!cancelled) {
+            setPrograms((pRes.data as Program[]) ?? []);
+            setCauses((cRes.data as Cause[]) ?? []);
+          }
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [id, lang]);
 
-  // Stable org id = first program id of this org (causes list is stable)
-  const orgTargetId = `org-${[...allPrograms].sort((a, b) =>
-    a.id.localeCompare(b.id)
-  )[0].id}`;
-
+  const orgTargetId = org ? `organization-${org.id}` : "";
   const following = useIsFollowing("organization", orgTargetId);
   const toggleFollow = useToggleFollow();
-  const { data: followerExtra = 0 } = useFollowerCount("organization", orgTargetId);
+  const { data: followerCount = 0 } = useFollowerCount("organization", orgTargetId);
 
   const handleFollow = () => {
+    if (!org) return;
     if (!user) {
-      toast({
-        title: lang === "ar" ? "سجّل الدخول للمتابعة" : "Sign in to follow",
-      });
+      toast({ title: lang === "ar" ? "سجّل الدخول للمتابعة" : "Sign in to follow" });
       navigate("/login");
       return;
     }
@@ -61,41 +129,49 @@ const OrganizationDetail = () => {
           });
         },
         onError: () => {
-          toast({
-            title: lang === "ar" ? "تعذّر تحديث المتابعة" : "Couldn't update follow",
-          });
+          toast({ title: lang === "ar" ? "تعذّر تحديث المتابعة" : "Couldn't update follow" });
         },
       }
     );
   };
 
-  const totalRaised = allPrograms.reduce((s, c) => s + c.raised, 0);
-  const totalGoal = allPrograms.reduce((s, c) => s + c.goal, 0);
-  const totalSupporters = allPrograms.reduce((s, c) => s + c.supporters, 0);
-  const fundedPct = totalGoal ? Math.round((totalRaised / totalGoal) * 100) : 0;
-  const baseFollowers = Math.max(120, Math.round(totalSupporters * 1.4));
-  const followerCount = baseFollowers + followerExtra;
-  const formatCount = (n: number) =>
-    n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : n.toLocaleString();
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background pb-20 p-4 space-y-4" aria-busy="true">
+        <Skeleton className="h-40 w-full rounded-xl" />
+        <Skeleton className="h-24 w-full rounded-xl" />
+        <Skeleton className="h-24 w-full rounded-xl" />
+      </div>
+    );
+  }
+  if (!org) return <NotFoundView context="organization" />;
+
+  const name = lang === "ar" ? org.name_ar : org.name_en;
+  const mission = lang === "ar" ? org.mission_ar : org.mission_en;
+  const description = lang === "ar" ? org.description_ar : org.description_en;
+  const location = lang === "ar" ? org.location_ar : org.location_en;
+  const focusAreas = (lang === "ar" ? org.focus_areas_ar : org.focus_areas_en) ?? [];
+  const regionName = region ? (lang === "ar" ? region.name_ar : region.name_en) : null;
+  const place = location || cityName || regionName;
 
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Cover */}
       <div className="relative h-44 bg-gradient-to-br from-primary/30 to-primary/10">
-        <img
-          src={cause.image}
-          alt=""
-          className="w-full h-full object-cover opacity-40"
-        />
+        {org.image && <img src={org.image} alt="" className="w-full h-full object-cover opacity-40" />}
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
         <button
           onClick={() => navigate(-1)}
           className="absolute top-4 start-4 p-2 rounded-full bg-background/80 backdrop-blur-sm z-10"
           aria-label="Back"
         >
-          <ArrowLeft className="w-5 h-5 text-foreground" />
+          <ArrowLeft className="w-5 h-5 text-foreground rtl:rotate-180" />
         </button>
         <button
+          onClick={() => {
+            navigator.clipboard?.writeText(window.location.href);
+            toast({ title: lang === "ar" ? "تم نسخ الرابط" : "Link copied" });
+          }}
           className="absolute top-4 end-4 p-2 rounded-full bg-background/80 backdrop-blur-sm z-10"
           aria-label="Share"
         >
@@ -107,71 +183,76 @@ const OrganizationDetail = () => {
       <div className="px-4 -mt-14 relative z-10">
         <div className="bg-card rounded-2xl shadow-elevated p-4">
           <div className="flex items-start gap-3">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl shrink-0">
-              {org.logo}
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl shrink-0 overflow-hidden">
+              {isImageUrl(org.logo) ? (
+                <img src={org.logo!} alt={name} className="w-full h-full object-cover" />
+              ) : org.logo ? (
+                org.logo
+              ) : (
+                <Building2 className="w-7 h-7 text-primary" />
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <h1 className="text-base font-bold text-foreground truncate">
-                  {org.name[lang]}
-                </h1>
-                <CheckCircle className="w-4 h-4 text-primary shrink-0" />
+                <h1 className="text-base font-bold text-foreground truncate">{name}</h1>
+                {org.status !== "published" && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-semibold">
+                    {lang === "ar" ? "مسودة" : "Draft"}
+                  </span>
+                )}
               </div>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {cause.category[lang]}
-              </p>
+              {org.org_type && (
+                <p className="text-xs text-muted-foreground mt-0.5">{org.org_type}</p>
+              )}
               <div className="flex items-center gap-3 mt-1.5 text-[11px] text-muted-foreground flex-wrap">
-                {region && (
+                {place && (
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
-                    {t(region.nameKey)}
+                    {place}
                   </span>
                 )}
                 <span className="flex items-center gap-1">
                   <Users className="w-3 h-3" />
-                  <span className="font-semibold text-foreground tabular-nums">
-                    {formatCount(followerCount)}
-                  </span>
+                  <span className="font-semibold text-foreground tabular-nums">{followerCount}</span>
                   {lang === "ar" ? "متابع" : "followers"}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-1.5 mt-3">
-            <span className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium">
-              ✅ {lang === "ar" ? "موثّقة" : "Verified"}
-            </span>
-            <span className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium">
-              📋 {lang === "ar" ? "مسجلة رسمياً" : "Registered NGO"}
-            </span>
-            <span className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium">
-              🛡️ {lang === "ar" ? "شفافية مالية" : "Transparent Finance"}
-            </span>
-          </div>
+          {focusAreas.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {focusAreas.map((f, i) => (
+                <span key={i} className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium">
+                  {f}
+                </span>
+              ))}
+            </div>
+          )}
 
           <div className="flex gap-2 mt-4">
-            <button
-              onClick={() => navigate(`/cause/${cause.id}`)}
-              className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-1.5"
-            >
-              <Heart className="w-4 h-4" />
-              {lang === "ar" ? "ادعم" : "Support"}
-            </button>
-            <button
-              onClick={() => navigate("/inbox")}
-              className="flex-1 py-2.5 rounded-xl border-2 border-border bg-card text-foreground font-semibold text-sm flex items-center justify-center gap-1.5"
-            >
-              <Mail className="w-4 h-4" />
-              {lang === "ar" ? "تواصل" : "Contact"}
-            </button>
+            {org.owner_id ? (
+              <button
+                onClick={() => navigate(`/inbox?personId=${org.owner_id}&kind=user`)}
+                className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-1.5"
+              >
+                <Mail className="w-4 h-4" />
+                {lang === "ar" ? "تواصل" : "Contact"}
+              </button>
+            ) : (
+              <button
+                disabled
+                className="flex-1 py-2.5 rounded-xl bg-secondary text-muted-foreground font-semibold text-xs flex items-center justify-center gap-1.5 cursor-not-allowed"
+              >
+                <Mail className="w-4 h-4 shrink-0" />
+                {lang === "ar" ? "لم تنضم بعد" : "Hasn't joined yet"}
+              </button>
+            )}
             <button
               onClick={handleFollow}
               aria-pressed={following}
               className={`flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 border-2 ${
-                following
-                  ? "bg-primary/10 border-primary text-primary"
-                  : "border-border bg-card text-foreground"
+                following ? "bg-primary/10 border-primary text-primary" : "border-border bg-card text-foreground"
               }`}
             >
               {following ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
@@ -184,230 +265,139 @@ const OrganizationDetail = () => {
       </div>
 
       {/* Quick stats */}
-      <div className="px-4 mt-3 grid grid-cols-3 gap-2">
-        <div className="bg-card rounded-xl border border-border p-3 text-center">
-          <Calendar className="w-4 h-4 text-primary mx-auto mb-1" />
-          <p className="text-sm font-bold text-foreground">{org.founded}</p>
-          <p className="text-[10px] text-muted-foreground">
-            {lang === "ar" ? "تأسست" : "Founded"}
-          </p>
-        </div>
+      <div className="px-4 mt-3 grid grid-cols-2 gap-2">
         <div className="bg-card rounded-xl border border-border p-3 text-center">
           <Users className="w-4 h-4 text-primary mx-auto mb-1" />
-          <p className="text-sm font-bold text-foreground">{org.members}</p>
-          <p className="text-[10px] text-muted-foreground">
-            {lang === "ar" ? "فريق" : "Team"}
-          </p>
+          <p className="text-sm font-bold text-foreground tabular-nums">{org.volunteers_count ?? 0}</p>
+          <p className="text-[10px] text-muted-foreground">{lang === "ar" ? "متطوعون" : "Volunteers"}</p>
         </div>
         <div className="bg-card rounded-xl border border-border p-3 text-center">
-          <Heart className="w-4 h-4 text-primary mx-auto mb-1" />
-          <p className="text-sm font-bold text-foreground">{totalSupporters}</p>
-          <p className="text-[10px] text-muted-foreground">
-            {lang === "ar" ? "داعم" : "Supporters"}
+          <HandCoins className="w-4 h-4 text-primary mx-auto mb-1" />
+          <p className="text-sm font-bold text-foreground tabular-nums">
+            {(org.donations_total ?? 0).toLocaleString()}
           </p>
+          <p className="text-[10px] text-muted-foreground">{lang === "ar" ? "تبرعات (ج.م)" : `Donations (${t("common.egp")})`}</p>
         </div>
       </div>
 
       {/* Today's Status */}
       <div className="px-4 mt-4">
         {user ? (
-          <DailyStatusCard
-            sampleId={`org-${cause.id}`}
-            accentBg="bg-primary"
-            accentText="text-primary"
-          />
+          <DailyStatusCard sampleId={`org-${org.id}`} accentBg="bg-primary" accentText="text-primary" />
         ) : (
-          <ProviderStatusView sampleId={`org-${cause.id}`} accentText="text-primary" />
+          <ProviderStatusView sampleId={`org-${org.id}`} accentText="text-primary" />
         )}
       </div>
 
       {/* Mission */}
-      <div className="px-4 mt-5">
-        <h2 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-          <Target className="w-4 h-4 text-primary" />
-          {lang === "ar" ? "رسالتنا" : "Our Mission"}
-        </h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {cause.description[lang]}
-        </p>
-      </div>
-
-      {/* Impact summary */}
-      <div className="px-4 mt-5">
-        <h2 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-primary" />
-          {lang === "ar" ? "أثرنا حتى الآن" : "Our Impact"}
-        </h2>
-        <div className="bg-surface rounded-xl border border-border p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-base font-bold text-primary-dark">
-              {totalRaised.toLocaleString()} {t("common.egp")}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              {lang === "ar" ? "من" : "of"} {totalGoal.toLocaleString()}{" "}
-              {t("common.egp")}
-            </span>
-          </div>
-          <div className="w-full bg-border rounded-full h-2 mb-2">
-            <div
-              className="bg-primary h-2 rounded-full transition-all"
-              style={{ width: `${Math.min(fundedPct, 100)}%` }}
-            />
-          </div>
-          <p className="text-[11px] text-primary font-semibold">
-            {fundedPct}% {lang === "ar" ? "تم تمويله عبر جميع البرامج" : "funded across all programs"}
-          </p>
+      {mission && (
+        <div className="px-4 mt-5">
+          <h2 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+            <Target className="w-4 h-4 text-primary" />
+            {lang === "ar" ? "رسالتنا" : "Our Mission"}
+          </h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">{mission}</p>
         </div>
-      </div>
+      )}
+
+      {/* About */}
+      {description && (
+        <div className="px-4 mt-5">
+          <h2 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-primary" />
+            {lang === "ar" ? "عن المنظمة" : "About"}
+          </h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+        </div>
+      )}
 
       {/* Programs */}
-      <div className="px-4 mt-5">
-        <h2 className="text-sm font-bold text-foreground mb-3">
-          {lang === "ar"
-            ? `البرامج (${allPrograms.length})`
-            : `Programs (${allPrograms.length})`}
-        </h2>
-        <div className="space-y-2">
-          {allPrograms.map((c) => {
-            const pct = Math.round((c.raised / c.goal) * 100);
-            return (
-              <button
-                key={c.id}
-                onClick={() => navigate(`/cause/${c.id}`)}
-                className="w-full flex items-center gap-3 bg-card rounded-xl border border-border p-3 text-start"
-              >
-                <img
-                  src={c.image}
-                  alt=""
-                  className="w-14 h-14 rounded-lg object-cover shrink-0"
-                />
+      {programs.length > 0 && (
+        <div className="px-4 mt-5">
+          <h2 className="text-sm font-bold text-foreground mb-3">
+            {lang === "ar" ? `البرامج (${programs.length})` : `Programs (${programs.length})`}
+          </h2>
+          <div className="space-y-2">
+            {programs.map((p) => (
+              <div key={p.id} className="flex items-center gap-3 bg-card rounded-xl border border-border p-3">
+                <img src={p.image || "/placeholder.svg"} alt="" className="w-14 h-14 rounded-lg object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-foreground line-clamp-1">
-                    {c.title[lang]}
+                    {lang === "ar" ? p.title_ar : p.title_en}
                   </p>
-                  <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">
-                    {c.summary[lang]}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <div className="flex-1 bg-border rounded-full h-1">
-                      <div
-                        className="bg-primary h-1 rounded-full"
-                        style={{ width: `${Math.min(pct, 100)}%` }}
-                      />
-                    </div>
-                    <span className="text-[10px] text-primary font-semibold">
-                      {pct}%
-                    </span>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 rtl:rotate-180" />
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Trust & Transparency */}
-      <div className="px-4 mt-5">
-        <h2 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-primary" />
-          {lang === "ar" ? "الثقة والشفافية" : "Trust & Transparency"}
-        </h2>
-        <div className="bg-card rounded-xl border border-border divide-y divide-border">
-          {[
-            { en: "Registered with the Ministry of Social Solidarity", ar: "مسجلة لدى وزارة التضامن الاجتماعي" },
-            { en: "Annual financial reports published", ar: "تقارير مالية سنوية منشورة" },
-            { en: "Independently audited", ar: "مدقق حساباتها مستقل" },
-          ].map((row, i) => (
-            <div key={i} className="flex items-center gap-2 px-3 py-2.5">
-              <CheckCircle className="w-4 h-4 text-primary shrink-0" />
-              <p className="text-xs text-foreground">{row[lang]}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Testimonials */}
-      <div className="px-4 mt-5">
-        <h2 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-          <Heart className="w-4 h-4 text-primary" />
-          {lang === "ar" ? "آراء الداعمين" : "Voices of Support"}
-        </h2>
-        <div className="space-y-2">
-          {[
-            {
-              name: { en: "Mariam Saleh", ar: "مريم صالح" },
-              role: { en: "Monthly Donor", ar: "متبرعة شهرية" },
-              initials: "MS",
-              quote: {
-                en: "Transparent reports and real impact on the ground. I see exactly where my contribution goes.",
-                ar: "تقارير شفافة وأثر حقيقي على أرض الواقع. أرى بوضوح أين تذهب مساهمتي.",
-              },
-            },
-            {
-              name: { en: "Ahmed Fathy", ar: "أحمد فتحي" },
-              role: { en: "Volunteer", ar: "متطوع" },
-              initials: "AF",
-              quote: {
-                en: "Working with this team changed how I see community work. Genuine people, genuine mission.",
-                ar: "العمل مع هذا الفريق غيّر نظرتي للعمل المجتمعي. أشخاص حقيقيون ورسالة صادقة.",
-              },
-            },
-            {
-              name: { en: "Layla Hassan", ar: "ليلى حسن" },
-              role: { en: "Beneficiary", ar: "مستفيدة" },
-              initials: "LH",
-              quote: {
-                en: "Their program gave my family hope when we needed it most. Forever grateful.",
-                ar: "برنامجهم منح عائلتي الأمل في أصعب الأوقات. ممتنة لهم دائماً.",
-              },
-            },
-          ].map((tst, i) => (
-            <div key={i} className="bg-card rounded-xl border border-border p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold shrink-0">
-                  {tst.initials}
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold text-foreground truncate">
-                    {tst.name[lang]}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground truncate">
-                    {tst.role[lang]}
+                  <p className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5">
+                    {lang === "ar" ? p.description_ar : p.description_en}
                   </p>
                 </div>
               </div>
-              <p className="text-xs text-foreground leading-relaxed">
-                "{tst.quote[lang]}"
-              </p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="px-4 mt-5">
-        <h2 className="text-sm font-bold text-foreground mb-2">
-          {lang === "ar" ? "تواصل معنا" : "Get in Touch"}
-        </h2>
-        <div className="bg-card rounded-xl border border-border divide-y divide-border">
-          <div className="flex items-center gap-3 px-3 py-3">
-            <Mail className="w-4 h-4 text-primary shrink-0" />
-            <p className="text-xs text-foreground">
-              {org.name.en.toLowerCase().replace(/\s+/g, ".")}@example.org
-            </p>
+      {/* Causes */}
+      {causes.length > 0 && (
+        <div className="px-4 mt-5">
+          <h2 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+            <Heart className="w-4 h-4 text-primary" />
+            {lang === "ar" ? `القضايا (${causes.length})` : `Causes (${causes.length})`}
+          </h2>
+          <div className="space-y-2">
+            {causes.map((c) => {
+              const pct = c.goal ? Math.round(((c.raised ?? 0) / c.goal) * 100) : 0;
+              return (
+                <div key={c.id} className="flex items-center gap-3 bg-card rounded-xl border border-border p-3">
+                  <img src={c.image || "/placeholder.svg"} alt="" className="w-14 h-14 rounded-lg object-cover shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-foreground line-clamp-1">
+                      {lang === "ar" ? c.title_ar : c.title_en}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">
+                      {lang === "ar" ? c.summary_ar : c.summary_en}
+                    </p>
+                    {c.goal ? (
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <div className="flex-1 bg-border rounded-full h-1">
+                          <div className="bg-primary h-1 rounded-full" style={{ width: `${Math.min(pct, 100)}%` }} />
+                        </div>
+                        <span className="text-[10px] text-primary font-semibold">{pct}%</span>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <div className="flex items-center gap-3 px-3 py-3">
-            <Globe className="w-4 h-4 text-primary shrink-0" />
-            <p className="text-xs text-foreground">www.example.org</p>
-          </div>
-          {region && (
-            <div className="flex items-center gap-3 px-3 py-3">
-              <MapPin className="w-4 h-4 text-primary shrink-0" />
-              <p className="text-xs text-foreground">{t(region.nameKey)}</p>
-            </div>
-          )}
         </div>
-      </div>
+      )}
+
+      {/* Contact */}
+      {(org.website || place) && (
+        <div className="px-4 mt-5">
+          <h2 className="text-sm font-bold text-foreground mb-2">
+            {lang === "ar" ? "تواصل معنا" : "Get in Touch"}
+          </h2>
+          <div className="bg-card rounded-xl border border-border divide-y divide-border">
+            {org.website && (
+              <a
+                href={org.website.startsWith("http") ? org.website : `https://${org.website}`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-3 px-3 py-3"
+              >
+                <Globe className="w-4 h-4 text-primary shrink-0" />
+                <p className="text-xs text-primary underline break-all">{org.website}</p>
+              </a>
+            )}
+            {place && (
+              <div className="flex items-center gap-3 px-3 py-3">
+                <MapPin className="w-4 h-4 text-primary shrink-0" />
+                <p className="text-xs text-foreground">{place}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
