@@ -80,6 +80,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "common.free": { en: "Free", ar: "مجاني" },
   "date.chooseDate": { en: "Choose a date to view Trips", ar: "اختر تاريخ لعرض الرحلات" },
   "section.whosWho": { en: "Who's Who", ar: "من هم" },
+  "section.collections": { en: "Knowledge Collections", ar: "مجموعات المعرفة" },
   "filter.allCities": { en: "All Cities", ar: "كل المدن" },
   "filter.city": { en: "City", ar: "المدينة" },
   "region.nileDelta": { en: "Nile Delta", ar: "دلتا النيل" },
