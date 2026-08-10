@@ -59,20 +59,40 @@ const CauseSupportDonate = () => {
 
   const selectedPayment = paymentMethods.find(m => m.id === paymentMethod);
 
-  const handleDonate = () => {
+  const handleDonate = async () => {
+    if (!user) {
+      toast.error(ar ? "يرجى تسجيل الدخول لتسجيل تعهدك" : "Please sign in to register your pledge");
+      navigate("/auth");
+      return;
+    }
     setProcessing(true);
-    setTimeout(() => {
-      setProcessing(false);
-      setStep("success");
-    }, 2000);
+    const { error } = await submitPledge({
+      causeIdOrSlug: id!,
+      supporterId: user.id,
+      kind: "donation",
+      amount: finalAmount,
+      currency: "EGP",
+      message: note || null,
+      details: { recurring, preferred_payment_method: paymentMethod },
+      contactName: contactName || null,
+      contactEmail: contactEmail || null,
+      contactPhone: contactPhone || null,
+    });
+    setProcessing(false);
+    if (error) {
+      toast.error(ar ? "تعذر تسجيل التعهد" : "Could not register the pledge");
+      return;
+    }
+    setStep("success");
   };
 
   const stepTitles: Record<Step, { en: string; ar: string }> = {
-    amount: { en: "Donate", ar: "تبرّع" },
-    payment: { en: "Payment Method", ar: "طريقة الدفع" },
-    confirm: { en: "Confirm Donation", ar: "تأكيد التبرع" },
-    success: { en: "Thank You!", ar: "شكراً لك!" },
+    amount: { en: "Pledge a Donation", ar: "تعهّد بالتبرع" },
+    payment: { en: "Preferred Method", ar: "الطريقة المفضلة" },
+    confirm: { en: "Confirm Pledge", ar: "تأكيد التعهد" },
+    success: { en: "Pledge Registered", ar: "تم تسجيل التعهد" },
   };
+
 
   const handleBack = () => {
     if (step === "payment") setStep("amount");
