@@ -112,6 +112,8 @@ const MyCollections = lazy(() => import("./pages/dashboards/MyCollections.tsx"))
 const MyTasks = lazy(() => import("./pages/dashboards/MyTasks.tsx"));
 const MySessions = lazy(() => import("./pages/dashboards/MySessions.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
+const Credits = lazy(() => import("./pages/Credits.tsx"));
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
