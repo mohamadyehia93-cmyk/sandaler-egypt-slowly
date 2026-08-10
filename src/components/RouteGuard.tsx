@@ -11,6 +11,7 @@ const allowedProviderRoutes = [
   "/profile/settings",
   "/profile/help",
   "/dashboard",
+  "/admin",
   "/booking",
   "/.lovable/oauth/consent",
 ];
