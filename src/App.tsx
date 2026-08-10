@@ -208,6 +208,8 @@ const App = () => {
             <Route path="/profile/settings" element={<Settings />} />
             <Route path="/profile/help" element={<HelpSupport />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/credits" element={<Credits />} />
+
             <Route path="/dashboard/culture-actor/new-article" element={<NewArticle />} />
             <Route path="/dashboard/culture-actor/edit-article/:id" element={<NewArticle />} />
             <Route path="/dashboard/culture-actor/my-content" element={<MyContent />} />
