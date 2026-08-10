@@ -353,6 +353,12 @@ const SplashPage = () => {
     return langs.length ? langs.join(", ") : null;
   };
 
+  // Sandal supports one role per account: if the signed-in user already has a
+  // different role we surface this confirmation instead of overwriting.
+  const [roleConflict, setRoleConflict] = useState<
+    { nextRole: LocalRole; currentRole: LocalRole } | null
+  >(null);
+
 
   const completeProvider = async (
     role: LocalRole,
