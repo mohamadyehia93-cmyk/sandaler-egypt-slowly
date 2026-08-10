@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useConversations } from "@/hooks/useMessages";
+import type { MessagingTargetKind } from "@/lib/messagingTarget";
 import BottomNav from "@/components/BottomNav";
 import ConversationList from "@/components/inbox/ConversationList";
 import ChatView from "@/components/inbox/ChatView";
@@ -16,13 +17,23 @@ const Inbox = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { conversations, loading, findOrCreateConversation } = useConversations();
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
-  // Handle deep-link: ?personId=<userId>
+  // Handle deep-link: ?personId=<id>&kind=user|provider|culture_actor
   useEffect(() => {
     const personId = searchParams.get("personId");
+    const kind = (searchParams.get("kind") || "auto") as MessagingTargetKind;
     if (personId && user) {
-      findOrCreateConversation(personId).then((convoId) => {
-        if (convoId) setActiveId(convoId);
+      findOrCreateConversation(personId, kind).then(({ conversationId, reason }) => {
+        if (conversationId) setActiveId(conversationId);
+        else if (reason === "unclaimed")
+          setNotice(lang === "ar"
+            ? "لم ينضم هذا المضيف إلى ساندال بعد، لذا لا يمكن إرسال رسالة إليه."
+            : "This host hasn't joined Sandal yet, so they can't receive messages.");
+        else
+          setNotice(lang === "ar"
+            ? "لا يمكن بدء محادثة مع هذا الحساب."
+            : "We couldn't start a conversation with this account.");
       });
       setSearchParams({}, { replace: true });
     }
