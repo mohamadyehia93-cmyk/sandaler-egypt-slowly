@@ -280,13 +280,13 @@ const CauseSupportDonate = () => {
               <p className="text-sm text-foreground">{currentImpact.text[lang]}</p>
             </div>
 
-            {/* Trust */}
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-surface border border-border">
-              <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
+            {/* Honest framing */}
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-warning/5 border border-warning/30">
+              <Info className="w-4 h-4 text-warning flex-shrink-0 mt-0.5" />
               <p className="text-[10px] text-muted-foreground">
                 {lang === "ar"
-                  ? "بالضغط على 'تأكيد التبرع' أنت توافق على شروط الاستخدام. جميع المعاملات آمنة ومشفرة."
-                  : "By clicking 'Confirm Donation' you agree to the terms of service. All transactions are secure and encrypted."}
+                  ? "لا يتم تحصيل أي مبلغ الآن. سيتم تسجيل تعهدك وستتواصل معك المنظمة لترتيب الدفع بالطريقة التي اخترتها."
+                  : "No money is charged now. Your pledge is registered and the organisation will contact you to arrange payment using the method you chose."}
               </p>
             </div>
           </>
