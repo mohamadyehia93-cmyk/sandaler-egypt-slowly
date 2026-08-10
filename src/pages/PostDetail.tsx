@@ -210,8 +210,11 @@ const PostDetail = () => {
     title: { en: row.title_en, ar: row.title_ar },
     body: { en: row.body_en || "", ar: row.body_ar || "" },
     category: { en: row.category || "", ar: row.category || "" },
-    author: { en: row.author_name_en || "", ar: row.author_name_ar || row.author_name_en || "" },
+    author: bylineNames(row),
     authorId: row.author_id,
+    isEditorial: isEditorialPost(row),
+    authorImage: row.author_image,
+
     date: row.created_at,
     readTime: row.read_time_minutes ?? 5,
     regionId: row.region_id,
