@@ -299,7 +299,7 @@ const AudioTourDetail = () => {
               <button
                 onClick={async () => {
                   toast.info(lang === "ar" ? "بدء تحميل الجولة..." : "Starting download...");
-                  await offline.download(SAMPLE_AUDIO_URL, mapStops.map((s) => ({ lat: s.lat, lng: s.lng })));
+                  await offline.download(audioSrc, mapStops.map((s) => ({ lat: s.lat, lng: s.lng })));
                   toast.success(lang === "ar" ? "الجولة متاحة الآن بدون إنترنت" : "Tour saved for offline use");
                 }}
                 disabled={!isOnline}
