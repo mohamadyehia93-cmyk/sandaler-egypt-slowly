@@ -360,9 +360,9 @@ const Booking = () => {
           {t("booking.slot_required_warning")}
         </div>
       )}
-      {bookingError && (
+      {(bookingError || requestError) && (
         <div className="mx-4 mb-3 p-3 rounded-lg bg-destructive/10 border border-destructive text-sm text-destructive">
-          {bookingError}
+          {bookingError || requestError}
         </div>
       )}
 
@@ -370,23 +370,27 @@ const Booking = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
         <div>
           <span className="text-lg font-bold text-foreground">{total} {t("common.egp")}</span>
-          <span className="text-xs text-muted-foreground block">{t("booking.total_label")}</span>
+          <span className="text-xs text-muted-foreground block">
+            {isExperience ? t("booking.total_label") : ar ? "تقديري" : "Estimated"}
+          </span>
         </div>
         {step === "details" ? (
           <button
             onClick={() => setStep("payment")}
             className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
           >
-            {t("booking.continue_to_payment")}
+            {isExperience
+              ? t("booking.continue_to_payment")
+              : ar ? "متابعة" : "Continue"}
           </button>
         ) : (
           <button
             onClick={async () => {
+              if (!user) {
+                navigate(`/login?return=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+                return;
+              }
               if (isExperience) {
-                if (!user) {
-                  navigate(`/login?return=${encodeURIComponent(window.location.pathname + window.location.search)}`);
-                  return;
-                }
                 if (!slotId) return; // Surfaced inline above; no-op so user can read the notice
                 await startBookingCheckout({
                   experienceId: id,
@@ -396,18 +400,49 @@ const Booking = () => {
                   visitorEmail: user.email || "",
                 });
                 // On success the browser redirects to Stripe. On failure bookingError is set.
-              } else {
-                // TODO(Sprint 3): wire stays/products/trips/transport to Stripe (or Fawry/Paymob per type)
-                setStep("confirmed");
+                return;
               }
+
+              // Non-experience types have no in-app payment: persist a real
+              // reservation request. owner_id and status are set server-side by
+              // the reservation_requests_insert_integrity trigger.
+              setRequestError(null);
+              setSubmitting(true);
+              const { error } = await supabase.from("reservation_requests").insert({
+                item_type: requestItemType,
+                item_id: item.id,
+                requester_id: user.id,
+                guests,
+                start_date: selectedDate || null,
+                contact_name: contactName.trim(),
+                contact_phone: contactPhone.trim(),
+                note: note.trim() || null,
+              });
+              setSubmitting(false);
+              if (error) {
+                setRequestError(
+                  ar ? `تعذر إرسال الطلب: ${error.message}` : `Could not send the request: ${error.message}`
+                );
+                return;
+              }
+              setStep("confirmed");
             }}
-            disabled={!paymentMethod || isProcessing || (isExperience && !slotId)}
+            disabled={
+              isProcessing ||
+              submitting ||
+              (isExperience ? !paymentMethod || !slotId : !contactName.trim() || contactPhone.trim().length < 8)
+            }
             className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-50"
           >
-            {isProcessing ? t("booking.processing") : t("booking.pay_now")}
+            {isExperience
+              ? (isProcessing ? t("booking.processing") : t("booking.pay_now"))
+              : submitting
+              ? (ar ? "جاري الإرسال..." : "Sending...")
+              : (ar ? "إرسال الطلب" : "Send request")}
           </button>
         )}
       </div>
+
     </div>
   );
 };
