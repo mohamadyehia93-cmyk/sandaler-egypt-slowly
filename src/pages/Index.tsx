@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Bell, Calendar, Search, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useLanguage } from "@/hooks/useLanguage";
 import { SEO } from "@/components/SEO";
-import { useExperiences, useAudioTours, useAccommodations, useTransport, useProducts, useWhosWho, useEvents } from "@/hooks/useListings";
+import { useEvents } from "@/hooks/useListings";
 import BottomNav from "@/components/BottomNav";
 import TopTabs from "@/components/TopTabs";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -26,19 +25,12 @@ import Certifications from "@/components/Certifications";
 
 const Index = () => {
   const { t } = useTranslation();
-  const { lang } = useLanguage();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "explore");
   const [scrolled, setScrolled] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const navigate = useNavigate();
-  const { data: dbTransport = [] } = useTransport();
   const { data: dbEvents = [] } = useEvents();
-  const { data: dbExperiences = [] } = useExperiences();
-  const { data: dbAudioTours = [] } = useAudioTours();
-  const { data: dbAccommodations = [] } = useAccommodations();
-  const { data: dbProducts = [] } = useProducts();
-  const { data: dbWhosWho = [] } = useWhosWho();
 
   useEffect(() => {
     const tab = searchParams.get("tab");
