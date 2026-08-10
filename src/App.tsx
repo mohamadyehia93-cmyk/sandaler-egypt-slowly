@@ -101,6 +101,8 @@ const AllAudioTours = lazy(() => import("./pages/AllAudioTours.tsx"));
 const AllTrips = lazy(() => import("./pages/AllTrips.tsx"));
 const AllCauses = lazy(() => import("./pages/AllCauses.tsx"));
 const AllPeople = lazy(() => import("./pages/AllPeople.tsx"));
+const AllCollections = lazy(() => import("./pages/AllCollections.tsx"));
+const CollectionDetail = lazy(() => import("./pages/CollectionDetail.tsx"));
 const VisitorProfile = lazy(() => import("./pages/VisitorProfile.tsx"));
 const StatusesFeed = lazy(() => import("./pages/StatusesFeed.tsx"));
 const MyContent = lazy(() => import("./pages/dashboards/MyContent.tsx"));
@@ -157,6 +159,8 @@ const App = () => {
             <Route path="/audio-tour/:id" element={<AudioTourDetail />} />
             <Route path="/causes" element={<AllCauses />} />
             <Route path="/people" element={<AllPeople />} />
+            <Route path="/collections" element={<AllCollections />} />
+            <Route path="/collection/:id" element={<CollectionDetail />} />
             <Route path="/cause/:id" element={<CauseDetail />} />
             <Route path="/organization/:id" element={<OrganizationDetail />} />
             <Route path="/cause/:id/gift" element={<CauseSupportGift />} />

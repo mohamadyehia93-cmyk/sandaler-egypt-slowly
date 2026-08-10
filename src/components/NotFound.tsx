@@ -20,7 +20,9 @@ export type NotFoundContext =
   | "transport"
   | "culture-actor"
   | "event"
+  | "collection"
   | "generic";
+
 
 const COPY: Record<NotFoundContext, { en: string; ar: string }> = {
   experience: { en: "Experience not found", ar: "التجربة غير موجودة" },
@@ -40,6 +42,7 @@ const COPY: Record<NotFoundContext, { en: string; ar: string }> = {
   transport: { en: "Transport option not found", ar: "وسيلة النقل غير موجودة" },
   "culture-actor": { en: "Culture actor not found", ar: "الفاعل الثقافي غير موجود" },
   event: { en: "Event not found", ar: "الفعالية غير موجودة" },
+  collection: { en: "Collection not found", ar: "المجموعة غير موجودة" },
   generic: { en: "Page not found", ar: "الصفحة غير موجودة" },
 };
 

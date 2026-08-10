@@ -19,6 +19,7 @@ import HomeCausesSection from "@/components/HomeCausesSection";
 import EventsSection from "@/components/EventsSection";
 import ProductGrid from "@/components/ProductGrid";
 import MeetUpSection from "@/components/MeetUpSection";
+import CollectionsSection from "@/components/CollectionsSection";
 import Testimonials from "@/components/Testimonials";
 import Partners from "@/components/Partners";
 import Certifications from "@/components/Certifications";
@@ -106,6 +107,7 @@ const Index = () => {
               <RegionScroll />
               <LatestPosts />
               <AudioTourCards />
+              <CollectionsSection />
               <EventsSection events={dbEvents as any[]} />
               <HomeCausesSection />
 

@@ -7,6 +7,7 @@ import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import BottomNav from "@/components/BottomNav";
 import FollowButton from "@/components/FollowButton";
 import NotFoundView from "@/components/NotFound";
+import ExpertCollections from "@/components/ExpertCollections";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Region = { id: string; name_en: string; name_ar: string; emoji: string | null; color: string | null };
@@ -161,6 +162,9 @@ const PersonDetail = () => {
 
       {/* Info cards */}
       <div className="px-4 space-y-3">
+        {/* Knowledge collections authored by this person (collections.expert_id = auth user id) */}
+        <ExpertCollections userId={person.user_id} />
+
         {interests.length > 0 && (
           <div className="bg-card rounded-xl p-4 shadow-card border border-border">
             <div className="flex items-center gap-2 mb-3">
