@@ -261,7 +261,7 @@ const PostDetail = () => {
           <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
             <Share2 className="w-5 h-5 text-foreground" />
           </button>
-          <WishlistButton variant="bookmark" />
+          <WishlistButton itemType="post" itemId={post.id} variant="bookmark" />
         </div>
         <div className="absolute bottom-4 left-4 right-4">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
