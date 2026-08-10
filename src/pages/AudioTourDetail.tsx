@@ -258,7 +258,8 @@ const AudioTourDetail = () => {
         )}
 
         {/* Download for offline */}
-        {mapStops.length > 0 && (
+        {audioSrc && mapStops.length > 0 && (
+
           <div className="mb-4">
             {offline.downloaded ? (
               <div className="flex items-center justify-between gap-2 rounded-xl bg-success/10 border border-success/30 px-3 py-2">
