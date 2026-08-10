@@ -4,7 +4,7 @@ import {createClient} from "@supabase/supabase-js";
 const mk=()=>createClient(URL,KEY);
 const rnd=Math.random().toString(36).slice(2,8);
 async function user(n){const c=mk();const email=`own${rnd}${n}@example.com`;
- let {data,error}=await c.auth.signUp({email,password:"Passw0rd!234"});
+ let {data,error}=await c.auth.signUp({email,password:"Zq7-marsh-lantern-9142"});
  if(error)throw error;
  const uid=data.user.id;
  const {data:p,error:pe}=await c.from("providers").insert({user_id:uid,role:"product-seller",name_en:"T"+n,name_ar:"T"+n,status:"published",slug:`t-${rnd}-${n}`}).select("id").single();
