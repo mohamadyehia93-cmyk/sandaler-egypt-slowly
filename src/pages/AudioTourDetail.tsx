@@ -18,7 +18,6 @@ import NotFoundView from "@/components/NotFound";
 
 const NEAR_THRESHOLD_M = 50; // when within 50m, mark stop as "near you"
 
-const SAMPLE_AUDIO_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
 
 const formatTime = (seconds: number) => {
   const m = Math.floor(seconds / 60);
