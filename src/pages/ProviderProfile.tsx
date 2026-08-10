@@ -75,8 +75,10 @@ const listingSectionLabels: Record<string, { en: string; ar: string }> = {
   "ambassador": { en: "Verified Providers", ar: "مزودون موثقون" },
 };
 
-// Map role to the table + column that links listings back
+// Map role to the table + column that links listings back.
+// All of these owner columns hold providers.id (see src/lib/providerRecord.ts).
 const listingSource: Record<string, { table: string; column: string; titleEn: string; titleAr: string; imageCol: string; ratingCol?: string; priceCol?: string }> = {
+
   "service-provider": { table: "experiences", column: "provider_id", titleEn: "title_en", titleAr: "title_ar", imageCol: "image", ratingCol: "rating", priceCol: "price" },
   "accommodation-host": { table: "accommodations", column: "host_id", titleEn: "name_en", titleAr: "name_ar", imageCol: "image", ratingCol: "rating", priceCol: "price_per_night" },
   "transport-provider": { table: "transport", column: "provider_id", titleEn: "name_en", titleAr: "name_ar", imageCol: "image", ratingCol: "rating", priceCol: "price" },

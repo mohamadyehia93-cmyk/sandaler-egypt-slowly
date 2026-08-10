@@ -3,6 +3,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchMyProviderId } from "@/lib/providerRecord";
+
 import { ArrowLeft, Plus, Trash2, Eye, Compass } from "lucide-react";
 import { toast } from "sonner";
 
@@ -16,15 +18,19 @@ const MyListings = () => {
     queryKey: ["my-experiences", user?.id],
     enabled: !!user,
     queryFn: async () => {
+      // experiences.provider_id holds providers.id (see src/lib/providerRecord.ts)
+      const providerId = await fetchMyProviderId(user!.id);
+      if (!providerId) return [];
       const { data, error } = await supabase
         .from("experiences")
         .select("id, title_en, title_ar, image, price, status, created_at")
-        .eq("provider_id", user!.id)
+        .eq("provider_id", providerId)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
   });
+
 
   const handleDelete = async (id: string) => {
     if (!window.confirm(lang === "ar" ? "حذف هذه التجربة؟" : "Delete this experience?")) return;
