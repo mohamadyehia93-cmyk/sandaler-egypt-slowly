@@ -1329,7 +1329,49 @@ const SplashPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {roleConflict && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center">
+          <div className="w-full max-w-sm rounded-2xl bg-background p-5 shadow-elevated">
+            <h2 className="text-base font-bold text-foreground">
+              {lang === "ar" ? "هذا الحساب مسجَّل بالفعل" : "This account already has a role"}
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              {lang === "ar"
+                ? `حسابك مسجَّل حاليًا بصفة «${roleLabels[roleConflict.currentRole].ar}». يدعم سندال دورًا واحدًا لكل حساب حاليًا، لذا التحويل إلى «${roleLabels[roleConflict.nextRole].ar}» سيستبدل دورك الحالي. سيتم إخفاء ملفك العام السابق (وليس حذفه).`
+                : `Your account is currently registered as a ${roleLabels[roleConflict.currentRole].en}. Sandal supports one role per account today, so switching to ${roleLabels[roleConflict.nextRole].en} will replace your current role. Your previous public profile will be unpublished, not deleted.`}
+            </p>
+            <div className="mt-4 space-y-2">
+              <button
+                onClick={() => {
+                  const path = roleDashboardPaths[roleConflict.currentRole] || "/";
+                  setRoleConflict(null);
+                  navigate(path);
+                }}
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm"
+              >
+                {lang === "ar" ? "الذهاب إلى لوحتي الحالية" : "Go to my current dashboard"}
+              </button>
+              <button
+                onClick={confirmRoleSwitch}
+                className="w-full py-3 rounded-xl border border-border text-sm font-semibold text-foreground"
+              >
+                {lang === "ar"
+                  ? `نعم، حوّلني إلى «${roleLabels[roleConflict.nextRole].ar}»`
+                  : `Yes, switch me to ${roleLabels[roleConflict.nextRole].en}`}
+              </button>
+              <button
+                onClick={() => setRoleConflict(null)}
+                className="w-full py-2.5 text-sm text-muted-foreground font-medium"
+              >
+                {lang === "ar" ? "إلغاء" : "Cancel"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+
   );
 };
 
