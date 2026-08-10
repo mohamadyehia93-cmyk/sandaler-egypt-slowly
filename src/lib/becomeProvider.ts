@@ -112,6 +112,38 @@ async function upsertSatellite(
 
 
 /**
+ * Satellite table (and owner column) for the roles that have one.
+ */
+const SATELLITE_BY_ROLE: Partial<Record<LocalRole, { table: "culture_actors" | "whos_who" | "organizations"; ownerCol: "user_id" | "owner_id" }>> = {
+  "culture-actor": { table: "culture_actors", ownerCol: "user_id" },
+  "whos-who": { table: "whos_who", ownerCol: "user_id" },
+  organization: { table: "organizations", ownerCol: "owner_id" },
+};
+
+/**
+ * When a user switches roles we never destroy the old satellite profile —
+ * we unpublish it (status = 'draft') so it stops appearing on public pages
+ * while the written bio/photos survive if they switch back.
+ */
+async function unpublishSatellite(oldRole: LocalRole, userId: string): Promise<void> {
+  const sat = SATELLITE_BY_ROLE[oldRole];
+  if (!sat) return;
+  try {
+    await supabase
+      .from(sat.table)
+      .update({ status: "draft" } as never)
+      .eq(sat.ownerCol, userId);
+  } catch {
+    // soft-fail; the role switch itself is what matters
+  }
+}
+
+export type BecomeProviderResult =
+  | { status: "ok"; error: null }
+  | { status: "error"; error: string }
+  | { status: "role-exists"; currentRole: LocalRole; error: null };
+
+/**
  * Creates (or updates) the current user's provider profile so that the
  * server-derived role in `useUserRole` resolves to the chosen provider role.
  *
@@ -119,16 +151,32 @@ async function upsertSatellite(
  * guarded by RLS (`auth.uid() = user_id`). A partial unique index on
  * `user_id` lets us upsert safely so a user has exactly one profile.
  *
- * Optional `details` carry everything collected during onboarding. When they
- * are absent the behaviour is unchanged (name/role/slug only).
+ * Sandal supports ONE role per account. If the user already has a provider
+ * row with a *different* role we do NOT silently overwrite: we return
+ * `{ status: "role-exists" }` so the caller can confirm with the user.
+ * Passing `{ force: true }` performs the switch and unpublishes the old
+ * role's satellite profile so no ghost public profile is left behind.
  */
 export async function becomeProvider(
   role: LocalRole,
-  details?: ProviderDetails
-): Promise<{ error: string | null }> {
+  details?: ProviderDetails,
+  options?: { force?: boolean }
+): Promise<BecomeProviderResult> {
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
-  if (!user) return { error: "not-authenticated" };
+  if (!user) return { status: "error", error: "not-authenticated" };
+
+  const { data: existing } = await supabase
+    .from("providers")
+    .select("role")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  const currentRole = (existing?.role as LocalRole | undefined) ?? null;
+  if (currentRole && currentRole !== role && !options?.force) {
+    return { status: "role-exists", currentRole, error: null };
+  }
+
 
   // Resolve a display name for the required name_en column.
   const { data: profile } = await supabase
