@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useMemo } from "react";
+import WishlistButton from "@/components/WishlistButton";
 import { ArrowLeft, Share2, Heart, MessageCircle, MapPin, Bus, Train, ChevronRight, Plus, Minus, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -65,8 +66,7 @@ const ExperienceDetail = () => {
     { icon: "❌", label: t("experience.cancellation_policy"), desc: t("experience.things_to_know_descriptions_cancellation") },
   ];
 
-  const [saved, setSaved] = useState(false);
-  const [selectedSlot, setSelectedSlot] = useState(0);
+    const [selectedSlot, setSelectedSlot] = useState(0);
   const [guests, setGuests] = useState(2);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetSlot, setSheetSlot] = useState(0);
@@ -291,13 +291,11 @@ const ExperienceDetail = () => {
           <button className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center">
             <Share2 className="w-3.5 h-3.5 text-foreground" />
           </button>
-          <button
-            onClick={() => setSaved(!saved)}
-            className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center transition-transform"
-            style={saved ? { transform: "scale(1.15)" } : {}}
-          >
-            <Heart className={`w-3.5 h-3.5 transition-colors ${saved ? "fill-primary text-primary" : "text-foreground"}`} />
-          </button>
+          <WishlistButton
+            itemType="experience"
+            itemId={exp?.id}
+            className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center transition-transform [&>svg]:w-3.5 [&>svg]:h-3.5"
+          />
         </div>
       </div>
 
