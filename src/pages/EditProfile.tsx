@@ -259,8 +259,11 @@ const EditProfile = () => {
   };
 
   const load = async () => {
-
-    if (!user) return;
+    // Signed out: stop loading so the sign-in prompt renders instead of the spinner.
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const [{ data: prov }, { data: prof }] = await Promise.all([
       supabase.from("providers").select("*").eq("user_id", user.id).maybeSingle(),
@@ -527,15 +530,9 @@ const EditProfile = () => {
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
   const cardClass = "bg-card rounded-xl shadow-card p-4 space-y-4";
 
-  if (authLoading || loading) {
-    return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
-      </div>
-    );
-  }
-
-  if (!user) {
+  // Once auth has resolved, a signed-out visitor gets the sign-in prompt —
+  // checked before the spinner so it can never be shadowed by a stale `loading`.
+  if (!authLoading && !user) {
     return (
       <div className="min-h-screen bg-surface flex flex-col items-center justify-center gap-4 px-6">
         <User className="w-10 h-10 text-primary" />
@@ -546,6 +543,16 @@ const EditProfile = () => {
       </div>
     );
   }
+
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-surface pb-28" dir={isRTL ? "rtl" : "ltr"}>
