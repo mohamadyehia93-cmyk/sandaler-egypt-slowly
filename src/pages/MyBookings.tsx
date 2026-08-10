@@ -12,16 +12,20 @@ type BookingRow = {
   guests: number;
   total_amount_egp: number;
   status: string;
+  payment_status: string;
   created_at: string;
   experience: { id: string; title_en: string; title_ar: string; image: string | null } | null;
 };
 
 const statusStyles: Record<string, string> = {
   confirmed: "bg-success/10 text-success",
+  pending: "bg-warning/10 text-warning",
   pending_payment: "bg-warning/10 text-warning",
+  declined: "bg-destructive/10 text-destructive",
   expired: "bg-muted text-muted-foreground",
   refunded: "bg-destructive/10 text-destructive",
 };
+
 
 const MyBookings = () => {
   const { lang } = useI18n();
@@ -34,7 +38,7 @@ const MyBookings = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("id, guests, total_amount_egp, status, created_at, experience:experiences(id, title_en, title_ar, image)")
+        .select("id, guests, total_amount_egp, status, payment_status, created_at, experience:experiences(id, title_en, title_ar, image)")
         .eq("visitor_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
