@@ -170,15 +170,9 @@ const NewExperience = () => {
       };
 
       if (isEdit) {
-        const update: Record<string, unknown> = { ...payload };
         // keep the existing photos when the host didn't upload new ones
-        if (imageUrls.length > 0) {
-          update.image = imageUrl;
-          update.images = imageUrls;
-        } else {
-          delete update.image;
-          delete update.images;
-        }
+        const { image: _img, images: _imgs, ...rest } = payload;
+        const update = imageUrls.length > 0 ? { ...rest, image: imageUrl, images: imageUrls } : rest;
         const { error } = await supabase.from("experiences").update(update).eq("id", editId);
         if (error) throw error;
         toast.success(ar ? "تم تحديث التجربة" : "Listing updated");
