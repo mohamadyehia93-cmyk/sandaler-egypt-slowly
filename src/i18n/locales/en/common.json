@@ -35,7 +35,8 @@
     "or": "or",
     "search": "Search",
     "notifications": "Notifications",
-    "see_all": "See all"
+    "see_all": "See all",
+    "image_credits": "Image credits"
   },
   "roles": {
     "visitor": "Visitor",
