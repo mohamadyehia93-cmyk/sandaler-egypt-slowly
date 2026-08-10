@@ -249,57 +249,76 @@ const Booking = () => {
 
         {step === "payment" && (
           <>
-            {/* Payment Methods */}
-            <h2 className="text-sm font-semibold text-foreground mb-3">
-              {t("booking.select_payment_method")}
-            </h2>
-            <div className="space-y-2 mb-5">
-              {paymentMethods.map((method) => (
-                <button
-                  key={method.id}
-                  onClick={() => setPaymentMethod(method.id)}
-                  className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 transition-colors text-start ${
-                    paymentMethod === method.id
-                      ? "border-primary bg-primary/5"
-                      : "border-border bg-card"
-                  }`}
-                >
-                  {method.emoji ? (
-                    <span className="text-xl">{method.emoji}</span>
-                  ) : method.icon ? (
-                    <method.icon className="w-5 h-5 text-muted-foreground" />
-                  ) : null}
-                  <span className="text-sm font-medium text-foreground">{method.label}</span>
-                  {paymentMethod === method.id && (
-                    <CheckCircle2 className="w-4 h-4 text-primary ms-auto" />
-                  )}
-                </button>
-              ))}
-            </div>
+            {isExperience ? (
+              <>
+                {/* Payment Methods */}
+                <h2 className="text-sm font-semibold text-foreground mb-3">
+                  {t("booking.select_payment_method")}
+                </h2>
+                <div className="space-y-2 mb-5">
+                  {paymentMethods.map((method) => (
+                    <button
+                      key={method.id}
+                      onClick={() => setPaymentMethod(method.id)}
+                      className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 transition-colors text-start ${
+                        paymentMethod === method.id
+                          ? "border-primary bg-primary/5"
+                          : "border-border bg-card"
+                      }`}
+                    >
+                      {method.emoji ? (
+                        <span className="text-xl">{method.emoji}</span>
+                      ) : method.icon ? (
+                        <method.icon className="w-5 h-5 text-muted-foreground" />
+                      ) : null}
+                      <span className="text-sm font-medium text-foreground">{method.label}</span>
+                      {paymentMethod === method.id && (
+                        <CheckCircle2 className="w-4 h-4 text-primary ms-auto" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Honest notice: this sends a request, it does not take payment */}
+                <div className="flex items-start gap-2 p-3 rounded-xl bg-warning/10 border border-warning mb-5">
+                  <Info className="w-4 h-4 text-warning flex-shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-foreground leading-relaxed">
+                    {ar
+                      ? "لا يمكن الدفع داخل التطبيق لهذا النوع حالياً. سيتم إرسال طلبك إلى المضيف، وسيتواصل معك لتأكيد التوفر وترتيب الدفع. المبلغ المعروض تقديري."
+                      : "In-app payment isn't available for this type yet. Your request is sent to the host, who will contact you to confirm availability and arrange payment. The amount shown is an estimate."}
+                  </p>
+                </div>
 
-            {/* Card Form (if card selected) */}
-            {paymentMethod === "card" && (
-              <div className="space-y-3 mb-5">
-                <input
-                  placeholder={t("booking.card_number")}
-                  className="w-full p-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground"
-                />
-                <div className="flex gap-3">
+                <h2 className="text-sm font-semibold text-foreground mb-3">
+                  {ar ? "بيانات التواصل" : "Your contact details"}
+                </h2>
+                <div className="space-y-3 mb-5">
                   <input
-                    placeholder="MM/YY"
-                    className="flex-1 p-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground"
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    placeholder={ar ? "الاسم الكامل" : "Full name"}
+                    className="w-full p-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground"
                   />
                   <input
-                    placeholder="CVV"
-                    className="w-24 p-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground"
+                    value={contactPhone}
+                    onChange={(e) => setContactPhone(e.target.value)}
+                    placeholder={ar ? "رقم الهاتف" : "Phone number"}
+                    className="w-full p-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground"
+                    dir="ltr"
+                  />
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    rows={3}
+                    placeholder={ar ? "ملاحظات للمضيف (اختياري)" : "Note for the host (optional)"}
+                    className="w-full p-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground resize-none"
                   />
                 </div>
-                <input
-                  placeholder={t("booking.name_on_card")}
-                  className="w-full p-3 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground"
-                />
-              </div>
+              </>
             )}
+
 
             {/* Order Summary */}
             <div className="rounded-xl bg-card shadow-card border border-border p-4 mb-5">
