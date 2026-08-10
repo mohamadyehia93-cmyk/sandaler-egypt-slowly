@@ -1,19 +1,24 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, CreditCard, Repeat, TrendingUp, ShieldCheck, Check, ChevronRight, X } from "lucide-react";
+import { ArrowLeft, CreditCard, Repeat, TrendingUp, Info, Check, ChevronRight, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { causes } from "@/lib/sampleData";
 import { useState } from "react";
+import { toast } from "sonner";
 import NotFoundView from "@/components/NotFound";
+import { useAuth } from "@/hooks/useAuth";
+import { submitPledge } from "@/lib/submitPledge";
 
 const presetAmounts = [50, 100, 250, 500, 1000];
 
 type Step = "amount" | "payment" | "confirm" | "success";
 
+// Payment is arranged offline by the organisation — nothing is charged in-app.
 const paymentMethods = [
   { id: "card", icon: CreditCard, label: { en: "Credit / Debit Card", ar: "بطاقة ائتمان / خصم" }, isComponent: true },
   { id: "wallet", icon: "📱", label: { en: "Mobile Wallet (Vodafone Cash, Fawry)", ar: "محفظة إلكترونية (فودافون كاش، فوري)" }, isComponent: false },
   { id: "bank", icon: "🏦", label: { en: "Bank Transfer", ar: "تحويل بنكي" }, isComponent: false },
 ];
+
 
 const CauseSupportDonate = () => {
   const { id } = useParams();
