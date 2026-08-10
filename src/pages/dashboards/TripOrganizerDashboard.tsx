@@ -1,6 +1,11 @@
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Bell, Plus, Map, Users, Calendar, TrendingUp, Send, ChevronRight } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { fetchMyProviderId } from "@/lib/providerRecord";
+import { useDashboardIdentity } from "@/hooks/useDashboardIdentity";
+import { ArrowLeft, Bell, Plus, Calendar, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
@@ -9,17 +14,50 @@ import OwnerReservationRequests from "@/components/OwnerReservationRequests";
 const TripOrganizerDashboard = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const identity = useDashboardIdentity();
+
+  const { data: trips = [] } = useQuery({
+    queryKey: ["to-trips", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      // trips.organizer_id holds providers.id; legacy rows may hold the auth user id
+      const providerId = await fetchMyProviderId(user!.id);
+      const owners = [user!.id, ...(providerId ? [providerId] : [])];
+      const { data, error } = await supabase
+        .from("trips")
+        .select("id, title_en, title_ar, status, date")
+        .in("organizer_id", owners);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const { data: requests = [] } = useQuery({
+    queryKey: ["to-requests", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("reservation_requests")
+        .select("id, status, created_at, item_type")
+        .eq("owner_id", user!.id)
+        .in("item_type", ["trip", "transport"]);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const published = trips.filter((t) => t.status === "published").length;
+  const drafts = trips.length - published;
+  const monthAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const requestsThisMonth = requests.filter((r) => new Date(r.created_at).getTime() >= monthAgo).length;
+  const pendingRequests = requests.filter((r) => r.status === "pending").length;
 
   const overview = [
-    { value: "6", label: lang === "ar" ? "رحلات نشطة" : "Active Trips", path: "/dashboard/trip-organizer/my-trips" },
-    { value: "14", label: lang === "ar" ? "حجوزات هذا الشهر" : "Bookings This Month", path: "/inbox" },
-    { value: "12,800", label: lang === "ar" ? "إيرادات" : "Revenue", suffix: lang === "ar" ? "ج.م" : "EGP", path: "/profile/impact" },
-    { value: "3", label: lang === "ar" ? "رحلات قادمة" : "Upcoming Departures", path: "/dashboard/trip-organizer/my-trips" },
-  ];
-
-  const departures = [
-    { name: lang === "ar" ? "رحلة يوم كامل للإسماعيلية" : "Full Day Trip to Ismailia", date: "Jan 3", confirmed: 8 },
-    { name: lang === "ar" ? "فنون الطعام على البحيرات" : "Gastronomy on the Lakes", date: "Jan 10", confirmed: 4 },
+    { value: String(published), label: lang === "ar" ? "رحلات منشورة" : "Published Trips", path: "/dashboard/trip-organizer/my-trips" },
+    { value: String(drafts), label: lang === "ar" ? "مسودات" : "Drafts", path: "/dashboard/trip-organizer/my-trips" },
+    { value: String(requestsThisMonth), label: lang === "ar" ? "طلبات هذا الشهر" : "Requests This Month", path: "/dashboard/trip-organizer" },
+    { value: String(pendingRequests), label: lang === "ar" ? "بانتظار الرد" : "Awaiting Reply", path: "/dashboard/trip-organizer" },
   ];
 
   const bottomNav = [
@@ -37,14 +75,16 @@ const TripOrganizerDashboard = () => {
           <div className="flex items-center gap-2">
             <EditProfileHeaderButton />
             <VisitorModeHeaderToggle />
-            <button onClick={() => navigate("/inbox")} className="relative p-1"><Bell className="w-5 h-5" /></button>
+            <button onClick={() => navigate("/inbox")} className="p-1" aria-label={lang === "ar" ? "الرسائل" : "Inbox"}><Bell className="w-5 h-5" /></button>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl">🗺️</div>
+          <div className="w-12 h-12 rounded-full bg-white/20 overflow-hidden flex items-center justify-center text-sm font-bold">
+            {identity.avatar ? <img src={identity.avatar} alt="" className="w-full h-full object-cover" /> : identity.initials || "🗺️"}
+          </div>
           <div>
             <p className="text-xs opacity-80">{lang === "ar" ? "منظم رحلات" : "Trip Organizer"}</p>
-            <h1 className="text-lg font-bold">{lang === "ar" ? "سمسمية تريبس" : "Semsemia Trips"}</h1>
+            <h1 className="text-lg font-bold">{identity.name || (lang === "ar" ? "لوحة التحكم" : "Dashboard")}</h1>
           </div>
         </div>
       </header>
@@ -55,38 +95,8 @@ const TripOrganizerDashboard = () => {
         <div className="grid grid-cols-2 gap-3">
           {overview.map((o, i) => (
             <div key={i} onClick={() => navigate(o.path)} className="bg-card rounded-xl shadow-card p-3 text-center cursor-pointer hover:shadow-md transition-shadow active:scale-[0.97]">
-              <span className="text-xl font-bold text-foreground block">{o.value}{o.suffix && <span className="text-xs ml-1">{o.suffix}</span>}</span>
+              <span className="text-xl font-bold text-foreground block">{o.value}</span>
               <span className="text-[10px] text-muted-foreground">{o.label}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* New Lead Alert */}
-        <div onClick={() => navigate("/inbox")} className="bg-primary/10 border border-primary/30 rounded-xl p-4 cursor-pointer hover:shadow-md transition-shadow">
-          <h3 className="text-sm font-bold text-foreground mb-1 flex items-center gap-2">
-            <Users className="w-4 h-4 text-primary" />
-            {lang === "ar" ? "استفسار جديد" : "New Lead"}
-            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
-          </h3>
-          <p className="text-xs text-muted-foreground">{lang === "ar" ? "مجموعة من ٦ أشخاص تسأل عن رحلة خاصة لدمياط" : "Group of 6 asking about a private trip to Damietta"}</p>
-        </div>
-
-        {/* Upcoming Departures */}
-        <div onClick={() => navigate("/dashboard/trip-organizer/my-trips")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
-          <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-role-trip-organizer" />
-            {lang === "ar" ? "الرحلات القادمة" : "Upcoming Departures"}
-            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
-          </h3>
-          {departures.map((d, i) => (
-            <div key={i} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
-              <div>
-                <p className="text-xs font-semibold text-foreground">{d.name}</p>
-                <p className="text-[10px] text-muted-foreground">{d.date} · {d.confirmed} {lang === "ar" ? "مؤكد" : "confirmed"}</p>
-              </div>
-              <button onClick={(e) => e.stopPropagation()} className="p-1.5 rounded-md bg-role-trip-organizer/10">
-                <Send className="w-3.5 h-3.5 text-role-trip-organizer" />
-              </button>
             </div>
           ))}
         </div>
@@ -95,6 +105,10 @@ const TripOrganizerDashboard = () => {
 
         <button onClick={() => navigate("/dashboard/trip-organizer/new-trip")} className="w-full bg-role-trip-organizer text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
           <Plus className="w-4 h-4" /> {lang === "ar" ? "إنشاء رحلة" : "Create Trip"}
+        </button>
+
+        <button onClick={() => navigate("/dashboard/trip-organizer/my-trips")} className="w-full bg-card border border-border text-foreground rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
+          {lang === "ar" ? "إدارة رحلاتي" : "Manage My Trips"} <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </button>
 
         <button onClick={() => navigate("/dashboard/trip-organizer/events")} className="w-full bg-card border border-border text-foreground rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">

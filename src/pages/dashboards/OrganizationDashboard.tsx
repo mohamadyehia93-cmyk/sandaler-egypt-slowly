@@ -1,6 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Bell, Plus, Users, Heart, Calendar, TrendingUp, CheckCircle, ChevronRight } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { useDashboardIdentity } from "@/hooks/useDashboardIdentity";
+import { ArrowLeft, Bell, Plus, Calendar, CheckCircle } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
@@ -10,12 +14,56 @@ import CausePledgesList from "@/components/CausePledgesList";
 const OrganizationDashboard = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const identity = useDashboardIdentity();
+
+  const { data: org } = useQuery({
+    queryKey: ["org-row", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("organizations")
+        .select("id, name_en, name_ar, logo, image, status")
+        .eq("owner_id", user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: stats } = useQuery({
+    queryKey: ["org-stats", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const [programs, applications, pledges] = await Promise.all([
+        supabase.from("programs").select("id, status").eq("owner_id", user!.id),
+        supabase.from("volunteer_applications").select("id, status, created_at").eq("org_owner_id", user!.id),
+        supabase.from("support_pledges").select("id, status, kind, amount, created_at").eq("owner_id", user!.id),
+      ]);
+      return {
+        programs: programs.data ?? [],
+        applications: applications.data ?? [],
+        pledges: pledges.data ?? [],
+      };
+    },
+  });
+
+  const monthAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const activePrograms = (stats?.programs ?? []).filter((p) => p.status === "published").length;
+  const volunteersThisMonth = (stats?.applications ?? []).filter((a) => new Date(a.created_at).getTime() >= monthAgo).length;
+  const acceptedVolunteers = (stats?.applications ?? []).filter((a) => a.status === "accepted").length;
+  const donationsThisMonth = (stats?.pledges ?? [])
+    .filter((p) => p.kind === "donation" && p.status === "accepted" && new Date(p.created_at).getTime() >= monthAgo)
+    .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+  const pendingPledges = (stats?.pledges ?? []).filter((p) => p.status === "pending").length;
+
+  const orgName = (lang === "ar" ? org?.name_ar : org?.name_en) || identity.name;
 
   const overview = [
-    { value: "4", label: lang === "ar" ? "برامج نشطة" : "Active Programs", path: "/dashboard/organization/my-programs" },
-    { value: "23", label: lang === "ar" ? "متطوعون هذا الشهر" : "Volunteers This Month", path: "/dashboard/organization/my-programs" },
-    { value: "8,500", label: lang === "ar" ? "تبرعات هذا الشهر" : "Donations This Month", suffix: lang === "ar" ? "ج.م" : "EGP", path: "/profile/impact" },
-    { value: "2", label: lang === "ar" ? "فعاليات قادمة" : "Upcoming Events", path: "/calendar" },
+    { value: String(activePrograms), label: lang === "ar" ? "برامج نشطة" : "Active Programs", path: "/dashboard/organization/my-programs" },
+    { value: String(volunteersThisMonth), label: lang === "ar" ? "طلبات تطوع هذا الشهر" : "Volunteer Requests This Month", path: "/dashboard/organization" },
+    { value: donationsThisMonth.toLocaleString(), label: lang === "ar" ? "تبرعات مقبولة هذا الشهر" : "Accepted Donations This Month", suffix: lang === "ar" ? "ج.م" : "EGP", path: "/dashboard/organization" },
+    { value: String(pendingPledges), label: lang === "ar" ? "تعهدات بانتظار الرد" : "Pledges Awaiting Reply", path: "/dashboard/organization" },
   ];
 
   const bottomNav = [
@@ -33,14 +81,20 @@ const OrganizationDashboard = () => {
           <div className="flex items-center gap-2">
             <EditProfileHeaderButton />
             <VisitorModeHeaderToggle />
-            <button onClick={() => navigate("/inbox")} className="relative p-1"><Bell className="w-5 h-5" /></button>
+            <button onClick={() => navigate("/inbox")} className="p-1" aria-label={lang === "ar" ? "الرسائل" : "Inbox"}><Bell className="w-5 h-5" /></button>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl">🏛️</div>
+          <div className="w-12 h-12 rounded-full bg-white/20 overflow-hidden flex items-center justify-center text-sm font-bold">
+            {org?.logo || org?.image || identity.avatar ? (
+              <img src={org?.logo || org?.image || identity.avatar!} alt="" className="w-full h-full object-cover" />
+            ) : (
+              identity.initials || "🏛️"
+            )}
+          </div>
           <div>
             <p className="text-xs opacity-80">{lang === "ar" ? "مؤسسة" : "Organization"}</p>
-            <h1 className="text-lg font-bold">{lang === "ar" ? "مكتبة أطفال طنطا" : "Children's Library Tanta"}</h1>
+            <h1 className="text-lg font-bold">{orgName || (lang === "ar" ? "لوحة التحكم" : "Dashboard")}</h1>
           </div>
         </div>
       </header>
@@ -48,13 +102,14 @@ const OrganizationDashboard = () => {
       <div className="px-4 py-4 space-y-4">
         <DailyStatusCard accentBg="bg-role-organization" accentText="text-role-organization" />
 
-        {/* Verification Badge */}
-        <div className="bg-success/10 border border-success/30 rounded-xl p-3 flex items-center gap-2">
-          <CheckCircle className="w-4 h-4 text-success" />
-          <span className="text-xs font-medium text-foreground">{lang === "ar" ? "مؤسسة موثقة ✓" : "Verified Organization ✓"}</span>
-        </div>
+        {/* Only shown when the organization row is actually published/approved */}
+        {org?.status === "published" && (
+          <div className="bg-success/10 border border-success/30 rounded-xl p-3 flex items-center gap-2">
+            <CheckCircle className="w-4 h-4 text-success" />
+            <span className="text-xs font-medium text-foreground">{lang === "ar" ? "مؤسسة منشورة" : "Published Organization"}</span>
+          </div>
+        )}
 
-        {/* Overview */}
         <div className="grid grid-cols-2 gap-3">
           {overview.map((o, i) => (
             <div key={i} onClick={() => navigate(o.path)} className="bg-card rounded-xl shadow-card p-3 text-center cursor-pointer hover:shadow-md transition-shadow active:scale-[0.97]">
@@ -64,32 +119,16 @@ const OrganizationDashboard = () => {
           ))}
         </div>
 
-        {/* Impact Snapshot */}
-        <div onClick={() => navigate("/profile/impact")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
-          <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-role-organization" />
-            {lang === "ar" ? "ملخص التأثير" : "Impact Snapshot"}
-            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
-          </h3>
-          <div className="flex justify-between text-center">
-            <div><span className="text-lg font-bold text-foreground">156</span><p className="text-[10px] text-muted-foreground">{lang === "ar" ? "متطوعون" : "Volunteers"}</p></div>
-            <div><span className="text-lg font-bold text-foreground">480</span><p className="text-[10px] text-muted-foreground">{lang === "ar" ? "ساعات" : "Hours"}</p></div>
-            <div><span className="text-lg font-bold text-foreground">32K</span><p className="text-[10px] text-muted-foreground">{lang === "ar" ? "تبرعات" : "Donations"}</p></div>
-          </div>
-        </div>
-
-        {/* Volunteer Applications */}
         <OrgApplicationsList />
 
         <CausePledgesList />
 
-        {/* Quick Actions */}
         <div className="space-y-2">
           <button onClick={() => navigate("/dashboard/organization/new-program")} className="w-full bg-role-organization text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
             <Plus className="w-4 h-4" /> {lang === "ar" ? "إضافة برنامج" : "Add Program"}
           </button>
           <button onClick={() => navigate("/calendar")} className="w-full border-2 border-role-organization text-role-organization rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
-            <Calendar className="w-4 h-4" /> {lang === "ar" ? "إنشاء فعالية" : "Create Event"}
+            <Calendar className="w-4 h-4" /> {lang === "ar" ? "تقويم الفعاليات" : "Events Calendar"}
           </button>
         </div>
       </div>
