@@ -12,6 +12,7 @@ import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
 import OwnerReservationRequests from "@/components/OwnerReservationRequests";
+import MessageUserButton from "@/components/MessageUserButton";
 
 
 type ProviderBooking = {
@@ -21,9 +22,11 @@ type ProviderBooking = {
   provider_amount_egp: number;
   status: string;
   payment_status: string;
+  visitor_id: string | null;
   created_at: string;
   experience: { title_en: string; title_ar: string } | null;
 };
+
 
 
 const ServiceProviderDashboard = () => {
@@ -57,7 +60,7 @@ const ServiceProviderDashboard = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("id, guests, total_amount_egp, provider_amount_egp, status, payment_status, created_at, experience:experiences(title_en, title_ar)")
+        .select("id, guests, total_amount_egp, provider_amount_egp, status, payment_status, visitor_id, created_at, experience:experiences(title_en, title_ar)")
         .eq("provider_id", user!.id)
         .order("created_at", { ascending: false })
         .limit(20);
@@ -192,25 +195,28 @@ const ServiceProviderDashboard = () => {
                     </span>
                   </div>
 
-                  {!resolved && (
-                    <div className="flex items-center gap-2 mt-2">
-                      <button
-                        disabled={savingId === b.id}
-                        onClick={() => updateBookingStatus(b.id, "confirmed")}
-                        className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-role-service-provider text-white flex items-center justify-center gap-1 disabled:opacity-50"
-                      >
-                        <Check className="w-3.5 h-3.5" /> {lang === "ar" ? "قبول" : "Accept"}
-                      </button>
-                      <button
-                        disabled={savingId === b.id}
-                        onClick={() => updateBookingStatus(b.id, "declined")}
+                  <div className="flex items-center gap-2 mt-2">
+                    {!resolved && (
+                      <>
+                        <button
+                          disabled={savingId === b.id}
+                          onClick={() => updateBookingStatus(b.id, "confirmed")}
+                          className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-role-service-provider text-white flex items-center justify-center gap-1 disabled:opacity-50"
+                        >
+                          <Check className="w-3.5 h-3.5" /> {lang === "ar" ? "قبول" : "Accept"}
+                        </button>
+                        <button
+                          disabled={savingId === b.id}
+                          onClick={() => updateBookingStatus(b.id, "declined")}
+                          className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
+                        >
+                          <X className="w-3.5 h-3.5" /> {lang === "ar" ? "رفض" : "Decline"}
+                        </button>
+                      </>
+                    )}
+                    <MessageUserButton userId={b.visitor_id} />
+                  </div>
 
-                        className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
-                      >
-                        <X className="w-3.5 h-3.5" /> {lang === "ar" ? "رفض" : "Decline"}
-                      </button>
-                    </div>
-                  )}
                 </div>
               );
             })

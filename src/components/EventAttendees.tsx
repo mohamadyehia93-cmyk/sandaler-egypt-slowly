@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { Users, Ticket } from "lucide-react";
+import MessageUserButton from "@/components/MessageUserButton";
 
 type TicketRow = {
   id: string;
@@ -9,9 +10,11 @@ type TicketRow = {
   quantity: number;
   status: string;
   attendee_name: string;
+  user_id: string | null;
   total_egp: number;
   created_at: string;
 };
+
 
 const statusLabel = (status: string, lang: string) => {
   if (status === "paid" || status === "confirmed") return lang === "ar" ? "مدفوع" : "Paid";
@@ -36,7 +39,7 @@ const EventAttendees = ({ eventId }: { eventId: string }) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("event_tickets")
-        .select("id, reference, quantity, status, attendee_name, total_egp, created_at")
+        .select("id, reference, quantity, status, attendee_name, user_id, total_egp, created_at")
         .eq("event_id", eventId)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -83,6 +86,8 @@ const EventAttendees = ({ eventId }: { eventId: string }) => {
                 <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusClasses(t.status)}`}>
                   {statusLabel(t.status, lang)}
                 </span>
+                <MessageUserButton userId={t.user_id} label={lang === "ar" ? "رسالة" : "Message"} />
+
               </div>
             </li>
           ))}
