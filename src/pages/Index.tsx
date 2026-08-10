@@ -107,6 +107,7 @@ const Index = () => {
               <RegionScroll />
               <LatestPosts />
               <AudioTourCards />
+              <CollectionsSection />
               <EventsSection events={dbEvents as any[]} />
               <HomeCausesSection />
 

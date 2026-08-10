@@ -14,6 +14,7 @@ import {
 import NotFoundView from "@/components/NotFound";
 import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
 import ProviderContactCard from "@/components/ProviderContactCard";
+import ExpertCollections from "@/components/ExpertCollections";
 
 type ProviderRole =
   | "culture-actor" | "service-provider" | "accommodation-host"
@@ -281,6 +282,9 @@ const ProviderProfile = () => {
             </div>
           )}
         </div>
+
+        {/* Knowledge collections (subject-expert output; expert_id = providers.user_id) */}
+        <ExpertCollections userId={provider.user_id} />
 
         {/* Specialties */}
         {specialties.length > 0 && (
