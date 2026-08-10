@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyProviderId } from "@/lib/providerRecord";
 
-import { ArrowLeft, Plus, Trash2, Eye, Compass } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Eye, Compass, Pencil, CalendarClock, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 const MyListings = () => {
@@ -31,6 +31,19 @@ const MyListings = () => {
     },
   });
 
+
+  const toggleStatus = async (id: string, status: string | null) => {
+    const nextStatus = status === "published" ? "draft" : "published";
+    const { error } = await supabase.from("experiences").update({ status: nextStatus }).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(
+      nextStatus === "published"
+        ? lang === "ar" ? "تم نشر التجربة" : "Listing published"
+        : lang === "ar" ? "تم إخفاء التجربة" : "Listing moved to draft"
+    );
+    queryClient.invalidateQueries({ queryKey: ["my-experiences"] });
+    queryClient.invalidateQueries({ queryKey: ["experiences"] });
+  };
 
   const handleDelete = async (id: string) => {
     if (!window.confirm(lang === "ar" ? "حذف هذه التجربة؟" : "Delete this experience?")) return;
@@ -60,21 +73,46 @@ const MyListings = () => {
           </div>
         ) : (
           items.map((e) => (
-            <div key={e.id} className="bg-card rounded-xl shadow-card p-3 flex gap-3 items-center">
-              <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary shrink-0 flex items-center justify-center">
-                {e.image ? <img src={e.image} alt="" className="w-full h-full object-cover" /> : <Compass className="w-6 h-6 text-muted-foreground" />}
+            <div key={e.id} className="bg-card rounded-xl shadow-card p-3 space-y-3">
+              <div className="flex gap-3 items-center">
+                <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary shrink-0 flex items-center justify-center">
+                  {e.image ? <img src={e.image} alt="" className="w-full h-full object-cover" /> : <Compass className="w-6 h-6 text-muted-foreground" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground line-clamp-1">{lang === "ar" ? e.title_ar : e.title_en}</p>
+                  <p className="text-[11px] text-muted-foreground">{e.price ? `${e.price} ${lang === "ar" ? "ج.م" : "EGP"}` : "—"}</p>
+                  <span className={`text-[10px] font-medium ${e.status === "published" ? "text-success" : "text-muted-foreground"}`}>
+                    {e.status === "published" ? (lang === "ar" ? "منشورة" : "published") : (lang === "ar" ? "مسودة" : "draft")}
+                  </span>
+                </div>
+                <button onClick={() => navigate(`/experience/${e.id}`)} className="p-2 rounded-lg bg-role-service-provider/10 text-role-service-provider" aria-label={lang === "ar" ? "عرض" : "View"}>
+                  <Eye className="w-4 h-4" />
+                </button>
+                <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive" aria-label={lang === "ar" ? "حذف" : "Delete"}>
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground line-clamp-1">{lang === "ar" ? e.title_ar : e.title_en}</p>
-                <p className="text-[11px] text-muted-foreground">{e.price ? `${e.price} ${lang === "ar" ? "ج.م" : "EGP"}` : "—"}</p>
-                <span className="text-[10px] font-medium text-success">{e.status}</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => navigate(`/dashboard/service-provider/edit-experience/${e.id}`)}
+                  className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-border text-[11px] font-semibold text-foreground"
+                >
+                  <Pencil className="w-3.5 h-3.5" /> {lang === "ar" ? "تعديل" : "Edit"}
+                </button>
+                <button
+                  onClick={() => navigate(`/dashboard/service-provider/listing/${e.id}/slots`)}
+                  className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-border text-[11px] font-semibold text-foreground"
+                >
+                  <CalendarClock className="w-3.5 h-3.5" /> {lang === "ar" ? "المواعيد" : "Availability"}
+                </button>
+                <button
+                  onClick={() => toggleStatus(e.id, e.status)}
+                  className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-border text-[11px] font-semibold text-foreground"
+                >
+                  {e.status === "published" ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  {e.status === "published" ? (lang === "ar" ? "إخفاء" : "Unpublish") : (lang === "ar" ? "نشر" : "Publish")}
+                </button>
               </div>
-              <button onClick={() => navigate(`/experience/${e.id}`)} className="p-2 rounded-lg bg-role-service-provider/10 text-role-service-provider">
-                <Eye className="w-4 h-4" />
-              </button>
-              <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
-                <Trash2 className="w-4 h-4" />
-              </button>
             </div>
           ))
         )}

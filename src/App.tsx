@@ -105,6 +105,7 @@ const VisitorProfile = lazy(() => import("./pages/VisitorProfile.tsx"));
 const StatusesFeed = lazy(() => import("./pages/StatusesFeed.tsx"));
 const MyContent = lazy(() => import("./pages/dashboards/MyContent.tsx"));
 const MyListings = lazy(() => import("./pages/dashboards/MyListings.tsx"));
+const ExperienceSlots = lazy(() => import("./pages/dashboards/ExperienceSlots.tsx"));
 const MyProducts = lazy(() => import("./pages/dashboards/MyProducts.tsx"));
 const MyTrips = lazy(() => import("./pages/dashboards/MyTrips.tsx"));
 const MyPrograms = lazy(() => import("./pages/dashboards/MyPrograms.tsx"));
@@ -216,6 +217,8 @@ const App = () => {
             <Route path="/dashboard/culture-actor" element={<CultureActorDashboard />} />
             <Route path="/dashboard/service-provider/new-experience" element={<NewExperience />} />
             <Route path="/dashboard/service-provider/my-listings" element={<MyListings />} />
+            <Route path="/dashboard/service-provider/edit-experience/:id" element={<NewExperience />} />
+            <Route path="/dashboard/service-provider/listing/:id/slots" element={<ExperienceSlots />} />
             <Route path="/dashboard/service-provider" element={<ServiceProviderDashboard />} />
             <Route path="/dashboard/whos-who/new-session" element={<NewSession />} />
             <Route path="/dashboard/whos-who/my-sessions" element={<MySessions />} />
