@@ -5,7 +5,6 @@ import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
 import OrgApplicationsList from "@/components/OrgApplicationsList";
-import OwnerReservationRequests from "@/components/OwnerReservationRequests";
 import CausePledgesList from "@/components/CausePledgesList";
 
 const OrganizationDashboard = () => {
