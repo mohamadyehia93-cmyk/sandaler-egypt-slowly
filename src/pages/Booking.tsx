@@ -77,6 +77,10 @@ const Booking = () => {
   const isExperience = type === "experience";
   const serviceFee = Math.round(subtotal * (isExperience ? 0.10 : 0.05));
   const total = subtotal + serviceFee;
+  // A paid checkout is only conceivable for an experience with a chosen slot. Everything else
+  // (and any Stripe failure) resolves to the unpaid "request to book" path.
+  const paidPath = isExperience && !!slotId;
+
 
   const priceLabel = isStay
     ? `${unitPrice} ${t("common.egp")} × ${nights} ${t("booking.nights")}`
