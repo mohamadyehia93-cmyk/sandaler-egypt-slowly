@@ -5,6 +5,7 @@ import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
 import SellerOrdersList from "@/components/SellerOrdersList";
+import OwnerReservationRequests from "@/components/OwnerReservationRequests";
 
 
 const ProductSellerDashboard = () => {
@@ -79,6 +80,8 @@ const ProductSellerDashboard = () => {
 
         {/* Incoming Orders (real) */}
         <SellerOrdersList />
+
+        <OwnerReservationRequests itemTypes={["product"]} accentBg="bg-role-product-seller" />
 
 
         <button onClick={() => navigate("/dashboard/product-seller/new-product")} className="w-full bg-role-product-seller text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">

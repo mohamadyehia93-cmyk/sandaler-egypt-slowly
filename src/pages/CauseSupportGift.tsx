@@ -4,6 +4,9 @@ import { useI18n } from "@/lib/i18n";
 import { causes } from "@/lib/sampleData";
 import { useState } from "react";
 import NotFoundView from "@/components/NotFound";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import { submitPledge } from "@/lib/submitPledge";
 
 const giftPackages = [
   {
@@ -52,6 +55,8 @@ const CauseSupportGift = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
+  const { user } = useAuth();
+  const ar = lang === "ar";
 
   const cause = causes.find((c) => c.id === id);
 
@@ -99,9 +104,41 @@ const CauseSupportGift = () => {
     setStep("own-review");
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    if (!user) {
+      toast.error(ar ? "يرجى تسجيل الدخول لتسجيل تعهدك" : "Please sign in to register your pledge");
+      navigate("/auth");
+      return;
+    }
     setSubmitting(true);
-    setTimeout(() => { setSubmitting(false); setStep("success"); }, 2000);
+    const isPackage = mode === "buy";
+    const { error } = await submitPledge({
+      causeIdOrSlug: id!,
+      supporterId: user.id,
+      kind: "gift",
+      amount: isPackage ? (pkg?.price ?? null) : null,
+      currency: "EGP",
+      message: isPackage ? (pkg?.name.en ?? null) : (itemDescription || null),
+      details: isPackage
+        ? { gift_mode: "package", package_name: pkg?.name.en }
+        : {
+            gift_mode: "own-items",
+            categories: selectedCategories,
+            condition: itemCondition,
+            delivery_method: deliveryMethod,
+            address,
+            preferred_date: preferredDate,
+            notes,
+          },
+      contactName: isPackage ? null : (fullName || null),
+      contactPhone: isPackage ? null : (phone || null),
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error(ar ? "تعذر تسجيل التعهد" : "Could not register the pledge");
+      return;
+    }
+    setStep("success");
   };
 
   const handleBack = () => {
@@ -113,10 +150,10 @@ const CauseSupportGift = () => {
 
   const stepTitles: Record<Step, { en: string; ar: string }> = {
     choose: { en: "Send a Gift", ar: "أرسل هدية" },
-    "package-confirm": { en: "Confirm Gift", ar: "تأكيد الهدية" },
+    "package-confirm": { en: "Pledge a Gift", ar: "تعهّد بهدية" },
     "own-form": { en: "Donate Your Items", ar: "تبرّع بأغراضك" },
     "own-review": { en: "Review", ar: "مراجعة" },
-    success: { en: "Thank You!", ar: "شكراً لك!" },
+    success: { en: "Pledge Registered", ar: "تم تسجيل التعهد" },
   };
 
   return (
@@ -553,18 +590,25 @@ const CauseSupportGift = () => {
         {/* ── Success ── */}
         {step === "success" && (
           <div className="flex flex-col items-center text-center pt-8">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-5">
-              <Check className="w-10 h-10 text-primary" />
+            <div className="w-20 h-20 rounded-full bg-warning/10 flex items-center justify-center mb-5">
+              <Clock className="w-10 h-10 text-warning" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
-              {mode === "buy"
-                ? (lang === "ar" ? "تم إرسال الهدية!" : "Gift Sent!")
-                : (lang === "ar" ? "تم تسجيل تبرعك!" : "Donation Registered!")}
+              {ar ? "تم تسجيل تعهدك" : "Pledge registered"}
             </h2>
+            <p className="text-sm font-semibold text-foreground mb-1">
+              {mode === "buy"
+                ? (ar ? "لم يتم تحصيل أي مبلغ" : "No payment has been taken")
+                : (ar ? "بانتظار تواصل المنظمة" : "Awaiting the organisation's contact")}
+            </p>
             <p className="text-sm text-muted-foreground mb-6 max-w-[300px]">
               {mode === "buy"
-                ? (lang === "ar" ? `شكراً! سيتم تسليم "${pkg?.name[lang]}" للمستفيدين وستتلقى تأكيداً.` : `Thank you! "${pkg?.name[lang]}" will be delivered to beneficiaries and you'll receive confirmation.`)
-                : (lang === "ar" ? `شكراً ${fullName}! تم تسجيل تبرعك بأغراضك. سنتواصل معك قريباً.` : `Thank you ${fullName}! Your item donation has been registered. We'll be in touch.`)}
+                ? (ar
+                    ? `ستتواصل معك المنظمة لترتيب دفع وتسليم "${pkg?.name[lang]}".`
+                    : `The organisation will contact you to arrange payment and delivery of "${pkg?.name[lang]}".`)
+                : (ar
+                    ? "سجّلنا تفاصيل أغراضك وستتواصل معك المنظمة لترتيب الاستلام."
+                    : "We saved your item details and the organisation will contact you to arrange collection.")}
             </p>
 
             <div className="w-full rounded-xl bg-card border border-border shadow-card p-4 mb-6 text-start space-y-3">
@@ -573,7 +617,7 @@ const CauseSupportGift = () => {
                 [
                   { label: { en: "Gift", ar: "الهدية" }, value: pkg.name[lang] },
                   { label: { en: "Amount", ar: "المبلغ" }, value: `${pkg.price} ${t("common.egp")}` },
-                  { label: { en: "Reference", ar: "المرجع" }, value: `#GFT-${Date.now().toString(36).toUpperCase().slice(-6)}` },
+                  { label: { en: "Status", ar: "الحالة" }, value: ar ? "بانتظار تواصل المنظمة" : "Awaiting contact" },
                 ].map((row, i) => (
                   <div key={i} className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">{row.label[lang]}</span>
@@ -585,7 +629,7 @@ const CauseSupportGift = () => {
                   { label: { en: "Items", ar: "الأغراض" }, value: selectedCategories.map((id) => itemCategories.find((c) => c.id === id)?.label[lang]).join(", ") },
                   { label: { en: "Delivery", ar: "التسليم" }, value: deliveryMethod === "pickup" ? (lang === "ar" ? "استلام" : "Pickup") : (lang === "ar" ? "شحن" : "Shipping") },
                   { label: { en: "Date", ar: "التاريخ" }, value: preferredDate },
-                  { label: { en: "Reference", ar: "المرجع" }, value: `#DON-${Date.now().toString(36).toUpperCase().slice(-6)}` },
+                  { label: { en: "Status", ar: "الحالة" }, value: ar ? "بانتظار تواصل المنظمة" : "Awaiting contact" },
                 ].map((row, i) => (
                   <div key={i} className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">{row.label[lang]}</span>
@@ -594,6 +638,10 @@ const CauseSupportGift = () => {
                 ))
               )}
             </div>
+
+            <button onClick={() => navigate("/pledges")} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated mb-3">
+              {ar ? "تعهداتي" : "My Pledges"}
+            </button>
 
             <div className="flex gap-3 w-full">
               <button onClick={() => navigate(`/cause/${id}`)} className="flex-1 py-3 rounded-xl border-2 border-primary text-primary font-bold text-sm">
@@ -612,12 +660,14 @@ const CauseSupportGift = () => {
         <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
           <div>
             <span className="text-lg font-bold text-foreground">{pkg?.price} {t("common.egp")}</span>
-            <span className="text-[10px] text-muted-foreground block">{pkg?.name[lang]}</span>
+            <span className="text-[10px] text-muted-foreground block">
+              {ar ? "تعهد — لا يتم الدفع الآن" : "pledge — no payment now"}
+            </span>
           </div>
           <button disabled={submitting} onClick={handleConfirm}
             className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-70"
           >
-            {submitting ? (lang === "ar" ? "جاري الإرسال..." : "Processing...") : (lang === "ar" ? "تأكيد الهدية" : "Confirm Gift")}
+            {submitting ? (ar ? "جاري الإرسال..." : "Sending...") : (ar ? "تسجيل التعهد" : "Register pledge")}
           </button>
         </div>
       )}
@@ -642,7 +692,7 @@ const CauseSupportGift = () => {
             <button disabled={submitting} onClick={handleConfirm}
               className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-70"
             >
-              {submitting ? (lang === "ar" ? "جاري الإرسال..." : "Submitting...") : (lang === "ar" ? "تأكيد التبرع" : "Confirm Donation")}
+              {submitting ? (ar ? "جاري الإرسال..." : "Sending...") : (ar ? "تسجيل التعهد" : "Register pledge")}
             </button>
           )}
         </div>

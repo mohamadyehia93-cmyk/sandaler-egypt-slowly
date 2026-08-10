@@ -4,6 +4,7 @@ import { ArrowLeft, Bell, Plus, Map, Users, Calendar, TrendingUp, Send, ChevronR
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
+import OwnerReservationRequests from "@/components/OwnerReservationRequests";
 
 const TripOrganizerDashboard = () => {
   const { lang } = useI18n();
@@ -89,6 +90,8 @@ const TripOrganizerDashboard = () => {
             </div>
           ))}
         </div>
+
+        <OwnerReservationRequests itemTypes={["trip", "transport"]} accentBg="bg-role-trip-organizer" />
 
         <button onClick={() => navigate("/dashboard/trip-organizer/new-trip")} className="w-full bg-role-trip-organizer text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
           <Plus className="w-4 h-4" /> {lang === "ar" ? "إنشاء رحلة" : "Create Trip"}

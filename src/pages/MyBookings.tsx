@@ -4,6 +4,8 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Ticket } from "lucide-react";
+import ReservationRequestsList from "@/components/ReservationRequestsList";
+
 
 type BookingRow = {
   id: string;
@@ -50,6 +52,7 @@ const MyBookings = () => {
       </header>
 
       <div className="px-4 py-5 space-y-3">
+        <ReservationRequestsList />
         {!user ? (
           <p className="text-center text-sm text-muted-foreground py-12">{lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in"}</p>
         ) : isLoading ? (

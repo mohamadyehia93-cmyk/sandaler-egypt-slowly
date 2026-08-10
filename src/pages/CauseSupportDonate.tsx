@@ -1,24 +1,31 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, CreditCard, Repeat, TrendingUp, ShieldCheck, Check, ChevronRight, X } from "lucide-react";
+import { ArrowLeft, CreditCard, Repeat, TrendingUp, Info, Check, ChevronRight, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { causes } from "@/lib/sampleData";
 import { useState } from "react";
+import { toast } from "sonner";
 import NotFoundView from "@/components/NotFound";
+import { useAuth } from "@/hooks/useAuth";
+import { submitPledge } from "@/lib/submitPledge";
 
 const presetAmounts = [50, 100, 250, 500, 1000];
 
 type Step = "amount" | "payment" | "confirm" | "success";
 
+// Payment is arranged offline by the organisation — nothing is charged in-app.
 const paymentMethods = [
   { id: "card", icon: CreditCard, label: { en: "Credit / Debit Card", ar: "بطاقة ائتمان / خصم" }, isComponent: true },
   { id: "wallet", icon: "📱", label: { en: "Mobile Wallet (Vodafone Cash, Fawry)", ar: "محفظة إلكترونية (فودافون كاش، فوري)" }, isComponent: false },
   { id: "bank", icon: "🏦", label: { en: "Bank Transfer", ar: "تحويل بنكي" }, isComponent: false },
 ];
 
+
 const CauseSupportDonate = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
+  const { user } = useAuth();
+  const ar = lang === "ar";
   const [selected, setSelected] = useState<number>(100);
   const [customAmount, setCustomAmount] = useState("");
   const [showCustom, setShowCustom] = useState(false);
@@ -26,6 +33,11 @@ const CauseSupportDonate = () => {
   const [step, setStep] = useState<Step>("amount");
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [contactName, setContactName] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [note, setNote] = useState("");
+
 
   const cause = causes.find((c) => c.id === id);
   if (!cause) return <NotFoundView context="cause" />;
@@ -47,20 +59,40 @@ const CauseSupportDonate = () => {
 
   const selectedPayment = paymentMethods.find(m => m.id === paymentMethod);
 
-  const handleDonate = () => {
+  const handleDonate = async () => {
+    if (!user) {
+      toast.error(ar ? "يرجى تسجيل الدخول لتسجيل تعهدك" : "Please sign in to register your pledge");
+      navigate("/auth");
+      return;
+    }
     setProcessing(true);
-    setTimeout(() => {
-      setProcessing(false);
-      setStep("success");
-    }, 2000);
+    const { error } = await submitPledge({
+      causeIdOrSlug: id!,
+      supporterId: user.id,
+      kind: "donation",
+      amount: finalAmount,
+      currency: "EGP",
+      message: note || null,
+      details: { recurring, preferred_payment_method: paymentMethod },
+      contactName: contactName || null,
+      contactEmail: contactEmail || null,
+      contactPhone: contactPhone || null,
+    });
+    setProcessing(false);
+    if (error) {
+      toast.error(ar ? "تعذر تسجيل التعهد" : "Could not register the pledge");
+      return;
+    }
+    setStep("success");
   };
 
   const stepTitles: Record<Step, { en: string; ar: string }> = {
-    amount: { en: "Donate", ar: "تبرّع" },
-    payment: { en: "Payment Method", ar: "طريقة الدفع" },
-    confirm: { en: "Confirm Donation", ar: "تأكيد التبرع" },
-    success: { en: "Thank You!", ar: "شكراً لك!" },
+    amount: { en: "Pledge a Donation", ar: "تعهّد بالتبرع" },
+    payment: { en: "Preferred Method", ar: "الطريقة المفضلة" },
+    confirm: { en: "Confirm Pledge", ar: "تأكيد التعهد" },
+    success: { en: "Pledge Registered", ar: "تم تسجيل التعهد" },
   };
+
 
   const handleBack = () => {
     if (step === "payment") setStep("amount");
@@ -224,13 +256,13 @@ const CauseSupportDonate = () => {
               ))}
             </div>
 
-            {/* Trust */}
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-surface border border-border">
-              <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
+            {/* Honest framing */}
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-warning/5 border border-warning/30">
+              <Info className="w-4 h-4 text-warning flex-shrink-0 mt-0.5" />
               <p className="text-[10px] text-muted-foreground">
                 {lang === "ar"
-                  ? "جميع التبرعات آمنة ومشفرة. 100% من مساهمتك تذهب للقضية."
-                  : "All donations are secure and encrypted. 100% of your contribution goes to the cause."}
+                  ? "لن يتم الدفع داخل التطبيق. اختر الطريقة التي تفضّلها وستستخدمها المنظمة عند التواصل معك."
+                  : "No payment happens in the app. Pick the method you'd prefer and the organisation will use it when they contact you."}
               </p>
             </div>
           </>
@@ -264,6 +296,41 @@ const CauseSupportDonate = () => {
               ))}
             </div>
 
+            {/* Contact details for the organisation to reach the supporter */}
+            <div className="rounded-xl bg-card border border-border shadow-card p-4 mb-5 space-y-2.5">
+              <p className="text-sm font-bold text-foreground">
+                {ar ? "بيانات التواصل" : "Your contact details"}
+              </p>
+              <input
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                placeholder={ar ? "الاسم" : "Full name"}
+                className="w-full bg-surface border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
+              />
+              <input
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                placeholder={ar ? "رقم الهاتف" : "Phone number"}
+                dir="ltr"
+                className="w-full bg-surface border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
+              />
+              <input
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                placeholder={ar ? "البريد الإلكتروني" : "Email"}
+                dir="ltr"
+                className="w-full bg-surface border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary"
+              />
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={3}
+                placeholder={ar ? "رسالة للمنظمة (اختياري)" : "Message to the organisation (optional)"}
+                className="w-full bg-surface border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary resize-none"
+              />
+            </div>
+
+
             {/* Impact */}
             <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 mb-5">
               <div className="flex items-center gap-2 mb-1.5">
@@ -275,13 +342,13 @@ const CauseSupportDonate = () => {
               <p className="text-sm text-foreground">{currentImpact.text[lang]}</p>
             </div>
 
-            {/* Trust */}
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-surface border border-border">
-              <ShieldCheck className="w-4 h-4 text-primary flex-shrink-0" />
+            {/* Honest framing */}
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-warning/5 border border-warning/30">
+              <Info className="w-4 h-4 text-warning flex-shrink-0 mt-0.5" />
               <p className="text-[10px] text-muted-foreground">
                 {lang === "ar"
-                  ? "بالضغط على 'تأكيد التبرع' أنت توافق على شروط الاستخدام. جميع المعاملات آمنة ومشفرة."
-                  : "By clicking 'Confirm Donation' you agree to the terms of service. All transactions are secure and encrypted."}
+                  ? "لا يتم تحصيل أي مبلغ الآن. سيتم تسجيل تعهدك وستتواصل معك المنظمة لترتيب الدفع بالطريقة التي اخترتها."
+                  : "No money is charged now. Your pledge is registered and the organisation will contact you to arrange payment using the method you chose."}
               </p>
             </div>
           </>
@@ -290,26 +357,34 @@ const CauseSupportDonate = () => {
         {/* ── STEP 4: Success ── */}
         {step === "success" && (
           <div className="flex flex-col items-center text-center pt-8">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-5">
-              <Check className="w-10 h-10 text-primary" />
+            <div className="w-20 h-20 rounded-full bg-warning/10 flex items-center justify-center mb-5">
+              <Clock className="w-10 h-10 text-warning" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
-              {lang === "ar" ? "تم التبرع بنجاح!" : "Donation Successful!"}
+              {ar ? "تم تسجيل تعهدك" : "Pledge registered"}
             </h2>
-            <p className="text-sm text-muted-foreground mb-6 max-w-[280px]">
-              {lang === "ar"
-                ? `شكراً لتبرعك بمبلغ ${finalAmount} ${t("common.egp")} لدعم "${cause.title[lang]}"`
-                : `Thank you for donating ${finalAmount} ${t("common.egp")} to support "${cause.title[lang]}"`}
+            <p className="text-sm text-muted-foreground mb-1 max-w-[300px]">
+              {ar
+                ? `تعهدت بمبلغ ${finalAmount} ${t("common.egp")} لدعم "${cause.title[lang]}".`
+                : `You pledged ${finalAmount} ${t("common.egp")} towards "${cause.title[lang]}".`}
+            </p>
+            <p className="text-sm font-semibold text-foreground mb-1">
+              {ar ? "لم يتم تحصيل أي مبلغ" : "No payment has been taken"}
+            </p>
+            <p className="text-xs text-muted-foreground mb-6 max-w-[300px]">
+              {ar
+                ? "ستتواصل معك المنظمة لترتيب الدفع. يمكنك متابعة أو إلغاء تعهدك من صفحة تعهداتي."
+                : "The organisation will contact you to arrange payment. You can track or cancel it from My Pledges."}
             </p>
 
-            {/* Receipt card */}
+            {/* Pledge summary */}
             <div className="w-full rounded-xl bg-card border border-border shadow-card p-4 mb-6 text-start space-y-3">
-              <p className="text-xs text-muted-foreground font-medium">{lang === "ar" ? "ملخص الإيصال" : "Receipt Summary"}</p>
+              <p className="text-xs text-muted-foreground font-medium">{ar ? "ملخص التعهد" : "Pledge Summary"}</p>
               {[
-                { label: { en: "Amount", ar: "المبلغ" }, value: `${finalAmount} ${t("common.egp")}` },
-                { label: { en: "Frequency", ar: "التكرار" }, value: recurring ? (lang === "ar" ? "شهرياً" : "Monthly") : (lang === "ar" ? "مرة واحدة" : "One-time") },
-                { label: { en: "Payment", ar: "الدفع" }, value: selectedPayment?.label[lang] || "" },
-                { label: { en: "Reference", ar: "المرجع" }, value: `#DON-${Date.now().toString(36).toUpperCase().slice(-6)}` },
+                { label: { en: "Amount pledged", ar: "المبلغ المتعهد به" }, value: `${finalAmount} ${t("common.egp")}` },
+                { label: { en: "Frequency", ar: "التكرار" }, value: recurring ? (ar ? "شهرياً" : "Monthly") : (ar ? "مرة واحدة" : "One-time") },
+                { label: { en: "Preferred method", ar: "الطريقة المفضلة" }, value: selectedPayment?.label[lang] || "" },
+                { label: { en: "Status", ar: "الحالة" }, value: ar ? "بانتظار تواصل المنظمة" : "Awaiting contact" },
               ].map((row, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">{row.label[lang]}</span>
@@ -319,15 +394,23 @@ const CauseSupportDonate = () => {
             </div>
 
             {/* Impact */}
-            <div className="w-full rounded-xl bg-primary/5 border border-primary/20 p-4 mb-6">
+            <div className="w-full rounded-xl bg-primary/5 border border-primary/20 p-4 mb-4">
               <div className="flex items-center gap-2 mb-1.5">
                 <TrendingUp className="w-4 h-4 text-primary" />
                 <span className="text-xs font-semibold text-primary">
-                  {lang === "ar" ? "أثرك" : "Your Impact"}
+                  {ar ? "الأثر المتوقع" : "Potential Impact"}
                 </span>
               </div>
               <p className="text-sm text-foreground">{currentImpact.text[lang]}</p>
             </div>
+
+            <button
+              onClick={() => navigate("/pledges")}
+              className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated mb-3"
+            >
+              {ar ? "تعهداتي" : "My Pledges"}
+            </button>
+
 
             <div className="flex gap-3 w-full">
               <button
@@ -353,7 +436,7 @@ const CauseSupportDonate = () => {
           <div>
             <span className="text-lg font-bold text-foreground">{finalAmount} {t("common.egp")}</span>
             <span className="text-xs text-muted-foreground block">
-              {recurring ? (lang === "ar" ? "شهرياً" : "monthly") : (lang === "ar" ? "مرة واحدة" : "one-time")}
+              {ar ? "تعهد — بدون دفع" : "pledge — no payment"}
             </span>
           </div>
           {step === "amount" && (
@@ -378,13 +461,14 @@ const CauseSupportDonate = () => {
             <button
               disabled={processing}
               onClick={handleDonate}
-              className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-70 flex items-center gap-2"
+              className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-70 flex items-center gap-2"
             >
               {processing
-                ? (lang === "ar" ? "جاري المعالجة..." : "Processing...")
-                : (lang === "ar" ? "تأكيد التبرع" : "Confirm Donation")}
+                ? (ar ? "جاري الإرسال..." : "Sending...")
+                : (ar ? "تسجيل التعهد" : "Register pledge")}
             </button>
           )}
+
         </div>
       )}
     </div>

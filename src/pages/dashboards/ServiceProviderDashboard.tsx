@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
+import OwnerReservationRequests from "@/components/OwnerReservationRequests";
 
 
 type ProviderBooking = {
@@ -203,6 +204,8 @@ const ServiceProviderDashboard = () => {
 
           )}
         </div>
+
+        <OwnerReservationRequests itemTypes={["accommodation", "transport"]} accentBg="bg-role-service-provider" />
 
         {/* Quick Action */}
         <button onClick={() => navigate("/dashboard/service-provider/new-experience")} className="w-full bg-role-service-provider text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">

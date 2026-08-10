@@ -4,6 +4,9 @@ import { useI18n } from "@/lib/i18n";
 import { causes } from "@/lib/sampleData";
 import { useState } from "react";
 import NotFoundView from "@/components/NotFound";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import { submitPledge } from "@/lib/submitPledge";
 
 const expertiseAreas = [
   { emoji: "💼", area: { en: "Business Strategy", ar: "استراتيجية الأعمال" }, desc: { en: "Help with fundraising, planning, and organizational growth", ar: "مساعدة في جمع التبرعات والتخطيط والنمو المؤسسي" } },
@@ -26,6 +29,8 @@ const CauseSupportConsult = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang } = useI18n();
+  const { user } = useAuth();
+  const ar = lang === "ar";
 
   const cause = causes.find((c) => c.id === id);
 
@@ -69,9 +74,35 @@ const CauseSupportConsult = () => {
     setStep("review");
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    if (!user) {
+      toast.error(ar ? "يرجى تسجيل الدخول لإرسال طلبك" : "Please sign in to send your offer");
+      navigate("/auth");
+      return;
+    }
     setSubmitting(true);
-    setTimeout(() => { setSubmitting(false); setStep("success"); }, 2000);
+    const { error } = await submitPledge({
+      causeIdOrSlug: id!,
+      supporterId: user.id,
+      kind: "consult",
+      message: message || null,
+      details: {
+        expertise: selectedExpertise.map((i) => expertiseAreas[i].area.en),
+        format: selectedFormat,
+        company,
+        years_experience: yearsExp,
+        availability,
+      },
+      contactName: fullName || null,
+      contactEmail: email || null,
+      contactPhone: phone || null,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error(ar ? "تعذر إرسال الطلب" : "Could not send your offer");
+      return;
+    }
+    setStep("success");
   };
 
   const handleBack = () => {
@@ -84,7 +115,7 @@ const CauseSupportConsult = () => {
     browse: { en: "Consult", ar: "استشارة" },
     form: { en: "Your Details", ar: "بياناتك" },
     review: { en: "Review", ar: "مراجعة" },
-    success: { en: "Request Sent!", ar: "تم الإرسال!" },
+    success: { en: "Offer Registered", ar: "تم تسجيل العرض" },
   };
 
   const fmt = consultFormats.find((f) => f.id === selectedFormat);
@@ -388,16 +419,19 @@ const CauseSupportConsult = () => {
         {/* ── STEP 4: Success ── */}
         {step === "success" && (
           <div className="flex flex-col items-center text-center pt-8">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-5">
-              <Check className="w-10 h-10 text-primary" />
+            <div className="w-20 h-20 rounded-full bg-warning/10 flex items-center justify-center mb-5">
+              <Clock className="w-10 h-10 text-warning" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
-              {lang === "ar" ? "تم إرسال طلبك!" : "Request Submitted!"}
+              {ar ? "تم تسجيل عرضك" : "Offer registered"}
             </h2>
+            <p className="text-sm font-semibold text-foreground mb-1">
+              {ar ? "بانتظار تواصل المنظمة" : "Awaiting the organisation's contact"}
+            </p>
             <p className="text-sm text-muted-foreground mb-6 max-w-[300px]">
-              {lang === "ar"
-                ? `شكراً ${fullName}! تم تسجيل طلب الاستشارة الخاص بك. سنتواصل معك قريباً.`
-                : `Thank you ${fullName}! Your consultation request has been submitted. We'll be in touch soon.`}
+              {ar
+                ? `شكراً ${fullName}! لم يتم تحديد أي موعد بعد — ستراجع المنظمة عرضك وتتواصل معك.`
+                : `Thank you ${fullName}! Nothing is scheduled yet — the organisation will review your offer and reach out.`}
             </p>
 
             <div className="w-full rounded-xl bg-card border border-border shadow-card p-4 mb-6 text-start space-y-3">
@@ -406,7 +440,7 @@ const CauseSupportConsult = () => {
                 { label: { en: "Expertise", ar: "الخبرة" }, value: selectedExpertise.map((i) => expertiseAreas[i].area[lang]).join(", ") },
                 { label: { en: "Format", ar: "الصيغة" }, value: fmt?.label[lang] || "" },
                 { label: { en: "Experience", ar: "سنوات الخبرة" }, value: `${yearsExp} ${lang === "ar" ? "سنوات" : "years"}` },
-                { label: { en: "Reference", ar: "المرجع" }, value: `#CON-${Date.now().toString(36).toUpperCase().slice(-6)}` },
+                { label: { en: "Status", ar: "الحالة" }, value: ar ? "بانتظار تواصل المنظمة" : "Awaiting contact" },
               ].map((row, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">{row.label[lang]}</span>
@@ -419,14 +453,18 @@ const CauseSupportConsult = () => {
               <p className="text-xs font-semibold text-primary mb-2">{lang === "ar" ? "الخطوات التالية" : "What's Next"}</p>
               <div className="space-y-2">
                 {[
-                  { en: "📧 Confirmation email sent to your inbox", ar: "📧 تم إرسال بريد تأكيد لبريدك" },
-                  { en: "📞 Organization will contact you within 48 hours", ar: "📞 ستتواصل المنظمة معك خلال 48 ساعة" },
-                  { en: "📅 Introductory call will be scheduled", ar: "📅 سيتم جدولة مكالمة تعارف" },
+                  { en: "📋 The organisation reviews your offer in their dashboard", ar: "📋 تراجع المنظمة عرضك من لوحة التحكم" },
+                  { en: "📞 They contact you using the details you provided", ar: "📞 تتواصل معك المنظمة بالبيانات التي أدخلتها" },
+                  { en: "📅 Any call or session is arranged directly with them", ar: "📅 يتم ترتيب أي مكالمة أو جلسة معهم مباشرة" },
                 ].map((item, i) => (
                   <p key={i} className="text-xs text-foreground">{item[lang]}</p>
                 ))}
               </div>
             </div>
+
+            <button onClick={() => navigate("/pledges")} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated mb-3">
+              {ar ? "عروضي وتعهداتي" : "My Pledges"}
+            </button>
 
             <div className="flex gap-3 w-full">
               <button onClick={() => navigate(`/cause/${id}`)} className="flex-1 py-3 rounded-xl border-2 border-primary text-primary font-bold text-sm">
@@ -472,7 +510,7 @@ const CauseSupportConsult = () => {
             <button disabled={submitting} onClick={handleConfirm}
               className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-70"
             >
-              {submitting ? (lang === "ar" ? "جاري الإرسال..." : "Submitting...") : (lang === "ar" ? "تأكيد الطلب" : "Confirm Request")}
+              {submitting ? (ar ? "جاري الإرسال..." : "Sending...") : (ar ? "إرسال العرض" : "Send offer")}
             </button>
           )}
         </div>
