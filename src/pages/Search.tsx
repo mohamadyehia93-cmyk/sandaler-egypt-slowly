@@ -163,7 +163,7 @@ const Search = () => {
               autoFocus
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              type="search"
+              type="text"
               enterKeyHint="search"
               placeholder={isAr ? "ابحث عن تجارب، أماكن، أشخاص…" : "Search experiences, places, people…"}
               aria-label={isAr ? "بحث" : "Search"}
