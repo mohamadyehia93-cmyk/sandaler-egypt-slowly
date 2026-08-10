@@ -381,7 +381,7 @@ const Booking = () => {
         <div>
           <span className="text-lg font-bold text-foreground">{total} {t("common.egp")}</span>
           <span className="text-xs text-muted-foreground block">
-            {isExperience ? t("booking.total_label") : ar ? "تقديري" : "Estimated"}
+            {paidPath ? t("booking.total_label") : ar ? "تقديري" : "Estimated"}
           </span>
         </div>
         {step === "details" ? (
@@ -389,7 +389,7 @@ const Booking = () => {
             onClick={() => setStep("payment")}
             className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
           >
-            {isExperience
+            {paidPath
               ? t("booking.continue_to_payment")
               : ar ? "متابعة" : "Continue"}
           </button>
@@ -401,15 +401,19 @@ const Booking = () => {
                 return;
               }
               if (isExperience) {
-                if (!slotId) return; // Surfaced inline above; no-op so user can read the notice
-                await startBookingCheckout({
-                  experienceId: id,
-                  slotId,
-                  guests,
-                  totalAmountEgp: total,
-                  visitorEmail: user.email || "",
-                });
-                // On success the browser redirects to Stripe. On failure bookingError is set.
+                // Tries paid checkout when a slot is chosen and falls back silently to an
+                // unpaid booking REQUEST. status/payment_status are forced server-side.
+                const outcome = await startBookingCheckout(
+                  {
+                    experienceId: id,
+                    slotId,
+                    guests,
+                    totalAmountEgp: total,
+                    visitorEmail: user.email || "",
+                  },
+                  ar
+                );
+                if (outcome === "requested") setStep("confirmed");
                 return;
               }
 
@@ -440,16 +444,24 @@ const Booking = () => {
             disabled={
               isProcessing ||
               submitting ||
-              (isExperience ? !paymentMethod || !slotId : !contactName.trim() || contactPhone.trim().length < 8)
+              (isExperience
+                ? paidPath && !paymentMethod
+                : !contactName.trim() || contactPhone.trim().length < 8)
             }
             className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-50"
           >
             {isExperience
-              ? (isProcessing ? t("booking.processing") : t("booking.pay_now"))
+              ? (isProcessing
+                  ? t("booking.processing")
+                  : paidPath
+                  ? t("booking.pay_now")
+                  : ar ? "إرسال الطلب" : "Send request")
               : submitting
               ? (ar ? "جاري الإرسال..." : "Sending...")
               : (ar ? "إرسال الطلب" : "Send request")}
           </button>
+        )}
+
         )}
       </div>
 
