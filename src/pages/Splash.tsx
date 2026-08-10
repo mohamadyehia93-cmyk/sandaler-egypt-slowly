@@ -354,7 +354,11 @@ const SplashPage = () => {
   };
 
 
-  const completeProvider = async (role: LocalRole, withDetails = true) => {
+  const completeProvider = async (
+    role: LocalRole,
+    withDetails = true,
+    force = false
+  ): Promise<"ok" | "failed" | "role-exists"> => {
     let avatarUrl: string | null = null;
     if (withDetails && avatarFiles.length > 0 && user) {
       try {
@@ -368,7 +372,7 @@ const SplashPage = () => {
     const city = selectedCities[0] ? citiesList.find((c) => c.id === selectedCities[0]) : null;
     const region = selectedRegion ? regionsList.find((r) => r.id === selectedRegion) : null;
 
-    const { error } = await becomeProvider(
+    const result = await becomeProvider(
       role,
       withDetails
         ? {
@@ -386,14 +390,31 @@ const SplashPage = () => {
             answerLabels: roleAnswerLabels(),
             languages: narratedLanguages(),
           }
-        : undefined
+        : undefined,
+      { force }
     );
 
-    if (error) {
-      toast.error(lang === "ar" ? "تعذّر إنشاء ملف المزوّد" : "Could not set up your provider profile");
-      return false;
+    if (result.status === "role-exists") {
+      setRoleConflict({ nextRole: role, currentRole: result.currentRole });
+      return "role-exists";
     }
-    return true;
+
+    if (result.status === "error") {
+      toast.error(lang === "ar" ? "تعذّر إنشاء ملف المزوّد" : "Could not set up your provider profile");
+      return "failed";
+    }
+    return "ok";
+  };
+
+  /** Explicit confirmation of a role switch — the only path that overwrites. */
+  const confirmRoleSwitch = async () => {
+    if (!roleConflict) return;
+    const { nextRole } = roleConflict;
+    setRoleConflict(null);
+    const status = await completeProvider(nextRole, true, true);
+    if (status !== "ok") return;
+    await persistPersonalization();
+    navigate(roleDashboardPaths[nextRole] || "/");
   };
 
   // If the user returns to onboarding already authenticated with a pending
@@ -402,15 +423,16 @@ const SplashPage = () => {
     const pending = sessionStorage.getItem("sandal-pending-role") as LocalRole | null;
     if (!pending || !user) return;
     (async () => {
-      const ok = await completeProvider(pending);
+      const status = await completeProvider(pending);
       sessionStorage.removeItem("sandal-pending-role");
-      if (ok) {
+      if (status === "ok") {
         await persistPersonalization();
         navigate(roleDashboardPaths[pending] || "/");
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
 
   const handleFinish = async () => {
     const mappedRole = selectedRole ? (onboardingToUserRole[selectedRole] || "visitor") : "visitor";
