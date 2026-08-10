@@ -259,8 +259,11 @@ const EditProfile = () => {
   };
 
   const load = async () => {
-
-    if (!user) return;
+    // Signed out: stop loading so the sign-in prompt renders instead of the spinner.
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const [{ data: prov }, { data: prof }] = await Promise.all([
       supabase.from("providers").select("*").eq("user_id", user.id).maybeSingle(),
