@@ -1,7 +1,6 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Bell, Calendar, Search, X, ChevronDown } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Bell, Calendar, Search, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
 import { SEO } from "@/components/SEO";
