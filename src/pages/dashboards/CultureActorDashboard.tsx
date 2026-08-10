@@ -3,10 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, FileText, Bookmark, Headphones, Users, Plus, Sparkles, ChevronRight, Bell } from "lucide-react";
+import { ArrowLeft, FileText, Bookmark, Headphones, Users, Plus, Sparkles, ChevronRight, Bell, Briefcase } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
+import ActorCommissionsList from "@/components/ActorCommissionsList";
 
 // Static editorial copy curated by the Sandal team — NOT personalised and not
 // backed by any table. Do not present these as generated suggestions.
@@ -104,7 +105,14 @@ const CultureActorDashboard = () => {
         followers = followRes.count ?? 0;
       }
 
+      const { count: pendingCommissions } = await supabase
+        .from("commissions")
+        .select("id", { count: "exact", head: true })
+        .eq("actor_user_id", user!.id)
+        .eq("status", "pending");
+
       return {
+        pendingCommissions: pendingCommissions ?? 0,
         published: published.count ?? 0,
         drafts: drafts.count ?? 0,
         saves,
@@ -199,11 +207,18 @@ const CultureActorDashboard = () => {
             <span className="text-[10px] text-muted-foreground">{lang === "ar" ? "جولات صوتية بصوتك" : "Audio tours narrated"}</span>
           </div>
           <div className="bg-card rounded-xl shadow-card p-4">
+            <Briefcase className="w-4 h-4 text-role-culture-actor mb-1" />
+            <span className="text-lg font-bold text-foreground block">{stats?.pendingCommissions ?? 0}</span>
+            <span className="text-[10px] text-muted-foreground">{lang === "ar" ? "تكليفات بانتظار الرد" : "Pending commissions"}</span>
+          </div>
+          <div className="bg-card rounded-xl shadow-card p-4">
             <Users className="w-4 h-4 text-role-culture-actor mb-1" />
             <span className="text-lg font-bold text-foreground block">{stats?.followers ?? 0}</span>
             <span className="text-[10px] text-muted-foreground">{lang === "ar" ? "متابعون" : "Followers"}</span>
           </div>
         </div>
+
+        <ActorCommissionsList />
 
         {/* Static content prompts (editorial copy, not personalised) */}
         <div className="bg-card rounded-xl shadow-card p-4">

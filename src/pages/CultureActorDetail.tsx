@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Quote, Feather, BookOpen, Share2, Instagram, Twitter, MessageCircle, Headphones, Clock } from "lucide-react";
+import { ArrowLeft, MapPin, Quote, Feather, BookOpen, Share2, Instagram, Twitter, MessageCircle, Headphones, Clock, Briefcase } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import ProviderStatusView from "@/components/ProviderStatusView";
 import FollowButton from "@/components/FollowButton";
+import CommissionForm from "@/components/CommissionForm";
 import NotFoundView from "@/components/NotFound";
 
 type Region = { id: string; name_en: string; name_ar: string; emoji: string | null; color: string | null };
@@ -46,6 +47,7 @@ const CultureActorDetail = () => {
   const [authorPosts, setAuthorPosts] = useState<Post[]>([]);
   const [audioTours, setAudioTours] = useState<AudioTour[]>([]);
   const [loading, setLoading] = useState(true);
+  const [commissionOpen, setCommissionOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -158,7 +160,40 @@ const CultureActorDetail = () => {
             {lang === "ar" ? "رسالة" : "Message"}
           </button>
         </div>
+
+        <button
+          onClick={() => setCommissionOpen(true)}
+          className="w-full mt-2 flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-card border-2 border-primary text-primary hover:bg-primary/5 transition-colors"
+        >
+          <Briefcase className="w-4 h-4" />
+          {lang === "ar" ? "اطلب مساهمة" : "Commission a piece"}
+        </button>
       </div>
+
+      {/* Commission sheet */}
+      {commissionOpen && (
+        <div className="fixed inset-0 z-[60] flex items-end bg-foreground/40" onClick={() => setCommissionOpen(false)}>
+          <div
+            className="w-full max-h-[90vh] overflow-y-auto bg-card rounded-t-2xl p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-base font-bold text-foreground mb-1">
+              {lang === "ar" ? "اطلب مساهمة" : "Commission a piece"}
+            </h2>
+            <p className="text-[11px] text-muted-foreground mb-3">
+              {lang === "ar"
+                ? "هذا طلب دعوة للمساهمة ولا يتم تحصيل أي مبلغ عبر التطبيق."
+                : "This is an invitation to contribute — no payment is taken through the app."}
+            </p>
+            <CommissionForm
+              cultureActorId={actor.id}
+              actorUserId={actor.user_id}
+              actorName={name}
+              onDone={() => setCommissionOpen(false)}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Today's Status */}
       <div className="px-4 mt-5">

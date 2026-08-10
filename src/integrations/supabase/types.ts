@@ -564,6 +564,78 @@ export type Database = {
         }
         Relationships: []
       }
+      commissions: {
+        Row: {
+          actor_user_id: string | null
+          brief: string | null
+          commissioner_id: string
+          created_at: string
+          culture_actor_id: string
+          currency: string | null
+          deadline: string | null
+          decline_reason: string | null
+          deliverable_post_id: string | null
+          deliverable_url: string | null
+          id: string
+          kind: string
+          proposed_fee: number | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          brief?: string | null
+          commissioner_id?: string
+          created_at?: string
+          culture_actor_id: string
+          currency?: string | null
+          deadline?: string | null
+          decline_reason?: string | null
+          deliverable_post_id?: string | null
+          deliverable_url?: string | null
+          id?: string
+          kind: string
+          proposed_fee?: number | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          brief?: string | null
+          commissioner_id?: string
+          created_at?: string
+          culture_actor_id?: string
+          currency?: string | null
+          deadline?: string | null
+          decline_reason?: string | null
+          deliverable_post_id?: string | null
+          deliverable_url?: string | null
+          id?: string
+          kind?: string
+          proposed_fee?: number | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commissions_culture_actor_id_fkey"
+            columns: ["culture_actor_id"]
+            isOneToOne: false
+            referencedRelation: "culture_actors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commissions_deliverable_post_id_fkey"
+            columns: ["deliverable_post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           created_at: string

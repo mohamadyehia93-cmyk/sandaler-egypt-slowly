@@ -67,6 +67,7 @@ const MyApplications = lazy(() => import("./pages/MyApplications.tsx"));
 const MyPledges = lazy(() => import("./pages/MyPledges.tsx"));
 const Sessions = lazy(() => import("./pages/Sessions.tsx"));
 const MySessionRequests = lazy(() => import("./pages/MySessionRequests.tsx"));
+const MyCommissions = lazy(() => import("./pages/MyCommissions.tsx"));
 const NewEvent = lazy(() => import("./pages/dashboards/NewEvent.tsx"));
 const MyEvents = lazy(() => import("./pages/dashboards/MyEvents.tsx"));
 const EventsDashboard = lazy(() => import("./pages/dashboards/EventsDashboard.tsx"));
@@ -194,6 +195,7 @@ const App = () => {
             <Route path="/pledges" element={<MyPledges />} />
             <Route path="/sessions" element={<Sessions />} />
             <Route path="/session-requests" element={<MySessionRequests />} />
+            <Route path="/commissions" element={<MyCommissions />} />
             <Route path="/wishlists" element={<Wishlists />} />
             <Route path="/search" element={<Search />} />
             <Route path="/inbox" element={<Inbox />} />
