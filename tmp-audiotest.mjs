@@ -17,9 +17,9 @@ console.log('url',audioUrl);
 const r2=await b.storage.from('audio-files').upload(`${u1}/hack-${Date.now()}.mp3`,buf,{contentType:'audio/mpeg'});
 console.log('non-owner upload into other folder:',r2.error?('BLOCKED '+r2.error.message):'ALLOWED (BAD)');
 // tours
-const t1=await a.from('audio_tours').insert({creator_id:u1,slug:'zz-test-with-audio-'+Date.now(),title_en:'ZZ Test Tour With Audio',title_ar:'جولة اختبار',city_id:'cairo',duration_minutes:20,stops_count:1,stops:[{label_en:'Stop A',label_ar:'محطة',desc_en:'d',desc_ar:'د',lat:30.0444,lng:31.2357,audio_url:null}],price:0,languages:['en'],audio_url:audioUrl,status:'published'}).select('id,slug').single();
+const t1=await a.from('audio_tours').insert({creator_id:u1,slug:'zz-test-with-audio-'+Date.now(),title_en:'ZZ Test Tour With Audio',title_ar:'جولة اختبار',city_id:null,duration_minutes:20,stops_count:1,stops:[{label_en:'Stop A',label_ar:'محطة',desc_en:'d',desc_ar:'د',lat:30.0444,lng:31.2357,audio_url:null}],price:0,languages:['en'],audio_url:audioUrl,status:'published'}).select('id,slug').single();
 console.log('tour with audio',t1.error?t1.error.message:t1.data);
-const t2=await a.from('audio_tours').insert({creator_id:u1,slug:'zz-test-no-audio-'+Date.now(),title_en:'ZZ Test Tour No Audio',title_ar:'جولة بدون صوت',city_id:'cairo',duration_minutes:20,stops_count:1,stops:[{label_en:'Stop B',label_ar:'محطة ب',lat:30.05,lng:31.24,audio_url:null}],price:0,languages:['en'],status:'published'}).select('id,slug').single();
+const t2=await a.from('audio_tours').insert({creator_id:u1,slug:'zz-test-no-audio-'+Date.now(),title_en:'ZZ Test Tour No Audio',title_ar:'جولة بدون صوت',city_id:null,duration_minutes:20,stops_count:1,stops:[{label_en:'Stop B',label_ar:'محطة ب',lat:30.05,lng:31.24,audio_url:null}],price:0,languages:['en'],status:'published'}).select('id,slug').single();
 console.log('tour without audio',t2.error?t2.error.message:t2.data);
 console.log(JSON.stringify({u1,path,audioUrl,t1:t1.data,t2:t2.data}));
 // seeded tours audio count
