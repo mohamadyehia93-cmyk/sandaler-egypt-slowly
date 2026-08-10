@@ -332,7 +332,7 @@ const CityDetail = () => {
               {cityPeople.slice(0, 3).map((p) => (
                 <div key={p.id} onClick={() => navigate(`/person/${p.id}`)} className="rounded-lg shadow-card bg-card overflow-hidden cursor-pointer">
                   <div className="relative h-28">
-                    <img src={p.image} alt={p.name[lang]} className="w-full h-full object-cover" />
+                    <img src={p.image || "/placeholder.svg"} alt={p.name[lang]} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-2 left-2 right-2">
                       <h3 className="text-xs font-bold text-white line-clamp-1">{p.name[lang]}</h3>
