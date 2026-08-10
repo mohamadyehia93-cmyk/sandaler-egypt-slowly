@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Plus, Trash2, Eye, FileText, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Eye, FileText, Pencil, Send, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 const MyContent = () => {
@@ -25,6 +25,19 @@ const MyContent = () => {
       return data;
     },
   });
+
+  const handleStatus = async (id: string, status: "draft" | "published") => {
+    const { error } = await supabase.from("posts").update({ status }).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(
+      status === "published"
+        ? lang === "ar" ? "تم النشر" : "Published"
+        : lang === "ar" ? "تم التحويل إلى مسودة" : "Moved to draft"
+    );
+    queryClient.invalidateQueries({ queryKey: ["my-posts"] });
+    queryClient.invalidateQueries({ queryKey: ["posts"] });
+    queryClient.invalidateQueries({ queryKey: ["culture-actor-stats"] });
+  };
 
   const handleDelete = async (id: string) => {
     if (!window.confirm(lang === "ar" ? "حذف هذا المقال؟" : "Delete this article?")) return;
@@ -61,8 +74,21 @@ const MyContent = () => {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground line-clamp-1">{lang === "ar" ? e.title_ar : e.title_en}</p>
                 <p className="text-[11px] text-muted-foreground line-clamp-1">{e.category}</p>
-                <span className="text-[10px] font-medium text-success">{e.status}</span>
+                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${e.status === "published" ? "bg-success/10 text-success" : "bg-amber/10 text-amber"}`}>
+                  {e.status === "published"
+                    ? lang === "ar" ? "منشور" : "Published"
+                    : lang === "ar" ? "مسودة" : "Draft"}
+                </span>
               </div>
+              {e.status === "published" ? (
+                <button onClick={() => handleStatus(e.id, "draft")} title={lang === "ar" ? "تحويل إلى مسودة" : "Unpublish"} className="p-2 rounded-lg bg-secondary text-muted-foreground">
+                  <Undo2 className="w-4 h-4" />
+                </button>
+              ) : (
+                <button onClick={() => handleStatus(e.id, "published")} title={lang === "ar" ? "نشر" : "Publish"} className="p-2 rounded-lg bg-success/10 text-success">
+                  <Send className="w-4 h-4" />
+                </button>
+              )}
               <button onClick={() => navigate(`/post/${e.id}`)} className="p-2 rounded-lg bg-role-culture-actor/10 text-role-culture-actor">
                 <Eye className="w-4 h-4" />
               </button>
