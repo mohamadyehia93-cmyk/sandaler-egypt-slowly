@@ -96,7 +96,7 @@ const ProviderProfile = () => {
       const col = UUID_RE.test(id!) ? "id" : "slug";
       const { data, error } = await (supabase as any)
         .from("providers")
-        .select("*")
+        .select(PROVIDER_PUBLIC_COLUMNS)
         .eq(col, id)
         .maybeSingle();
       if (error) throw error;

@@ -266,7 +266,7 @@ const EditProfile = () => {
     }
     setLoading(true);
     const [{ data: prov }, { data: prof }] = await Promise.all([
-      supabase.from("providers").select("*").eq("user_id", user.id).maybeSingle(),
+      supabase.from("providers").select(PROVIDER_PUBLIC_COLUMNS).eq("user_id", user.id).maybeSingle(),
       supabase.from("profiles").select("display_name, avatar_url, bio").eq("user_id", user.id).maybeSingle(),
     ]);
 

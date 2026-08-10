@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
 
 interface ProviderBioCardProps {
   providerId?: string;
@@ -30,7 +31,7 @@ const ProviderBioCard = ({ providerId, roleLabel }: ProviderBioCardProps) => {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("providers")
-        .select("*")
+        .select(PROVIDER_PUBLIC_COLUMNS)
         .eq("id", providerId)
         .maybeSingle();
       if (error) throw error;

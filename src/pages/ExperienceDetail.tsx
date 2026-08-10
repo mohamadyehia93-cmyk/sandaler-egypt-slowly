@@ -83,7 +83,7 @@ const ExperienceDetail = () => {
   const { data: provider } = useQuery({
     queryKey: ["provider", providerId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("providers").select("*").eq("id", providerId).maybeSingle();
+      const { data, error } = await supabase.from("providers").select(PROVIDER_PUBLIC_COLUMNS).eq("id", providerId).maybeSingle();
       if (error) throw error;
       return data;
     },
