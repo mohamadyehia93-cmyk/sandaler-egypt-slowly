@@ -2673,6 +2673,19 @@ export type Database = {
           whatsapp: string
         }[]
       }
+      global_search: {
+        Args: { _limit?: number; _q: string }
+        Returns: {
+          image: string
+          item_id: string
+          item_type: string
+          rank: number
+          slug: string
+          subtitle: string
+          title_ar: string
+          title_en: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2689,6 +2702,8 @@ export type Database = {
         Returns: boolean
       }
       resolve_owner_user_id: { Args: { _owner: string }; Returns: string }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

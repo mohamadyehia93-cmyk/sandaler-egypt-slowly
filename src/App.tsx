@@ -29,6 +29,7 @@ const AudioTourDetail = lazy(() => import("./pages/AudioTourDetail.tsx"));
 const CauseDetail = lazy(() => import("./pages/CauseDetail.tsx"));
 const OrganizationDetail = lazy(() => import("./pages/OrganizationDetail.tsx"));
 const Wishlists = lazy(() => import("./pages/Wishlists.tsx"));
+const Search = lazy(() => import("./pages/Search.tsx"));
 const Inbox = lazy(() => import("./pages/Inbox.tsx"));
 const Profile = lazy(() => import("./pages/Profile.tsx"));
 const EditProfile = lazy(() => import("./pages/EditProfile.tsx"));
@@ -193,6 +194,7 @@ const App = () => {
             <Route path="/sessions" element={<Sessions />} />
             <Route path="/session-requests" element={<MySessionRequests />} />
             <Route path="/wishlists" element={<Wishlists />} />
+            <Route path="/search" element={<Search />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/edit-profile" element={<EditProfile />} />
