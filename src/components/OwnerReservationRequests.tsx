@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { itemTypeLabel, reservationStatusClasses, reservationStatusLabel } from "@/components/ReservationRequestsList";
+import MessageUserButton from "@/components/MessageUserButton";
 
 type OwnerRequest = {
   id: string;
@@ -17,8 +18,10 @@ type OwnerRequest = {
   contact_phone: string | null;
   note: string | null;
   status: string;
+  requester_id: string | null;
   created_at: string;
 };
+
 
 const TERMINAL = ["confirmed", "declined", "cancelled"];
 
@@ -43,7 +46,7 @@ const OwnerReservationRequests = ({ itemTypes, accentBg = "bg-primary" }: Props)
     queryFn: async () => {
       let query = supabase
         .from("reservation_requests")
-        .select("id, item_type, item_id, guests, start_date, contact_name, contact_phone, note, status, created_at")
+        .select("id, item_type, item_id, guests, start_date, contact_name, contact_phone, note, status, requester_id, created_at")
         .eq("owner_id", user!.id);
       if (itemTypes && itemTypes.length > 0) query = query.in("item_type", itemTypes);
       const { data, error } = await query.order("created_at", { ascending: false });
@@ -107,24 +110,28 @@ const OwnerReservationRequests = ({ itemTypes, accentBg = "bg-primary" }: Props)
 
               {r.note && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-3">{r.note}</p>}
 
-              {!terminal && (
-                <div className="flex items-center gap-2 mt-2">
-                  <button
-                    disabled={savingId === r.id}
-                    onClick={() => updateStatus(r.id, "confirmed")}
-                    className={`flex-1 text-[11px] font-semibold py-1.5 rounded-lg ${accentBg} text-white flex items-center justify-center gap-1 disabled:opacity-50`}
-                  >
-                    <Check className="w-3.5 h-3.5" /> {ar ? "تأكيد" : "Confirm"}
-                  </button>
-                  <button
-                    disabled={savingId === r.id}
-                    onClick={() => updateStatus(r.id, "declined")}
-                    className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
-                  >
-                    <X className="w-3.5 h-3.5" /> {ar ? "رفض" : "Decline"}
-                  </button>
-                </div>
-              )}
+              <div className="flex items-center gap-2 mt-2">
+                {!terminal && (
+                  <>
+                    <button
+                      disabled={savingId === r.id}
+                      onClick={() => updateStatus(r.id, "confirmed")}
+                      className={`flex-1 text-[11px] font-semibold py-1.5 rounded-lg ${accentBg} text-white flex items-center justify-center gap-1 disabled:opacity-50`}
+                    >
+                      <Check className="w-3.5 h-3.5" /> {ar ? "تأكيد" : "Confirm"}
+                    </button>
+                    <button
+                      disabled={savingId === r.id}
+                      onClick={() => updateStatus(r.id, "declined")}
+                      className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
+                    >
+                      <X className="w-3.5 h-3.5" /> {ar ? "رفض" : "Decline"}
+                    </button>
+                  </>
+                )}
+                <MessageUserButton userId={r.requester_id} />
+              </div>
+
             </div>
           );
         })

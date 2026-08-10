@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import MessageUserButton from "@/components/MessageUserButton";
 
 const SessionRequestsList = ({ accentText = "text-primary" }: { accentText?: string }) => {
   const { lang } = useI18n();
@@ -94,6 +95,8 @@ const SessionRequestsList = ({ accentText = "text-primary" }: { accentText?: str
                 >
                   <X className="h-3 w-3" /> {ar ? "رفض" : "Decline"}
                 </button>
+                <MessageUserButton userId={r.requester_id} />
+
               </div>
             </div>
           ))}

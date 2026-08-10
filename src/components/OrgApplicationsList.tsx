@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { applicationStatusClasses, applicationStatusLabel } from "@/pages/MyApplications";
+import MessageUserButton from "@/components/MessageUserButton";
 
 type OrgApplication = {
   id: string;
@@ -15,10 +16,12 @@ type OrgApplication = {
   contact_phone: string | null;
   message: string | null;
   availability: string | null;
+  applicant_id: string | null;
   created_at: string;
   cause: { title_en: string; title_ar: string } | null;
   program: { title_en: string; title_ar: string } | null;
 };
+
 
 const TERMINAL = ["accepted", "declined", "withdrawn"];
 
@@ -37,7 +40,7 @@ const OrgApplicationsList = () => {
       const { data, error } = await supabase
         .from("volunteer_applications")
         .select(
-          "id, status, full_name, contact_email, contact_phone, message, availability, created_at, cause:causes(title_en, title_ar), program:programs(title_en, title_ar)"
+          "id, status, full_name, contact_email, contact_phone, message, availability, applicant_id, created_at, cause:causes(title_en, title_ar), program:programs(title_en, title_ar)"
         )
         .eq("org_owner_id", user!.id)
         .order("created_at", { ascending: false });
@@ -105,24 +108,28 @@ const OrgApplicationsList = () => {
 
               {a.message && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-3">{a.message}</p>}
 
-              {!terminal && (
-                <div className="flex items-center gap-2 mt-2">
-                  <button
-                    disabled={savingId === a.id}
-                    onClick={() => updateStatus(a.id, "accepted")}
-                    className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-role-organization text-white flex items-center justify-center gap-1 disabled:opacity-50"
-                  >
-                    <Check className="w-3.5 h-3.5" /> {ar ? "قبول" : "Accept"}
-                  </button>
-                  <button
-                    disabled={savingId === a.id}
-                    onClick={() => updateStatus(a.id, "declined")}
-                    className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
-                  >
-                    <X className="w-3.5 h-3.5" /> {ar ? "رفض" : "Decline"}
-                  </button>
-                </div>
-              )}
+              <div className="flex items-center gap-2 mt-2">
+                {!terminal && (
+                  <>
+                    <button
+                      disabled={savingId === a.id}
+                      onClick={() => updateStatus(a.id, "accepted")}
+                      className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-role-organization text-white flex items-center justify-center gap-1 disabled:opacity-50"
+                    >
+                      <Check className="w-3.5 h-3.5" /> {ar ? "قبول" : "Accept"}
+                    </button>
+                    <button
+                      disabled={savingId === a.id}
+                      onClick={() => updateStatus(a.id, "declined")}
+                      className="flex-1 text-[11px] font-semibold py-1.5 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center gap-1 disabled:opacity-50"
+                    >
+                      <X className="w-3.5 h-3.5" /> {ar ? "رفض" : "Decline"}
+                    </button>
+                  </>
+                )}
+                <MessageUserButton userId={a.applicant_id} />
+              </div>
+
             </div>
           );
         })

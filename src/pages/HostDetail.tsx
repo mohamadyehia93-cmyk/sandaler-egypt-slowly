@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Star, Home, Heart, MessageCircle, Share2, UserPlus, UserCheck, Shield, Calendar, Globe } from "lucide-react";
+import { ArrowLeft, MapPin, Star, Home, Heart, Share2, UserPlus, UserCheck, Shield, Calendar, Globe } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { hosts, accommodation, regions } from "@/lib/sampleData";
 import NotFoundView from "@/components/NotFound";
@@ -129,13 +129,10 @@ const HostDetail = () => {
         </div>
       </div>
 
-      {/* Contact */}
-      <div className="px-4 mt-5">
-        <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-card border border-border shadow-card text-sm font-semibold text-foreground">
-          <MessageCircle className="w-4 h-4 text-primary" />
-          {lang === "ar" ? "تواصل مع المضيف" : "Message Host"}
-        </button>
-      </div>
+      {/* No in-app messaging here: `hosts` is sample data with no auth account
+          behind it, so a Message button could never resolve a real recipient.
+          Real, claimable host profiles live at /provider/:id and /person/:id. */}
+
 
       {/* Listings */}
       {hostListings.length > 0 && (

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import MessageUserButton from "@/components/MessageUserButton";
 
 type ReservationRow = {
   id: string;
@@ -14,8 +15,10 @@ type ReservationRow = {
   start_date: string | null;
   status: string;
   note: string | null;
+  owner_id: string | null;
   created_at: string;
 };
+
 
 export const reservationStatusLabel = (status: string, ar: boolean) => {
   switch (status) {
@@ -58,7 +61,7 @@ const ReservationRequestsList = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reservation_requests")
-        .select("id, item_type, item_id, guests, start_date, status, note, created_at")
+        .select("id, item_type, item_id, guests, start_date, status, note, owner_id, created_at")
         .eq("requester_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -111,15 +114,19 @@ const ReservationRequestsList = () => {
               </span>
             </div>
             {r.note && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{r.note}</p>}
-            {r.status === "pending" && (
-              <button
-                disabled={savingId === r.id}
-                onClick={() => cancel(r.id)}
-                className="mt-2 text-[11px] font-semibold py-1.5 px-3 rounded-lg bg-destructive/10 text-destructive inline-flex items-center gap-1 disabled:opacity-50"
-              >
-                <X className="w-3.5 h-3.5" /> {ar ? "إلغاء الطلب" : "Cancel request"}
-              </button>
-            )}
+            <div className="flex items-center gap-2 mt-2">
+              {r.status === "pending" && (
+                <button
+                  disabled={savingId === r.id}
+                  onClick={() => cancel(r.id)}
+                  className="text-[11px] font-semibold py-1.5 px-3 rounded-lg bg-destructive/10 text-destructive inline-flex items-center gap-1 disabled:opacity-50"
+                >
+                  <X className="w-3.5 h-3.5" /> {ar ? "إلغاء الطلب" : "Cancel request"}
+                </button>
+              )}
+              <MessageUserButton userId={r.owner_id} label={ar ? "رسالة للمضيف" : "Message host"} />
+            </div>
+
           </div>
         ))
       )}

@@ -7,6 +7,7 @@ import { fetchMyProviderId } from "@/lib/providerRecord";
 import { ShoppingCart, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { orderStatusLabel, orderStatusClasses } from "@/pages/MyOrders";
+import MessageUserButton from "@/components/MessageUserButton";
 
 type SellerOrder = {
   id: string;
@@ -15,11 +16,13 @@ type SellerOrder = {
   total_egp: number | null;
   status: string;
   buyer_note: string | null;
+  buyer_id: string | null;
   contact_name: string | null;
   contact_phone: string | null;
   created_at: string;
   product: { name_en: string; name_ar: string } | null;
 };
+
 
 const TERMINAL = ["declined", "fulfilled", "cancelled", "completed"];
 
@@ -40,7 +43,7 @@ const SellerOrdersList = () => {
       const owners = [user!.id, ...(providerId ? [providerId] : [])];
       const { data, error } = await supabase
         .from("orders")
-        .select("id, quantity, unit_price_egp, total_egp, status, buyer_note, contact_name, contact_phone, created_at, product:products(name_en, name_ar)")
+        .select("id, quantity, unit_price_egp, total_egp, status, buyer_note, buyer_id, contact_name, contact_phone, created_at, product:products(name_en, name_ar)")
         .in("seller_id", owners)
         .order("created_at", { ascending: false })
         .limit(20);
@@ -110,9 +113,9 @@ const SellerOrdersList = () => {
 
               {o.buyer_note && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{o.buyer_note}</p>}
 
-              {!terminal && (
-                <div className="flex items-center gap-2 mt-2">
-                  {o.status === "pending" ? (
+              <div className="flex items-center gap-2 mt-2">
+                {!terminal && (
+                  o.status === "pending" ? (
                     <>
                       <button
                         disabled={savingId === o.id}
@@ -137,9 +140,11 @@ const SellerOrdersList = () => {
                     >
                       <Check className="w-3.5 h-3.5" /> {ar ? "تم التسليم" : "Mark fulfilled"}
                     </button>
-                  )}
-                </div>
-              )}
+                  )
+                )}
+                <MessageUserButton userId={o.buyer_id} />
+              </div>
+
             </div>
           );
         })
