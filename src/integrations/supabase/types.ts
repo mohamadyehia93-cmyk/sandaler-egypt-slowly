@@ -2021,6 +2021,57 @@ export type Database = {
         }
         Relationships: []
       }
+      reservation_requests: {
+        Row: {
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          end_date: string | null
+          guests: number | null
+          id: string
+          item_id: string
+          item_type: string
+          note: string | null
+          owner_id: string | null
+          requester_id: string
+          start_date: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          end_date?: string | null
+          guests?: number | null
+          id?: string
+          item_id: string
+          item_type: string
+          note?: string | null
+          owner_id?: string | null
+          requester_id?: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          end_date?: string | null
+          guests?: number | null
+          id?: string
+          item_id?: string
+          item_type?: string
+          note?: string | null
+          owner_id?: string | null
+          requester_id?: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       saved_itineraries: {
         Row: {
           created_at: string
@@ -2100,6 +2151,68 @@ export type Database = {
             columns: ["meetup_id"]
             isOneToOne: false
             referencedRelation: "meetups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_pledges: {
+        Row: {
+          amount: number | null
+          cause_id: string
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          currency: string
+          details: Json
+          id: string
+          kind: string
+          message: string | null
+          owner_id: string | null
+          status: string
+          supporter_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          cause_id: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          currency?: string
+          details?: Json
+          id?: string
+          kind: string
+          message?: string | null
+          owner_id?: string | null
+          status?: string
+          supporter_id?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          cause_id?: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          currency?: string
+          details?: Json
+          id?: string
+          kind?: string
+          message?: string | null
+          owner_id?: string | null
+          status?: string
+          supporter_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_pledges_cause_id_fkey"
+            columns: ["cause_id"]
+            isOneToOne: false
+            referencedRelation: "causes"
             referencedColumns: ["id"]
           },
         ]
@@ -2551,6 +2664,7 @@ export type Database = {
         Args: { _seller_id: string; _user_id: string }
         Returns: boolean
       }
+      resolve_owner_user_id: { Args: { _owner: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
