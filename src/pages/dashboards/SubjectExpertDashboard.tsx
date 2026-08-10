@@ -1,6 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
-import { ArrowLeft, Bell, Plus, BookOpen, GraduationCap, Library, TrendingUp, Download, ChevronRight } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { useDashboardIdentity } from "@/hooks/useDashboardIdentity";
+import { ArrowLeft, Bell, Plus, BookOpen, ChevronRight } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
@@ -9,12 +13,48 @@ import SessionRequestsList from "@/components/SessionRequestsList";
 const SubjectExpertDashboard = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const identity = useDashboardIdentity();
+
+  const { data: collections = [] } = useQuery({
+    queryKey: ["se-collections", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("collections")
+        .select("id, title_en, title_ar, status, entries")
+        .eq("expert_id", user!.id);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const { data: requests = [] } = useQuery({
+    queryKey: ["se-requests", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("session_requests")
+        .select("id, status")
+        .eq("expert_owner_id", user!.id);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const published = collections.filter((c) => c.status === "published").length;
+  const drafts = collections.filter((c) => c.status !== "published").length;
+  const entryCount = collections.reduce(
+    (sum, c) => sum + (Array.isArray(c.entries) ? c.entries.length : 0),
+    0
+  );
+  const pendingRequests = requests.filter((r) => r.status === "pending").length;
 
   const overview = [
-    { value: "3", label: lang === "ar" ? "مجموعات منشورة" : "Published Collections", path: "/dashboard/subject-expert/my-collections" },
-    { value: "7", label: lang === "ar" ? "مقالات" : "Essays", path: "/dashboard/subject-expert/my-collections" },
-    { value: "2", label: lang === "ar" ? "حقائب تعليمية" : "Teacher Packs", path: "/dashboard/subject-expert/my-collections" },
-    { value: "45", label: lang === "ar" ? "تحميلات" : "Downloads", path: "/profile/impact" },
+    { value: published, label: lang === "ar" ? "مجموعات منشورة" : "Published Collections", path: "/dashboard/subject-expert/my-collections" },
+    { value: drafts, label: lang === "ar" ? "مسودات" : "Drafts", path: "/dashboard/subject-expert/my-collections" },
+    { value: entryCount, label: lang === "ar" ? "مداخل" : "Entries", path: "/dashboard/subject-expert/my-collections" },
+    { value: pendingRequests, label: lang === "ar" ? "طلبات بانتظار الرد" : "Requests Awaiting Reply", path: "/dashboard/subject-expert" },
   ];
 
   const bottomNav = [
@@ -32,14 +72,16 @@ const SubjectExpertDashboard = () => {
           <div className="flex items-center gap-2">
             <EditProfileHeaderButton />
             <VisitorModeHeaderToggle />
-            <button onClick={() => navigate("/inbox")} className="relative p-1"><Bell className="w-5 h-5" /></button>
+            <button onClick={() => navigate("/inbox")} className="p-1" aria-label={lang === "ar" ? "الرسائل" : "Inbox"}><Bell className="w-5 h-5" /></button>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-xl">🔬</div>
+          <div className="w-12 h-12 rounded-full bg-white/20 overflow-hidden flex items-center justify-center text-sm font-bold">
+            {identity.avatar ? <img src={identity.avatar} alt="" className="w-full h-full object-cover" /> : identity.initials || "🔬"}
+          </div>
           <div>
             <p className="text-xs opacity-80">{lang === "ar" ? "خبير متخصص" : "Subject Expert"}</p>
-            <h1 className="text-lg font-bold">{lang === "ar" ? "د. ليلى مصطفى" : "Dr. Laila Mostafa"}</h1>
+            <h1 className="text-lg font-bold">{identity.name || (lang === "ar" ? "لوحة التحكم" : "Dashboard")}</h1>
           </div>
         </div>
       </header>
@@ -56,39 +98,15 @@ const SubjectExpertDashboard = () => {
           ))}
         </div>
 
-        {/* Analytics */}
-        <div onClick={() => navigate("/profile/impact")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
-          <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-role-subject-expert" />
-            {lang === "ar" ? "تحليلات" : "Analytics"}
-            <ChevronRight className="w-4 h-4 text-muted-foreground ms-auto" />
-          </h3>
-          <div className="flex justify-between text-center">
-            <div><span className="text-lg font-bold text-foreground">1.2K</span><p className="text-[10px] text-muted-foreground">{lang === "ar" ? "قراءات" : "Reads"}</p></div>
-            <div><span className="text-lg font-bold text-foreground">89</span><p className="text-[10px] text-muted-foreground">{lang === "ar" ? "حفظ" : "Saves"}</p></div>
-            <div><span className="text-lg font-bold text-foreground">45</span><p className="text-[10px] text-muted-foreground">{lang === "ar" ? "تحميلات" : "Downloads"}</p></div>
-          </div>
-        </div>
-
-        {/* Licensing */}
-        <div className="bg-success/10 border border-success/30 rounded-xl p-3 flex items-center gap-2">
-          <Library className="w-4 h-4 text-success" />
-          <span className="text-xs font-medium text-foreground">{lang === "ar" ? "اتفاقية الترخيص نشطة" : "Licensing Agreement Active"}</span>
-        </div>
-
-        {/* Session Requests */}
         <SessionRequestsList accentText="text-role-subject-expert" />
-
 
         <div className="space-y-2">
           <button onClick={() => navigate("/dashboard/subject-expert/new-collection")} className="w-full bg-role-subject-expert text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
             <Plus className="w-4 h-4" /> {lang === "ar" ? "مجموعة جديدة" : "New Collection"}
           </button>
-          <button onClick={() => navigate("/dashboard/subject-expert/new-collection")} className="w-full border-2 border-role-subject-expert text-role-subject-expert rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
-            <BookOpen className="w-4 h-4" /> {lang === "ar" ? "كتابة مقال" : "Write Essay"}
-          </button>
-          <button onClick={() => navigate("/dashboard/subject-expert/new-collection")} className="w-full border-2 border-role-subject-expert text-role-subject-expert rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
-            <GraduationCap className="w-4 h-4" /> {lang === "ar" ? "حقيبة تعليمية" : "Create Teacher Pack"}
+          <button onClick={() => navigate("/dashboard/subject-expert/my-collections")} className="w-full border-2 border-role-subject-expert text-role-subject-expert rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
+            <BookOpen className="w-4 h-4" /> {lang === "ar" ? "إدارة مجموعاتي" : "Manage My Collections"}
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
