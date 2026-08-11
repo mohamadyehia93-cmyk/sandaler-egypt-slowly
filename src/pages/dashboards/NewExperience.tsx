@@ -119,8 +119,17 @@ const NewExperience = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    if (!form.title_en.trim() || !form.title_ar.trim() || !form.category || !form.price.trim()) {
-      toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
+    const theme = themeForCategory(form.category);
+    if (!form.title_en.trim() || !form.title_ar.trim() || !theme || !form.price.trim()) {
+      toast.error(
+        !theme && form.category
+          ? lang === "ar"
+            ? "الفئة المختارة غير مدعومة. يرجى اختيار فئة من القائمة."
+            : "That category isn't supported. Please pick one from the list."
+          : lang === "ar"
+          ? "يرجى ملء الحقول المطلوبة"
+          : "Please fill in required fields"
+      );
       return;
     }
 
@@ -160,7 +169,7 @@ const NewExperience = () => {
         title_ar: form.title_ar.trim(),
         description_en: form.description_en.trim(),
         description_ar: form.description_ar.trim(),
-        theme: form.category,
+        theme,
         price: parseInt(form.price) || 0,
         duration_minutes: durationMinutes || null,
         capacity_min: parseInt(form.groupSizeMin) || 1,
@@ -217,7 +226,10 @@ const NewExperience = () => {
       toast.success(ar ? "تم نشر التجربة بنجاح!" : "Experience published successfully!");
       navigate("/dashboard/service-provider/my-listings");
     } catch (err: any) {
-      toast.error(err.message || "Failed to create experience");
+      toast.error(
+        readableDbError(err?.message || "", ar) ||
+          (ar ? "تعذّر حفظ التجربة" : "Failed to save the listing")
+      );
     } finally {
       setSubmitting(false);
     }
