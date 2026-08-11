@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
-import { cityData, experiences, audioTours, accommodation, products, causes, latestPosts, trips } from "@/lib/sampleData";
+import { cityData } from "@/lib/sampleData";
 import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
@@ -131,6 +131,7 @@ const CityDetail = () => {
   const { data: dbWhosWho = [], isLoading: l7 } = useWhosWho();
   const { data: dbPosts = [], isLoading: l8 } = usePosts();
   const { data: dbEvents = [] } = useEvents();
+  const { data: dbCauses = [] } = useCauses();
   const isLoading = l1 || l2 || l3 || l4 || l5 || l6 || l7 || l8;
 
   const city = cityData[cityId || ""];
@@ -192,7 +193,7 @@ const CityDetail = () => {
       })),
   ]);
 
-  const cityCauses = (dbCauses as any[] | undefined)?.filter((c) => c.city_id === cityId) ?? [];
+  const cityCauses = (dbCauses as any[]).filter((c) => c.city_id === cityId);
   const cityPosts = dedupe([
     ...(dbPosts as any[]).filter((p) => p.city_id === cityId).map((p) => ({
       id: p.slug || p.id, slug: p.slug,
