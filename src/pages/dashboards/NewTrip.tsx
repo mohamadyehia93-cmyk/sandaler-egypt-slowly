@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages } from "@/lib/dashboardForms";
 import { fetchMyProviderId } from "@/lib/providerRecord";
+import { tripTypeForLabel, readableDbError } from "@/lib/listingTaxonomy";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Clock, Users, DollarSign, Calendar, ListChecks } from "lucide-react";
 import { toast } from "sonner";
@@ -93,7 +94,8 @@ const NewTrip = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    if (!form.title.trim() || !form.description.trim() || !form.tripType || !form.price.trim()) {
+    const tripTypeValue = tripTypeForLabel(form.tripType);
+    if (!form.title.trim() || !form.description.trim() || !tripTypeValue || !form.price.trim()) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
@@ -121,7 +123,7 @@ const NewTrip = () => {
         title_ar: form.title.trim(),
         description_en: form.description.trim(),
         description_ar: form.description.trim(),
-        trip_type: form.tripType,
+        trip_type: tripTypeValue,
         price: parseInt(form.price) || 0,
         duration_days: parseInt(form.days) || 1,
         capacity_max: parseInt(form.maxGroup) || null,
@@ -148,7 +150,10 @@ const NewTrip = () => {
       }
       navigate("/dashboard/trip-organizer/my-trips");
     } catch (err: any) {
-      toast.error(err.message || "Failed to save trip");
+      toast.error(
+        readableDbError(err?.message || "", lang === "ar") ||
+          (lang === "ar" ? "تعذّر حفظ الرحلة" : "Failed to save trip")
+      );
     } finally {
       setSubmitting(false);
     }

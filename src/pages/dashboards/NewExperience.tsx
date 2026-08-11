@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyProviderId } from "@/lib/providerRecord";
 import { generateSlotDrafts } from "@/lib/experienceSlots";
+import { themeForCategory, readableDbError } from "@/lib/listingTaxonomy";
 
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
@@ -102,8 +103,10 @@ const NewExperience = () => {
     switch (step) {
       case 0: return form.title_en.trim().length > 0 && form.title_ar.trim().length > 0;
       case 1: return form.description_en.trim().length > 0;
-      case 2: return form.category.length > 0;
-      case 4: return form.price.trim().length > 0;
+      // Validate at the category step, not at publish time: only a category that
+      // maps to a stored theme the database accepts may advance.
+      case 2: return !!themeForCategory(form.category);
+      case 4: return form.price.trim().length > 0 && Number(form.price) >= 0;
       default: return true;
     }
   };
@@ -116,8 +119,17 @@ const NewExperience = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    if (!form.title_en.trim() || !form.title_ar.trim() || !form.category || !form.price.trim()) {
-      toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
+    const theme = themeForCategory(form.category);
+    if (!form.title_en.trim() || !form.title_ar.trim() || !theme || !form.price.trim()) {
+      toast.error(
+        !theme && form.category
+          ? lang === "ar"
+            ? "الفئة المختارة غير مدعومة. يرجى اختيار فئة من القائمة."
+            : "That category isn't supported. Please pick one from the list."
+          : lang === "ar"
+          ? "يرجى ملء الحقول المطلوبة"
+          : "Please fill in required fields"
+      );
       return;
     }
 
@@ -157,7 +169,7 @@ const NewExperience = () => {
         title_ar: form.title_ar.trim(),
         description_en: form.description_en.trim(),
         description_ar: form.description_ar.trim(),
-        theme: form.category,
+        theme,
         price: parseInt(form.price) || 0,
         duration_minutes: durationMinutes || null,
         capacity_min: parseInt(form.groupSizeMin) || 1,
@@ -214,7 +226,10 @@ const NewExperience = () => {
       toast.success(ar ? "تم نشر التجربة بنجاح!" : "Experience published successfully!");
       navigate("/dashboard/service-provider/my-listings");
     } catch (err: any) {
-      toast.error(err.message || "Failed to create experience");
+      toast.error(
+        readableDbError(err?.message || "", ar) ||
+          (ar ? "تعذّر حفظ التجربة" : "Failed to save the listing")
+      );
     } finally {
       setSubmitting(false);
     }
