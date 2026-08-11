@@ -1,10 +1,82 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Globe, Bell, Moon, Shield, LogOut, ChevronRight, Eye } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Settings = () => {
   const navigate = useNavigate();
   const { lang, setLang } = useI18n();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [emailNotifications, setEmailNotifications] = useState<boolean | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      const uid = data.user?.id ?? null;
+      if (!active) return;
+      setUserId(uid);
+      if (!uid) return;
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("email_notifications")
+        .eq("user_id", uid)
+        .maybeSingle();
+      if (active) setEmailNotifications(profile?.email_notifications ?? true);
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const toggleEmailNotifications = async () => {
+    if (!userId) {
+      toast.error(lang === "ar" ? "يجب تسجيل الدخول أولاً" : "Please sign in first");
+      return;
+    }
+    if (saving) return;
+    const next = !(emailNotifications ?? true);
+    setSaving(true);
+    setEmailNotifications(next);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ email_notifications: next })
+      .eq("user_id", userId);
+    setSaving(false);
+    if (error) {
+      setEmailNotifications(!next);
+      toast.error(lang === "ar" ? "لم يتم حفظ التغيير" : "Could not save that change");
+      return;
+    }
+    toast.success(
+      next
+        ? lang === "ar"
+          ? "تم تشغيل إشعارات البريد الإلكتروني"
+          : "Email notifications turned on"
+        : lang === "ar"
+          ? "تم إيقاف إشعارات البريد الإلكتروني"
+          : "Email notifications turned off",
+    );
+  };
+
+  const changeLanguage = async () => {
+    const next = lang === "ar" ? "en" : "ar";
+    setLang(next);
+    if (userId) {
+      await supabase.from("profiles").update({ preferred_language: next }).eq("user_id", userId);
+    }
+  };
+
+  const notificationValue = !userId
+    ? { en: "Sign in", ar: "سجّل الدخول" }
+    : emailNotifications === null
+      ? { en: "…", ar: "…" }
+      : emailNotifications
+        ? { en: "On", ar: "مفعّل" }
+        : { en: "Off", ar: "مغلق" };
 
   const sections = [
     {
@@ -14,7 +86,7 @@ const Settings = () => {
           icon: Globe,
           label: { en: "Language", ar: "اللغة" },
           value: lang === "ar" ? "العربية" : "English",
-          action: () => setLang(lang === "ar" ? "en" : "ar"),
+          action: changeLanguage,
         },
         {
           icon: Moon,
@@ -23,8 +95,9 @@ const Settings = () => {
         },
         {
           icon: Bell,
-          label: { en: "Notifications", ar: "الإشعارات" },
-          value: { en: "On", ar: "مفعّل" },
+          label: { en: "Email notifications", ar: "إشعارات البريد الإلكتروني" },
+          value: notificationValue,
+          action: toggleEmailNotifications,
         },
       ],
     },
