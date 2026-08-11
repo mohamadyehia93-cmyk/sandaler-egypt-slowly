@@ -155,10 +155,18 @@ const NewSession = () => {
           </div>
         </div>
 
-        <div>
-          <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-whos-who" />{lang === "ar" ? "المكان" : "Location"}</label>
-          <input className={inputClass} placeholder={lang === "ar" ? "مثال: بيت السحيمي، القاهرة" : "e.g. Bayt Al-Suhaymi, Cairo"} value={form.location} onChange={(e) => set("location", e.target.value)} maxLength={100} />
-        </div>
+        <BilingualField
+          fieldEn="location_en" fieldAr="location_ar"
+          labelEn="Location" labelAr="المكان"
+          icon={<MapPin className="w-3.5 h-3.5 text-role-whos-who" />}
+          valueEn={form.locationEn} valueAr={form.locationAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, locationEn: en, locationAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="venue and city name in Egypt"
+          placeholderEn="e.g. Bayt Al-Suhaymi, Cairo" placeholderAr="مثال: بيت السحيمي، القاهرة"
+          inputClass={inputClass} labelClass={labelClass}
+        />
 
         <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-whos-who text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
           {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر الجلسة" : "Publish Session")}
