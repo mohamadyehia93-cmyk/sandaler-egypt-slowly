@@ -165,21 +165,41 @@ const NewProduct = () => {
       </header>
 
       <div className="px-4 py-5 space-y-5">
+        <AuthorLangToggle value={authorLang} onChange={setAuthorLang} />
+
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-product-seller" />{lang === "ar" ? "صور المنتج" : "Product Photos"}</label>
           <PhotoPicker files={photos} onChange={setPhotos} max={5} hint={lang === "ar" ? "حتى ٥ صور" : "Up to 5 photos"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-product-seller" />{lang === "ar" ? "اسم المنتج *" : "Product Name *"}</label>
-          <input className={inputClass} placeholder={lang === "ar" ? "مثال: سجاد فوة يدوي" : "e.g. Handmade Fuwwah Carpet"} value={form.name} onChange={(e) => set("name", e.target.value)} maxLength={100} />
-        </div>
+        <BilingualField
+          fieldEn="name_en" fieldAr="name_ar"
+          labelEn="Product Name" labelAr="اسم المنتج"
+          required
+          icon={<FileText className="w-3.5 h-3.5 text-role-product-seller" />}
+          valueEn={form.nameEn} valueAr={form.nameAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, nameEn: en, nameAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="short marketplace product name for an Egyptian handmade craft"
+          placeholderEn="e.g. Handmade Fuwwah Carpet" placeholderAr="مثال: سجاد فوة يدوي"
+          inputClass={inputClass} labelClass={labelClass}
+        />
 
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-product-seller" />{lang === "ar" ? "الوصف *" : "Description *"}</label>
-          <textarea className={`${inputClass} min-h-[100px] resize-none`} placeholder={lang === "ar" ? "اوصف المنتج بالتفصيل..." : "Describe your product..."} value={form.description} onChange={(e) => set("description", e.target.value)} maxLength={1000} />
-          <span className="text-[10px] text-muted-foreground mt-1 block text-right">{form.description.length}/1000</span>
-        </div>
+        <BilingualField
+          fieldEn="description_en" fieldAr="description_ar"
+          labelEn="Description" labelAr="الوصف"
+          required multiline rows={4}
+          icon={<FileText className="w-3.5 h-3.5 text-role-product-seller" />}
+          valueEn={form.descriptionEn} valueAr={form.descriptionAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, descriptionEn: en, descriptionAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="product description for an Egyptian handmade craft listing"
+          placeholderEn="Describe your product..." placeholderAr="اوصف المنتج بالتفصيل..."
+          inputClass={inputClass} labelClass={labelClass}
+        />
+
 
         <div>
           <label className={labelClass}><Tag className="w-3.5 h-3.5 text-role-product-seller" />{lang === "ar" ? "الفئة *" : "Category *"}</label>
