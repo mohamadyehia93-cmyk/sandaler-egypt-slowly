@@ -106,7 +106,9 @@ const Admin = () => {
     await queryClient.invalidateQueries({ queryKey: ["is-admin"] });
   };
 
+  const { data: reports = [], isLoading: reportsLoading } = useQuery({
     queryKey: ["admin-flag-reports"],
+
     queryFn: async () => {
       const { data, error } = await supabase
         .from("flag_reports")
