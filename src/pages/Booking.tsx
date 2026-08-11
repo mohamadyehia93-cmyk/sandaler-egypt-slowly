@@ -86,20 +86,22 @@ const Booking = () => {
     ? (item.title_ar || item.name_ar || "")
     : (item.title_en || item.name_en || ""));
   const itemImage = item.image || "";
-  const unitPrice = item.price ?? item.price_per_night ?? 0;
   const isStay = type === "stay";
   const isProduct = type === "product";
-  const nights = isStay ? 2 : 0;
+  const isExperience = type === "experience";
+  const chosenSlot = (slots || []).find((s: any) => s.id === selectedSlotId);
+  const unitPrice = chosenSlot?.price ?? item.price ?? item.price_per_night ?? 0;
+  const nights = isStay ? 1 : 0;
   const quantity = isProduct ? guests : 1;
   const subtotal = isProduct ? unitPrice * quantity : isStay ? unitPrice * nights : unitPrice * guests;
-  // Experiences carry 10% platform fee (Ambassador verification + content production overhead);
-  // stays/products/trips/transport are simpler transactions at 5%. The differential is intentional.
-  const isExperience = type === "experience";
+  // Estimated only. No card is charged anywhere in this flow, so this is presented
+  // as an estimate the host will confirm — never as a captured amount.
   const serviceFee = Math.round(subtotal * (isExperience ? 0.10 : 0.05));
   const total = subtotal + serviceFee;
-  // A paid checkout is only conceivable for an experience with a chosen slot. Everything else
-  // (and any Stripe failure) resolves to the unpaid "request to book" path.
-  const paidPath = isExperience && !!slotId;
+  // There is no payment processor wired up, so there is NO paid path in the UI.
+  // Every submission is an unpaid request. Do not re-enable this without real checkout.
+  const paidPath = false;
+
 
 
   const priceLabel = isStay
