@@ -203,10 +203,19 @@ const NewProduct = () => {
           </div>
         </div>
 
-        <div>
-          <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-product-seller" />{lang === "ar" ? "مكان الصنع" : "Origin / Made In"}</label>
-          <input className={inputClass} placeholder={lang === "ar" ? "مثال: فوة، كفر الشيخ" : "e.g. Fuwwah, Kafr El-Sheikh"} value={form.origin} onChange={(e) => set("origin", e.target.value)} maxLength={100} />
-        </div>
+        <BilingualField
+          fieldEn="seller_village_en" fieldAr="seller_village_ar"
+          labelEn="Origin / Made In" labelAr="مكان الصنع"
+          icon={<MapPin className="w-3.5 h-3.5 text-role-product-seller" />}
+          valueEn={form.originEn} valueAr={form.originAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, originEn: en, originAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="the Egyptian town or village where a handmade product was made"
+          placeholderEn="e.g. Fuwwah, Kafr El-Sheikh" placeholderAr="مثال: فوة، كفر الشيخ"
+          inputClass={inputClass} labelClass={labelClass}
+        />
+
 
         <div className="grid grid-cols-2 gap-3">
           <div>
