@@ -24,10 +24,15 @@ export interface ExperienceFormData {
   includes: string[];
   excludes: string[];
   location: string;
+  cityId: string;
+  regionId: string;
+  remarks_en: string;
+  remarks_ar: string;
   meetingPointName: string;
   meetingPointLat: string;
   meetingPointLng: string;
   itinerary: { step: string }[];
+
 }
 
 export const defaultFormData: ExperienceFormData = {
@@ -56,10 +61,15 @@ export const defaultFormData: ExperienceFormData = {
   includes: [""],
   excludes: [""],
   location: "",
+  cityId: "",
+  regionId: "",
+  remarks_en: "",
+  remarks_ar: "",
   meetingPointName: "",
   meetingPointLat: "",
   meetingPointLng: "",
   itinerary: [{ step: "" }],
+
 };
 
 export const categories = [
