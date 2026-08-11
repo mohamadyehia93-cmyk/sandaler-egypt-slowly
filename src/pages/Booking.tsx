@@ -222,21 +222,50 @@ const Booking = () => {
 
         {step === "details" && (
           <>
-            {/* Date Selection */}
+            {/* Date Selection — experiences pick from real published slots */}
             {!isProduct && (
               <div className="mb-4">
                 <label className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-primary" />
                   {t("booking.date_label")}
                 </label>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full mt-2 p-3 rounded-xl bg-card border border-border text-sm text-foreground"
-                />
+                {isExperience ? (
+                  slots && slots.length > 0 ? (
+                    <select
+                      value={selectedSlotId}
+                      onChange={(e) => {
+                        setSelectedSlotId(e.target.value);
+                        const s = slots.find((x: any) => x.id === e.target.value);
+                        setSelectedDate(s?.slot_date || "");
+                      }}
+                      className="w-full mt-2 p-3 rounded-xl bg-card border border-border text-sm text-foreground"
+                    >
+                      <option value="">{ar ? "اختر موعداً" : "Choose a date"}</option>
+                      {slots.map((s: any) => (
+                        <option key={s.id} value={s.id}>
+                          {s.slot_date} · {s.start_time.slice(0, 5)}–{s.end_time.slice(0, 5)} · {s.price} {t("common.egp")}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <p className="mt-2 p-3 rounded-xl bg-warning/10 border border-warning text-xs text-foreground">
+                      {ar
+                        ? "لم ينشر المضيف مواعيد متاحة بعد، لذلك لا يمكن إرسال طلب بموعد. راسل المضيف للاتفاق على موعد."
+                        : "The host hasn't published any available dates yet, so a request cannot be dated. Message the host to agree a date."}
+                    </p>
+                  )
+                ) : (
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    min={new Date().toISOString().slice(0, 10)}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="w-full mt-2 p-3 rounded-xl bg-card border border-border text-sm text-foreground"
+                  />
+                )}
               </div>
             )}
+
 
             {/* Guests / Quantity */}
             <div className="mb-5">
