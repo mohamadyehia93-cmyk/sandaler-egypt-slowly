@@ -68,6 +68,33 @@ const PostDetail = () => {
   });
   const { data: allPosts } = usePosts();
 
+  // Author bio card: resolve the REAL culture-actor profile owned by this author.
+  // Never match against sample actors — that showed a stranger's bio on a post.
+  const { data: actorRow } = useQuery({
+    queryKey: ["post-author-actor", (row as any)?.author_id],
+    enabled: !!(row as any)?.author_id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("culture_actors")
+        .select("id, slug, name_en, name_ar, title_en, title_ar, bio_en, bio_ar, image, expertise_en, expertise_ar, quote_en, quote_ar, status")
+        .eq("user_id", (row as any).author_id)
+        .eq("status", "published")
+        .limit(1);
+      return data?.[0] ?? null;
+    },
+  });
+  const actor = actorRow
+    ? {
+        id: (actorRow as any).slug || (actorRow as any).id,
+        name: { en: (actorRow as any).name_en, ar: (actorRow as any).name_ar },
+        title: { en: (actorRow as any).title_en || "", ar: (actorRow as any).title_ar || "" },
+        bio: { en: (actorRow as any).bio_en || "", ar: (actorRow as any).bio_ar || "" },
+        image: (actorRow as any).image || "",
+        expertise: { en: (actorRow as any).expertise_en || [], ar: (actorRow as any).expertise_ar || [] },
+        quote: { en: (actorRow as any).quote_en || "", ar: (actorRow as any).quote_ar || "" },
+      }
+    : null;
+
   // Real (signed-up) authors: resolve their live profile name + avatar.
   const realAuthorId = (row as any)?.author_id as string | null | undefined;
   const { data: authorProfile } = useQuery({
@@ -206,13 +233,11 @@ const PostDetail = () => {
             className="flex items-center gap-2 cursor-pointer"
             data-testid="post-byline"
             onClick={() => {
-              const actor = cultureActors.find((a) => a.id === post.authorId);
               if (actor) navigate(`/culture-actor/${actor.id}`);
               else if (post.authorId) navigate(`/visitor/${post.authorId}`);
             }}
           >
             {(() => {
-              const actor = cultureActors.find((a) => a.id === post.authorId);
               const img = actor?.image || authorProfile?.avatar_url || post.authorImage;
               const name = actor?.name[lang] || authorProfile?.display_name || post.author[lang];
               return img ? (
@@ -225,7 +250,7 @@ const PostDetail = () => {
             })()}
             <div>
               <p className="text-xs font-semibold text-primary">
-                {cultureActors.find((a) => a.id === post.authorId)?.name[lang] ||
+                {actor?.name[lang] ||
                   authorProfile?.display_name ||
                   post.author[lang]}
               </p>
@@ -257,7 +282,6 @@ const PostDetail = () => {
 
       {/* Author Bio Section */}
       {(() => {
-        const actor = cultureActors.find((a) => a.id === post.authorId);
         if (!actor) return null;
         return (
           <div className="mx-4 mt-6 rounded-xl bg-card border border-border p-4 shadow-sm">
