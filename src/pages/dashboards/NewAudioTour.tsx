@@ -6,6 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages, uploadAudio } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import AudioPicker from "@/components/dashboard/AudioPicker";
+import BilingualField from "@/components/dashboard/BilingualField";
+import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
+import type { Lang, TranslationMeta } from "@/lib/translation";
 import { ArrowLeft, FileText, MapPin, Clock, Tag, Languages, DollarSign, Plus, Trash2, Mic, Image as ImageIcon, Navigation } from "lucide-react";
 import { toast } from "sonner";
 
@@ -55,9 +58,14 @@ const NewAudioTour = () => {
   const [tourAudioFile, setTourAudioFile] = useState<File | null>(null);
   const [existingTourAudio, setExistingTourAudio] = useState<string | null>(null);
 
+  const [authorLang, setAuthorLang] = useState<Lang>(lang === "ar" ? "ar" : "en");
+  const [meta, setMeta] = useState<TranslationMeta>({});
+
   const [form, setForm] = useState({
-    title: "",
-    description: "",
+    titleEn: "",
+    titleAr: "",
+    descriptionEn: "",
+    descriptionAr: "",
     city: "",
     theme: "",
     duration: "",
@@ -75,9 +83,12 @@ const NewAudioTour = () => {
         toast.error(lang === "ar" ? "تعذر تحميل الجولة" : "Could not load tour");
         return;
       }
+      setMeta(((data as any).translation_meta as TranslationMeta) || {});
       setForm({
-        title: data.title_en || "",
-        description: data.description_en || "",
+        titleEn: data.title_en || "",
+        titleAr: data.title_ar || "",
+        descriptionEn: data.description_en || "",
+        descriptionAr: data.description_ar || "",
         city: data.city_id || "",
         theme: "",
         duration: data.duration_minutes != null ? String(data.duration_minutes) : "",
@@ -88,7 +99,7 @@ const NewAudioTour = () => {
       setStops(
         dbStops.length
           ? dbStops.map((s: any) => ({
-              name: s.label_en || "",
+              name: s.label_en || s.label_ar || "",
               desc_en: s.desc_en || "",
               desc_ar: s.desc_ar || "",
               lat: s.lat != null ? String(s.lat) : "",
@@ -129,7 +140,8 @@ const NewAudioTour = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    if (!form.title.trim() || !form.city.trim() || (!isEdit && !form.theme) || stops.length === 0 || !stops[0].name.trim()) {
+    const titleSrc = authorLang === "ar" ? form.titleAr : form.titleEn;
+    if (!titleSrc.trim() || !form.city.trim() || (!isEdit && !form.theme) || stops.length === 0 || !stops[0].name.trim()) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة وإضافة محطة واحدة على الأقل" : "Please fill required fields and add at least one stop");
       return;
     }
@@ -153,8 +165,8 @@ const NewAudioTour = () => {
         let stopAudio = s.audioUrl;
         if (s.audioFile) stopAudio = await uploadAudio(s.audioFile, user.id);
         cleanStops.push({
-          label_en: s.name.trim(),
-          label_ar: s.name.trim(),
+          label_en: authorLang === "en" ? s.name.trim() : "",
+          label_ar: authorLang === "ar" ? s.name.trim() : "",
           desc_en: s.desc_en.trim(),
           desc_ar: s.desc_ar.trim(),
           lat: parseCoord(s.lat, 90),
@@ -180,10 +192,11 @@ const NewAudioTour = () => {
 
       const payload = {
         creator_id: user.id,
-        title_en: form.title.trim(),
-        title_ar: form.title.trim(),
-        description_en: form.description.trim() || null,
-        description_ar: form.description.trim() || null,
+        title_en: form.titleEn.trim(),
+        title_ar: form.titleAr.trim(),
+        description_en: form.descriptionEn.trim() || null,
+        description_ar: form.descriptionAr.trim() || null,
+        translation_meta: meta as any,
         city_id: form.city.trim(),
         duration_minutes: parseInt(form.duration) || 30,
         stops_count: cleanStops.length,
@@ -204,7 +217,7 @@ const NewAudioTour = () => {
         if (error) throw error;
         toast.success(lang === "ar" ? "تم تحديث الجولة!" : "Audio tour updated!");
       } else {
-        const { error } = await supabase.from("audio_tours").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        const { error } = await supabase.from("audio_tours").insert({ ...payload, slug: slugify(form.titleEn || form.titleAr, user.id.slice(0, 6)) });
         if (error) throw error;
         toast.success(lang === "ar" ? "تم نشر الجولة الصوتية بنجاح!" : "Audio tour published successfully!");
       }
@@ -236,15 +249,35 @@ const NewAudioTour = () => {
       </header>
 
       <div className="px-4 py-5 space-y-5">
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "عنوان الجولة *" : "Tour Title *"}</label>
-          <input className={inputClass} placeholder={lang === "ar" ? "مثال: حواري الخان وأسرارها" : "e.g. Khan Alleys & Their Secrets"} value={form.title} onChange={(e) => set("title", e.target.value)} maxLength={100} />
-        </div>
+        <AuthorLangToggle value={authorLang} onChange={setAuthorLang} />
 
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "وصف الجولة" : "Tour Description"}</label>
-          <textarea className={`${inputClass} min-h-[100px] resize-none`} placeholder={lang === "ar" ? "صف ما سيسمعه المستمع..." : "Describe what the listener will hear..."} value={form.description} onChange={(e) => set("description", e.target.value)} maxLength={1000} />
-        </div>
+        <BilingualField
+          fieldEn="title_en" fieldAr="title_ar"
+          labelEn="Tour Title" labelAr="عنوان الجولة"
+          required
+          icon={<FileText className="w-3.5 h-3.5 text-role-narrator" />}
+          valueEn={form.titleEn} valueAr={form.titleAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, titleEn: en, titleAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="short title for a self-guided audio walking tour in Egypt"
+          placeholderEn="e.g. Khan Alleys & Their Secrets" placeholderAr="مثال: حواري الخان وأسرارها"
+          inputClass={inputClass} labelClass={labelClass}
+        />
+
+        <BilingualField
+          fieldEn="description_en" fieldAr="description_ar"
+          labelEn="Tour Description" labelAr="وصف الجولة"
+          multiline rows={4} maxLength={1000}
+          icon={<FileText className="w-3.5 h-3.5 text-role-narrator" />}
+          valueEn={form.descriptionEn} valueAr={form.descriptionAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, descriptionEn: en, descriptionAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="description of a self-guided audio walking tour in Egypt"
+          placeholderEn="Describe what the listener will hear..." placeholderAr="صف ما سيسمعه المستمع..."
+          inputClass={inputClass} labelClass={labelClass}
+        />
 
         <div className="grid grid-cols-2 gap-3">
           <div>
