@@ -401,9 +401,12 @@ const Booking = () => {
                 <span className="text-sm text-foreground">{subtotal} {t("common.egp")}</span>
               </div>
               <div className="flex justify-between mb-2">
-                <span className="text-sm text-muted-foreground">{t("booking.service_fee")}</span>
+                <span className="text-sm text-muted-foreground">
+                  {t("booking.service_fee")} — {ar ? "تقديري، لم يُحصَّل" : "estimate, not charged"}
+                </span>
                 <span className="text-sm text-foreground">{serviceFee} {t("common.egp")}</span>
               </div>
+
               <div className="border-t border-border pt-2 flex justify-between">
                 <span className="text-sm font-bold text-foreground">
                   {paidPath ? t("booking.total") : ar ? "الإجمالي التقديري" : "Estimated total"}
