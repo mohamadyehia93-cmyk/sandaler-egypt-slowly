@@ -123,7 +123,7 @@ const NewTrip = () => {
         title_ar: form.title.trim(),
         description_en: form.description.trim(),
         description_ar: form.description.trim(),
-        trip_type: form.tripType,
+        trip_type: tripTypeValue,
         price: parseInt(form.price) || 0,
         duration_days: parseInt(form.days) || 1,
         capacity_max: parseInt(form.maxGroup) || null,
@@ -150,7 +150,10 @@ const NewTrip = () => {
       }
       navigate("/dashboard/trip-organizer/my-trips");
     } catch (err: any) {
-      toast.error(err.message || "Failed to save trip");
+      toast.error(
+        readableDbError(err?.message || "", lang === "ar") ||
+          (lang === "ar" ? "تعذّر حفظ الرحلة" : "Failed to save trip")
+      );
     } finally {
       setSubmitting(false);
     }
