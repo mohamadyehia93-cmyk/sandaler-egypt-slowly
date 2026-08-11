@@ -68,13 +68,13 @@ const BilingualField = ({
     setFailed(null);
     const res = await translateText({ text, from: authorLang, to: targetLang, context });
     setBusy(false);
-    if (!res.ok) {
+    if (res.ok === true) {
+      onChange(authorLang === "en" ? { en: valueEn, ar: res.translation } : { en: res.translation, ar: valueAr });
+      onMetaChange(markMachine(meta, targetField, authorLang));
+    } else {
       // Never mirror the source into the target column.
       setFailed(res.error);
-      return;
     }
-    onChange(authorLang === "en" ? { en: valueEn, ar: res.translation } : { en: res.translation, ar: valueAr });
-    onMetaChange(markMachine(meta, targetField, authorLang));
   };
 
   const sourceLabel = authorLang === "en" ? labelEn : labelAr;
