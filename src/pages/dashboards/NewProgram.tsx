@@ -5,6 +5,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import BilingualField from "@/components/dashboard/BilingualField";
+import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
+import type { Lang, TranslationMeta } from "@/lib/translation";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Calendar, Users, Heart } from "lucide-react";
 import { toast } from "sonner";
 
@@ -26,11 +29,17 @@ const NewProgram = () => {
   const [photos, setPhotos] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
+  const [authorLang, setAuthorLang] = useState<Lang>(lang === "ar" ? "ar" : "en");
+  const [meta, setMeta] = useState<TranslationMeta>({});
+
   const [form, setForm] = useState({
-    title: "",
-    description: "",
+    titleEn: "",
+    titleAr: "",
+    descriptionEn: "",
+    descriptionAr: "",
     type: "",
-    location: "",
+    locationEn: "",
+    locationAr: "",
     startDate: "",
     endDate: "",
     volunteersNeeded: "",
@@ -48,16 +57,20 @@ const NewProgram = () => {
       }
       const goals = Array.isArray(data.goals) ? (data.goals as any[]) : [];
       setForm({
-        title: data.title_en || "",
-        description: data.description_en || "",
+        titleEn: data.title_en || "",
+        titleAr: data.title_ar || "",
+        descriptionEn: data.description_en || "",
+        descriptionAr: data.description_ar || "",
         type: data.program_type || "",
-        location: data.location_en || "",
+        locationEn: data.location_en || "",
+        locationAr: data.location_ar || "",
         startDate: data.start_date || "",
         endDate: data.end_date || "",
         volunteersNeeded: data.volunteers_needed != null ? String(data.volunteers_needed) : "",
         goals: goals.length ? goals.map((g: any) => String(g)) : [""],
         donationTarget: data.donation_target != null ? String(data.donation_target) : "",
       });
+      setMeta(((data as any).translation_meta as TranslationMeta) || {});
       setExistingImages(data.image ? [data.image] : []);
     })();
   }, [isEdit, id, lang]);
@@ -76,7 +89,9 @@ const NewProgram = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    if (!form.title.trim() || !form.description.trim() || !form.type) {
+    const titleSrc = authorLang === "ar" ? form.titleAr : form.titleEn;
+    const descSrc = authorLang === "ar" ? form.descriptionAr : form.descriptionEn;
+    if (!titleSrc.trim() || !descSrc.trim() || !form.type) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
@@ -88,13 +103,14 @@ const NewProgram = () => {
 
       const payload = {
         owner_id: user.id,
-        title_en: form.title.trim(),
-        title_ar: form.title.trim(),
-        description_en: form.description.trim(),
-        description_ar: form.description.trim(),
+        title_en: form.titleEn.trim(),
+        title_ar: form.titleAr.trim(),
+        description_en: form.descriptionEn.trim(),
+        description_ar: form.descriptionAr.trim(),
         program_type: form.type,
-        location_en: form.location || null,
-        location_ar: form.location || null,
+        location_en: form.locationEn.trim() || null,
+        location_ar: form.locationAr.trim() || null,
+        translation_meta: meta as any,
         start_date: form.startDate || null,
         end_date: form.endDate || null,
         volunteers_needed: parseInt(form.volunteersNeeded) || null,
@@ -109,7 +125,7 @@ const NewProgram = () => {
         if (error) throw error;
         toast.success(lang === "ar" ? "تم تحديث البرنامج!" : "Program updated!");
       } else {
-        const { error } = await supabase.from("programs").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        const { error } = await supabase.from("programs").insert({ ...payload, slug: slugify(form.titleEn || form.titleAr, user.id.slice(0, 6)) });
         if (error) throw error;
         toast.success(lang === "ar" ? "تم نشر البرنامج بنجاح!" : "Program published successfully!");
       }
@@ -133,20 +149,40 @@ const NewProgram = () => {
       </header>
 
       <div className="px-4 py-5 space-y-5">
+        <AuthorLangToggle value={authorLang} onChange={setAuthorLang} />
+
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-organization" />{lang === "ar" ? "صور البرنامج" : "Program Photos"}</label>
           <PhotoPicker files={photos} onChange={setPhotos} max={3} hint={lang === "ar" ? "حتى ٣ صور" : "Up to 3 photos"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-organization" />{lang === "ar" ? "اسم البرنامج *" : "Program Name *"}</label>
-          <input className={inputClass} placeholder={lang === "ar" ? "مثال: حملة تنظيف بحيرة البرلس" : "e.g. Lake Burullus Cleanup Campaign"} value={form.title} onChange={(e) => set("title", e.target.value)} maxLength={100} />
-        </div>
+        <BilingualField
+          fieldEn="title_en" fieldAr="title_ar"
+          labelEn="Program Name" labelAr="اسم البرنامج"
+          required
+          icon={<FileText className="w-3.5 h-3.5 text-role-organization" />}
+          valueEn={form.titleEn} valueAr={form.titleAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, titleEn: en, titleAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="short name of a community or environmental program in Egypt"
+          placeholderEn="e.g. Lake Burullus Cleanup Campaign" placeholderAr="مثال: حملة تنظيف بحيرة البرلس"
+          inputClass={inputClass} labelClass={labelClass}
+        />
 
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-organization" />{lang === "ar" ? "الوصف *" : "Description *"}</label>
-          <textarea className={`${inputClass} min-h-[100px] resize-none`} placeholder={lang === "ar" ? "اوصف البرنامج..." : "Describe the program..."} value={form.description} onChange={(e) => set("description", e.target.value)} maxLength={2000} />
-        </div>
+        <BilingualField
+          fieldEn="description_en" fieldAr="description_ar"
+          labelEn="Description" labelAr="الوصف"
+          required multiline rows={5}
+          icon={<FileText className="w-3.5 h-3.5 text-role-organization" />}
+          valueEn={form.descriptionEn} valueAr={form.descriptionAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, descriptionEn: en, descriptionAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="description of a community or environmental program in Egypt"
+          placeholderEn="Describe the program..." placeholderAr="اوصف البرنامج..."
+          inputClass={inputClass} labelClass={labelClass}
+        />
 
         <div>
           <label className={labelClass}><Tag className="w-3.5 h-3.5 text-role-organization" />{lang === "ar" ? "النوع *" : "Type *"}</label>
@@ -159,10 +195,18 @@ const NewProgram = () => {
           </div>
         </div>
 
-        <div>
-          <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-organization" />{lang === "ar" ? "الموقع" : "Location"}</label>
-          <input className={inputClass} placeholder={lang === "ar" ? "مثال: طنطا، الغربية" : "e.g. Tanta, Gharbia"} value={form.location} onChange={(e) => set("location", e.target.value)} maxLength={100} />
-        </div>
+        <BilingualField
+          fieldEn="location_en" fieldAr="location_ar"
+          labelEn="Location" labelAr="الموقع"
+          icon={<MapPin className="w-3.5 h-3.5 text-role-organization" />}
+          valueEn={form.locationEn} valueAr={form.locationAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, locationEn: en, locationAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="city and governorate name in Egypt"
+          placeholderEn="e.g. Tanta, Gharbia" placeholderAr="مثال: طنطا، الغربية"
+          inputClass={inputClass} labelClass={labelClass}
+        />
 
         <div className="grid grid-cols-2 gap-3">
           <div>
