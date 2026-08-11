@@ -7,6 +7,9 @@ import { slugify, uploadImages } from "@/lib/dashboardForms";
 import { fetchMyProviderId } from "@/lib/providerRecord";
 import { tripTypeForLabel, readableDbError } from "@/lib/listingTaxonomy";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import BilingualField from "@/components/dashboard/BilingualField";
+import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
+import type { Lang, TranslationMeta } from "@/lib/translation";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Clock, Users, DollarSign, Calendar, ListChecks } from "lucide-react";
 import { toast } from "sonner";
 
@@ -26,9 +29,14 @@ const NewTrip = () => {
   const [photos, setPhotos] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
+  const [authorLang, setAuthorLang] = useState<Lang>(lang === "ar" ? "ar" : "en");
+  const [meta, setMeta] = useState<TranslationMeta>({});
+
   const [form, setForm] = useState({
-    title: "",
-    description: "",
+    titleEn: "",
+    titleAr: "",
+    descriptionEn: "",
+    descriptionAr: "",
     tripType: "",
     days: "",
     maxGroup: "",
@@ -48,12 +56,16 @@ const NewTrip = () => {
         toast.error(lang === "ar" ? "تعذر تحميل الرحلة" : "Could not load trip");
         return;
       }
-      const routeParts = (data.route_en || "").split(" → ").map((s: string) => s.trim()).filter(Boolean);
-      const itin = Array.isArray(data.itinerary_en) ? (data.itinerary_en as any[]) : [];
-      const inc = Array.isArray(data.inclusions_en) ? (data.inclusions_en as any[]) : [];
+      const routeParts = ((data.route_en || data.route_ar) || "").split(" → ").map((s: string) => s.trim()).filter(Boolean);
+      const itinSrc = Array.isArray(data.itinerary_en) && data.itinerary_en.length ? data.itinerary_en : data.itinerary_ar;
+      const itin = Array.isArray(itinSrc) ? (itinSrc as any[]) : [];
+      const incSrc = Array.isArray(data.inclusions_en) && data.inclusions_en.length ? data.inclusions_en : data.inclusions_ar;
+      const inc = Array.isArray(incSrc) ? (incSrc as any[]) : [];
       setForm({
-        title: data.title_en || "",
-        description: data.description_en || "",
+        titleEn: data.title_en || "",
+        titleAr: data.title_ar || "",
+        descriptionEn: data.description_en || "",
+        descriptionAr: data.description_ar || "",
         tripType: data.trip_type || "",
         days: data.duration_days != null ? String(data.duration_days) : "",
         maxGroup: data.capacity_max != null ? String(data.capacity_max) : "",
@@ -64,6 +76,7 @@ const NewTrip = () => {
         includes: inc.length ? inc.map((i: any) => String(i)) : [""],
         departureDate: data.date || "",
       });
+      setMeta(((data as any).translation_meta as TranslationMeta) || {});
       setExistingImages(Array.isArray(data.images) ? (data.images as string[]) : data.image ? [data.image] : []);
     })();
   }, [isEdit, id, lang]);
@@ -95,7 +108,9 @@ const NewTrip = () => {
       return;
     }
     const tripTypeValue = tripTypeForLabel(form.tripType);
-    if (!form.title.trim() || !form.description.trim() || !tripTypeValue || !form.price.trim()) {
+    const titleSrc = authorLang === "ar" ? form.titleAr : form.titleEn;
+    const descSrc = authorLang === "ar" ? form.descriptionAr : form.descriptionEn;
+    if (!titleSrc.trim() || !descSrc.trim() || !tripTypeValue || !form.price.trim()) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
@@ -119,21 +134,22 @@ const NewTrip = () => {
 
       const payload = {
         organizer_id: providerId,
-        title_en: form.title.trim(),
-        title_ar: form.title.trim(),
-        description_en: form.description.trim(),
-        description_ar: form.description.trim(),
+        title_en: form.titleEn.trim(),
+        title_ar: form.titleAr.trim(),
+        description_en: form.descriptionEn.trim(),
+        description_ar: form.descriptionAr.trim(),
+        translation_meta: meta as any,
         trip_type: tripTypeValue,
         price: parseInt(form.price) || 0,
         duration_days: parseInt(form.days) || 1,
         capacity_max: parseInt(form.maxGroup) || null,
         date: form.departureDate || null,
-        route_en: route || null,
-        route_ar: route || null,
-        itinerary_en: itinerary,
-        itinerary_ar: itinerary,
-        inclusions_en: inclusions,
-        inclusions_ar: inclusions,
+        route_en: authorLang === "en" ? route || null : null,
+        route_ar: authorLang === "ar" ? route || null : null,
+        itinerary_en: authorLang === "en" ? itinerary : [],
+        itinerary_ar: authorLang === "ar" ? itinerary : [],
+        inclusions_en: authorLang === "en" ? inclusions : [],
+        inclusions_ar: authorLang === "ar" ? inclusions : [],
         image: images[0] || null,
         images,
         status: "published",
@@ -144,7 +160,7 @@ const NewTrip = () => {
         if (error) throw error;
         toast.success(lang === "ar" ? "تم تحديث الرحلة!" : "Trip updated!");
       } else {
-        const { error } = await supabase.from("trips").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        const { error } = await supabase.from("trips").insert({ ...payload, slug: slugify(form.titleEn || form.titleAr, user.id.slice(0, 6)) });
         if (error) throw error;
         toast.success(lang === "ar" ? "تم نشر الرحلة بنجاح!" : "Trip published successfully!");
       }
@@ -171,21 +187,40 @@ const NewTrip = () => {
       </header>
 
       <div className="px-4 py-5 space-y-5">
+        <AuthorLangToggle value={authorLang} onChange={setAuthorLang} />
+
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-trip-organizer" />{lang === "ar" ? "صور الرحلة" : "Trip Photos"}</label>
           <PhotoPicker files={photos} onChange={setPhotos} max={5} hint={lang === "ar" ? "حتى ٥ صور" : "Up to 5 photos"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-trip-organizer" />{lang === "ar" ? "اسم الرحلة *" : "Trip Name *"}</label>
-          <input className={inputClass} placeholder={lang === "ar" ? "مثال: رحلة يوم كامل للإسماعيلية" : "e.g. Full Day Trip to Ismailia"} value={form.title} onChange={(e) => set("title", e.target.value)} maxLength={100} />
-        </div>
+        <BilingualField
+          fieldEn="title_en" fieldAr="title_ar"
+          labelEn="Trip Name" labelAr="اسم الرحلة"
+          required
+          icon={<FileText className="w-3.5 h-3.5 text-role-trip-organizer" />}
+          valueEn={form.titleEn} valueAr={form.titleAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, titleEn: en, titleAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="short listing title for a guided trip in Egypt"
+          placeholderEn="e.g. Full Day Trip to Ismailia" placeholderAr="مثال: رحلة يوم كامل للإسماعيلية"
+          inputClass={inputClass} labelClass={labelClass}
+        />
 
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-trip-organizer" />{lang === "ar" ? "الوصف *" : "Description *"}</label>
-          <textarea className={`${inputClass} min-h-[100px] resize-none`} placeholder={lang === "ar" ? "اوصف الرحلة..." : "Describe the trip..."} value={form.description} onChange={(e) => set("description", e.target.value)} maxLength={2000} />
-          <span className="text-[10px] text-muted-foreground mt-1 block text-right">{form.description.length}/2000</span>
-        </div>
+        <BilingualField
+          fieldEn="description_en" fieldAr="description_ar"
+          labelEn="Description" labelAr="الوصف"
+          required multiline rows={5} maxLength={2000}
+          icon={<FileText className="w-3.5 h-3.5 text-role-trip-organizer" />}
+          valueEn={form.descriptionEn} valueAr={form.descriptionAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, descriptionEn: en, descriptionAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="listing description for a guided trip in Egypt"
+          placeholderEn="Describe the trip..." placeholderAr="اوصف الرحلة..."
+          inputClass={inputClass} labelClass={labelClass}
+        />
 
         <div>
           <label className={labelClass}><Tag className="w-3.5 h-3.5 text-role-trip-organizer" />{lang === "ar" ? "نوع الرحلة *" : "Trip Type *"}</label>

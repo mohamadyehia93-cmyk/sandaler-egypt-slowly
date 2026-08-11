@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, MapPin, ShoppingCart, Leaf, Package, Minus, Plus, X } from "lucide-react";
+import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { toast } from "sonner";
 import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
@@ -133,7 +134,8 @@ const ProductDetail = () => {
         {description && (
           <>
             <h2 className="text-base font-bold text-primary-dark mb-2">{lang === "ar" ? "عن المنتج" : "About This Product"}</h2>
-            <p className="text-sm text-foreground leading-relaxed mb-5">{description}</p>
+            <p className="text-sm text-foreground leading-relaxed mb-1">{description}</p>
+            <MachineTranslatedNote meta={(product as any).translation_meta} field={lang === "ar" ? "description_ar" : "description_en"} className="mb-5" />
           </>
         )}
 

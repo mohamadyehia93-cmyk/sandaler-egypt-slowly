@@ -1,5 +1,6 @@
 import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { ArrowLeft, Share2, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle, ChevronRight, Feather } from "lucide-react";
+import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import WishlistButton from "@/components/WishlistButton";
@@ -372,7 +373,8 @@ const AudioTourDetail = () => {
         {description && (
           <>
             <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "عن الجولة" : "About This Tour"}</h2>
-            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">{description}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+            <MachineTranslatedNote meta={(tour as any)?.translation_meta} field={lang === "ar" ? "description_ar" : "description_en"} className="mb-6" />
           </>
         )}
 

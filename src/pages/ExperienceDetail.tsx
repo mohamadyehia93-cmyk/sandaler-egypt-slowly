@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useMemo } from "react";
 import WishlistButton from "@/components/WishlistButton";
 import { ArrowLeft, Share2, Heart, MessageCircle, MapPin, Bus, Train, ChevronRight, Plus, Minus, X } from "lucide-react";
+import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -688,7 +689,8 @@ const ExperienceDetail = () => {
           <>
             <div className="h-4" />
             <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.about_this_experience")}</h2>
-            <p className="text-[13px] text-muted-foreground leading-relaxed mb-4">{description}</p>
+            <p className="text-[13px] text-muted-foreground leading-relaxed mb-1">{description}</p>
+            <MachineTranslatedNote meta={(exp as any)?.translation_meta} field={lang === "ar" ? "description_ar" : "description_en"} className="mb-6" />
           </>
         )}
       </div>

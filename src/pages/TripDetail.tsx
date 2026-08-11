@@ -1,5 +1,6 @@
 import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { ArrowLeft, Share2, MapPin, Clock, Users, Calendar, MapPinned, Sparkles, Backpack, Navigation2, ShieldCheck, HelpCircle, Mountain, Languages, Award, AlertTriangle, ChevronDown } from "lucide-react";
+import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
@@ -99,7 +100,8 @@ const TripDetail = () => {
         {description && (
           <>
             <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "عن الرحلة" : "About This Trip"}</h2>
-            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">{description}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+            <MachineTranslatedNote meta={(trip as any)?.translation_meta} field={lang === "ar" ? "description_ar" : "description_en"} className="mb-6" />
           </>
         )}
 

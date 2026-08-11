@@ -39,6 +39,7 @@ export type Database = {
           reviews_count: number | null
           slug: string | null
           status: string | null
+          translation_meta: Json
           updated_at: string
         }
         Insert: {
@@ -65,6 +66,7 @@ export type Database = {
           reviews_count?: number | null
           slug?: string | null
           status?: string | null
+          translation_meta?: Json
           updated_at?: string
         }
         Update: {
@@ -91,6 +93,7 @@ export type Database = {
           reviews_count?: number | null
           slug?: string | null
           status?: string | null
+          translation_meta?: Json
           updated_at?: string
         }
         Relationships: [
@@ -182,6 +185,7 @@ export type Database = {
           stops_count: number
           title_ar: string
           title_en: string
+          translation_meta: Json
           updated_at: string
         }
         Insert: {
@@ -209,6 +213,7 @@ export type Database = {
           stops_count?: number
           title_ar: string
           title_en: string
+          translation_meta?: Json
           updated_at?: string
         }
         Update: {
@@ -236,6 +241,7 @@ export type Database = {
           stops_count?: number
           title_ar?: string
           title_en?: string
+          translation_meta?: Json
           updated_at?: string
         }
         Relationships: [
@@ -365,6 +371,7 @@ export type Database = {
           supporters: number | null
           title_ar: string
           title_en: string
+          translation_meta: Json
           updated_at: string
         }
         Insert: {
@@ -394,6 +401,7 @@ export type Database = {
           supporters?: number | null
           title_ar: string
           title_en: string
+          translation_meta?: Json
           updated_at?: string
         }
         Update: {
@@ -423,6 +431,7 @@ export type Database = {
           supporters?: number | null
           title_ar?: string
           title_en?: string
+          translation_meta?: Json
           updated_at?: string
         }
         Relationships: []
@@ -530,6 +539,7 @@ export type Database = {
           status: string
           title_ar: string
           title_en: string
+          translation_meta: Json
           updated_at: string
         }
         Insert: {
@@ -548,6 +558,7 @@ export type Database = {
           status?: string
           title_ar: string
           title_en: string
+          translation_meta?: Json
           updated_at?: string
         }
         Update: {
@@ -566,6 +577,7 @@ export type Database = {
           status?: string
           title_ar?: string
           title_en?: string
+          translation_meta?: Json
           updated_at?: string
         }
         Relationships: []
@@ -691,6 +703,7 @@ export type Database = {
           status: string | null
           title_ar: string | null
           title_en: string | null
+          translation_meta: Json
           updated_at: string
           user_id: string | null
         }
@@ -712,6 +725,7 @@ export type Database = {
           status?: string | null
           title_ar?: string | null
           title_en?: string | null
+          translation_meta?: Json
           updated_at?: string
           user_id?: string | null
         }
@@ -733,6 +747,7 @@ export type Database = {
           status?: string | null
           title_ar?: string | null
           title_en?: string | null
+          translation_meta?: Json
           updated_at?: string
           user_id?: string | null
         }
@@ -823,6 +838,7 @@ export type Database = {
           ticket_url: string | null
           title_ar: string
           title_en: string
+          translation_meta: Json
           updated_at: string
           venue_ar: string | null
           venue_en: string | null
@@ -852,6 +868,7 @@ export type Database = {
           ticket_url?: string | null
           title_ar: string
           title_en: string
+          translation_meta?: Json
           updated_at?: string
           venue_ar?: string | null
           venue_en?: string | null
@@ -881,6 +898,7 @@ export type Database = {
           ticket_url?: string | null
           title_ar?: string
           title_en?: string
+          translation_meta?: Json
           updated_at?: string
           venue_ar?: string | null
           venue_en?: string | null
@@ -1002,6 +1020,7 @@ export type Database = {
           theme: string | null
           title_ar: string
           title_en: string
+          translation_meta: Json
           updated_at: string
           verified: boolean | null
         }
@@ -1035,6 +1054,7 @@ export type Database = {
           theme?: string | null
           title_ar: string
           title_en: string
+          translation_meta?: Json
           updated_at?: string
           verified?: boolean | null
         }
@@ -1068,6 +1088,7 @@ export type Database = {
           theme?: string | null
           title_ar?: string
           title_en?: string
+          translation_meta?: Json
           updated_at?: string
           verified?: boolean | null
         }
@@ -1274,6 +1295,7 @@ export type Database = {
           status: string | null
           title_ar: string
           title_en: string
+          translation_meta: Json
           updated_at: string
         }
         Insert: {
@@ -1295,6 +1317,7 @@ export type Database = {
           status?: string | null
           title_ar: string
           title_en: string
+          translation_meta?: Json
           updated_at?: string
         }
         Update: {
@@ -1316,6 +1339,7 @@ export type Database = {
           status?: string | null
           title_ar?: string
           title_en?: string
+          translation_meta?: Json
           updated_at?: string
         }
         Relationships: []
@@ -1492,6 +1516,7 @@ export type Database = {
           region_id: string | null
           slug: string | null
           status: string | null
+          translation_meta: Json
           updated_at: string
           volunteers_count: number | null
           website: string | null
@@ -1519,6 +1544,7 @@ export type Database = {
           region_id?: string | null
           slug?: string | null
           status?: string | null
+          translation_meta?: Json
           updated_at?: string
           volunteers_count?: number | null
           website?: string | null
@@ -1546,6 +1572,7 @@ export type Database = {
           region_id?: string | null
           slug?: string | null
           status?: string | null
+          translation_meta?: Json
           updated_at?: string
           volunteers_count?: number | null
           website?: string | null
@@ -1723,6 +1750,7 @@ export type Database = {
           tags: string[] | null
           title_ar: string
           title_en: string
+          translation_meta: Json
           updated_at: string
         }
         Insert: {
@@ -1749,6 +1777,7 @@ export type Database = {
           tags?: string[] | null
           title_ar: string
           title_en: string
+          translation_meta?: Json
           updated_at?: string
         }
         Update: {
@@ -1775,6 +1804,7 @@ export type Database = {
           tags?: string[] | null
           title_ar?: string
           title_en?: string
+          translation_meta?: Json
           updated_at?: string
         }
         Relationships: [
@@ -1824,6 +1854,7 @@ export type Database = {
           slug: string | null
           status: string | null
           stock: number | null
+          translation_meta: Json
           updated_at: string
         }
         Insert: {
@@ -1855,6 +1886,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           stock?: number | null
+          translation_meta?: Json
           updated_at?: string
         }
         Update: {
@@ -1886,6 +1918,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           stock?: number | null
+          translation_meta?: Json
           updated_at?: string
         }
         Relationships: [
@@ -1973,6 +2006,7 @@ export type Database = {
           status: string
           title_ar: string
           title_en: string
+          translation_meta: Json
           updated_at: string
           volunteers_needed: number | null
         }
@@ -1995,6 +2029,7 @@ export type Database = {
           status?: string
           title_ar: string
           title_en: string
+          translation_meta?: Json
           updated_at?: string
           volunteers_needed?: number | null
         }
@@ -2017,6 +2052,7 @@ export type Database = {
           status?: string
           title_ar?: string
           title_en?: string
+          translation_meta?: Json
           updated_at?: string
           volunteers_needed?: number | null
         }
@@ -2085,6 +2121,7 @@ export type Database = {
           status: string | null
           tagline_ar: string | null
           tagline_en: string | null
+          translation_meta: Json
           updated_at: string
           user_id: string | null
           verified: boolean | null
@@ -2118,6 +2155,7 @@ export type Database = {
           status?: string | null
           tagline_ar?: string | null
           tagline_en?: string | null
+          translation_meta?: Json
           updated_at?: string
           user_id?: string | null
           verified?: boolean | null
@@ -2151,6 +2189,7 @@ export type Database = {
           status?: string | null
           tagline_ar?: string | null
           tagline_en?: string | null
+          translation_meta?: Json
           updated_at?: string
           user_id?: string | null
           verified?: boolean | null
@@ -2440,6 +2479,7 @@ export type Database = {
           status: string | null
           to_ar: string | null
           to_en: string | null
+          translation_meta: Json
           transport_type: string | null
           updated_at: string
         }
@@ -2469,6 +2509,7 @@ export type Database = {
           status?: string | null
           to_ar?: string | null
           to_en?: string | null
+          translation_meta?: Json
           transport_type?: string | null
           updated_at?: string
         }
@@ -2498,6 +2539,7 @@ export type Database = {
           status?: string | null
           to_ar?: string | null
           to_en?: string | null
+          translation_meta?: Json
           transport_type?: string | null
           updated_at?: string
         }
@@ -2562,6 +2604,7 @@ export type Database = {
           theme: string | null
           title_ar: string
           title_en: string
+          translation_meta: Json
           trip_type: string | null
           updated_at: string
         }
@@ -2601,6 +2644,7 @@ export type Database = {
           theme?: string | null
           title_ar: string
           title_en: string
+          translation_meta?: Json
           trip_type?: string | null
           updated_at?: string
         }
@@ -2640,6 +2684,7 @@ export type Database = {
           theme?: string | null
           title_ar?: string
           title_en?: string
+          translation_meta?: Json
           trip_type?: string | null
           updated_at?: string
         }
@@ -2766,6 +2811,7 @@ export type Database = {
           role_en: string | null
           slug: string | null
           status: string | null
+          translation_meta: Json
           updated_at: string
           user_id: string | null
           years_active: number | null
@@ -2794,6 +2840,7 @@ export type Database = {
           role_en?: string | null
           slug?: string | null
           status?: string | null
+          translation_meta?: Json
           updated_at?: string
           user_id?: string | null
           years_active?: number | null
@@ -2822,6 +2869,7 @@ export type Database = {
           role_en?: string | null
           slug?: string | null
           status?: string | null
+          translation_meta?: Json
           updated_at?: string
           user_id?: string | null
           years_active?: number | null
