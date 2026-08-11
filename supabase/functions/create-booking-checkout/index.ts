@@ -3,10 +3,19 @@ import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
 import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
-  apiVersion: '2024-04-10',
-  httpClient: Stripe.createFetchHttpClient(),
-});
+// Stripe is constructed per-request, not at module load. `new Stripe(undefined)`
+// throws, and a throw during module evaluation takes down the whole function —
+// including the CORS preflight, which then 500s and surfaces in the browser as
+// an opaque network error. Reading the secret inside the handler is the same
+// shape health/index.ts already uses.
+function createStripeClient(): Stripe | null {
+  const secretKey = Deno.env.get('STRIPE_SECRET_KEY');
+  if (!secretKey) return null;
+  return new Stripe(secretKey, {
+    apiVersion: '2024-04-10',
+    httpClient: Stripe.createFetchHttpClient(),
+  });
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -28,29 +37,49 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 
+  // Fail fast and explicitly when the secret is absent, instead of throwing at
+  // import time. The preflight above has already been answered by this point.
+  const stripe = createStripeClient();
+  if (!stripe) {
+    console.error('STRIPE_SECRET_KEY is not set — cannot create a checkout session');
+    return new Response(
+      JSON.stringify({ error: 'Payment processing is not configured' }),
+      { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+    );
+  }
+
   try {
     const body: BookingRequest = await req.json();
     const { experienceId, slotId, guests, totalAmountEgp, visitorEmail, successUrl, cancelUrl } = body;
 
     // Validate redirect origins against an allowlist to prevent post-payment phishing.
     // Only the origin of the client-supplied URLs is honored; final paths are fixed server-side.
+    //
+    // Exact-host match only. The previous suffix match (`.lovable.app` /
+    // `.lovable.dev`) accepted ANY Lovable project, so anyone with a free
+    // project could receive a user immediately after a real payment.
+    // Hosts come from ALLOWED_REDIRECT_HOSTS (comma-separated) so a new
+    // domain does not need a code change; the default is the production host.
+    const DEFAULT_APP_HOST = 'sandal.lovable.app';
+    const allowedHosts = (Deno.env.get('ALLOWED_REDIRECT_HOSTS') ?? DEFAULT_APP_HOST)
+      .split(',')
+      .map((h) => h.trim().toLowerCase())
+      .filter(Boolean);
+
     const isAllowedOrigin = (raw: string): string | null => {
       try {
         const u = new URL(raw);
-        if (u.protocol !== 'https:' && u.hostname !== 'localhost') return null;
-        const host = u.hostname;
-        const allowed =
-          host === 'localhost' ||
-          host === 'sandaler-egypt-slowly.lovable.app' ||
-          host.endsWith('.lovable.app') ||
-          host.endsWith('.lovable.dev');
-        return allowed ? u.origin : null;
+        const host = u.hostname.toLowerCase();
+        // localhost stays usable for development, over http or https.
+        if (host === 'localhost' || host === '127.0.0.1') return u.origin;
+        if (u.protocol !== 'https:') return null;
+        return allowedHosts.includes(host) ? u.origin : null;
       } catch {
         return null;
       }
     };
 
-    const fallbackOrigin = 'https://sandaler-egypt-slowly.lovable.app';
+    const fallbackOrigin = `https://${allowedHosts[0] ?? DEFAULT_APP_HOST}`;
     const successOrigin = isAllowedOrigin(successUrl ?? '') ?? fallbackOrigin;
     const cancelOrigin = isAllowedOrigin(cancelUrl ?? '') ?? fallbackOrigin;
 
