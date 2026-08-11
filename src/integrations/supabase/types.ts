@@ -2794,6 +2794,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_exists: { Args: never; Returns: boolean }
       claim_first_admin: { Args: never; Returns: boolean }
       decrement_slot_spots: {
         Args: { _guests: number; _slot_id: string }
