@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages } from "@/lib/dashboardForms";
 import { fetchMyProviderId } from "@/lib/providerRecord";
+import { tripTypeForLabel, readableDbError } from "@/lib/listingTaxonomy";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Clock, Users, DollarSign, Calendar, ListChecks } from "lucide-react";
 import { toast } from "sonner";
@@ -93,7 +94,8 @@ const NewTrip = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    if (!form.title.trim() || !form.description.trim() || !form.tripType || !form.price.trim()) {
+    const tripTypeValue = tripTypeForLabel(form.tripType);
+    if (!form.title.trim() || !form.description.trim() || !tripTypeValue || !form.price.trim()) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
