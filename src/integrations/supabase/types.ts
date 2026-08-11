@@ -994,6 +994,8 @@ export type Database = {
           provider_id: string | null
           rating: number | null
           region_id: string | null
+          remarks_ar: string | null
+          remarks_en: string | null
           reviews_count: number | null
           slug: string | null
           status: string | null
@@ -1025,6 +1027,8 @@ export type Database = {
           provider_id?: string | null
           rating?: number | null
           region_id?: string | null
+          remarks_ar?: string | null
+          remarks_en?: string | null
           reviews_count?: number | null
           slug?: string | null
           status?: string | null
@@ -1056,6 +1060,8 @@ export type Database = {
           provider_id?: string | null
           rating?: number | null
           region_id?: string | null
+          remarks_ar?: string | null
+          remarks_en?: string | null
           reviews_count?: number | null
           slug?: string | null
           status?: string | null
