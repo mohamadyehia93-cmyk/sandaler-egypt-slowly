@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyProviderId } from "@/lib/providerRecord";
 import { generateSlotDrafts } from "@/lib/experienceSlots";
+import { themeForCategory, readableDbError } from "@/lib/listingTaxonomy";
 
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
@@ -102,8 +103,10 @@ const NewExperience = () => {
     switch (step) {
       case 0: return form.title_en.trim().length > 0 && form.title_ar.trim().length > 0;
       case 1: return form.description_en.trim().length > 0;
-      case 2: return form.category.length > 0;
-      case 4: return form.price.trim().length > 0;
+      // Validate at the category step, not at publish time: only a category that
+      // maps to a stored theme the database accepts may advance.
+      case 2: return !!themeForCategory(form.category);
+      case 4: return form.price.trim().length > 0 && Number(form.price) >= 0;
       default: return true;
     }
   };
