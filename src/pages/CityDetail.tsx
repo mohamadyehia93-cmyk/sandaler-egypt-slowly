@@ -142,7 +142,8 @@ const CityDetail = () => {
     return arr.filter((x) => (seen.has(x.id) ? false : (seen.add(x.id), true)));
   };
 
-  // Map DB rows to sample-data shape and merge with sample fallback
+  // DB ROWS ONLY. Sample listings must never be merged into a city page:
+  // they would appear to visitors as real, bookable offerings in that city.
   const cityExperiences = dedupe([
     ...(dbExperiences as any[]).filter((e) => e.city_id === cityId).map((e) => ({
       id: e.slug || e.id, slug: e.slug,
@@ -150,7 +151,6 @@ const CityDetail = () => {
       image: e.image, price: e.price ?? 0, rating: e.rating ?? 0,
       cityId: e.city_id, regionId: e.region_id,
     })),
-    ...experiences.filter((e) => e.cityId === cityId),
   ]);
   const cityAudioTours = dedupe(
     (dbAudioTours as any[]).filter((a) => a.city_id === cityId).map((a) => ({
@@ -168,7 +168,6 @@ const CityDetail = () => {
       image: a.image, price: a.price_per_night ?? 0, rating: a.rating ?? 0,
       cityId: a.city_id,
     })),
-    ...accommodation.filter((a) => a.cityId === cityId),
   ]);
   const cityProducts = dedupe([
     ...(dbProducts as any[]).filter((p) => p.city_id === cityId).map((p) => ({
@@ -179,7 +178,6 @@ const CityDetail = () => {
       image: p.image, price: p.price ?? 0,
       cityId: p.city_id,
     })),
-    ...products.filter((p) => p.cityId === cityId),
   ]);
   const cityPeople = dedupe([
     ...(dbWhosWho as any[])
@@ -194,7 +192,7 @@ const CityDetail = () => {
       })),
   ]);
 
-  const cityCauses = causes.filter((c) => c.cityId === cityId);
+  const cityCauses = (dbCauses as any[] | undefined)?.filter((c) => c.city_id === cityId) ?? [];
   const cityPosts = dedupe([
     ...(dbPosts as any[]).filter((p) => p.city_id === cityId).map((p) => ({
       id: p.slug || p.id, slug: p.slug,
@@ -204,7 +202,6 @@ const CityDetail = () => {
       image: p.image, readTime: p.read_time_minutes ?? 5,
       cityId: p.city_id, regionId: p.region_id,
     })) as any[],
-    ...latestPosts.filter((p) => (p as any).cityId === cityId),
   ]);
   const cityTransport = dbTransport.filter((tr) => tr.city_id === cityId);
   const cityTrips = dedupe([
@@ -215,7 +212,6 @@ const CityDetail = () => {
       image: tr.image, price: tr.price ?? 0, date: tr.date || "",
       cityId: tr.city_id,
     })),
-    ...trips.filter((tr) => tr.cityId === cityId),
   ]);
   const cityEvents = (dbEvents as any[]).filter((e) => e.city_id === cityId);
 
