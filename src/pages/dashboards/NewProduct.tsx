@@ -94,7 +94,10 @@ const NewProduct = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    if (!form.name.trim() || !form.description.trim() || !form.category || !form.price.trim()) {
+    const nameSrc = authorLang === "ar" ? form.nameAr : form.nameEn;
+    const descSrc = authorLang === "ar" ? form.descriptionAr : form.descriptionEn;
+    // Required-field validation needs ONE language, not both.
+    if (!nameSrc.trim() || !descSrc.trim() || !form.category || !form.price.trim()) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
@@ -115,20 +118,22 @@ const NewProduct = () => {
 
       const payload = {
         seller_id: providerId,
-        name_en: form.name.trim(),
-        name_ar: form.name.trim(),
-        description_en: form.description.trim(),
-        description_ar: form.description.trim(),
-        origin_story_en: originStory || null,
-        origin_story_ar: originStory || null,
+        name_en: form.nameEn.trim(),
+        name_ar: form.nameAr.trim(),
+        description_en: form.descriptionEn.trim(),
+        description_ar: form.descriptionAr.trim(),
+        // composite spec line — stored only in the language it was written in
+        origin_story_en: (authorLang === "en" ? originStory : null) || null,
+        origin_story_ar: (authorLang === "ar" ? originStory : null) || null,
         category: form.category,
         price: parseInt(form.price) || 0,
         stock: parseInt(form.stock) || 0,
-        seller_village_en: form.origin || null,
-        seller_village_ar: form.origin || null,
+        seller_village_en: form.originEn.trim() || null,
+        seller_village_ar: form.originAr.trim() || null,
         image: images[0] || null,
         images,
         status: "published",
+        translation_meta: meta as any,
       };
 
       if (isEdit) {
@@ -136,7 +141,7 @@ const NewProduct = () => {
         if (error) throw error;
         toast.success(lang === "ar" ? "تم تحديث المنتج!" : "Product updated!");
       } else {
-        const { error } = await supabase.from("products").insert({ ...payload, slug: slugify(form.name, user.id.slice(0, 6)) });
+        const { error } = await supabase.from("products").insert({ ...payload, slug: slugify(form.nameEn || form.nameAr, user.id.slice(0, 6)) });
         if (error) throw error;
         toast.success(lang === "ar" ? "تمت إضافة المنتج بنجاح!" : "Product published successfully!");
       }
