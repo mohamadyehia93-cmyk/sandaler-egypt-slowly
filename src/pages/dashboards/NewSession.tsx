@@ -5,6 +5,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify } from "@/lib/dashboardForms";
 import { ArrowLeft, FileText, MapPin, Clock, Users, Calendar, Tag } from "lucide-react";
+import BilingualField from "@/components/dashboard/BilingualField";
+import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
+import type { Lang, TranslationMeta } from "@/lib/translation";
 import { toast } from "sonner";
 
 const sessionTypes = [
@@ -21,15 +24,21 @@ const NewSession = () => {
   const { user } = useAuth();
   const [submitting, setSubmitting] = useState(false);
 
+  const [authorLang, setAuthorLang] = useState<Lang>(lang === "ar" ? "ar" : "en");
+  const [meta, setMeta] = useState<TranslationMeta>({});
+
   const [form, setForm] = useState({
-    title: "",
-    description: "",
+    titleEn: "",
+    titleAr: "",
+    descriptionEn: "",
+    descriptionAr: "",
     type: "",
     date: "",
     time: "",
     duration: "",
     maxSpots: "",
-    location: "",
+    locationEn: "",
+    locationAr: "",
   });
 
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
@@ -39,25 +48,27 @@ const NewSession = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    if (!form.title.trim() || !form.type || !form.date) {
+    const titleSrc = authorLang === "ar" ? form.titleAr : form.titleEn;
+    if (!titleSrc.trim() || !form.type || !form.date) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
     setSubmitting(true);
     try {
-      const description = [form.type, form.description.trim()].filter(Boolean).join(" — ");
+      const withType = (d: string) => [form.type, d.trim()].filter(Boolean).join(" — ");
       const { error } = await supabase.from("meetups").insert({
         organizer_id: user.id,
-        title_en: form.title.trim(),
-        title_ar: form.title.trim(),
-        description_en: description || null,
-        description_ar: description || null,
+        title_en: form.titleEn.trim(),
+        title_ar: form.titleAr.trim(),
+        description_en: form.descriptionEn.trim() ? withType(form.descriptionEn) : null,
+        description_ar: form.descriptionAr.trim() ? withType(form.descriptionAr) : null,
         meetup_date: form.date || null,
         meetup_time: form.time || null,
-        location_en: form.location || null,
-        location_ar: form.location || null,
+        location_en: form.locationEn.trim() || null,
+        location_ar: form.locationAr.trim() || null,
         capacity: parseInt(form.maxSpots) || 20,
-        slug: slugify(form.title, user.id.slice(0, 6)),
+        translation_meta: meta as any,
+        slug: slugify(form.titleEn || form.titleAr, user.id.slice(0, 6)),
         status: "published",
       });
       if (error) throw error;
@@ -81,15 +92,35 @@ const NewSession = () => {
       </header>
 
       <div className="px-4 py-5 space-y-5">
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-whos-who" />{lang === "ar" ? "عنوان الجلسة *" : "Session Title *"}</label>
-          <input className={inputClass} placeholder={lang === "ar" ? "مثال: قصص عن طرق صيد المنزلة" : "e.g. Stories of Manzala fishing routes"} value={form.title} onChange={(e) => set("title", e.target.value)} maxLength={100} />
-        </div>
+        <AuthorLangToggle value={authorLang} onChange={setAuthorLang} />
 
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-whos-who" />{lang === "ar" ? "الوصف" : "Description"}</label>
-          <textarea className={`${inputClass} min-h-[100px] resize-none`} placeholder={lang === "ar" ? "اوصف جلستك..." : "Describe your session..."} value={form.description} onChange={(e) => set("description", e.target.value)} maxLength={1000} />
-        </div>
+        <BilingualField
+          fieldEn="title_en" fieldAr="title_ar"
+          labelEn="Session Title" labelAr="عنوان الجلسة"
+          required
+          icon={<FileText className="w-3.5 h-3.5 text-role-whos-who" />}
+          valueEn={form.titleEn} valueAr={form.titleAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, titleEn: en, titleAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="short title for a community session or storytelling meetup in Egypt"
+          placeholderEn="e.g. Stories of Manzala fishing routes" placeholderAr="مثال: قصص عن طرق صيد المنزلة"
+          inputClass={inputClass} labelClass={labelClass}
+        />
+
+        <BilingualField
+          fieldEn="description_en" fieldAr="description_ar"
+          labelEn="Description" labelAr="الوصف"
+          multiline rows={4}
+          icon={<FileText className="w-3.5 h-3.5 text-role-whos-who" />}
+          valueEn={form.descriptionEn} valueAr={form.descriptionAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, descriptionEn: en, descriptionAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="description of a community session or meetup in Egypt"
+          placeholderEn="Describe your session..." placeholderAr="اوصف جلستك..."
+          inputClass={inputClass} labelClass={labelClass}
+        />
 
         <div>
           <label className={labelClass}><Tag className="w-3.5 h-3.5 text-role-whos-who" />{lang === "ar" ? "نوع الجلسة *" : "Session Type *"}</label>
