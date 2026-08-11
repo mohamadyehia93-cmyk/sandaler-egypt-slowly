@@ -11,6 +11,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import NotFoundView from "@/components/NotFound";
 import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
+import { mapsUrl } from "@/lib/cityCoords";
+
 
 /* ── static fallbacks ────────────────────────────────────────── */
 const fallbackTags = [
