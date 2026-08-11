@@ -20,8 +20,12 @@ const StepReview = ({ form }: Props) => {
     { label: lang === "ar" ? "حجم المجموعة" : "Group Size", value: `${form.groupSizeMin}–${form.groupSizeMax}`, required: false },
     { label: lang === "ar" ? "الأيام" : "Days", value: form.availableDays.join(", "), required: false },
     { label: lang === "ar" ? "سياسة الإلغاء" : "Cancellation", value: form.cancellationPolicy, required: false },
-    { label: lang === "ar" ? "الموقع" : "Location", value: form.location, required: false },
+    { label: lang === "ar" ? "المدينة" : "City", value: form.cityId, required: false },
+    { label: lang === "ar" ? "منطقة أدق" : "Precise area", value: form.location, required: false },
     { label: lang === "ar" ? "نقطة الالتقاء" : "Meeting Point", value: form.meetingPointName, required: false },
+    { label: lang === "ar" ? "الإحداثيات" : "Pin", value: form.meetingPointLat && form.meetingPointLng ? `${form.meetingPointLat}, ${form.meetingPointLng}` : "", required: false },
+    { label: lang === "ar" ? "ملاحظات مهمة" : "Remarks", value: (lang === "ar" ? form.remarks_ar || form.remarks_en : form.remarks_en || form.remarks_ar).slice(0, 60), required: false },
+
   ];
 
   return (
