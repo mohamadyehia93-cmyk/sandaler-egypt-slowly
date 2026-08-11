@@ -1,12 +1,13 @@
 import { writeFileSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { DEFAULT_SITE_URL } from "../site.config.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const PUBLIC = join(ROOT, "public");
-// TODO: switch to "https://sandal.eg" once the domain is registered (Sprint 3)
-const BASE_URL = "https://sandaler-egypt-slowly.lovable.app";
+// Single source of truth: VITE_SITE_URL, else site.config.mjs fallback.
+const BASE_URL = (process.env.VITE_SITE_URL || DEFAULT_SITE_URL).replace(/\/+$/, "");
 
 const REGION_SLUGS = [
   "nile-delta",
@@ -31,14 +32,13 @@ const staticRoutes = [
   })),
 ];
 
-const today = new Date().toISOString().split("T")[0];
-
+// No <lastmod>: there is no page-specific modification timestamp available here,
+// and generation time is not a valid substitute.
 const urlEntries = staticRoutes
   .map(
     ({ path, changefreq, priority }) => `
   <url>
     <loc>${BASE_URL}${path}</loc>
-    <lastmod>${today}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
     <xhtml:link rel="alternate" hreflang="en" href="${BASE_URL}${path}"/>

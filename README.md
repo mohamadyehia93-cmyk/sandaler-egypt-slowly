@@ -162,7 +162,7 @@ Sandal supports 9 distinct user roles, each with its own dashboard and permissio
 
 ## Deployment
 
-Currently deployed via Lovable at: https://sandaler-egypt-slowly.lovable.app
+Currently deployed via Lovable at: https://sandal.lovable.app
 
 Lovable should be configured to push to `lovable-staging`, not `main`.
 
