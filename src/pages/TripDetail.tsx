@@ -1,5 +1,5 @@
 import MessageOwnerButton from "@/components/MessageOwnerButton";
-import { ArrowLeft, Share2, MapPin, Clock, Users, Calendar, MapPinned, Sparkles, Backpack, Navigation2, ShieldCheck, HelpCircle, Mountain, Languages, Award, AlertTriangle, ChevronDown } from "lucide-react";
+import { ArrowLeft, Share2, MapPin, Clock, Users, Calendar, MapPinned, Navigation2, Mountain, Award } from "lucide-react";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
@@ -16,7 +16,6 @@ const TripDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const { data: trip, isLoading } = useQuery({
     queryKey: ["trip", id],
