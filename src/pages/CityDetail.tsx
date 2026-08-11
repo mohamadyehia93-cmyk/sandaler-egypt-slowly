@@ -3,8 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
-import { cityData, experiences, audioTours, accommodation, products, causes, latestPosts, trips } from "@/lib/sampleData";
-import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents } from "@/hooks/useListings";
+import { cityData } from "@/lib/sampleData";
+import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents, useCauses } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
 import CausesSection from "@/components/CausesSection";
@@ -14,7 +14,17 @@ import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
 
-type PostItem = (typeof latestPosts)[number];
+type PostItem = {
+  id: string;
+  slug?: string;
+  title: { en: string; ar: string };
+  category: { en: string; ar: string };
+  author: { en: string; ar: string };
+  image: string;
+  readTime: number;
+  cityId?: string;
+  regionId?: string;
+};
 
 const CityPostsSection = ({
   posts,
@@ -131,6 +141,7 @@ const CityDetail = () => {
   const { data: dbWhosWho = [], isLoading: l7 } = useWhosWho();
   const { data: dbPosts = [], isLoading: l8 } = usePosts();
   const { data: dbEvents = [] } = useEvents();
+  const { data: dbCauses = [] } = useCauses();
   const isLoading = l1 || l2 || l3 || l4 || l5 || l6 || l7 || l8;
 
   const city = cityData[cityId || ""];
@@ -142,7 +153,8 @@ const CityDetail = () => {
     return arr.filter((x) => (seen.has(x.id) ? false : (seen.add(x.id), true)));
   };
 
-  // Map DB rows to sample-data shape and merge with sample fallback
+  // DB ROWS ONLY. Sample listings must never be merged into a city page:
+  // they would appear to visitors as real, bookable offerings in that city.
   const cityExperiences = dedupe([
     ...(dbExperiences as any[]).filter((e) => e.city_id === cityId).map((e) => ({
       id: e.slug || e.id, slug: e.slug,
@@ -150,7 +162,6 @@ const CityDetail = () => {
       image: e.image, price: e.price ?? 0, rating: e.rating ?? 0,
       cityId: e.city_id, regionId: e.region_id,
     })),
-    ...experiences.filter((e) => e.cityId === cityId),
   ]);
   const cityAudioTours = dedupe(
     (dbAudioTours as any[]).filter((a) => a.city_id === cityId).map((a) => ({
@@ -168,7 +179,6 @@ const CityDetail = () => {
       image: a.image, price: a.price_per_night ?? 0, rating: a.rating ?? 0,
       cityId: a.city_id,
     })),
-    ...accommodation.filter((a) => a.cityId === cityId),
   ]);
   const cityProducts = dedupe([
     ...(dbProducts as any[]).filter((p) => p.city_id === cityId).map((p) => ({
@@ -179,7 +189,6 @@ const CityDetail = () => {
       image: p.image, price: p.price ?? 0,
       cityId: p.city_id,
     })),
-    ...products.filter((p) => p.cityId === cityId),
   ]);
   const cityPeople = dedupe([
     ...(dbWhosWho as any[])
@@ -194,7 +203,7 @@ const CityDetail = () => {
       })),
   ]);
 
-  const cityCauses = causes.filter((c) => c.cityId === cityId);
+  const cityCauses = (dbCauses as any[]).filter((c) => c.city_id === cityId);
   const cityPosts = dedupe([
     ...(dbPosts as any[]).filter((p) => p.city_id === cityId).map((p) => ({
       id: p.slug || p.id, slug: p.slug,
@@ -204,7 +213,6 @@ const CityDetail = () => {
       image: p.image, readTime: p.read_time_minutes ?? 5,
       cityId: p.city_id, regionId: p.region_id,
     })) as any[],
-    ...latestPosts.filter((p) => (p as any).cityId === cityId),
   ]);
   const cityTransport = dbTransport.filter((tr) => tr.city_id === cityId);
   const cityTrips = dedupe([
@@ -215,7 +223,6 @@ const CityDetail = () => {
       image: tr.image, price: tr.price ?? 0, date: tr.date || "",
       cityId: tr.city_id,
     })),
-    ...trips.filter((tr) => tr.cityId === cityId),
   ]);
   const cityEvents = (dbEvents as any[]).filter((e) => e.city_id === cityId);
 

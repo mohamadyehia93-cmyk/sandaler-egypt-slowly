@@ -8,7 +8,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
-import DetailTestimonials from "@/components/DetailTestimonials";
 import TourStopsMap from "@/components/TourStopsMap";
 import TurnByTurnGuidance from "@/components/TurnByTurnGuidance";
 import { Slider } from "@/components/ui/slider";
@@ -475,7 +474,6 @@ const AudioTourDetail = () => {
           })}
         </div>
 
-        <DetailTestimonials />
       </div>
 
       {/* Audio Player — only when this tour has its own narration */}

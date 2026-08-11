@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useMemo } from "react";
 import WishlistButton from "@/components/WishlistButton";
-import { ArrowLeft, Share2, Heart, MessageCircle, MapPin, Bus, Train, ChevronRight, Plus, Minus, X } from "lucide-react";
+import { ArrowLeft, Share2, MessageCircle, Bus, Train, Plus, Minus } from "lucide-react";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -13,16 +13,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import NotFoundView from "@/components/NotFound";
 import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
 import { mapsUrl } from "@/lib/cityCoords";
-
-
-/* ── static fallbacks ────────────────────────────────────────── */
-const fallbackTags = [
-  { label: "Nature", bg: "bg-secondary", border: "border-primary/40", text: "text-primary-dark" },
-  { label: "Lake Manzala", bg: "bg-muted", border: "border-border", text: "text-muted-foreground" },
-  { label: "4 hours", bg: "bg-muted", border: "border-border", text: "text-muted-foreground" },
-  { label: "Women-friendly", bg: "bg-success/10", border: "border-success/40", text: "text-success" },
-  { label: "Seasonal: Oct–Mar", bg: "bg-warning/10", border: "border-warning/40", text: "text-warning" },
-];
 
 /* ── helpers ──────────────────────────────────────────────────── */
 const StarRow = ({ count, size = 13 }: { count: number; size?: number }) => (
@@ -46,30 +36,21 @@ const formatSlotDate = (dateStr: string) => {
   return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 };
 
-/* ═══════════════════════════════════════════════════════════════ */
+/**
+ * INTEGRITY RULE for this page: every block below must be backed by a real column
+ * on THIS row or a real query scoped to this row. No sample reviews, no invented
+ * itinerary/policy/impact figures, no payment-protection claims (there is no
+ * in-app payment processing — bookings are unpaid requests).
+ */
 const ExperienceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { lang } = useLanguage();
+  const ar = lang === "ar";
   const reviewsRef = useRef<HTMLDivElement>(null);
 
-  const fallbackSteps = [
-    { num: 1, title: t("experience.step_1_title"), desc: t("experience.step_1_desc"), color: "bg-secondary" },
-    { num: 2, title: t("experience.step_2_title"), desc: t("experience.step_2_desc"), color: "bg-secondary" },
-    { num: 3, title: t("experience.step_3_title"), desc: t("experience.step_3_desc"), color: "bg-warning/30" },
-  ];
-
-  const thingsToKnow = [
-    { icon: "👥", label: t("experience.guest_requirements"), desc: t("experience.things_to_know_descriptions_guest_requirements") },
-    { icon: "🥾", label: t("experience.activity_level"), desc: t("experience.things_to_know_descriptions_activity_level") },
-    { icon: "🎒", label: t("experience.what_to_bring"), desc: t("experience.things_to_know_descriptions_what_to_bring") },
-    { icon: "📵", label: t("experience.offline_friendly"), desc: t("experience.things_to_know_descriptions_offline_friendly") },
-    { icon: "🤝", label: t("experience.rural_etiquette"), desc: t("experience.things_to_know_descriptions_rural_etiquette") },
-    { icon: "❌", label: t("experience.cancellation_policy"), desc: t("experience.things_to_know_descriptions_cancellation") },
-  ];
-
-    const [selectedSlot, setSelectedSlot] = useState(0);
+  const [selectedSlot, setSelectedSlot] = useState(0);
   const [guests, setGuests] = useState(2);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetSlot, setSheetSlot] = useState(0);
@@ -94,12 +75,20 @@ const ExperienceDetail = () => {
     enabled: !!providerId,
   });
 
-  // ── Fetch reviews ──
+  // ── Fetch reviews for THIS experience only ──
   const expId = exp?.id;
   const { data: dbReviews } = useQuery({
     queryKey: ["experience-reviews", expId],
     queryFn: async () => {
-      const { data, error } = await (supabase as any).from("experience_reviews").select("*").eq("experience_id", expId).order("created_at", { ascending: false }).limit(10);
+      const { data, error } = await (supabase as any)
+        .from("experience_reviews")
+        .select("*")
+        .eq("experience_id", expId)
+        // Only reviews written by a real signed-in account. Seeded/sample rows
+        // (user_id IS NULL) must never appear as social proof.
+        .not("user_id", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(10);
       if (error) throw error;
       return data as any[];
     },
@@ -110,7 +99,13 @@ const ExperienceDetail = () => {
   const { data: dbSlots } = useQuery({
     queryKey: ["experience-slots", expId],
     queryFn: async () => {
-      const { data, error } = await (supabase as any).from("experience_slots").select("*").eq("experience_id", expId).order("slot_date", { ascending: true }).order("start_time", { ascending: true });
+      const { data, error } = await (supabase as any)
+        .from("experience_slots")
+        .select("*")
+        .eq("experience_id", expId)
+        .gte("slot_date", new Date().toISOString().slice(0, 10))
+        .order("slot_date", { ascending: true })
+        .order("start_time", { ascending: true });
       if (error) throw error;
       return data as any[];
     },
@@ -121,22 +116,31 @@ const ExperienceDetail = () => {
   const { data: relatedExps } = useQuery({
     queryKey: ["related-experiences", exp?.region_id, expId],
     queryFn: async () => {
-      const { data, error } = await supabase.from("experiences").select("id, slug, title_en, title_ar, price, rating, duration_minutes, theme, image").eq("region_id", exp!.region_id).neq("id", expId!).limit(5);
+      const { data, error } = await supabase
+        .from("experiences")
+        .select("id, slug, title_en, title_ar, price, rating, duration_minutes, theme, image")
+        .eq("region_id", exp!.region_id)
+        .neq("id", expId!)
+        .limit(5);
       if (error) throw error;
       return data;
     },
     enabled: !!exp?.region_id && !!expId,
   });
 
-  // ── Fetch transport (same region) ──
-  const { data: regionTransport } = useQuery({
-    queryKey: ["region-transport", exp?.region_id],
+  // ── Transport that genuinely serves THIS listing's city ──
+  const { data: cityTransport } = useQuery({
+    queryKey: ["city-transport", exp?.city_id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("transport").select("id, name_en, name_ar, from_en, from_ar, to_en, to_ar, price, duration, transport_type").eq("region_id", exp!.region_id).limit(4);
+      const { data, error } = await supabase
+        .from("transport")
+        .select("id, name_en, name_ar, from_en, from_ar, to_en, to_ar, price, duration, transport_type")
+        .eq("city_id", exp!.city_id)
+        .limit(4);
       if (error) throw error;
       return data;
     },
-    enabled: !!exp?.region_id,
+    enabled: !!exp?.city_id,
   });
 
   // ── Fetch region name ──
@@ -151,115 +155,93 @@ const ExperienceDetail = () => {
   });
 
   // ── Derived values ──
-  const title = exp ? (lang === "ar" ? exp.title_ar : exp.title_en) : "";
-  const description = exp ? (lang === "ar" ? (exp.description_ar || exp.description_en) : exp.description_en) : "";
+  const title = exp ? (ar ? exp.title_ar : exp.title_en) : "";
+  const description = exp ? (ar ? (exp.description_ar || exp.description_en) : (exp.description_en || exp.description_ar)) : "";
   const hostName = provider
-    ? (lang === "ar" ? provider.name_ar : provider.name_en)
-    : exp ? (lang === "ar" ? (exp.host_name_ar || exp.host_name_en) : exp.host_name_en) : "";
-  const regionName = region ? (lang === "ar" ? region.name_ar : region.name_en) : "Nile Delta";
+    ? (ar ? provider.name_ar : provider.name_en)
+    : exp ? (ar ? (exp.host_name_ar || exp.host_name_en) : exp.host_name_en) : "";
+  const regionName = region ? (ar ? region.name_ar : region.name_en) : "";
 
+  // Real slots only — never a sample calendar.
   const slots = useMemo(() => {
-    if (dbSlots && dbSlots.length > 0) {
-      return dbSlots.map((s: any) => ({
-        id: s.id, // UUID — required by /booking page to drive Stripe checkout
-        date: formatSlotDate(s.slot_date),
-        time: `${formatTime(s.start_time)} – ${formatTime(s.end_time)}`,
-        price: s.price,
-        spots: s.spots_available,
-        discounted: s.is_discounted,
-        low: s.spots_available <= 3,
-        rawDate: s.slot_date,
-        rawStart: s.start_time,
-        rawEnd: s.end_time,
-      }));
-    }
-    return [
-      { date: "Fri, Dec 26", time: "6:00 – 10:00 AM", price: 150, spots: 12, discounted: false, low: false },
-      { date: "Fri, Dec 26", time: "3:00 – 7:00 PM", price: 120, spots: 14, discounted: true, low: false },
-      { date: "Sat, Dec 27", time: "6:00 – 10:00 AM", price: 150, spots: 2, discounted: false, low: true },
-    ];
+    if (!dbSlots) return [];
+    return dbSlots.map((s: any) => ({
+      id: s.id,
+      date: formatSlotDate(s.slot_date),
+      time: `${formatTime(s.start_time)} – ${formatTime(s.end_time)}`,
+      price: s.price,
+      spots: s.spots_available,
+      discounted: s.is_discounted,
+      low: s.spots_available <= 3,
+      rawDate: s.slot_date,
+    }));
   }, [dbSlots]);
 
+  // Real reviews only. The "verified attendee" badge is intentionally NOT rendered:
+  // nothing in the schema proves the reviewer actually attended this experience.
   const reviews = useMemo(() => {
-    if (dbReviews && dbReviews.length > 0) {
-      return dbReviews.map((r: any) => ({
-        initials: r.reviewer_initials || r.reviewer_name?.slice(0, 2)?.toUpperCase() || "??",
-        name: r.reviewer_name,
-        city: r.reviewer_city || "",
-        rating: r.rating,
-        text: r.review_text || "",
-        bg: `bg-[${r.reviewer_avatar_bg || "#9FE1CB"}]`,
-        verified: r.verified_attendee,
-      }));
-    }
-    return [
-      { initials: "SH", name: "Sharif", city: "Cairo · solo", rating: 4, text: "Fun way to connect with nature and hear real local stories about the lake...", bg: "bg-secondary", verified: true },
-      { initials: "NA", name: "Nadia", city: "Alexandria · family", rating: 5, text: "Hassan was incredibly patient with our kids. The flamingos were breathtaking...", bg: "bg-secondary", verified: true },
-    ];
+    if (!dbReviews) return [];
+    return dbReviews.map((r: any) => ({
+      initials: r.reviewer_initials || r.reviewer_name?.slice(0, 2)?.toUpperCase() || "??",
+      name: r.reviewer_name,
+      city: r.reviewer_city || "",
+      rating: r.rating,
+      text: r.review_text || "",
+      bg: r.reviewer_avatar_bg || "#9FE1CB",
+    }));
   }, [dbReviews]);
 
-  const hostInitials = provider
-    ? (provider.name_en || "").split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase()
-    : (exp?.host_name_en || "HM").split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase();
+  const hostInitials = (provider?.name_en || exp?.host_name_en || "")
+    .split(" ")
+    .map((w: string) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   const hostSubtitle = provider
-    ? t("experience.host_subtitle", {
-        role: provider.role === "service-provider" ? t("experience.host_role_service_provider") : provider.role,
-        city: provider.city_en || "",
-        years: provider.years_active || 0,
-      })
-    : t("experience.host_default_subtitle");
+    ? [provider.city_en, provider.years_active ? `${provider.years_active} ${ar ? "سنوات خبرة" : "years active"}` : null]
+        .filter(Boolean)
+        .join(" · ")
+    : "";
 
+  // Only facts stored on the provider record.
   const hostCredentials = provider
-    ? [
-        provider.bio_en ? provider.bio_en.split(".")[0] : null,
+    ? ([
+        ar ? provider.bio_ar || provider.bio_en : provider.bio_en || provider.bio_ar,
         provider.languages ? t("experience.speaks", { languages: provider.languages }) : null,
-        t("experience.on_sandal_since", { year: new Date(provider.created_at).getFullYear(), count: provider.review_count || 0 }),
-        provider.specialties && Array.isArray(provider.specialties)
+        provider.specialties && Array.isArray(provider.specialties) && provider.specialties.length
           ? t("experience.specializes_in", { topics: (provider.specialties as any[]).map((s: any) => s.en || s).join(", ") })
           : null,
-      ].filter(Boolean) as string[]
-    : [
-        t("experience.host_fallback_born_raised"),
-        t("experience.host_fallback_speaks"),
-        t("experience.host_fallback_on_sandal"),
-        t("experience.host_fallback_specializes"),
-      ];
+      ].filter(Boolean) as string[])
+    : [];
 
-  const unitPrice = slots[selectedSlot]?.price ?? exp?.price ?? 150;
-  const platformFee = Math.round(unitPrice * guests * 0.1);
-  const total = unitPrice * guests + platformFee;
-  const hostShare = Math.round(unitPrice * 0.85);
+  const unitPrice = slots[selectedSlot]?.price ?? exp?.price ?? 0;
+  const subtotal = unitPrice * guests;
 
   const scrollToReviews = useCallback(() => {
     reviewsRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  // ── Build tags from DB data ──
+  // Tags come only from stored columns.
   const tags = useMemo(() => {
-    if (!exp) return fallbackTags;
-    const result = [];
-    if (exp.theme) result.push({ label: exp.theme, bg: "bg-secondary", border: "border-primary/40", text: "text-primary-dark" });
-    if (exp.meeting_point_name) result.push({ label: exp.meeting_point_name, bg: "bg-muted", border: "border-border", text: "text-muted-foreground" });
+    if (!exp) return [];
+    const result: { label: string }[] = [];
+    if (exp.theme) result.push({ label: exp.theme });
+    if (exp.meeting_point_name) result.push({ label: exp.meeting_point_name });
     if (exp.duration_minutes) {
       const hrs = Math.round(exp.duration_minutes / 60);
-      result.push({ label: `${hrs} hour${hrs > 1 ? "s" : ""}`, bg: "bg-muted", border: "border-border", text: "text-muted-foreground" });
+      result.push({ label: `${hrs} ${ar ? "ساعة" : hrs > 1 ? "hours" : "hour"}` });
     }
-    if (result.length === 0) return fallbackTags;
+    if (exp.capacity_max) result.push({ label: `${ar ? "حتى" : "up to"} ${exp.capacity_max} ${ar ? "ضيوف" : "guests"}` });
     return result;
-  }, [exp]);
+  }, [exp, ar]);
 
-  // Group sheet slots by date for the bottom sheet
   const sheetSlotGroups = useMemo(() => {
-    const groups: { label: string; slots: typeof slots }[] = [];
+    const groups: { label: string; slots: any[] }[] = [];
     slots.forEach((s, i) => {
-      const dateLabel = s.date;
-      const lastGroup = groups[groups.length - 1];
-      if (lastGroup && lastGroup.label === dateLabel) {
-        lastGroup.slots.push({ ...s, _idx: i } as any);
-      } else {
-        groups.push({ label: dateLabel, slots: [{ ...s, _idx: i } as any] });
-      }
+      const last = groups[groups.length - 1];
+      if (last && last.label === s.date) last.slots.push({ ...s, _idx: i });
+      else groups.push({ label: s.date, slots: [{ ...s, _idx: i }] });
     });
     return groups;
   }, [slots]);
@@ -275,21 +257,23 @@ const ExperienceDetail = () => {
     );
   }
 
-  if (!exp) {
-    return <NotFoundView context="experience" />;
-  }
+  if (!exp) return <NotFoundView context="experience" />;
 
   const photos = exp.images?.length ? exp.images : [exp.image || "/placeholder.svg"];
+  const remarks = ar ? (exp as any).remarks_ar || (exp as any).remarks_en : (exp as any).remarks_en || (exp as any).remarks_ar;
+  const hasRating = (exp.rating ?? 0) > 0 && reviews.length > 0;
 
   return (
     <div className="min-h-screen bg-background pb-[140px]">
 
-      {/* ── 1. TOP NAV ─────────────────────────────────────────── */}
+      {/* ── TOP NAV ─────────────────────────────────────────────── */}
       <div className="h-11 flex items-center justify-between px-4 bg-card sticky top-0 z-40">
         <button onClick={() => navigate(-1)} className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center">
           <ArrowLeft className="w-4 h-4 text-foreground" />
         </button>
-        <span className="text-xs text-muted-foreground font-normal">{regionName} · {t("experience.experiences_subtitle")}</span>
+        <span className="text-xs text-muted-foreground font-normal truncate max-w-[55%]">
+          {[regionName, t("experience.experiences_subtitle")].filter(Boolean).join(" · ")}
+        </span>
         <div className="flex gap-2">
           <button className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center">
             <Share2 className="w-3.5 h-3.5 text-foreground" />
@@ -302,155 +286,61 @@ const ExperienceDetail = () => {
         </div>
       </div>
 
-      {/* ── 2. HERO PHOTO ──────────────────────────────────────── */}
+      {/* ── HERO PHOTO ──────────────────────────────────────────── */}
       <div className="relative h-[260px]">
         <img src={photos[0]} alt={title} className="w-full h-full object-cover" />
         {photos.length > 1 && (
-          <span className="absolute bottom-2.5 right-2.5 bg-black/55 text-primary-foreground text-[11px] px-2 py-0.5 rounded-md">{t("experience.more_photos", { count: photos.length - 1 })}</span>
-        )}
-        {exp.verified && (
-          <span className="absolute top-2.5 left-2.5 bg-secondary border border-primary/40 text-primary-dark text-[9px] font-medium px-2 py-0.5 rounded-full">✓ {t("common.ambassador_verified")}</span>
+          <span className="absolute bottom-2.5 right-2.5 bg-black/55 text-primary-foreground text-[11px] px-2 py-0.5 rounded-md">
+            {t("experience.more_photos", { count: photos.length - 1 })}
+          </span>
         )}
       </div>
 
-      {/* ── 3. CONTENT ─────────────────────────────────────────── */}
       <div className="px-4">
 
-        {/* 3A TITLE + TAGS + RATING */}
+        {/* ── TITLE + TAGS + (real) RATING ───────────────────────── */}
         <div className="pt-3.5">
           <h1 className="text-[17px] font-bold text-foreground leading-[1.35] mb-2">{title}</h1>
-          <div className="flex gap-1.5 overflow-x-auto hide-scrollbar mb-2.5">
-            {tags.map((tag, i) => (
-              <span key={i} className={`flex-shrink-0 px-2.5 py-[3px] rounded-full text-[10px] font-medium border ${tag.bg} ${tag.border} ${tag.text}`}>{tag.label}</span>
-            ))}
-          </div>
-          <div className="flex items-center gap-1.5 flex-wrap mb-2.5">
-            <StarRow count={exp.rating || 0} />
-            <span className="text-[13px] font-semibold text-foreground">{exp.rating || 0}</span>
-            <button onClick={scrollToReviews} className="text-xs text-primary underline">{t("experience.reviews_count", { count: exp.reviews_count || reviews.length })}</button>
-            <span className="bg-success/10 border border-success/40 text-success text-[10px] font-medium px-2 py-0.5 rounded-full">{t("common.verified_attendees", { count: reviews.filter(r => r.verified).length })}</span>
-          </div>
-
-          {/* AI summary */}
-          {reviews.length > 0 && (
-            <div className="bg-secondary border-l-[3px] border-l-primary rounded-r-lg p-2.5 mb-2.5">
-              <p className="text-[9px] font-medium text-primary mb-1">{t("experience.ai_summary", { count: exp.reviews_count || reviews.length })}</p>
-              <p className="text-[11px] italic text-primary-dark leading-[1.55]">
-                {t("experience.ai_summary_template", { name: hostName?.split(" ")[0] || t("experience.default_host_name") })}
-              </p>
+          <MachineTranslatedNote meta={(exp as any)?.translation_meta} field={ar ? "title_ar" : "title_en"} className="mb-1.5" />
+          {tags.length > 0 && (
+            <div className="flex gap-1.5 overflow-x-auto hide-scrollbar mb-2.5">
+              {tags.map((tag, i) => (
+                <span key={i} className="flex-shrink-0 px-2.5 py-[3px] rounded-full text-[10px] font-medium border bg-muted border-border text-muted-foreground">
+                  {tag.label}
+                </span>
+              ))}
+            </div>
+          )}
+          {hasRating && (
+            <div className="flex items-center gap-1.5 flex-wrap mb-2.5">
+              <StarRow count={exp.rating || 0} />
+              <span className="text-[13px] font-semibold text-foreground">{exp.rating}</span>
+              <button onClick={scrollToReviews} className="text-xs text-primary underline">
+                {t("experience.reviews_count", { count: reviews.length })}
+              </button>
             </div>
           )}
         </div>
 
-        <Divider />
-
-        {/* 3C HOST CARD */}
-        <div>
-          <div className="flex items-start gap-3 mb-2">
-            {provider?.avatar ? (
-              <img src={provider.avatar} alt={hostName} className="w-11 h-11 rounded-full object-cover flex-shrink-0" />
-            ) : (
-              <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-[15px] font-semibold flex-shrink-0">{hostInitials}</div>
-            )}
+        {/* ── DESCRIPTION (the listing's own words, near the top) ── */}
+        {description && (
+          <>
+            <Divider />
             <div>
-              <p className="text-sm font-semibold text-foreground">{hostName}</p>
-              <p className="text-[11px] text-muted-foreground">{hostSubtitle}</p>
+              <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.about_this_experience")}</h2>
+              <p className="text-[13px] text-muted-foreground leading-relaxed whitespace-pre-line">{description}</p>
+              <MachineTranslatedNote meta={(exp as any)?.translation_meta} field={ar ? "description_ar" : "description_en"} className="mt-1" />
             </div>
-          </div>
-          <div className="bg-muted rounded-lg p-2.5 mb-2 space-y-1">
-            {hostCredentials.map((c, i) => (
-              <div key={i} className="flex items-start gap-1.5">
-                <span className="w-[5px] h-[5px] rounded-full bg-primary mt-1 flex-shrink-0" />
-                <span className="text-[11px] text-muted-foreground">{c}</span>
-              </div>
-            ))}
-          </div>
-          <button
-            onClick={() => navigate(`/inbox?personId=${providerId || exp.provider_id || ""}&kind=provider`)}
-            className="w-full h-10 rounded-lg border border-primary text-primary text-xs font-semibold mb-1.5"
-          >
-            {t("experience.message_host", { name: hostName?.split(" ")[0] || t("experience.default_host_name") })}
-          </button>
-          <div className="flex items-start gap-1.5">
-            <span className="text-xs flex-shrink-0">🔒</span>
-            <p className="text-[10px] text-muted-foreground leading-[1.5]">{t("experience.always_book_through_sandal")}</p>
-          </div>
-        </div>
+          </>
+        )}
 
+        {/* ── PRICE + GUESTS ─────────────────────────────────────── */}
         <Divider />
-
-        {/* 3D REVENUE TRANSPARENCY */}
-        <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.where_your_money_goes")}</h2>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { n: String(hostShare), l: t("experience.egp_to", { name: hostName?.split(" ")[0] || t("experience.default_host_name") }) },
-              { n: String(unitPrice - hostShare), l: t("experience.platform_fee") },
-              { n: "0", l: t("experience.to_intermediary") },
-            ].map((c, i) => (
-              <div key={i} className="border border-border rounded-lg p-2.5 text-center bg-card">
-                <p className="text-xl font-bold text-primary">{c.n}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{c.l}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <Divider />
-
-        {/* 3E WHAT YOU'LL DO — Timeline */}
-        <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2.5">{t("experience.what_youll_do")}</h2>
-          <div className="space-y-0">
-            {fallbackSteps.map((s, i) => (
-              <div key={s.num} className="flex gap-2.5 relative pb-2">
-                {i < fallbackSteps.length - 1 && (
-                  <div className="absolute left-[13px] top-[36px] w-[1.5px] bg-primary/30" style={{ height: "calc(100% - 8px)" }} />
-                )}
-                <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-[11px] font-semibold flex-shrink-0 z-10">{s.num}</div>
-                <div className={`w-12 h-12 rounded-lg ${s.color} flex-shrink-0`} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-foreground mb-0.5">{s.title}</p>
-                  <p className="text-[11px] text-muted-foreground leading-[1.45]">{s.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <Divider />
-
-        {/* 3F UPCOMING AVAILABILITY */}
-        <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.upcoming_availability")}</h2>
-          <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
-            {slots.map((s, i) => (
-              <button
-                key={i}
-                onClick={() => setSelectedSlot(i)}
-                className={`flex-shrink-0 w-[158px] rounded-[10px] p-2.5 border text-left transition-colors ${
-                  selectedSlot === i ? "border-primary bg-secondary" : "border-border bg-card"
-                }`}
-              >
-                <p className={`text-xs font-semibold ${selectedSlot === i ? "text-primary-dark" : "text-foreground"}`}>{s.date}</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">{s.time}</p>
-                <div className="flex justify-between items-center mt-1.5">
-                  <span className={`text-[11px] font-semibold ${s.discounted ? "text-warning" : "text-primary"}`}>{s.price} {t("common.egp")}</span>
-                  <span className={`text-[10px] ${s.low ? "text-destructive font-medium" : "text-muted-foreground"}`}>{s.spots} {t("experience.spots")}</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <Divider />
-
-        {/* 3G GUEST SELECTOR + PRICE BREAKDOWN */}
         <div>
           <div className="flex justify-between items-center py-3 border-y border-border">
             <div>
               <p className="text-[13px] font-semibold text-foreground">{t("experience.adults")}</p>
-              <button className="text-[11px] text-primary underline">{t("experience.add_children_half_price")}</button>
+              <p className="text-[11px] text-muted-foreground">{unitPrice} {t("common.egp")} {t("common.per_person")}</p>
             </div>
             <div className="flex items-center gap-3">
               <button onClick={() => setGuests(Math.max(1, guests - 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center">
@@ -463,262 +353,254 @@ const ExperienceDetail = () => {
             </div>
           </div>
           <div className="py-2.5 space-y-1.5">
-            <div className="flex justify-between"><span className="text-[13px] text-foreground">{guests} × {unitPrice} {t("common.egp")}</span><span className="text-[13px] text-foreground">{guests * unitPrice} {t("common.egp")}</span></div>
-            <div className="flex justify-between"><span className="text-xs text-muted-foreground">{t("experience.platform_fee")}</span><span className="text-xs text-muted-foreground">{platformFee} {t("common.egp")}</span></div>
-            <div className="flex justify-between"><span className="text-[11px] text-muted-foreground">{t("experience.free_cancellation_until_dec_25")}</span><span className="text-xs font-medium text-success">✓</span></div>
-            <div className="h-px bg-black/[0.06]" />
-            <div className="flex justify-between"><span className="text-sm font-semibold text-foreground">{t("booking.total")}</span><span className="text-sm font-semibold text-foreground">{total} {t("common.egp")}</span></div>
-          </div>
-        </div>
-
-        <Divider />
-
-        {/* 3H MEETING POINT MAP */}
-        <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.where_well_meet")}</h2>
-          {exp.meeting_point_lat != null && exp.meeting_point_lng != null ? (
-            <a
-              href={mapsUrl(Number(exp.meeting_point_lat), Number(exp.meeting_point_lng))}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative block w-full h-[120px] bg-secondary rounded-[10px] border border-primary/40 mb-2 flex items-center justify-center overflow-hidden"
-            >
-              <span className="text-2xl">📍</span>
-              <span className="absolute bottom-2.5 bg-card border border-border text-primary-dark text-[9px] font-semibold px-1.5 py-0.5 rounded underline">
-                {exp.meeting_point_name || t("experience.meeting_point_default")} ·{" "}
-                {lang === "ar" ? "افتح في خرائط جوجل" : "Open in Google Maps"}
-              </span>
-            </a>
-          ) : (
-            <div className="relative w-full h-[120px] bg-secondary rounded-[10px] border border-primary/40 mb-2 flex items-center justify-center overflow-hidden">
-              <span className="text-2xl">📍</span>
-              <span className="absolute bottom-2.5 bg-card border border-border text-foreground text-[9px] px-1.5 py-0.5 rounded">{exp.meeting_point_name || t("experience.meeting_point_default")}</span>
+            <div className="flex justify-between">
+              <span className="text-[13px] text-foreground">{guests} × {unitPrice} {t("common.egp")}</span>
+              <span className="text-[13px] font-semibold text-foreground">{subtotal} {t("common.egp")}</span>
             </div>
-          )}
-          <div className="flex items-start gap-1.5">
-            <span className="text-xs flex-shrink-0">🚌</span>
-            <p className="text-[11px] text-muted-foreground leading-[1.5]">
-              {t("experience.hotel_pickup_description", { offlineMap: t("experience.offline_map") }).split(t("experience.offline_map"))[0]}
-              <span className="text-primary underline">{t("experience.offline_map")}</span>
-              {t("experience.hotel_pickup_description", { offlineMap: t("experience.offline_map") }).split(t("experience.offline_map"))[1]}
+            <p className="text-[11px] text-muted-foreground">
+              {ar
+                ? "لا يتم الدفع داخل التطبيق — يُرسل طلبك إلى المضيف ليؤكد التوفر ويرتب الدفع."
+                : "No payment is taken in the app — your request goes to the host, who confirms availability and arranges payment."}
             </p>
           </div>
         </div>
 
-        {(() => {
-          const remarks = lang === "ar"
-            ? (exp as any).remarks_ar || (exp as any).remarks_en
-            : (exp as any).remarks_en || (exp as any).remarks_ar;
-          if (!remarks) return null;
-          return (
-            <>
-              <Divider />
-              <div>
-                <h2 className="text-sm font-semibold text-foreground mb-2">
-                  {lang === "ar" ? "ملاحظات مهمة" : "Main Remarks"}
-                </h2>
-                <div className="bg-secondary border border-primary/40 rounded-[10px] p-3">
-                  <p className="text-xs text-foreground leading-[1.6] whitespace-pre-line">{remarks}</p>
-                </div>
-              </div>
-            </>
-          );
-        })()}
-
-
-        <Divider />
-
-        {/* 3I GETTING THERE */}
-        {regionTransport && regionTransport.length > 0 && (
+        {/* ── MEETING POINT ──────────────────────────────────────── */}
+        {(exp.meeting_point_name || (exp.meeting_point_lat != null && exp.meeting_point_lng != null)) && (
           <>
+            <Divider />
             <div>
-              <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.getting_there")}</h2>
-              <div className="bg-secondary rounded-[10px] border border-primary/40 p-3">
-                <p className="text-xs font-semibold text-primary-dark mb-2">{t("experience.transport_options_in", { region: regionName })}</p>
-                <div className="space-y-1.5">
-                  {regionTransport.map((tr) => {
-                    const Icon = tr.transport_type === "train" ? Train : Bus;
-                    const name = lang === "ar" ? tr.name_ar : tr.name_en;
-                    const from = lang === "ar" ? (tr.from_ar || tr.from_en) : tr.from_en;
-                    const to = lang === "ar" ? (tr.to_ar || tr.to_en) : tr.to_en;
-                    return (
-                      <div key={tr.id} className="flex items-center gap-2.5">
-                        <div className="w-[26px] h-[26px] rounded-[7px] bg-primary flex items-center justify-center flex-shrink-0">
-                          <Icon className="w-3 h-3 text-primary-foreground" />
-                        </div>
-                        <span className="text-[11px] text-primary-dark leading-[1.4]">
-                          {name}: {from} → {to} · {tr.duration || "?"} · {tr.price} {t("common.egp")}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-            <Divider />
-          </>
-        )}
-
-        {/* 3J REVIEWS */}
-        <div ref={reviewsRef}>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-semibold text-foreground"><span className="text-warning">★</span> {exp.rating || 0} · {t("experience.reviews_count", { count: exp.reviews_count || reviews.length })}</span>
-            <button className="text-xs font-medium text-primary">{t("common.see_all")} →</button>
-          </div>
-          <div className="grid grid-cols-2 gap-2 mb-2">
-            {reviews.slice(0, 4).map((r, i) => (
-              <div key={i} className="border border-border rounded-[10px] p-2.5 bg-card">
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <div className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-[9px] font-medium text-primary-dark" style={{ backgroundColor: dbReviews?.[i]?.reviewer_avatar_bg || "#9FE1CB" }}>{r.initials}</div>
-                  <div>
-                    <p className="text-[11px] font-semibold text-foreground">{r.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{r.city}</p>
-                  </div>
-                </div>
-                <StarRow count={r.rating} size={11} />
-                <p className="text-[10px] text-muted-foreground leading-[1.45] mt-1 mb-1.5 line-clamp-3">{r.text}</p>
-                {r.verified && (
-                  <span className="inline-flex items-center gap-1 bg-success/10 rounded-lg px-1.5 py-0.5">
-                    <span className="w-[5px] h-[5px] rounded-full bg-success" />
-                    <span className="text-[9px] font-medium text-success">{t("experience.verified_attendee")}</span>
+              <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.where_well_meet")}</h2>
+              {exp.meeting_point_lat != null && exp.meeting_point_lng != null ? (
+                <a
+                  href={mapsUrl(Number(exp.meeting_point_lat), Number(exp.meeting_point_lng))}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative block w-full h-[120px] bg-secondary rounded-[10px] border border-primary/40 flex items-center justify-center overflow-hidden"
+                >
+                  <span className="text-2xl">📍</span>
+                  <span className="absolute bottom-2.5 bg-card border border-border text-primary-dark text-[9px] font-semibold px-1.5 py-0.5 rounded underline">
+                    {exp.meeting_point_name || (ar ? "نقطة اللقاء" : "Meeting point")} · {ar ? "افتح في خرائط جوجل" : "Open in Google Maps"}
                   </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <Divider />
-
-        {/* 3K THINGS TO KNOW */}
-        <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2.5">{t("experience.things_to_know")}</h2>
-          <div className="grid grid-cols-2 gap-2">
-            {thingsToKnow.map((thing, i) => (
-              <div key={i} className="flex items-start gap-1.5">
-                <span className="text-base mt-0.5 flex-shrink-0">{thing.icon}</span>
-                <div>
-                  <p className="text-[11px] font-semibold text-foreground mb-0.5">{thing.label}</p>
-                  <p className="text-[10px] text-muted-foreground leading-[1.4]">{thing.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <Divider />
-
-        {/* 3L AMBASSADOR VETTING BADGE */}
-        {exp.verified && (
-          <>
-            <div className="flex gap-2.5 items-start border border-warning/40 rounded-[10px] p-3 bg-warning/10">
-              <div className="w-9 h-9 rounded-full bg-warning flex items-center justify-center text-primary-foreground text-base font-bold flex-shrink-0">✓</div>
-              <div>
-                <p className="text-xs font-semibold text-warning mb-0.5">{t("experience.ambassador_verified_full")}</p>
-                <p className="text-[10px] text-warning leading-[1.5]">{t("experience.ambassador_verified_description", { name: hostName })}</p>
-              </div>
+                </a>
+              ) : (
+                <p className="text-[13px] text-foreground">{exp.meeting_point_name}</p>
+              )}
             </div>
-            <Divider />
           </>
         )}
 
-        {/* 3M SAFETY NOTE */}
-        <div className="bg-muted rounded-lg p-2.5">
-          <p className="text-[10px] text-muted-foreground leading-[1.55]">{t("experience.payment_held")}</p>
+        {/* ── REMARKS (host's own notes) ─────────────────────────── */}
+        {remarks && (
+          <>
+            <Divider />
+            <div>
+              <h2 className="text-sm font-semibold text-foreground mb-2">{ar ? "ملاحظات مهمة" : "Main Remarks"}</h2>
+              <div className="bg-secondary border border-primary/40 rounded-[10px] p-3">
+                <p className="text-xs text-foreground leading-[1.6] whitespace-pre-line">{remarks}</p>
+              </div>
+              <MachineTranslatedNote meta={(exp as any)?.translation_meta} field={ar ? "remarks_ar" : "remarks_en"} className="mt-1" />
+            </div>
+          </>
+        )}
+
+        {/* ── AVAILABILITY (real slots only) ─────────────────────── */}
+        <Divider />
+        <div>
+          <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.upcoming_availability")}</h2>
+          {slots.length > 0 ? (
+            <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+              {slots.map((s, i) => (
+                <button
+                  key={s.id}
+                  onClick={() => setSelectedSlot(i)}
+                  className={`flex-shrink-0 w-[158px] rounded-[10px] p-2.5 border text-left transition-colors ${
+                    selectedSlot === i ? "border-primary bg-secondary" : "border-border bg-card"
+                  }`}
+                >
+                  <p className={`text-xs font-semibold ${selectedSlot === i ? "text-primary-dark" : "text-foreground"}`}>{s.date}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{s.time}</p>
+                  <div className="flex justify-between items-center mt-1.5">
+                    <span className="text-[11px] font-semibold text-primary">{s.price} {t("common.egp")}</span>
+                    <span className={`text-[10px] ${s.low ? "text-destructive font-medium" : "text-muted-foreground"}`}>{s.spots} {t("experience.spots")}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              {ar
+                ? "لم ينشر المضيف مواعيد بعد. راسله لتحديد موعد."
+                : "The host hasn't published dates yet. Message them to agree a date."}
+            </p>
+          )}
         </div>
 
-        <Divider />
+        {/* ── HOST ───────────────────────────────────────────────── */}
+        {(hostName || provider) && (
+          <>
+            <Divider />
+            <div>
+              <div className="flex items-start gap-3 mb-2">
+                {provider?.avatar ? (
+                  <img src={provider.avatar} alt={hostName} className="w-11 h-11 rounded-full object-cover flex-shrink-0" />
+                ) : (
+                  <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-[15px] font-semibold flex-shrink-0">
+                    {hostInitials || "·"}
+                  </div>
+                )}
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{hostName}</p>
+                  {hostSubtitle && <p className="text-[11px] text-muted-foreground">{hostSubtitle}</p>}
+                </div>
+              </div>
+              {hostCredentials.length > 0 && (
+                <div className="bg-muted rounded-lg p-2.5 mb-2 space-y-1">
+                  {hostCredentials.map((c, i) => (
+                    <div key={i} className="flex items-start gap-1.5">
+                      <span className="w-[5px] h-[5px] rounded-full bg-primary mt-1 flex-shrink-0" />
+                      <span className="text-[11px] text-muted-foreground">{c}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <button
+                onClick={() => navigate(`/inbox?personId=${providerId || exp.provider_id || ""}&kind=provider`)}
+                className="w-full h-10 rounded-lg border border-primary text-primary text-xs font-semibold"
+              >
+                {t("experience.message_host", { name: hostName?.split(" ")[0] || "" })}
+              </button>
+            </div>
+          </>
+        )}
 
-        {/* 3N IMPACT DASHBOARD */}
-        <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.your_visit_impact")}</h2>
-          <div className="bg-muted rounded-[10px] p-3">
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { n: String(hostShare), l: t("experience.egp_to", { name: hostName?.split(" ")[0] || t("experience.default_host_name") }) },
-                { n: String(unitPrice - hostShare), l: t("experience.egp_to_local_fund") },
-                { n: String(exp.reviews_count || reviews.length), l: t("experience.visitors_this_month") },
-              ].map((c, i) => (
-                <div key={i} className="bg-card border border-border rounded-lg p-2.5 text-center">
-                  <p className="text-lg font-bold text-primary">{c.n}</p>
-                  <p className="text-[9px] text-muted-foreground mt-0.5">{c.l}</p>
+        {/* ── REVIEWS (real or honest empty state) ───────────────── */}
+        <Divider />
+        <div ref={reviewsRef}>
+          <h2 className="text-sm font-semibold text-foreground mb-2">
+            {ar ? "التقييمات" : "Reviews"}
+          </h2>
+          {reviews.length > 0 ? (
+            <div className="grid grid-cols-2 gap-2">
+              {reviews.slice(0, 4).map((r, i) => (
+                <div key={i} className="border border-border rounded-[10px] p-2.5 bg-card">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <div className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-[9px] font-medium text-primary-dark" style={{ backgroundColor: r.bg }}>
+                      {r.initials}
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold text-foreground">{r.name}</p>
+                      {r.city && <p className="text-[10px] text-muted-foreground">{r.city}</p>}
+                    </div>
+                  </div>
+                  <StarRow count={r.rating} size={11} />
+                  {r.text && <p className="text-[10px] text-muted-foreground leading-[1.45] mt-1 line-clamp-3">{r.text}</p>}
                 </div>
               ))}
             </div>
-          </div>
+          ) : (
+            <p className="text-xs text-muted-foreground">{ar ? "لا توجد تقييمات بعد." : "No reviews yet."}</p>
+          )}
         </div>
 
-        <Divider />
-
-        {/* 3O RELATED EXPERIENCES */}
-        {relatedExps && relatedExps.length > 0 && (
-          <div>
-            <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.more_experiences_in", { region: regionName })}</h2>
-            <div className="flex gap-2.5 overflow-x-auto hide-scrollbar pb-1.5">
-              {relatedExps.map((r) => {
-                const rTitle = lang === "ar" ? r.title_ar : r.title_en;
-                const hrs = r.duration_minutes ? `${Math.round(r.duration_minutes / 60)}h` : "";
-                return (
-                  <div key={r.id} className="flex-shrink-0 w-[138px] border border-border rounded-[10px] overflow-hidden bg-card">
-                    <div className="h-[72px] bg-secondary overflow-hidden">
-                      {r.image ? (
-                        <img src={r.image} alt={rTitle} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[10px] text-primary-dark font-medium px-2 text-center">{rTitle}</div>
-                      )}
+        {/* ── GETTING THERE — only transport serving this city ───── */}
+        {cityTransport && cityTransport.length > 0 && (
+          <>
+            <Divider />
+            <div>
+              <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.getting_there")}</h2>
+              <div className="bg-secondary rounded-[10px] border border-primary/40 p-3 space-y-1.5">
+                {cityTransport.map((tr) => {
+                  const Icon = tr.transport_type === "train" ? Train : Bus;
+                  const name = ar ? tr.name_ar : tr.name_en;
+                  const from = ar ? (tr.from_ar || tr.from_en) : tr.from_en;
+                  const to = ar ? (tr.to_ar || tr.to_en) : tr.to_en;
+                  return (
+                    <div key={tr.id} className="flex items-center gap-2.5">
+                      <div className="w-[26px] h-[26px] rounded-[7px] bg-primary flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-3 h-3 text-primary-foreground" />
+                      </div>
+                      <span className="text-[11px] text-primary-dark leading-[1.4]">
+                        {name}{from && to ? `: ${from} → ${to}` : ""}{tr.duration ? ` · ${tr.duration}` : ""} · {tr.price} {t("common.egp")}
+                      </span>
                     </div>
-                    <div className="p-2">
-                      <p className="text-[11px] font-semibold text-foreground leading-[1.3] mb-0.5 line-clamp-2">{rTitle}</p>
-                      <p className="text-[10px] text-muted-foreground mb-1.5">{r.theme || ""} · {hrs} · {r.price} {t("common.egp")} · ★{r.rating}</p>
-                      <button
-                        onClick={() => navigate(`/experience/${r.slug || r.id}`)}
-                        className="w-full h-7 rounded-md bg-primary text-primary-foreground text-[10px] font-semibold"
-                      >
-                        {t("common.book")}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          </>
         )}
 
-        {/* Description */}
-        {description && (
+        {/* ── MORE EXPERIENCES — last ────────────────────────────── */}
+        {relatedExps && relatedExps.length > 0 && (
           <>
-            <div className="h-4" />
-            <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.about_this_experience")}</h2>
-            <p className="text-[13px] text-muted-foreground leading-relaxed mb-1">{description}</p>
-            <MachineTranslatedNote meta={(exp as any)?.translation_meta} field={lang === "ar" ? "description_ar" : "description_en"} className="mb-6" />
+            <Divider />
+            <div>
+              <h2 className="text-sm font-semibold text-foreground mb-2">
+                {regionName ? t("experience.more_experiences_in", { region: regionName }) : (ar ? "تجارب أخرى" : "More experiences")}
+              </h2>
+              <div className="flex gap-2.5 overflow-x-auto hide-scrollbar pb-1.5">
+                {relatedExps.map((r) => {
+                  const rTitle = ar ? r.title_ar : r.title_en;
+                  const hrs = r.duration_minutes ? `${Math.round(r.duration_minutes / 60)}h` : "";
+                  return (
+                    <div key={r.id} className="flex-shrink-0 w-[138px] border border-border rounded-[10px] overflow-hidden bg-card">
+                      <div className="h-[72px] bg-secondary overflow-hidden">
+                        {r.image ? (
+                          <img src={r.image} alt={rTitle} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-[10px] text-primary-dark font-medium px-2 text-center">{rTitle}</div>
+                        )}
+                      </div>
+                      <div className="p-2">
+                        <p className="text-[11px] font-semibold text-foreground leading-[1.3] mb-0.5 line-clamp-2">{rTitle}</p>
+                        <p className="text-[10px] text-muted-foreground mb-1.5">
+                          {[r.theme, hrs, `${r.price} ${t("common.egp")}`].filter(Boolean).join(" · ")}
+                        </p>
+                        <button
+                          onClick={() => navigate(`/experience/${r.slug || r.id}`)}
+                          className="w-full h-7 rounded-md bg-primary text-primary-foreground text-[10px] font-semibold"
+                        >
+                          {ar ? "عرض" : "View"}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </>
         )}
       </div>
 
-      {/* ── 4. PERSISTENT CHAT BAR ─────────────────────────────── */}
-      <div className="fixed bottom-[80px] left-0 right-0 z-50 bg-secondary border-t border-primary/40 px-4 py-2.5 flex items-center gap-2.5">
+      {/* ── MESSAGE BAR (in-app only) ───────────────────────────── */}
+      <button
+        onClick={() => navigate(`/inbox?personId=${providerId || exp.provider_id || ""}&kind=provider`)}
+        className="fixed bottom-[80px] left-0 right-0 z-50 bg-secondary border-t border-primary/40 px-4 py-2.5 flex items-center gap-2.5 text-start"
+      >
         <div className="w-[22px] h-[22px] rounded-full bg-primary flex items-center justify-center flex-shrink-0">
           <MessageCircle className="w-[11px] h-[11px] text-primary-foreground" />
         </div>
-        <span className="text-xs text-primary-dark flex-1 min-w-0 truncate">{t("experience.message_provider_within", { name: hostName?.split(" ")[0] || t("experience.default_host_name"), time: "2h" })}</span>
-        <a href="https://wa.me/" target="_blank" rel="noopener" className="bg-primary text-primary-foreground text-[9px] font-semibold px-2 py-0.5 rounded-[10px] flex-shrink-0">
-          WhatsApp ↗
-        </a>
-      </div>
+        <span className="text-xs text-primary-dark flex-1 min-w-0 truncate">
+          {ar ? "راسل المضيف داخل التطبيق" : "Message the host in the app"}
+        </span>
+      </button>
 
-      {/* ── 5. STICKY BOTTOM BOOKING BAR ───────────────────────── */}
+      {/* ── STICKY BOOKING BAR ─────────────────────────────────── */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-2px_12px_rgba(0,0,0,0.06)] px-4 py-3 pb-7 flex items-center justify-between">
         <div>
           <span className="text-xl font-bold text-primary">{unitPrice} {t("common.egp")}</span>
           <span className="text-[13px] text-muted-foreground"> {t("common.per_person")}</span>
-          <p className="text-[11px] font-medium text-success">✓ {t("common.free_cancellation")}</p>
         </div>
-        <button onClick={() => setSheetOpen(true)} className="h-[46px] px-[26px] bg-primary rounded-[10px] text-primary-foreground text-sm font-bold">
-          {t("common.book_now")}
+        <button
+          onClick={() => (slots.length > 0 ? setSheetOpen(true) : navigate(`/booking?type=experience&id=${exp.id || id}`))}
+          className="h-[46px] px-[26px] bg-primary rounded-[10px] text-primary-foreground text-sm font-bold"
+        >
+          {ar ? "اطلب الحجز" : "Request to book"}
         </button>
       </div>
 
-      {/* ── 6. BOOKING BOTTOM SHEET ────────────────────────────── */}
+      {/* ── BOOKING SHEET ──────────────────────────────────────── */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent side="bottom" className="rounded-t-[20px] px-0 pb-8 pt-0 max-h-[85vh] overflow-y-auto">
           <div className="flex justify-center pt-2.5 pb-1">
@@ -728,12 +610,10 @@ const ExperienceDetail = () => {
             <SheetTitle className="text-base font-bold text-foreground">{t("experience.select_a_time")}</SheetTitle>
           </SheetHeader>
 
-          {/* adults */}
           <div className="px-4 pb-3 flex justify-between items-center border-b border-border">
-            <div>
-              <p className="text-sm font-semibold text-foreground">{t(sheetGuests > 1 ? "experience.n_adults_other" : "experience.n_adults_one", { count: sheetGuests })}</p>
-              <button className="text-xs text-primary underline">{t("experience.add_children")}</button>
-            </div>
+            <p className="text-sm font-semibold text-foreground">
+              {t(sheetGuests > 1 ? "experience.n_adults_other" : "experience.n_adults_one", { count: sheetGuests })}
+            </p>
             <div className="flex items-center gap-3">
               <button onClick={() => setSheetGuests(Math.max(1, sheetGuests - 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center"><Minus className="w-3.5 h-3.5" /></button>
               <span className="text-[15px] font-semibold w-5 text-center">{sheetGuests}</span>
@@ -741,7 +621,6 @@ const ExperienceDetail = () => {
             </div>
           </div>
 
-          {/* slots grouped by date */}
           {sheetSlotGroups.map((group, gi) => (
             <div key={gi} className="px-4">
               <p className="text-sm font-bold text-foreground pt-2.5 pb-1.5">{group.label}</p>
@@ -761,18 +640,17 @@ const ExperienceDetail = () => {
             </div>
           ))}
 
-          {/* confirm */}
           <div className="px-4 pt-2">
             <button
               onClick={() => {
                 setSheetOpen(false);
                 const slotUuid = (slots[sheetSlot] as { id?: string } | undefined)?.id;
                 const slotParam = slotUuid ? `&slot=${slotUuid}` : "";
-                navigate(`/booking?type=experience&id=${exp.id || id}${slotParam}`);
+                navigate(`/booking?type=experience&id=${exp.id || id}${slotParam}&guests=${sheetGuests}`);
               }}
               className="w-full h-[46px] bg-primary rounded-[10px] text-primary-foreground text-sm font-bold"
             >
-              {t("experience.confirm_with_total", { amount: (slots[sheetSlot]?.price || unitPrice) * sheetGuests + Math.round((slots[sheetSlot]?.price || unitPrice) * sheetGuests * 0.1) })}
+              {ar ? "متابعة" : "Continue"} · {(slots[sheetSlot]?.price || unitPrice) * sheetGuests} {t("common.egp")}
             </button>
           </div>
         </SheetContent>

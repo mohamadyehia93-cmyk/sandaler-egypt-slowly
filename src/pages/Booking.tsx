@@ -41,8 +41,27 @@ const Booking = () => {
     enabled: !!id,
   });
 
-  const [guests, setGuests] = useState(1);
+  // Real published slots for this experience — the Date field is driven by these,
+  // never by a free-text picker that lets a request through with no usable date.
+  const { data: slots } = useQuery({
+    queryKey: ["booking-slots", item?.id],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("experience_slots")
+        .select("id, slot_date, start_time, end_time, price, spots_available")
+        .eq("experience_id", item!.id)
+        .gte("slot_date", new Date().toISOString().slice(0, 10))
+        .order("slot_date", { ascending: true })
+        .order("start_time", { ascending: true });
+      if (error) throw error;
+      return data as any[];
+    },
+    enabled: type === "experience" && !!item?.id,
+  });
+
+  const [guests, setGuests] = useState(Number(params.get("guests")) || 1);
   const [selectedDate, setSelectedDate] = useState("");
+  const [selectedSlotId, setSelectedSlotId] = useState<string>(slotId || "");
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [step, setStep] = useState<"details" | "payment" | "confirmed">("details");
   const [contactName, setContactName] = useState("");
@@ -50,6 +69,7 @@ const Booking = () => {
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [requestError, setRequestError] = useState<string | null>(null);
+
 
 
   if (isLoading) return (
@@ -66,20 +86,22 @@ const Booking = () => {
     ? (item.title_ar || item.name_ar || "")
     : (item.title_en || item.name_en || ""));
   const itemImage = item.image || "";
-  const unitPrice = item.price ?? item.price_per_night ?? 0;
   const isStay = type === "stay";
   const isProduct = type === "product";
-  const nights = isStay ? 2 : 0;
+  const isExperience = type === "experience";
+  const chosenSlot = (slots || []).find((s: any) => s.id === selectedSlotId);
+  const unitPrice = chosenSlot?.price ?? item.price ?? item.price_per_night ?? 0;
+  const nights = isStay ? 1 : 0;
   const quantity = isProduct ? guests : 1;
   const subtotal = isProduct ? unitPrice * quantity : isStay ? unitPrice * nights : unitPrice * guests;
-  // Experiences carry 10% platform fee (Ambassador verification + content production overhead);
-  // stays/products/trips/transport are simpler transactions at 5%. The differential is intentional.
-  const isExperience = type === "experience";
+  // Estimated only. No card is charged anywhere in this flow, so this is presented
+  // as an estimate the host will confirm — never as a captured amount.
   const serviceFee = Math.round(subtotal * (isExperience ? 0.10 : 0.05));
   const total = subtotal + serviceFee;
-  // A paid checkout is only conceivable for an experience with a chosen slot. Everything else
-  // (and any Stripe failure) resolves to the unpaid "request to book" path.
-  const paidPath = isExperience && !!slotId;
+  // There is no payment processor wired up, so there is NO paid path in the UI.
+  // Every submission is an unpaid request. Do not re-enable this without real checkout.
+  const paidPath = false;
+
 
 
   const priceLabel = isStay
@@ -200,21 +222,50 @@ const Booking = () => {
 
         {step === "details" && (
           <>
-            {/* Date Selection */}
+            {/* Date Selection — experiences pick from real published slots */}
             {!isProduct && (
               <div className="mb-4">
                 <label className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-primary" />
                   {t("booking.date_label")}
                 </label>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full mt-2 p-3 rounded-xl bg-card border border-border text-sm text-foreground"
-                />
+                {isExperience ? (
+                  slots && slots.length > 0 ? (
+                    <select
+                      value={selectedSlotId}
+                      onChange={(e) => {
+                        setSelectedSlotId(e.target.value);
+                        const s = slots.find((x: any) => x.id === e.target.value);
+                        setSelectedDate(s?.slot_date || "");
+                      }}
+                      className="w-full mt-2 p-3 rounded-xl bg-card border border-border text-sm text-foreground"
+                    >
+                      <option value="">{ar ? "اختر موعداً" : "Choose a date"}</option>
+                      {slots.map((s: any) => (
+                        <option key={s.id} value={s.id}>
+                          {s.slot_date} · {s.start_time.slice(0, 5)}–{s.end_time.slice(0, 5)} · {s.price} {t("common.egp")}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <p className="mt-2 p-3 rounded-xl bg-warning/10 border border-warning text-xs text-foreground">
+                      {ar
+                        ? "لم ينشر المضيف مواعيد متاحة بعد، لذلك لا يمكن إرسال طلب بموعد. راسل المضيف للاتفاق على موعد."
+                        : "The host hasn't published any available dates yet, so a request cannot be dated. Message the host to agree a date."}
+                    </p>
+                  )
+                ) : (
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    min={new Date().toISOString().slice(0, 10)}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="w-full mt-2 p-3 rounded-xl bg-card border border-border text-sm text-foreground"
+                  />
+                )}
               </div>
             )}
+
 
             {/* Guests / Quantity */}
             <div className="mb-5">
@@ -250,14 +301,22 @@ const Booking = () => {
                   <span className="text-foreground">{subtotal} {t("common.egp")}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{t("booking.service_fee")}</span>
+                  <span className="text-muted-foreground">
+                    {t("booking.service_fee")} — {ar ? "تقديري، لم يُحصَّل" : "estimate, not charged"}
+                  </span>
                   <span className="text-foreground">{serviceFee} {t("common.egp")}</span>
                 </div>
                 <div className="border-t border-border pt-2 flex justify-between">
-                  <span className="text-sm font-bold text-foreground">{t("booking.total")}</span>
+                  <span className="text-sm font-bold text-foreground">{ar ? "الإجمالي التقديري" : "Estimated total"}</span>
                   <span className="text-base font-bold text-primary">{total} {t("common.egp")}</span>
                 </div>
+                <p className="text-[11px] text-muted-foreground">
+                  {ar
+                    ? "لا يتم تحصيل أي مبلغ في التطبيق. يؤكد المضيف المبلغ النهائي وطريقة الدفع."
+                    : "Nothing is charged in the app. The host confirms the final amount and how to pay."}
+                </p>
               </div>
+
             </div>
           </>
         )}
@@ -342,9 +401,12 @@ const Booking = () => {
                 <span className="text-sm text-foreground">{subtotal} {t("common.egp")}</span>
               </div>
               <div className="flex justify-between mb-2">
-                <span className="text-sm text-muted-foreground">{t("booking.service_fee")}</span>
+                <span className="text-sm text-muted-foreground">
+                  {t("booking.service_fee")} — {ar ? "تقديري، لم يُحصَّل" : "estimate, not charged"}
+                </span>
                 <span className="text-sm text-foreground">{serviceFee} {t("common.egp")}</span>
               </div>
+
               <div className="border-t border-border pt-2 flex justify-between">
                 <span className="text-sm font-bold text-foreground">
                   {paidPath ? t("booking.total") : ar ? "الإجمالي التقديري" : "Estimated total"}
@@ -386,13 +448,20 @@ const Booking = () => {
         </div>
         {step === "details" ? (
           <button
-            onClick={() => setStep("payment")}
+            onClick={() => {
+              // Never let a request through with no date the host can act on.
+              if (isExperience && slots && slots.length > 0 && !selectedSlotId) {
+                setRequestError(ar ? "يرجى اختيار موعد أولاً." : "Please choose a date first.");
+                return;
+              }
+              setRequestError(null);
+              setStep("payment");
+            }}
             className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
           >
-            {paidPath
-              ? t("booking.continue_to_payment")
-              : ar ? "متابعة" : "Continue"}
+            {ar ? "متابعة" : "Continue"}
           </button>
+
         ) : (
           <button
             onClick={async () => {
@@ -405,8 +474,8 @@ const Booking = () => {
                 // unpaid booking REQUEST. status/payment_status are forced server-side.
                 const outcome = await startBookingCheckout(
                   {
-                    experienceId: id,
-                    slotId,
+                    experienceId: item.id,
+                    slotId: selectedSlotId || null,
                     guests,
                     totalAmountEgp: total,
                     visitorEmail: user.email || "",

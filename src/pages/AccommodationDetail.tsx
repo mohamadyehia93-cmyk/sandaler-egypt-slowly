@@ -7,7 +7,6 @@ import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import ProviderBioCard from "@/components/ProviderBioCard";
-import DetailTestimonials from "@/components/DetailTestimonials";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -27,20 +26,6 @@ const AccommodationDetail = () => {
     queryFn: () => fetchByIdOrSlug("accommodations", id!),
     enabled: !!id,
   });
-
-  const availabilityMap = useMemo(() => {
-    if (!place) return new Map<string, "available" | "limited" | "booked">();
-    const seed = place.id.split("").reduce((acc: number, c: string) => acc + c.charCodeAt(0), 0);
-    const statuses: ("available" | "limited" | "booked")[] = ["available", "limited", "booked"];
-    const map = new Map<string, "available" | "limited" | "booked">();
-    const today = new Date();
-    for (let i = 0; i < 60; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() + i);
-      map.set(format(d, "yyyy-MM-dd"), statuses[(seed + i * 7) % 3]);
-    }
-    return map;
-  }, [place?.id]);
 
   if (isLoading) {
     return (
@@ -100,8 +85,9 @@ const AccommodationDetail = () => {
           </>
         )}
 
-        {/* Availability Calendar */}
-        <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "التوافر" : "Availability"}</h2>
+        {/* Preferred date — the host confirms availability. The app has no live
+            availability data for stays, so no status colours are shown. */}
+        <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "التاريخ المفضل" : "Preferred Date"}</h2>
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className={cn("w-full justify-start text-left font-normal mb-2", !selectedDate && "text-muted-foreground")}>
@@ -117,33 +103,14 @@ const AccommodationDetail = () => {
               initialFocus
               className={cn("p-3 pointer-events-auto")}
               disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-              modifiers={{
-                available: Array.from(availabilityMap.entries()).filter(([, s]) => s === "available").map(([k]) => new Date(k)),
-                limited: Array.from(availabilityMap.entries()).filter(([, s]) => s === "limited").map(([k]) => new Date(k)),
-                booked: Array.from(availabilityMap.entries()).filter(([, s]) => s === "booked").map(([k]) => new Date(k)),
-              }}
-              modifiersStyles={{
-                available: { backgroundColor: "hsl(142 71% 93%)", color: "hsl(142 71% 29%)" },
-                limited: { backgroundColor: "hsl(38 92% 90%)", color: "hsl(38 92% 35%)" },
-                booked: { backgroundColor: "hsl(0 84% 92%)", color: "hsl(0 84% 40%)" },
-              }}
             />
           </PopoverContent>
         </Popover>
-        {selectedDate && (() => {
-          const key = format(selectedDate, "yyyy-MM-dd");
-          const status = availabilityMap.get(key);
-          const statusLabel = status === "available" ? (lang === "ar" ? "✅ متاح" : "✅ Available") : status === "limited" ? (lang === "ar" ? "⚠️ محدود" : "⚠️ Limited") : (lang === "ar" ? "❌ محجوز" : "❌ Booked");
-          const statusClass = status === "available" ? "text-green-600 bg-green-50" : status === "limited" ? "text-amber-600 bg-amber-50" : "text-red-500 bg-red-50";
-          return <div className={`p-3 rounded-lg text-sm font-medium mb-5 ${statusClass}`}>{format(selectedDate, "EEEE, MMM d")} — {statusLabel}</div>;
-        })()}
-        {!selectedDate && (
-          <div className="flex gap-3 text-[10px] text-muted-foreground mb-5">
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-200 inline-block" /> {lang === "ar" ? "متاح" : "Available"}</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-200 inline-block" /> {lang === "ar" ? "محدود" : "Limited"}</span>
-            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-200 inline-block" /> {lang === "ar" ? "محجوز" : "Booked"}</span>
-          </div>
-        )}
+        <p className="text-[11px] text-muted-foreground mb-5">
+          {lang === "ar"
+            ? "يؤكد المضيف التوافر بعد إرسال طلبك."
+            : "The host confirms availability after you send your request."}
+        </p>
 
         {/* Amenities */}
         {amenities.length > 0 && (
@@ -160,21 +127,6 @@ const AccommodationDetail = () => {
           </>
         )}
 
-        {/* House Rules */}
-        <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "قواعد المكان" : "House Rules"}</h2>
-        <div className="space-y-2 mb-6">
-          {[
-            { icon: "🚭", text: lang === "ar" ? "ممنوع التدخين داخلياً" : "No smoking indoors" },
-            { icon: "❌", text: lang === "ar" ? "إلغاء مجاني قبل ٤٨ ساعة" : "Free cancellation 48h before" },
-          ].map((r, i) => (
-            <div key={i} className="flex items-center gap-2 p-2.5 rounded-lg bg-surface">
-              <span className="text-base">{r.icon}</span>
-              <span className="text-xs text-foreground">{r.text}</span>
-            </div>
-          ))}
-        </div>
-
-        <DetailTestimonials />
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
@@ -183,7 +135,7 @@ const AccommodationDetail = () => {
           <span className="text-xs text-muted-foreground block">{t("common.perNight")}</span>
         </div>
         <button onClick={() => navigate(`/booking?type=stay&id=${place.id}`)} className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated">
-          {t("common.book")}
+          {lang === "ar" ? "إرسال طلب" : "Send request"}
         </button>
       </div>
     </div>

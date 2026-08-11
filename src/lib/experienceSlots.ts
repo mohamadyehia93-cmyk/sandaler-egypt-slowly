@@ -21,6 +21,17 @@ export type SlotDraft = {
 };
 
 /**
+ * Local YYYY-MM-DD. Never use toISOString() here: the cursor is a LOCAL midnight,
+ * and in any UTC+ timezone (Egypt is UTC+2/+3) toISOString() rolls back to the
+ * previous day — which shifted every generated slot one weekday earlier.
+ */
+const localISODate = (d: Date) => {
+  const m = `${d.getMonth() + 1}`.padStart(2, "0");
+  const day = `${d.getDate()}`.padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
+};
+
+/**
  * Expands "these weekdays, this time, between these two dates" into concrete
  * slot rows. Capped at 180 rows so a wide range can't flood the table.
  */
@@ -48,7 +59,7 @@ export function generateSlotDrafts(opts: {
   while (cursor <= end && out.length < 180) {
     if (wanted.has(cursor.getDay())) {
       out.push({
-        slot_date: cursor.toISOString().slice(0, 10),
+        slot_date: localISODate(cursor),
         start_time: startTime,
         end_time: endTime,
         price,

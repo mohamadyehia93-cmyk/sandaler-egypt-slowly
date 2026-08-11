@@ -41,7 +41,6 @@ const PersonDetail = lazy(() => import("./pages/PersonDetail.tsx"));
 const PostDetail = lazy(() => import("./pages/PostDetail.tsx"));
 const CultureActorDetail = lazy(() => import("./pages/CultureActorDetail.tsx"));
 const AccommodationDetail = lazy(() => import("./pages/AccommodationDetail.tsx"));
-const HostDetail = lazy(() => import("./pages/HostDetail.tsx"));
 const TransportDetail = lazy(() => import("./pages/TransportDetail.tsx"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail.tsx"));
 const PartnerDetail = lazy(() => import("./pages/PartnerDetail.tsx"));
@@ -176,7 +175,6 @@ const App = () => {
             <Route path="/post/:id" element={<PostDetail />} />
             <Route path="/culture-actor/:id" element={<CultureActorDetail />} />
             <Route path="/stay/:id" element={<AccommodationDetail />} />
-            <Route path="/host/:id" element={<HostDetail />} />
             <Route path="/transport/:id" element={<TransportDetail />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/partner/:id" element={<PartnerDetail />} />

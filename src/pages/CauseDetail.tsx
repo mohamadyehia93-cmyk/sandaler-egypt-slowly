@@ -4,12 +4,11 @@ import { ArrowLeft, Heart, Share2, Users, Calendar, MapPin, ExternalLink, Gift, 
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
-import { causes, regions } from "@/lib/sampleData";
+import { regions } from "@/lib/sampleData";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { supabase } from "@/integrations/supabase/client";
 import { dbToLegacyCause } from "@/lib/dbAdapters";
 import ProviderBioCard from "@/components/ProviderBioCard";
-import DetailTestimonials from "@/components/DetailTestimonials";
 import NotFoundView from "@/components/NotFound";
 
 const supportOptions = [
@@ -46,10 +45,12 @@ const CauseDetail = () => {
     },
   });
 
-  const cause = dbToLegacyCause(dbCause) || causes.find((c) => c.id === id);
+  // DB row only. A missing cause must 404 — never fall back to a sample cause,
+  // which would show a different organisation's fundraising numbers.
+  const cause = dbToLegacyCause(dbCause);
   if (!cause) return <NotFoundView context="cause" />;
   const region = regions.find((r) => r.id === cause.regionId);
-  const progress = Math.round((cause.raised / cause.goal) * 100);
+  const progress = cause.goal > 0 ? Math.round((cause.raised / cause.goal) * 100) : 0;
   const orgHref = ownerOrg ? `/organization/${(ownerOrg as any).slug || (ownerOrg as any).id}` : null;
 
 
@@ -175,7 +176,6 @@ const CauseDetail = () => {
         </div>
 
         {/* Testimonials */}
-        <DetailTestimonials />
       </div>
 
       {/* Organization Bio */}
