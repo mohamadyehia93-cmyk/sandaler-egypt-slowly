@@ -84,6 +84,9 @@ const ExperienceDetail = () => {
         .from("experience_reviews")
         .select("*")
         .eq("experience_id", expId)
+        // Only reviews written by a real signed-in account. Seeded/sample rows
+        // (user_id IS NULL) must never appear as social proof.
+        .not("user_id", "is", null)
         .order("created_at", { ascending: false })
         .limit(10);
       if (error) throw error;
