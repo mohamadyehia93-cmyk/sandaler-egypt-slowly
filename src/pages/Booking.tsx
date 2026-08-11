@@ -301,14 +301,22 @@ const Booking = () => {
                   <span className="text-foreground">{subtotal} {t("common.egp")}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{t("booking.service_fee")}</span>
+                  <span className="text-muted-foreground">
+                    {t("booking.service_fee")} — {ar ? "تقديري، لم يُحصَّل" : "estimate, not charged"}
+                  </span>
                   <span className="text-foreground">{serviceFee} {t("common.egp")}</span>
                 </div>
                 <div className="border-t border-border pt-2 flex justify-between">
-                  <span className="text-sm font-bold text-foreground">{t("booking.total")}</span>
+                  <span className="text-sm font-bold text-foreground">{ar ? "الإجمالي التقديري" : "Estimated total"}</span>
                   <span className="text-base font-bold text-primary">{total} {t("common.egp")}</span>
                 </div>
+                <p className="text-[11px] text-muted-foreground">
+                  {ar
+                    ? "لا يتم تحصيل أي مبلغ في التطبيق. يؤكد المضيف المبلغ النهائي وطريقة الدفع."
+                    : "Nothing is charged in the app. The host confirms the final amount and how to pay."}
+                </p>
               </div>
+
             </div>
           </>
         )}
