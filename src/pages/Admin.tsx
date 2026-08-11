@@ -65,9 +65,50 @@ const Admin = () => {
   const queryClient = useQueryClient();
   const { isAdmin, loading, user } = useIsAdmin();
   const [tab, setTab] = useState<"reports" | "events">("reports");
+  const [claiming, setClaiming] = useState(false);
+
+  // A signed-in non-admin cannot read other users' rows in user_roles (RLS is
+  // scoped to auth.uid()), so we ask the DB for a single boolean instead.
+  const { data: adminExists } = useQuery({
+    queryKey: ["admin-exists"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_exists");
+      if (error) throw error;
+      return !!data;
+    },
+    enabled: !!user && !isAdmin && !loading,
+    staleTime: 30_000,
+  });
+  const noAdminYet = adminExists === false;
+
+  const claimAdmin = async () => {
+    setClaiming(true);
+    const { error } = await supabase.rpc("claim_first_admin");
+    setClaiming(false);
+    if (error) {
+      const already = /already/i.test(error.message);
+      toast.error(
+        already
+          ? ar
+            ? "يوجد مشرف بالفعل. لا يمكن طلب الصلاحية مرة أخرى."
+            : "An administrator already exists. Admin access can no longer be claimed."
+          : ar
+            ? `تعذّر طلب صلاحية الإدارة: ${error.message}`
+            : `Could not claim admin access: ${error.message}`,
+      );
+      queryClient.invalidateQueries({ queryKey: ["admin-exists"] });
+      return;
+    }
+    toast.success(
+      ar ? "تم منحك صلاحية الإدارة." : "You are now the administrator.",
+    );
+    await queryClient.invalidateQueries({ queryKey: ["admin-exists"] });
+    await queryClient.invalidateQueries({ queryKey: ["is-admin"] });
+  };
 
   const { data: reports = [], isLoading: reportsLoading } = useQuery({
     queryKey: ["admin-flag-reports"],
+
     queryFn: async () => {
       const { data, error } = await supabase
         .from("flag_reports")
@@ -169,12 +210,28 @@ const Admin = () => {
             ? "هذه الصفحة مخصّصة للمشرفين فقط."
             : "This page is only available to administrators."}
         </p>
+
+        {noAdminYet && (
+          <div className="w-full max-w-sm rounded-xl border border-primary/30 bg-primary/5 p-4 text-start" dir={ar ? "rtl" : "ltr"}>
+            <p className="text-sm text-foreground">
+              {ar
+                ? "لم يتم تعيين أي مشرف بعد. سيؤدي طلب صلاحية الإدارة إلى جعل هذا الحساب هو المشرف. يمكن تنفيذ ذلك مرة واحدة فقط."
+                : "No administrator has been set up yet. Claiming admin access will make this account the administrator. This can only be done once."}
+            </p>
+            <Button className="mt-3 w-full gap-2" onClick={claimAdmin} disabled={claiming}>
+              {claiming ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
+              {ar ? "طلب صلاحية الإدارة" : "Claim admin access"}
+            </Button>
+          </div>
+        )}
+
         <Button variant="outline" onClick={() => navigate("/profile")}>
           {ar ? "العودة إلى الملف الشخصي" : "Back to profile"}
         </Button>
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-surface pb-24">
