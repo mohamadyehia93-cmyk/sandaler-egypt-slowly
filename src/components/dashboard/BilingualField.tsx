@@ -26,6 +26,7 @@ type Props = {
   inputClass?: string;
   labelClass?: string;
   icon?: React.ReactNode;
+  maxLength?: number;
   /** when true, never auto-translate on blur — author must press the button (editorial prose) */
   manualOnly?: boolean;
 };
@@ -33,7 +34,7 @@ type Props = {
 const BilingualField = ({
   fieldEn, fieldAr, labelEn, labelAr, valueEn, valueAr, onChange, meta, onMetaChange,
   authorLang, context, required, multiline, rows = 4, placeholderEn, placeholderAr,
-  inputClass, labelClass, icon, manualOnly,
+  inputClass, labelClass, icon, manualOnly, maxLength,
 }: Props) => {
   const { lang } = useI18n();
   const [busy, setBusy] = useState(false);
@@ -93,6 +94,7 @@ const BilingualField = ({
         <textarea
           className={base}
           rows={rows}
+          maxLength={maxLength}
           dir={authorLang === "ar" ? "rtl" : "ltr"}
           value={sourceValue}
           placeholder={authorLang === "ar" ? placeholderAr : placeholderEn}
@@ -102,6 +104,7 @@ const BilingualField = ({
       ) : (
         <input
           className={base}
+          maxLength={maxLength}
           dir={authorLang === "ar" ? "rtl" : "ltr"}
           value={sourceValue}
           placeholder={authorLang === "ar" ? placeholderAr : placeholderEn}
@@ -147,6 +150,7 @@ const BilingualField = ({
             <textarea
               className={`${base} mt-2`}
               rows={rows}
+              maxLength={maxLength}
               dir={targetLang === "ar" ? "rtl" : "ltr"}
               value={targetValue}
               onChange={(e) => setTarget(e.target.value)}
@@ -154,6 +158,7 @@ const BilingualField = ({
           ) : (
             <input
               className={`${base} mt-2`}
+              maxLength={maxLength}
               dir={targetLang === "ar" ? "rtl" : "ltr"}
               value={targetValue}
               onChange={(e) => setTarget(e.target.value)}

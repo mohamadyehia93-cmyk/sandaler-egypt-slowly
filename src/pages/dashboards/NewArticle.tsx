@@ -5,6 +5,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import BilingualField from "@/components/dashboard/BilingualField";
+import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
+import type { Lang, TranslationMeta } from "@/lib/translation";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin } from "lucide-react";
 import { toast } from "sonner";
 
@@ -28,9 +31,14 @@ const NewArticle = () => {
   const [photos, setPhotos] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
+  const [authorLang, setAuthorLang] = useState<Lang>(lang === "ar" ? "ar" : "en");
+  const [meta, setMeta] = useState<TranslationMeta>({});
+
   const [form, setForm] = useState({
-    title: "",
-    body: "",
+    titleEn: "",
+    titleAr: "",
+    bodyEn: "",
+    bodyAr: "",
     category: "",
     location: "",
     tags: [""],
@@ -44,9 +52,12 @@ const NewArticle = () => {
         toast.error(lang === "ar" ? "تعذر تحميل المقال" : "Could not load article");
         return;
       }
+      setMeta(((data as any).translation_meta as TranslationMeta) || {});
       setForm({
-        title: data.title_en || "",
-        body: data.body_en || "",
+        titleEn: data.title_en || "",
+        titleAr: data.title_ar || "",
+        bodyEn: data.body_en || "",
+        bodyAr: data.body_ar || "",
         category: data.category || "",
         location: "",
         tags: Array.isArray(data.tags) && data.tags.length ? (data.tags as string[]) : [""],
@@ -74,7 +85,9 @@ const NewArticle = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    if (!form.title.trim() || !form.body.trim() || !form.category) {
+    const titleSrc = authorLang === "ar" ? form.titleAr : form.titleEn;
+    const bodySrc = authorLang === "ar" ? form.bodyAr : form.bodyEn;
+    if (!titleSrc.trim() || !bodySrc.trim() || !form.category) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
@@ -83,17 +96,17 @@ const NewArticle = () => {
       const uploaded = await uploadImages(photos, user.id);
       const images = [...existingImages, ...uploaded];
       const tags = form.tags.map((t) => t.trim()).filter(Boolean);
-      const excerpt = form.body.trim().slice(0, 160);
-      const readTime = Math.max(1, Math.round(form.body.trim().split(/\s+/).length / 200));
+      const readTime = Math.max(1, Math.round(bodySrc.trim().split(/\s+/).length / 200));
 
       const payload = {
         author_id: user.id,
-        title_en: form.title.trim(),
-        title_ar: form.title.trim(),
-        body_en: form.body.trim(),
-        body_ar: form.body.trim(),
-        excerpt_en: excerpt,
-        excerpt_ar: excerpt,
+        title_en: form.titleEn.trim(),
+        title_ar: form.titleAr.trim(),
+        body_en: form.bodyEn.trim(),
+        body_ar: form.bodyAr.trim(),
+        excerpt_en: form.bodyEn.trim() ? form.bodyEn.trim().slice(0, 160) : null,
+        excerpt_ar: form.bodyAr.trim() ? form.bodyAr.trim().slice(0, 160) : null,
+        translation_meta: meta as any,
         category: form.category,
         tags,
         image: images[0] || null,
@@ -108,7 +121,7 @@ const NewArticle = () => {
         if (error) throw error;
         toast.success(status === "draft" ? (lang === "ar" ? "تم حفظ المسودة" : "Draft saved") : (lang === "ar" ? "تم تحديث المقال!" : "Article updated!"));
       } else {
-        const { error } = await supabase.from("posts").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        const { error } = await supabase.from("posts").insert({ ...payload, slug: slugify(form.titleEn || form.titleAr, user.id.slice(0, 6)) });
         if (error) throw error;
         toast.success(status === "draft" ? (lang === "ar" ? "تم حفظ المسودة" : "Draft saved") : (lang === "ar" ? "تم نشر المقال بنجاح!" : "Article published successfully!"));
       }
@@ -138,18 +151,37 @@ const NewArticle = () => {
           <PhotoPicker files={photos} onChange={setPhotos} max={3} hint={lang === "ar" ? "اسحب أو اضغط للرفع" : "Drag or tap to upload"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
-        {/* Title */}
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "العنوان *" : "Title *"}</label>
-          <input className={inputClass} placeholder={lang === "ar" ? "عنوان مقالك..." : "Your article title..."} value={form.title} onChange={(e) => set("title", e.target.value)} maxLength={120} />
-        </div>
+        <AuthorLangToggle value={authorLang} onChange={setAuthorLang} />
+
+        {/* Title — editorial prose: translation is opt-in, never automatic */}
+        <BilingualField
+          fieldEn="title_en" fieldAr="title_ar"
+          labelEn="Title" labelAr="العنوان"
+          required manualOnly maxLength={120}
+          icon={<FileText className="w-3.5 h-3.5 text-role-culture-actor" />}
+          valueEn={form.titleEn} valueAr={form.titleAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, titleEn: en, titleAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="headline of a cultural heritage article about Egypt"
+          placeholderEn="Your article title..." placeholderAr="عنوان مقالك..."
+          inputClass={inputClass} labelClass={labelClass}
+        />
 
         {/* Body */}
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "المحتوى *" : "Content *"}</label>
-          <textarea className={`${inputClass} min-h-[180px] resize-none`} placeholder={lang === "ar" ? "اكتب مقالك هنا..." : "Write your article here..."} value={form.body} onChange={(e) => set("body", e.target.value)} maxLength={5000} />
-          <span className="text-[10px] text-muted-foreground mt-1 block text-right">{form.body.length}/5000</span>
-        </div>
+        <BilingualField
+          fieldEn="body_en" fieldAr="body_ar"
+          labelEn="Content" labelAr="المحتوى"
+          required manualOnly multiline rows={8} maxLength={5000}
+          icon={<FileText className="w-3.5 h-3.5 text-role-culture-actor" />}
+          valueEn={form.bodyEn} valueAr={form.bodyAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, bodyEn: en, bodyAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="body prose of a cultural heritage article about Egypt"
+          placeholderEn="Write your article here..." placeholderAr="اكتب مقالك هنا..."
+          inputClass={inputClass} labelClass={labelClass}
+        />
 
         {/* Category */}
         <div>
