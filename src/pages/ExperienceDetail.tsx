@@ -473,10 +473,25 @@ const ExperienceDetail = () => {
         {/* 3H MEETING POINT MAP */}
         <div>
           <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.where_well_meet")}</h2>
-          <div className="relative w-full h-[120px] bg-secondary rounded-[10px] border border-primary/40 mb-2 flex items-center justify-center overflow-hidden">
-            <span className="text-2xl">📍</span>
-            <span className="absolute bottom-2.5 bg-card border border-border text-foreground text-[9px] px-1.5 py-0.5 rounded">{exp.meeting_point_name || t("experience.meeting_point_default")}</span>
-          </div>
+          {exp.meeting_point_lat != null && exp.meeting_point_lng != null ? (
+            <a
+              href={mapsUrl(Number(exp.meeting_point_lat), Number(exp.meeting_point_lng))}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative block w-full h-[120px] bg-secondary rounded-[10px] border border-primary/40 mb-2 flex items-center justify-center overflow-hidden"
+            >
+              <span className="text-2xl">📍</span>
+              <span className="absolute bottom-2.5 bg-card border border-border text-primary-dark text-[9px] font-semibold px-1.5 py-0.5 rounded underline">
+                {exp.meeting_point_name || t("experience.meeting_point_default")} ·{" "}
+                {lang === "ar" ? "افتح في خرائط جوجل" : "Open in Google Maps"}
+              </span>
+            </a>
+          ) : (
+            <div className="relative w-full h-[120px] bg-secondary rounded-[10px] border border-primary/40 mb-2 flex items-center justify-center overflow-hidden">
+              <span className="text-2xl">📍</span>
+              <span className="absolute bottom-2.5 bg-card border border-border text-foreground text-[9px] px-1.5 py-0.5 rounded">{exp.meeting_point_name || t("experience.meeting_point_default")}</span>
+            </div>
+          )}
           <div className="flex items-start gap-1.5">
             <span className="text-xs flex-shrink-0">🚌</span>
             <p className="text-[11px] text-muted-foreground leading-[1.5]">
@@ -486,6 +501,27 @@ const ExperienceDetail = () => {
             </p>
           </div>
         </div>
+
+        {(() => {
+          const remarks = lang === "ar"
+            ? (exp as any).remarks_ar || (exp as any).remarks_en
+            : (exp as any).remarks_en || (exp as any).remarks_ar;
+          if (!remarks) return null;
+          return (
+            <>
+              <Divider />
+              <div>
+                <h2 className="text-sm font-semibold text-foreground mb-2">
+                  {lang === "ar" ? "ملاحظات مهمة" : "Main Remarks"}
+                </h2>
+                <div className="bg-secondary border border-primary/40 rounded-[10px] p-3">
+                  <p className="text-xs text-foreground leading-[1.6] whitespace-pre-line">{remarks}</p>
+                </div>
+              </div>
+            </>
+          );
+        })()}
+
 
         <Divider />
 
