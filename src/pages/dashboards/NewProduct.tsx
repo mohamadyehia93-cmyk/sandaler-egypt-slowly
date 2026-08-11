@@ -55,16 +55,20 @@ const NewProduct = () => {
         return;
       }
       setForm({
-        name: data.name_en || "",
-        description: data.description_en || "",
+        nameEn: data.name_en || "",
+        nameAr: data.name_ar || "",
+        descriptionEn: data.description_en || "",
+        descriptionAr: data.description_ar || "",
+        originEn: data.seller_village_en || "",
+        originAr: data.seller_village_ar || "",
         category: data.category || "",
         price: data.price != null ? String(data.price) : "",
         stock: data.stock != null ? String(data.stock) : "",
-        origin: data.seller_village_en || "",
         material: "",
         dimensions: "",
         shippingOptions: data.origin_story_en ? data.origin_story_en.split(" · ").filter(Boolean) : [""],
       });
+      setMeta(((data as any).translation_meta as TranslationMeta) || {});
       setExistingImages(Array.isArray(data.images) ? (data.images as string[]) : data.image ? [data.image] : []);
     })();
   }, [isEdit, id, lang]);
