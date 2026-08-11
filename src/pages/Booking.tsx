@@ -41,8 +41,27 @@ const Booking = () => {
     enabled: !!id,
   });
 
-  const [guests, setGuests] = useState(1);
+  // Real published slots for this experience — the Date field is driven by these,
+  // never by a free-text picker that lets a request through with no usable date.
+  const { data: slots } = useQuery({
+    queryKey: ["booking-slots", item?.id],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("experience_slots")
+        .select("id, slot_date, start_time, end_time, price, spots_available")
+        .eq("experience_id", item!.id)
+        .gte("slot_date", new Date().toISOString().slice(0, 10))
+        .order("slot_date", { ascending: true })
+        .order("start_time", { ascending: true });
+      if (error) throw error;
+      return data as any[];
+    },
+    enabled: type === "experience" && !!item?.id,
+  });
+
+  const [guests, setGuests] = useState(Number(params.get("guests")) || 1);
   const [selectedDate, setSelectedDate] = useState("");
+  const [selectedSlotId, setSelectedSlotId] = useState<string>(slotId || "");
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [step, setStep] = useState<"details" | "payment" | "confirmed">("details");
   const [contactName, setContactName] = useState("");
@@ -50,6 +69,7 @@ const Booking = () => {
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [requestError, setRequestError] = useState<string | null>(null);
+
 
 
   if (isLoading) return (
