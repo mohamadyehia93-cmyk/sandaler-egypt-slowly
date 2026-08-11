@@ -561,7 +561,7 @@ const ExperienceDetail = () => {
                           onClick={() => navigate(`/experience/${r.slug || r.id}`)}
                           className="w-full h-7 rounded-md bg-primary text-primary-foreground text-[10px] font-semibold"
                         >
-                          {t("common.view")}
+                          {ar ? "عرض" : "View"}
                         </button>
                       </div>
                     </div>
