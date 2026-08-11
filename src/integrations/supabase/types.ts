@@ -1355,6 +1355,57 @@ export type Database = {
           },
         ]
       }
+      notification_outbox: {
+        Row: {
+          attempts: number
+          created_at: string
+          dedupe_key: string
+          id: string
+          language: string
+          last_error: string | null
+          next_attempt_at: string
+          payload: Json
+          recipient_email: string
+          recipient_user_id: string | null
+          sent_at: string | null
+          status: string
+          template: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          dedupe_key: string
+          id?: string
+          language?: string
+          last_error?: string | null
+          next_attempt_at?: string
+          payload?: Json
+          recipient_email: string
+          recipient_user_id?: string | null
+          sent_at?: string | null
+          status?: string
+          template: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          dedupe_key?: string
+          id?: string
+          language?: string
+          last_error?: string | null
+          next_attempt_at?: string
+          payload?: Json
+          recipient_email?: string
+          recipient_user_id?: string | null
+          sent_at?: string | null
+          status?: string
+          template?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           buyer_id: string
@@ -1856,8 +1907,10 @@ export type Database = {
           cities: string[] | null
           created_at: string
           display_name: string | null
+          email_notifications: boolean
           id: string
           interests: string[] | null
+          preferred_language: string | null
           travel_style: string | null
           updated_at: string
           user_id: string
@@ -1869,8 +1922,10 @@ export type Database = {
           cities?: string[] | null
           created_at?: string
           display_name?: string | null
+          email_notifications?: boolean
           id?: string
           interests?: string[] | null
+          preferred_language?: string | null
           travel_style?: string | null
           updated_at?: string
           user_id: string
@@ -1882,8 +1937,10 @@ export type Database = {
           cities?: string[] | null
           created_at?: string
           display_name?: string | null
+          email_notifications?: boolean
           id?: string
           interests?: string[] | null
+          preferred_language?: string | null
           travel_style?: string | null
           updated_at?: string
           user_id?: string
@@ -2839,6 +2896,16 @@ export type Database = {
       is_order_seller: {
         Args: { _seller_id: string; _user_id: string }
         Returns: boolean
+      }
+      notif_auth_user: { Args: { _id: string }; Returns: string }
+      notif_enqueue: {
+        Args: {
+          _dedupe: string
+          _payload: Json
+          _template: string
+          _user: string
+        }
+        Returns: undefined
       }
       owns_provider_record: {
         Args: { _provider_id: string; _user_id: string }
