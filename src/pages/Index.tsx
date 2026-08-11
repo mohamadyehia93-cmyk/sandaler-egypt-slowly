@@ -20,9 +20,7 @@ import EventsSection from "@/components/EventsSection";
 import ProductGrid from "@/components/ProductGrid";
 import MeetUpSection from "@/components/MeetUpSection";
 import CollectionsSection from "@/components/CollectionsSection";
-import Testimonials from "@/components/Testimonials";
 import Partners from "@/components/Partners";
-import Certifications from "@/components/Certifications";
 
 const Index = () => {
   const { t } = useTranslation();
@@ -124,9 +122,7 @@ const Index = () => {
                 </button>
                 {whyOpen && (
                   <div className="mt-4 animate-fade-in">
-                    <Testimonials />
                     <Partners />
-                    <Certifications />
                   </div>
                 )}
                 {/* Footer links — image credits must stay reachable from the home page

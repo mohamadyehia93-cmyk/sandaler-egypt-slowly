@@ -7,7 +7,6 @@ import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { supabase } from "@/integrations/supabase/client";
-import DetailTestimonials from "@/components/DetailTestimonials";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
@@ -376,7 +375,6 @@ const TripDetail = () => {
           </>
         )}
 
-        <DetailTestimonials />
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">

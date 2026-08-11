@@ -9,7 +9,6 @@ import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { supabase } from "@/integrations/supabase/client";
 import { dbToLegacyCause } from "@/lib/dbAdapters";
 import ProviderBioCard from "@/components/ProviderBioCard";
-import DetailTestimonials from "@/components/DetailTestimonials";
 import NotFoundView from "@/components/NotFound";
 
 const supportOptions = [
@@ -175,7 +174,6 @@ const CauseDetail = () => {
         </div>
 
         {/* Testimonials */}
-        <DetailTestimonials />
       </div>
 
       {/* Organization Bio */}
