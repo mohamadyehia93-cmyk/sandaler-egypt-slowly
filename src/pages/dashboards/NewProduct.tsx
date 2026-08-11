@@ -28,13 +28,19 @@ const NewProduct = () => {
   const [photos, setPhotos] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
+  const [authorLang, setAuthorLang] = useState<Lang>(lang === "ar" ? "ar" : "en");
+  const [meta, setMeta] = useState<TranslationMeta>({});
+
   const [form, setForm] = useState({
-    name: "",
-    description: "",
+    nameEn: "",
+    nameAr: "",
+    descriptionEn: "",
+    descriptionAr: "",
+    originEn: "",
+    originAr: "",
     category: "",
     price: "",
     stock: "",
-    origin: "",
     material: "",
     dimensions: "",
     shippingOptions: [""],
