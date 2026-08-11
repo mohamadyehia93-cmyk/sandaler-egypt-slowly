@@ -77,9 +77,14 @@ const NewExperience = () => {
           groupSizeMin: data.capacity_min != null ? String(data.capacity_min) : "1",
           groupSizeMax: data.capacity_max != null ? String(data.capacity_max) : "10",
           photoPreviewUrls: (data.images as string[] | null) ?? (data.image ? [data.image] : []),
+          cityId: data.city_id ?? "",
+          regionId: data.region_id ?? "",
+          remarks_en: (data as any).remarks_en ?? "",
+          remarks_ar: (data as any).remarks_ar ?? "",
           meetingPointName: data.meeting_point_name ?? "",
           meetingPointLat: data.meeting_point_lat != null ? String(data.meeting_point_lat) : "",
           meetingPointLng: data.meeting_point_lng != null ? String(data.meeting_point_lng) : "",
+
         });
         setLoadState("ok");
       } catch {
@@ -179,7 +184,12 @@ const NewExperience = () => {
         meeting_point_name: form.meetingPointName || null,
         meeting_point_lat: form.meetingPointLat ? parseFloat(form.meetingPointLat) : null,
         meeting_point_lng: form.meetingPointLng ? parseFloat(form.meetingPointLng) : null,
+        city_id: form.cityId || null,
+        region_id: form.regionId || null,
+        remarks_en: form.remarks_en.trim() || null,
+        remarks_ar: form.remarks_ar.trim() || null,
       };
+
 
       if (isEdit) {
         // keep the existing photos when the host didn't upload new ones
