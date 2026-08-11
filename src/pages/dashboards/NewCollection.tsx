@@ -5,6 +5,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import BilingualField from "@/components/dashboard/BilingualField";
+import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
+import type { Lang, TranslationMeta } from "@/lib/translation";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
@@ -28,9 +31,14 @@ const NewCollection = () => {
   const [photos, setPhotos] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
+  const [authorLang, setAuthorLang] = useState<Lang>(lang === "ar" ? "ar" : "en");
+  const [meta, setMeta] = useState<TranslationMeta>({});
+
   const [form, setForm] = useState({
-    title: "",
-    abstract: "",
+    titleEn: "",
+    titleAr: "",
+    abstractEn: "",
+    abstractAr: "",
     discipline: "",
     region: "",
     entries: [{ title: "", summary: "" }],
@@ -48,9 +56,12 @@ const NewCollection = () => {
       }
       const entries = Array.isArray(data.entries) ? (data.entries as any[]) : [];
       const refs = Array.isArray(data.refs) ? (data.refs as any[]) : [];
+      setMeta(((data as any).translation_meta as TranslationMeta) || {});
       setForm({
-        title: data.title_en || "",
-        abstract: data.abstract_en || "",
+        titleEn: data.title_en || "",
+        titleAr: data.title_ar || "",
+        abstractEn: data.abstract_en || "",
+        abstractAr: data.abstract_ar || "",
         discipline: data.discipline || "",
         region: data.region_id || "",
         entries: entries.length ? entries.map((e: any) => ({ title: e.title || "", summary: e.summary || "" })) : [{ title: "", summary: "" }],
@@ -81,7 +92,9 @@ const NewCollection = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    if (!form.title.trim() || !form.abstract.trim() || !form.discipline) {
+    const titleSrc = authorLang === "ar" ? form.titleAr : form.titleEn;
+    const absSrc = authorLang === "ar" ? form.abstractAr : form.abstractEn;
+    if (!titleSrc.trim() || !absSrc.trim() || !form.discipline) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
@@ -94,10 +107,11 @@ const NewCollection = () => {
 
       const payload = {
         expert_id: user.id,
-        title_en: form.title.trim(),
-        title_ar: form.title.trim(),
-        abstract_en: form.abstract.trim(),
-        abstract_ar: form.abstract.trim(),
+        title_en: form.titleEn.trim(),
+        title_ar: form.titleAr.trim(),
+        abstract_en: form.abstractEn.trim(),
+        abstract_ar: form.abstractAr.trim(),
+        translation_meta: meta as any,
         discipline: form.discipline,
         region_id: form.region || null,
         cover_image: images[0] || null,
@@ -112,7 +126,7 @@ const NewCollection = () => {
         if (error) throw error;
         toast.success(lang === "ar" ? "تم تحديث المجموعة!" : "Collection updated!");
       } else {
-        const { error } = await supabase.from("collections").insert({ ...payload, slug: slugify(form.title, user.id.slice(0, 6)) });
+        const { error } = await supabase.from("collections").insert({ ...payload, slug: slugify(form.titleEn || form.titleAr, user.id.slice(0, 6)) });
         if (error) throw error;
         toast.success(lang === "ar" ? "تم نشر المجموعة بنجاح!" : "Collection published successfully!");
       }
@@ -141,16 +155,36 @@ const NewCollection = () => {
           <PhotoPicker files={photos} onChange={setPhotos} max={1} hint={lang === "ar" ? "صورة غلاف المجموعة" : "Collection cover image"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-subject-expert" />{lang === "ar" ? "عنوان المجموعة *" : "Collection Title *"}</label>
-          <input className={inputClass} placeholder={lang === "ar" ? "مثال: التراث المعماري لرشيد" : "e.g. Architectural Heritage of Rosetta"} value={form.title} onChange={(e) => set("title", e.target.value)} maxLength={120} />
-        </div>
+        <AuthorLangToggle value={authorLang} onChange={setAuthorLang} />
 
-        <div>
-          <label className={labelClass}><FileText className="w-3.5 h-3.5 text-role-subject-expert" />{lang === "ar" ? "الملخص *" : "Abstract *"}</label>
-          <textarea className={`${inputClass} min-h-[120px] resize-none`} placeholder={lang === "ar" ? "ملخص أكاديمي للمجموعة..." : "Academic abstract for the collection..."} value={form.abstract} onChange={(e) => set("abstract", e.target.value)} maxLength={2000} />
-          <span className="text-[10px] text-muted-foreground mt-1 block text-right">{form.abstract.length}/2000</span>
-        </div>
+        {/* Editorial/academic prose: translation is opt-in, never automatic */}
+        <BilingualField
+          fieldEn="title_en" fieldAr="title_ar"
+          labelEn="Collection Title" labelAr="عنوان المجموعة"
+          required manualOnly maxLength={120}
+          icon={<FileText className="w-3.5 h-3.5 text-role-subject-expert" />}
+          valueEn={form.titleEn} valueAr={form.titleAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, titleEn: en, titleAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="title of a scholarly heritage collection about Egypt"
+          placeholderEn="e.g. Architectural Heritage of Rosetta" placeholderAr="مثال: التراث المعماري لرشيد"
+          inputClass={inputClass} labelClass={labelClass}
+        />
+
+        <BilingualField
+          fieldEn="abstract_en" fieldAr="abstract_ar"
+          labelEn="Abstract" labelAr="الملخص"
+          required manualOnly multiline rows={6} maxLength={2000}
+          icon={<FileText className="w-3.5 h-3.5 text-role-subject-expert" />}
+          valueEn={form.abstractEn} valueAr={form.abstractAr}
+          onChange={({ en, ar }) => setForm((p) => ({ ...p, abstractEn: en, abstractAr: ar }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="academic abstract of a scholarly heritage collection about Egypt"
+          placeholderEn="Academic abstract for the collection..." placeholderAr="ملخص أكاديمي للمجموعة..."
+          inputClass={inputClass} labelClass={labelClass}
+        />
 
         <div>
           <label className={labelClass}><Tag className="w-3.5 h-3.5 text-role-subject-expert" />{lang === "ar" ? "التخصص *" : "Discipline *"}</label>
