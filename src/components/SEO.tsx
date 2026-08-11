@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { SITE_URL, absoluteUrl } from "@/lib/siteUrl";
 
 interface SEOProps {
   title?: string;
@@ -13,8 +14,8 @@ const SITE_NAME = "Sandal";
 const DEFAULT_TITLE = "Sandal — Discover Egypt. Slowly.";
 const DEFAULT_DESCRIPTION =
   "Explore authentic rural Egypt through local experiences, audio tours, stays, and trips — all curated by community ambassadors.";
-const DEFAULT_IMAGE = "https://sandaler-egypt-slowly.lovable.app/og-image.png";
-const BASE_URL = "https://sandaler-egypt-slowly.lovable.app";
+const DEFAULT_IMAGE = absoluteUrl("/og-image.png");
+const BASE_URL = SITE_URL;
 
 export function SEO({
   title,
