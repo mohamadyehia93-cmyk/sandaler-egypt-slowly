@@ -59,7 +59,7 @@ export function generateSlotDrafts(opts: {
   while (cursor <= end && out.length < 180) {
     if (wanted.has(cursor.getDay())) {
       out.push({
-        slot_date: cursor.toISOString().slice(0, 10),
+        slot_date: localISODate(cursor),
         start_time: startTime,
         end_time: endTime,
         price,
