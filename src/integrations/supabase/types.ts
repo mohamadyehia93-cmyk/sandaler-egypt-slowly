@@ -2795,6 +2795,10 @@ export type Database = {
     }
     Functions: {
       claim_first_admin: { Args: never; Returns: boolean }
+      decrement_slot_spots: {
+        Args: { _guests: number; _slot_id: string }
+        Returns: number
+      }
       get_follower_count: {
         Args: { _target_id: string; _target_type: string }
         Returns: number
