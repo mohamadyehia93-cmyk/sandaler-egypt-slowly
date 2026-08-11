@@ -4,7 +4,7 @@ import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, Boo
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
 import { cityData } from "@/lib/sampleData";
-import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents } from "@/hooks/useListings";
+import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents, useCauses } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
 import CausesSection from "@/components/CausesSection";
@@ -14,7 +14,17 @@ import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
 
-type PostItem = (typeof latestPosts)[number];
+type PostItem = {
+  id: string;
+  slug?: string;
+  title: { en: string; ar: string };
+  category: { en: string; ar: string };
+  author: { en: string; ar: string };
+  image: string;
+  readTime: number;
+  cityId?: string;
+  regionId?: string;
+};
 
 const CityPostsSection = ({
   posts,
