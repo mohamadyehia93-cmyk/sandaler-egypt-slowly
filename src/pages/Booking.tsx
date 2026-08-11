@@ -448,13 +448,20 @@ const Booking = () => {
         </div>
         {step === "details" ? (
           <button
-            onClick={() => setStep("payment")}
+            onClick={() => {
+              // Never let a request through with no date the host can act on.
+              if (isExperience && slots && slots.length > 0 && !selectedSlotId) {
+                setRequestError(ar ? "يرجى اختيار موعد أولاً." : "Please choose a date first.");
+                return;
+              }
+              setRequestError(null);
+              setStep("payment");
+            }}
             className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
           >
-            {paidPath
-              ? t("booking.continue_to_payment")
-              : ar ? "متابعة" : "Continue"}
+            {ar ? "متابعة" : "Continue"}
           </button>
+
         ) : (
           <button
             onClick={async () => {
