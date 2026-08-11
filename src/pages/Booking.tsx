@@ -474,8 +474,8 @@ const Booking = () => {
                 // unpaid booking REQUEST. status/payment_status are forced server-side.
                 const outcome = await startBookingCheckout(
                   {
-                    experienceId: id,
-                    slotId,
+                    experienceId: item.id,
+                    slotId: selectedSlotId || null,
                     guests,
                     totalAmountEgp: total,
                     visitorEmail: user.email || "",
