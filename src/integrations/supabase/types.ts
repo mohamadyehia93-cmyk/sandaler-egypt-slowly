@@ -1479,6 +1479,8 @@ export type Database = {
           contact_name: string | null
           contact_phone: string | null
           created_at: string
+          delivery_address: string | null
+          delivery_method: string | null
           id: string
           product_id: string
           quantity: number
@@ -1487,6 +1489,7 @@ export type Database = {
           total_egp: number | null
           unit_price_egp: number | null
           updated_at: string
+          variant_selection: Json | null
         }
         Insert: {
           buyer_id?: string
@@ -1494,6 +1497,8 @@ export type Database = {
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          delivery_address?: string | null
+          delivery_method?: string | null
           id?: string
           product_id: string
           quantity?: number
@@ -1502,6 +1507,7 @@ export type Database = {
           total_egp?: number | null
           unit_price_egp?: number | null
           updated_at?: string
+          variant_selection?: Json | null
         }
         Update: {
           buyer_id?: string
@@ -1509,6 +1515,8 @@ export type Database = {
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          delivery_address?: string | null
+          delivery_method?: string | null
           id?: string
           product_id?: string
           quantity?: number
@@ -1517,6 +1525,7 @@ export type Database = {
           total_egp?: number | null
           unit_price_egp?: number | null
           updated_at?: string
+          variant_selection?: Json | null
         }
         Relationships: [
           {
