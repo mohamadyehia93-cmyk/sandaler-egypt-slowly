@@ -8,34 +8,36 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { submitPledge } from "@/lib/submitPledge";
 
+/**
+ * Suggested bundles the visitor can PLEDGE, not stock the cause holds. The
+ * per-package "impact" claims ("supports 1 family for a month", "plants 20 trees")
+ * and the delivery-receipt/photos-within-7-days promise were removed: nothing in
+ * the app tracks fulfilment, so neither could be honoured.
+ */
 const giftPackages = [
   {
     emoji: "📦",
     name: { en: "Essential Care Package", ar: "حزمة الرعاية الأساسية" },
     desc: { en: "Includes hygiene kits, school supplies, and basic necessities for a family of four.", ar: "تشمل أدوات النظافة، مستلزمات مدرسية، واحتياجات أساسية لعائلة من أربعة." },
     price: 150,
-    impact: { en: "Supports 1 family for a month", ar: "تدعم عائلة واحدة لمدة شهر" },
   },
   {
     emoji: "🎒",
     name: { en: "Student Starter Kit", ar: "حقيبة الطالب" },
     desc: { en: "Backpack, notebooks, pens, and educational materials for one student.", ar: "حقيبة ظهر، دفاتر، أقلام، ومواد تعليمية لطالب واحد." },
     price: 80,
-    impact: { en: "Equips 1 student for the year", ar: "تجهز طالب واحد للعام الدراسي" },
   },
   {
     emoji: "🧶",
     name: { en: "Artisan Craft Bundle", ar: "حزمة الحرف اليدوية" },
     desc: { en: "Raw materials and tools to help local artisans create and sell their crafts.", ar: "مواد خام وأدوات لمساعدة الحرفيين المحليين على الإنتاج والبيع." },
     price: 200,
-    impact: { en: "Empowers 1 artisan for 3 months", ar: "تمكّن حرفي واحد لمدة 3 أشهر" },
   },
   {
     emoji: "🌱",
     name: { en: "Green Growth Box", ar: "صندوق النمو الأخضر" },
     desc: { en: "Seeds, saplings, and gardening tools for community farming projects.", ar: "بذور، شتلات، وأدوات زراعية لمشاريع الزراعة المجتمعية." },
     price: 120,
-    impact: { en: "Plants 20 trees in the community", ar: "تزرع 20 شجرة في المجتمع" },
   },
 ];
 
@@ -226,8 +228,8 @@ const CauseSupportGift = () => {
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {lang === "ar"
-                      ? "كل هدية يتم تسليمها مباشرة للمستفيدين مع إيصال تأكيد وصور"
-                      : "Every gift is delivered directly to beneficiaries with a confirmation receipt and photos"}
+                      ? "اختر حزمة لتتعهد بها؛ سيتواصل معك المنظّمون لتأكيد التفاصيل والتسليم."
+                      : "Pick a bundle to pledge; the organisers will contact you to confirm the details and hand-over."}
                   </p>
                 </div>
 
@@ -239,10 +241,6 @@ const CauseSupportGift = () => {
                         <div className="flex-1">
                           <p className="text-sm font-bold text-foreground">{p.name[lang]}</p>
                           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{p.desc[lang]}</p>
-                          <div className="flex items-center gap-1 mt-2">
-                            <Heart className="w-3 h-3 text-primary" />
-                            <span className="text-[10px] text-primary font-medium">{p.impact[lang]}</span>
-                          </div>
                         </div>
                       </div>
                       <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
@@ -327,7 +325,6 @@ const CauseSupportGift = () => {
               <div className="h-px bg-border my-3" />
               {[
                 { label: { en: "Price", ar: "السعر" }, value: `${pkg.price} ${t("common.egp")}` },
-                { label: { en: "Impact", ar: "الأثر" }, value: pkg.impact[lang] },
                 { label: { en: "Delivery", ar: "التوصيل" }, value: lang === "ar" ? "مباشرة للمستفيدين" : "Direct to beneficiaries" },
               ].map((row, i) => (
                 <div key={i} className="flex items-center justify-between py-1.5">
@@ -337,22 +334,7 @@ const CauseSupportGift = () => {
               ))}
             </div>
 
-            <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 mb-5">
-              <div className="flex items-center gap-2 mb-1.5">
-                <Heart className="w-4 h-4 text-primary" />
-                <span className="text-xs font-semibold text-primary">{lang === "ar" ? "أثر هديتك" : "Your Gift's Impact"}</span>
-              </div>
-              <p className="text-sm text-foreground">{pkg.impact[lang]}</p>
-            </div>
 
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-surface border border-border">
-              <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-              <p className="text-[10px] text-muted-foreground">
-                {lang === "ar"
-                  ? "ستتلقى إيصال تأكيد وصور من التسليم خلال 7 أيام عمل."
-                  : "You'll receive a confirmation receipt and delivery photos within 7 business days."}
-              </p>
-            </div>
           </>
         )}
 
