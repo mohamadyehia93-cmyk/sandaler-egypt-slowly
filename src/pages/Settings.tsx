@@ -119,14 +119,24 @@ const Settings = () => {
       title: { en: "Account", ar: "الحساب" },
       items: [
         {
+          icon: Repeat,
+          label: { en: "Switch role / Become a provider", ar: "تغيير الدور / كن مقدم خدمة" },
+          action: () => navigate("/welcome"),
+        },
+        {
           icon: LogOut,
           label: { en: "Log Out", ar: "تسجيل الخروج" },
           danger: true,
-          action: () => navigate("/welcome"),
+          action: async () => {
+            await supabase.auth.signOut();
+            toast.success(lang === "ar" ? "تم تسجيل الخروج" : "Signed out");
+            navigate("/welcome");
+          },
         },
       ],
     },
   ];
+
 
   return (
     <div className="min-h-screen bg-surface pb-20">
