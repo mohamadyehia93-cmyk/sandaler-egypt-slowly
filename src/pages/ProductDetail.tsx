@@ -2,7 +2,7 @@ import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, MapPin, ShoppingCart, Leaf, Package, Minus, Plus, X } from "lucide-react";
+import { ArrowLeft, MapPin, ShoppingCart, Leaf, Minus, Plus, X } from "lucide-react";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { toast } from "sonner";
 import WishlistButton from "@/components/WishlistButton";
