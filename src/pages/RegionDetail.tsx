@@ -9,7 +9,7 @@ import { bylineNames } from "@/lib/postByline";
 // Sample experiences/posts used to be merged into the DB results here, so a region
 // page mixed fabricated listings (with their own invented ratings and prices) in
 // with real ones. Only real rows are rendered now.
-import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents, useTrips } from "@/hooks/useListings";
+import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents, useTrips, useProducts } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
 import CausesSection from "@/components/CausesSection";
@@ -162,6 +162,7 @@ const RegionDetail = () => {
   const { data: dbPosts = [], isLoading: l4 } = usePosts();
   const { data: dbEvents = [] } = useEvents();
   const { data: dbTrips = [] } = useTrips();
+  const { data: dbProducts = [] } = useProducts();
   // City copy comes from the cities table, not the sample cityData map, so a
   // selected city can never show another city's overview.
   const { data: selectedCityRow } = useQuery({
