@@ -160,6 +160,7 @@ const RegionDetail = () => {
   const { data: dbWhosWho = [], isLoading: l3 } = useWhosWho();
   const { data: dbPosts = [], isLoading: l4 } = usePosts();
   const { data: dbEvents = [] } = useEvents();
+  const { data: dbTrips = [] } = useTrips();
   // City copy comes from the cities table, not the sample cityData map, so a
   // selected city can never show another city's overview.
   const { data: selectedCityRow } = useQuery({
@@ -200,6 +201,18 @@ const RegionDetail = () => {
         title: { en: e.title_en, ar: e.title_ar },
         image: e.image, price: e.price ?? 0, rating: e.rating ?? 0,
         cityId: e.city_id, regionId: e.region_id,
+      })),
+    ])
+  );
+  // Trips now carry a real city_id/region_id, so they belong on this page too.
+  const regionTrips = cityFilter(
+    dedupe([
+      ...(dbTrips as any[]).filter((tr) => tr.region_id === regionId).map((tr) => ({
+        id: tr.slug || tr.id, slug: tr.slug,
+        title: { en: tr.title_en, ar: tr.title_ar },
+        route: { en: tr.route_en || "", ar: tr.route_ar || "" },
+        image: tr.image, price: tr.price ?? 0,
+        cityId: tr.city_id, regionId: tr.region_id,
       })),
     ])
   );
@@ -393,6 +406,34 @@ const RegionDetail = () => {
                         <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {e.rating}
                       </span>
                     </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionHeader>
+        )}
+
+        {/* Trips */}
+        {regionTrips.length > 0 && (
+          <SectionHeader titleKey="section.trips" onSeeAll={() => navigate("/trips")}>
+            <div className="grid grid-cols-3 gap-3 px-4">
+              {regionTrips.slice(0, 3).map((tr) => (
+                <div key={tr.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/trip/${tr.id}`)}>
+                  <div className="relative h-32">
+                    {tr.image ? (
+                      <img src={tr.image} alt={tr.title[lang]} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-secondary" />
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">{tr.title[lang]}</h3>
+                    {tr.route[lang] && (
+                      <p className="text-[11px] text-muted-foreground line-clamp-1 mb-1">{tr.route[lang]}</p>
+                    )}
+                    <span className="text-sm font-bold text-primary-dark">
+                      {tr.price === 0 ? t("common.free") : `${tr.price} ${t("common.egp")}`}
+                    </span>
                   </div>
                 </div>
               ))}
