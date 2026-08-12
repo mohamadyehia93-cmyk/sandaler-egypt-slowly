@@ -56,6 +56,8 @@ const Community = () => {
   const [replyingTo, setReplyingTo] = useState<Record<string, string | null>>({});
 
   const { user } = useAuth();
+  const meta = (user?.user_metadata ?? {}) as { display_name?: string; full_name?: string };
+  const displayName = meta.display_name || meta.full_name || (lang === "ar" ? "مستخدم" : "User");
   const queryClient = useQueryClient();
   const [posting, setPosting] = useState(false);
 
@@ -97,11 +99,8 @@ const Community = () => {
     setOpenComments((prev) => ({ ...prev, [id]: !prev[id] }));
 
   const buildAuthorPayload = () => ({
-    author_name:
-      (user!.user_metadata as any)?.display_name ||
-      (user!.user_metadata as any)?.full_name ||
-      // Never expose the full email publicly — fall back to a generic label.
-      (lang === "ar" ? "مستخدم" : "User"),
+    // Never expose the full email publicly — fall back to a generic label.
+    author_name: displayName,
     // Never persist raw external OAuth photo URLs (e.g. lh3.googleusercontent.com)
     // in publicly readable comments — they are linkable PII. Render initials instead.
     author_avatar: null,
@@ -158,10 +157,7 @@ const Community = () => {
     try {
       const { error } = await supabase.from("community_posts").insert({
         author_id: user!.id,
-        author_name:
-          (user!.user_metadata as any)?.display_name ||
-          (user!.user_metadata as any)?.full_name ||
-          (lang === "ar" ? "مستخدم" : "User"),
+        author_name: displayName,
         category: newCategory,
         content: newContent.trim(),
         location: newLocation.trim() || null,
