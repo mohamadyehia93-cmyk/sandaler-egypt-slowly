@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
+import Avatar from "@/components/AvatarFallback";
+
 
 interface ProviderBioCardProps {
   providerId?: string;
