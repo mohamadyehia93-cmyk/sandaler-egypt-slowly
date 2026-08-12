@@ -122,10 +122,14 @@ const CauseSupportDonate = () => {
               <img src={cause.image} alt={cause.title[lang]} className="w-14 h-14 rounded-lg object-cover" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground truncate">{cause.title[lang]}</p>
-                <div className="w-full h-1.5 bg-border rounded-full mt-1.5">
-                  <div className="h-full bg-primary rounded-full" style={{ width: `${Math.min(progress ?? 0, 100)}%` }} />
-                </div>
-                <p className="text-[10px] text-muted-foreground mt-1">{progress}% {lang === "ar" ? "ممول" : "funded"}</p>
+                {progress !== null && (
+                  <>
+                    <div className="w-full h-1.5 bg-border rounded-full mt-1.5">
+                      <div className="h-full bg-primary rounded-full" style={{ width: `${Math.min(progress, 100)}%` }} />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-1">{progress}% {lang === "ar" ? "ممول" : "funded"}</p>
+                  </>
+                )}
               </div>
             </div>
 
@@ -311,9 +315,6 @@ const CauseSupportDonate = () => {
             </div>
 
 
-              <p className="text-sm text-foreground">{currentImpact.text[lang]}</p>
-            </div>
-
             {/* Honest framing */}
             <div className="flex items-start gap-2 p-3 rounded-lg bg-warning/5 border border-warning/30">
               <Info className="w-4 h-4 text-warning flex-shrink-0 mt-0.5" />
@@ -363,9 +364,6 @@ const CauseSupportDonate = () => {
                   <span className="text-xs font-semibold text-foreground">{row.value}</span>
                 </div>
               ))}
-            </div>
-
-              <p className="text-sm text-foreground">{currentImpact.text[lang]}</p>
             </div>
 
             <button
