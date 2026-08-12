@@ -229,8 +229,7 @@ const CauseSupportVolunteer = () => {
               </p>
             </div>
 
-              ))}
-            </div>
+
 
             {/* Opportunities */}
             <h2 className="text-base font-bold text-foreground mb-3">
