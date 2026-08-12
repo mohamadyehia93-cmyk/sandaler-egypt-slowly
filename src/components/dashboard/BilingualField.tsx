@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Languages, Loader2, Pencil, Sparkles } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { translateText, markMachine, markHuman, machineLabel, type Lang, type TranslationMeta } from "@/lib/translation";
