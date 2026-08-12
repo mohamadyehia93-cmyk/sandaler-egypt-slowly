@@ -199,7 +199,7 @@ const RegionDetail = () => {
     dedupe([
       ...(dbExperiences as any[]).filter((e) => e.region_id === regionId).map((e) => ({
         id: e.slug || e.id, slug: e.slug,
-        title: { en: e.title_en, ar: e.title_ar },
+        title: { en: e.title_en, ar: e.title_ar || e.title_en },
         image: e.image, price: e.price ?? 0, rating: e.rating ?? 0,
         cityId: e.city_id, regionId: e.region_id,
       })),
@@ -210,7 +210,7 @@ const RegionDetail = () => {
     dedupe([
       ...(dbTrips as any[]).filter((tr) => tr.region_id === regionId).map((tr) => ({
         id: tr.slug || tr.id, slug: tr.slug,
-        title: { en: tr.title_en, ar: tr.title_ar },
+        title: { en: tr.title_en, ar: tr.title_ar || tr.title_en },
         route: { en: tr.route_en || "", ar: tr.route_ar || "" },
         image: tr.image, price: tr.price ?? 0,
         cityId: tr.city_id, regionId: tr.region_id,
@@ -223,7 +223,7 @@ const RegionDetail = () => {
   const regionPosts = dedupe([
     ...(dbPosts as any[]).filter((p) => p.region_id === regionId).map((p) => ({
       id: p.slug || p.id, slug: p.slug,
-      title: { en: p.title_en, ar: p.title_ar },
+      title: { en: p.title_en, ar: p.title_ar || p.title_en },
       category: { en: p.category || "Article", ar: p.category || "مقال" },
       author: bylineNames(p),
       image: p.image, readTime: p.read_time_minutes ?? 5,
@@ -236,7 +236,7 @@ const RegionDetail = () => {
         .filter((w) => w.region_id === regionId && (w.status ?? "published") === "published")
         .map((w) => ({
           id: w.slug || w.id, slug: w.slug,
-          name: { en: w.name_en, ar: w.name_ar },
+          name: { en: w.name_en, ar: w.name_ar || w.name_en },
           role: { en: w.role_en || "", ar: w.role_ar || "" },
           bio: { en: w.bio_en || "", ar: w.bio_ar || "" },
           image: w.image, cityId: w.city_id, regionId: w.region_id,
@@ -249,7 +249,7 @@ const RegionDetail = () => {
       .filter((a) => a.region_id === regionId)
       .map((a) => ({
         id: a.slug || a.id,
-        title: { en: a.title_en, ar: a.title_ar },
+        title: { en: a.title_en, ar: a.title_ar || a.title_en },
         image: a.image,
         regionId: a.region_id,
         cityId: a.city_id,
