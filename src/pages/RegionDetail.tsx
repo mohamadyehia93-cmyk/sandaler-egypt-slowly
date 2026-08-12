@@ -8,7 +8,6 @@ import { bylineNames } from "@/lib/postByline";
 // Sample experiences/posts used to be merged into the DB results here, so a region
 // page mixed fabricated listings (with their own invented ratings and prices) in
 // with real ones. Only real rows are rendered now.
-import { regions, regionCities, latestPosts } from "@/lib/sampleData";
 import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
@@ -19,7 +18,17 @@ import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
 
-type PostItem = (typeof latestPosts)[number];
+type PostItem = {
+  id: string;
+  slug?: string;
+  title: { en: string; ar: string };
+  category: { en: string; ar: string };
+  author: { en: string; ar: string };
+  image: string;
+  readTime: number;
+  cityId?: string;
+  regionId?: string;
+};
 
 const RegionPostsSection = ({
   posts,
@@ -121,9 +130,27 @@ const RegionDetail = () => {
   const [selectedCity, setSelectedCity] = useState("all");
   const [cityDropOpen, setCityDropOpen] = useState(false);
 
-  const region = regions.find((r) => r.id === regionId);
-
-  const cities = regionCities[regionId || ""] || [];
+  // Region copy and its city list come from the regions/cities tables. There is
+  // no sample fallback: an unknown region id must 404.
+  const { data: regionRow, isLoading: lRegion } = useQuery({
+    queryKey: ["region", regionId],
+    enabled: !!regionId,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("regions").select("*").eq("id", regionId!).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+  const { data: cities = [] } = useQuery({
+    queryKey: ["region-cities", regionId],
+    enabled: !!regionId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("cities").select("id, name_en, name_ar").eq("region_id", regionId!).order("name_en");
+      if (error) throw error;
+      return (data || []).map((c) => ({ id: c.id, name: { en: c.name_en || "", ar: c.name_ar || c.name_en || "" } }));
+    },
+  });
 
   const cityFilter = <T extends { cityId?: string }>(items: T[]) =>
     selectedCity === "all" ? items : items.filter((i) => i.cityId === selectedCity);
@@ -149,10 +176,17 @@ const RegionDetail = () => {
       };
     },
   });
-  const isLoading = l1 || l2 || l3 || l4;
+  const isLoading = l1 || l2 || l3 || l4 || lRegion;
 
   if (isLoading) return <DetailSkeleton variant="region" />;
-  if (!region) return <NotFoundView context="region" />;
+  if (!regionRow) return <NotFoundView context="region" />;
+
+  const region = {
+    emoji: regionRow.emoji || "",
+    color: regionRow.color || "hsl(var(--primary))",
+    name: lang === "ar" ? regionRow.name_ar || regionRow.name_en || "" : regionRow.name_en || "",
+    about: lang === "ar" ? regionRow.about_ar || "" : regionRow.about_en || "",
+  };
 
   const dedupe = <T extends { id: string }>(arr: T[]) => {
     const seen = new Set<string>();
@@ -224,7 +258,7 @@ const RegionDetail = () => {
         </button>
         <div className="flex items-center gap-2 flex-1">
           <span className="text-2xl">{region.emoji}</span>
-          <h1 className="text-lg font-bold text-foreground">{t(region.nameKey)}</h1>
+          <h1 className="text-lg font-bold text-foreground">{region.name}</h1>
         </div>
       </header>
 
@@ -290,7 +324,7 @@ const RegionDetail = () => {
               {lang === "ar" ? "عن المنطقة" : "About"}
             </h3>
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">{region.about[lang]}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{region.about}</p>
         </div>
       ) : null}
 

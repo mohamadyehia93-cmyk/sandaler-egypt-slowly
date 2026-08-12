@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Heart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { experienceThemes } from "@/lib/sampleData";
+import { EXPERIENCE_THEMES } from "@/lib/listingTaxonomy";
 import { useExperiences, useRegions } from "@/hooks/useListings";
 import CityBadge from "./CityBadge";
 import { useNavigate } from "react-router-dom";
@@ -20,9 +20,9 @@ const ExperienceCards = () => {
     (e) => activeRegion === "all" || e.region_id === activeRegion
   );
 
-  // Group by theme, preserving the experienceThemes order
+  // Group by theme, preserving the EXPERIENCE_THEMES order
   const grouped = useMemo(() => {
-    return experienceThemes
+    return EXPERIENCE_THEMES
       .map((th) => ({
         theme: th,
         items: filtered.filter((e) => e.theme === th.key),

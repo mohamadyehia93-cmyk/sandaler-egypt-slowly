@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
-import { cityData } from "@/lib/sampleData";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents, useCauses } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
@@ -144,9 +145,38 @@ const CityDetail = () => {
   const { data: dbCauses = [] } = useCauses();
   const isLoading = l1 || l2 || l3 || l4 || l5 || l6 || l7 || l8;
 
-  const city = cityData[cityId || ""];
-  if (isLoading) return <DetailSkeleton variant="city" />;
-  if (!city) return <NotFoundView context="city" />;
+  // City copy comes from the cities table only. There is no sample fallback: an
+  // unknown city id must 404 rather than borrow another city's description.
+  const { data: cityRow, isLoading: lCity } = useQuery({
+    queryKey: ["city", cityId],
+    enabled: !!cityId,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("cities").select("*").eq("id", cityId!).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (isLoading || lCity) return <DetailSkeleton variant="city" />;
+  if (!cityRow) return <NotFoundView context="city" />;
+
+  const city = {
+    id: cityRow.id,
+    regionId: cityRow.region_id || "",
+    name: { en: cityRow.name_en || "", ar: cityRow.name_ar || cityRow.name_en || "" },
+    governorate: { en: cityRow.governorate_en || "", ar: cityRow.governorate_ar || cityRow.governorate_en || "" },
+    population: cityRow.population || "",
+    image: cityRow.image || "",
+    about: {
+      overview: { en: cityRow.overview_en || "", ar: cityRow.overview_ar || "" },
+      history: { en: cityRow.history_en || "", ar: cityRow.history_ar || "" },
+      culture: { en: cityRow.culture_en || "", ar: cityRow.culture_ar || "" },
+      geography: { en: cityRow.geography_en || "", ar: cityRow.geography_ar || "" },
+    },
+    highlights: { en: cityRow.highlights_en || [], ar: cityRow.highlights_ar || [] },
+    knownFor: { en: cityRow.known_for_en || [], ar: cityRow.known_for_ar || [] },
+    bestTime: { en: cityRow.best_time_en || "", ar: cityRow.best_time_ar || "" },
+  };
 
   const dedupe = <T extends { id: string }>(arr: T[]) => {
     const seen = new Set<string>();
@@ -256,37 +286,46 @@ const CityDetail = () => {
       <div className="space-y-5 pt-4">
         {/* About Section */}
         <div className="px-4 space-y-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Compass className="w-4 h-4 text-primary" />
-              <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "نظرة عامة" : "Overview"}</h3>
+          {city.about.overview[lang] && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Compass className="w-4 h-4 text-primary" />
+                <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "نظرة عامة" : "Overview"}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{city.about.overview[lang]}</p>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.overview[lang]}</p>
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <BookOpen className="w-4 h-4 text-primary" />
-              <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "التاريخ" : "History"}</h3>
+          )}
+          {city.about.history[lang] && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <BookOpen className="w-4 h-4 text-primary" />
+                <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "التاريخ" : "History"}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{city.about.history[lang]}</p>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.history[lang]}</p>
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Palette className="w-4 h-4 text-primary" />
-              <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "الثقافة" : "Culture"}</h3>
+          )}
+          {city.about.culture[lang] && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Palette className="w-4 h-4 text-primary" />
+                <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "الثقافة" : "Culture"}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{city.about.culture[lang]}</p>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.culture[lang]}</p>
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Mountain className="w-4 h-4 text-primary" />
-              <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "الجغرافيا" : "Geography"}</h3>
+          )}
+          {city.about.geography[lang] && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Mountain className="w-4 h-4 text-primary" />
+                <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "الجغرافيا" : "Geography"}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{city.about.geography[lang]}</p>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">{city.about.geography[lang]}</p>
-          </div>
+          )}
         </div>
 
         {/* Highlights */}
+        {city.highlights.en.length > 0 && (
         <div className="px-4">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-4 h-4 text-primary" />
@@ -308,8 +347,10 @@ const CityDetail = () => {
             })}
           </div>
         </div>
+        )}
 
         {/* Known For */}
+        {city.knownFor[lang].length > 0 && (
         <div className="px-4">
           <div className="flex items-center gap-2 mb-2">
             <Heart className="w-4 h-4 text-primary" />
@@ -321,8 +362,10 @@ const CityDetail = () => {
             ))}
           </div>
         </div>
+        )}
 
         {/* Best Time to Visit */}
+        {city.bestTime[lang] && (
         <div className="px-4">
           <div className="flex items-center gap-2 bg-card rounded-lg p-3 shadow-card border border-border">
             <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
@@ -332,6 +375,7 @@ const CityDetail = () => {
             </div>
           </div>
         </div>
+        )}
 
         {/* Categorized Posts/Articles */}
         {cityPosts.length > 0 && <CityPostsSection posts={cityPosts} lang={lang} navigate={navigate} />}

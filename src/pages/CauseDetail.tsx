@@ -4,10 +4,10 @@ import { ArrowLeft, Heart, Share2, Users, Calendar, MapPin, ExternalLink, Gift, 
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
-import { regions } from "@/lib/sampleData";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { supabase } from "@/integrations/supabase/client";
 import { dbToLegacyCause } from "@/lib/dbAdapters";
+import { useRegions } from "@/hooks/useListings";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import NotFoundView from "@/components/NotFound";
 
@@ -22,6 +22,7 @@ const CauseDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
+  const { data: dbRegions } = useRegions();
 
   const { data: dbCause } = useQuery({
     queryKey: ["cause", id],
@@ -49,7 +50,7 @@ const CauseDetail = () => {
   // which would show a different organisation's fundraising numbers.
   const cause = dbToLegacyCause(dbCause);
   if (!cause) return <NotFoundView context="cause" />;
-  const region = regions.find((r) => r.id === cause.regionId);
+  const region = (dbRegions ?? []).find((r) => r.id === cause.regionId);
   const progress = cause.goal > 0 ? Math.round((cause.raised / cause.goal) * 100) : 0;
   const orgHref = ownerOrg ? `/organization/${(ownerOrg as any).slug || (ownerOrg as any).id}` : null;
 
@@ -80,7 +81,7 @@ const CauseDetail = () => {
       <div className="px-4 pt-4">
         {/* Meta */}
         <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
-          <span className="flex items-center gap-1"><MapPin className="w-4 h-4 text-primary" /> {region ? t(region.nameKey) : ""}</span>
+          <span className="flex items-center gap-1"><MapPin className="w-4 h-4 text-primary" /> {region ? (lang === "ar" ? region.name_ar || region.name_en : region.name_en) : ""}</span>
           <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {cause.supporters} {lang === "ar" ? "داعم" : "supporters"}</span>
         </div>
 
