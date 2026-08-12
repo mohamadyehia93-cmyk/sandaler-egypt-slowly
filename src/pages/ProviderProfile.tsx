@@ -170,11 +170,12 @@ const ProviderProfile = () => {
       {/* Avatar + Name */}
       <div className="px-4 -mt-12 relative z-10">
         <div className="flex items-end gap-3">
-          <img
-            src={provider.avatar || "/placeholder.svg"}
-            alt={name}
-            className="w-20 h-20 rounded-2xl border-4 border-background object-cover shadow-card"
+          <Avatar
+            src={provider.avatar}
+            name={name}
+            className="w-20 h-20 rounded-2xl border-4 border-background shadow-card"
           />
+
           <div className="pb-1 flex-1">
             <div className="flex items-center gap-1.5">
               <h1 className="text-lg font-bold text-foreground">{name}</h1>
