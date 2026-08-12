@@ -43,7 +43,6 @@ const translations: Record<string, Record<Lang, string>> = {
   "event.category.heritage": { en: "Heritage", ar: "تراث" },
   "event.category": { en: "Category", ar: "التصنيف" },
   "event.details": { en: "Event details", ar: "تفاصيل الفعالية" },
-  "event.goodToKnow": { en: "Good to know", ar: "معلومات مفيدة" },
   "event.organizer": { en: "Organizer", ar: "المنظم" },
   "event.addToCalendar": { en: "Add to calendar", ar: "أضف للتقويم" },
   "event.directions": { en: "Directions", ar: "الاتجاهات" },
@@ -67,9 +66,6 @@ const translations: Record<string, Record<Lang, string>> = {
   "event.linkCopied": { en: "Link copied", ar: "تم نسخ الرابط" },
   "event.calendarSaved": { en: "Calendar file downloaded", ar: "تم تنزيل ملف التقويم" },
   "event.moreInCity": { en: "More events nearby", ar: "فعاليات أخرى قريبة" },
-  "event.tip1": { en: "Arrive 15–30 minutes early — seating and parking fill up fast.", ar: "احضر قبل الموعد بـ ١٥–٣٠ دقيقة — الأماكن تمتلئ سريعًا." },
-  "event.tip2": { en: "Bring cash: many local venues do not accept cards.", ar: "خذ معك نقودًا: كثير من الأماكن لا تقبل البطاقات." },
-  "event.tip3": { en: "Dress modestly and ask before photographing performers.", ar: "التزم بالزي المحتشم واستأذن قبل تصوير المشاركين." },
 
   "section.seeAll": { en: "See all", ar: "عرض الكل" },
   "common.book": { en: "Book", ar: "احجز" },

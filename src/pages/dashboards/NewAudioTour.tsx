@@ -22,7 +22,14 @@ const themes = [
 ];
 
 type StopDraft = {
+  /** Label in the authoring language. */
   name: string;
+  /**
+   * Label already stored in the OTHER language. Preserved verbatim on save —
+   * previously the non-authored label was written as "" which silently
+   * destroyed the Arabic (or English) stop names on every edit.
+   */
+  nameOther: string;
   desc_en: string;
   desc_ar: string;
   lat: string;
@@ -35,6 +42,7 @@ type StopDraft = {
 
 const emptyStop = (): StopDraft => ({
   name: "",
+  nameOther: "",
   desc_en: "",
   desc_ar: "",
   lat: "",
@@ -90,7 +98,7 @@ const NewAudioTour = () => {
         descriptionEn: data.description_en || "",
         descriptionAr: data.description_ar || "",
         city: data.city_id || "",
-        theme: "",
+        theme: data.theme || "",
         duration: data.duration_minutes != null ? String(data.duration_minutes) : "",
         price: data.price != null ? String(data.price) : "",
         languages: Array.isArray(data.languages) ? (data.languages as string[]) : [],
@@ -99,7 +107,8 @@ const NewAudioTour = () => {
       setStops(
         dbStops.length
           ? dbStops.map((s: any) => ({
-              name: s.label_en || s.label_ar || "",
+              name: (authorLang === "ar" ? s.label_ar || s.label_en : s.label_en || s.label_ar) || "",
+              nameOther: (authorLang === "ar" ? s.label_en : s.label_ar) || "",
               desc_en: s.desc_en || "",
               desc_ar: s.desc_ar || "",
               lat: s.lat != null ? String(s.lat) : "",
@@ -112,6 +121,9 @@ const NewAudioTour = () => {
       setExistingImages(data.image ? [data.image] : []);
       setExistingTourAudio((data as any).audio_url || null);
     })();
+  // authorLang intentionally excluded: toggling language must not reload and
+  // discard in-progress edits.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, id, lang]);
 
   const set = (key: string, value: string | string[]) => setForm((p) => ({ ...p, [key]: value }));
@@ -165,8 +177,8 @@ const NewAudioTour = () => {
         let stopAudio = s.audioUrl;
         if (s.audioFile) stopAudio = await uploadAudio(s.audioFile, user.id);
         cleanStops.push({
-          label_en: authorLang === "en" ? s.name.trim() : "",
-          label_ar: authorLang === "ar" ? s.name.trim() : "",
+          label_en: authorLang === "en" ? s.name.trim() : s.nameOther.trim(),
+          label_ar: authorLang === "ar" ? s.name.trim() : s.nameOther.trim(),
           desc_en: s.desc_en.trim(),
           desc_ar: s.desc_ar.trim(),
           lat: parseCoord(s.lat, 90),
@@ -198,6 +210,7 @@ const NewAudioTour = () => {
         description_ar: form.descriptionAr.trim() || null,
         translation_meta: meta as any,
         city_id: form.city.trim(),
+        theme: form.theme || null,
         duration_minutes: parseInt(form.duration) || 30,
         stops_count: cleanStops.length,
         stops: cleanStops,

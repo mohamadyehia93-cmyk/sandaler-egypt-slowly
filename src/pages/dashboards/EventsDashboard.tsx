@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchMyProviderId } from "@/lib/providerRecord";
 import {
   ArrowLeft, Plus, Pencil, Trash2, Calendar, Users, MapPin, Clock,
   CalendarCheck, CalendarClock, Send, CheckCircle2, XCircle, FileEdit, ChevronDown,
@@ -46,7 +47,12 @@ const EventsDashboard = () => {
     queryKey: ["my-events", user?.id, isAdmin],
     queryFn: async () => {
       let query = supabase.from("events").select("*").order("start_date", { ascending: false });
-      if (!isAdmin) query = query.eq("organizer_id", user!.id);
+      if (!isAdmin) {
+        // events.organizer_id holds providers.id
+        const providerId = await fetchMyProviderId(user!.id);
+        if (!providerId) return [] as EventRow[];
+        query = query.eq("organizer_id", providerId);
+      }
       const { data, error } = await query;
       if (error) throw error;
       return data as EventRow[];

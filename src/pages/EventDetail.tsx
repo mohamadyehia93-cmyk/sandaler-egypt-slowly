@@ -12,7 +12,6 @@ import {
   Share2,
   Users,
   Navigation,
-  Info,
   Timer,
   Wallet,
 } from "lucide-react";
@@ -332,17 +331,6 @@ const EventDetail = () => {
           </div>
         </div>
 
-        {/* Good to know */}
-        <div className="bg-card rounded-xl shadow-card p-4">
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t("event.goodToKnow")}</h3>
-          <ul className="space-y-2">
-            {[t("event.tip1"), t("event.tip2"), t("event.tip3")].map((tip) => (
-              <li key={tip} className="flex items-start gap-2 text-xs text-foreground leading-relaxed">
-                <Info className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" /> {tip}
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
 
       {/* Organizer */}
