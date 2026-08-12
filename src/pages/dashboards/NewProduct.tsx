@@ -67,6 +67,8 @@ const NewProduct = () => {
         originEn: data.seller_village_en || "",
         originAr: data.seller_village_ar || "",
         category: data.category || "",
+        cityId: data.city_id || "",
+        regionId: data.region_id || "",
         price: data.price != null ? String(data.price) : "",
         stock: data.stock != null ? String(data.stock) : "",
         material: "",
