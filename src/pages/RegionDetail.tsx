@@ -217,6 +217,17 @@ const RegionDetail = () => {
       })),
     ])
   );
+  // Products carry city_id/region_id from the seller's city picker.
+  const regionProducts = cityFilter(
+    dedupe([
+      ...(dbProducts as any[]).filter((p) => p.region_id === regionId).map((p) => ({
+        id: p.slug || p.id, slug: p.slug,
+        title: { en: p.name_en, ar: p.name_ar || p.name_en },
+        image: p.image, price: p.price ?? 0,
+        cityId: p.city_id, regionId: p.region_id,
+      })),
+    ])
+  );
   const regionEvents = (dbEvents as any[])
     .filter((e) => e.region_id === regionId)
     .filter((e) => selectedCity === "all" || e.city_id === selectedCity);
