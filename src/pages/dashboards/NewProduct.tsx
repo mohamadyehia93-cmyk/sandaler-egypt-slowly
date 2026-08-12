@@ -14,14 +14,8 @@ import type { Json } from "@/integrations/supabase/types";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, DollarSign, Package, Ruler, Truck, Clock, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
-const categories = [
-  { en: "Handmade Jewelry", ar: "مجوهرات يدوية" },
-  { en: "Textiles & Weaving", ar: "نسيج وحياكة" },
-  { en: "Pottery & Ceramics", ar: "فخار وخزف" },
-  { en: "Food & Spices", ar: "طعام وتوابل" },
-  { en: "Palm & Wood Crafts", ar: "حرف نخيل وخشب" },
-  { en: "Art & Paintings", ar: "فنون ولوحات" },
-];
+import { PRODUCT_CATEGORIES as categories } from "@/lib/productTaxonomy";
+
 
 type VariantJson = { label_en?: string | null; label_ar?: string | null; options?: string[] | string | null };
 type DeliveryJson = { method_en?: string | null; method_ar?: string | null; cost?: number | null; notes_en?: string | null; notes_ar?: string | null };
