@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, UserCheck, Calendar, MapPin, Clock, CheckCircle2, Users, ChevronRight, Check, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { causes } from "@/lib/sampleData";
+import { useCauseRow } from "@/lib/causeRow";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";

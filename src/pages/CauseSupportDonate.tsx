@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, CreditCard, Repeat, TrendingUp, Info, Check, ChevronRight, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { causes } from "@/lib/sampleData";
+import { useCauseRow } from "@/lib/causeRow";
 import { useState } from "react";
 import { toast } from "sonner";
 import NotFoundView from "@/components/NotFound";
@@ -39,7 +39,8 @@ const CauseSupportDonate = () => {
   const [note, setNote] = useState("");
 
 
-  const cause = causes.find((c) => c.id === id);
+  const { cause, isLoading: causeLoading } = useCauseRow(id);
+  if (causeLoading) return <div className="min-h-screen bg-background" />;
   if (!cause) return <NotFoundView context="cause" />;
 
   const progress = Math.round((cause.raised / cause.goal) * 100);

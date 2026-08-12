@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Gift, Package, Heart, Star, ChevronRight, Check, Truck, MapPin, Camera, Clock, CheckCircle2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { causes } from "@/lib/sampleData";
+import { useCauseRow } from "@/lib/causeRow";
 import { useState } from "react";
 import NotFoundView from "@/components/NotFound";
 import { toast } from "sonner";
