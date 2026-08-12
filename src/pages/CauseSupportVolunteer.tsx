@@ -63,7 +63,7 @@ const CauseSupportVolunteer = () => {
   const { lang } = useI18n();
   const { user } = useAuth();
 
-  const cause = causes.find((c) => c.id === id);
+  const { cause, isLoading: causeLoading } = useCauseRow(id);
 
   const [step, setStep] = useState<Step>("browse");
   const [selectedOpp, setSelectedOpp] = useState<number | null>(null);

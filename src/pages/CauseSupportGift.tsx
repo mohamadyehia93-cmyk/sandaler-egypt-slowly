@@ -58,7 +58,7 @@ const CauseSupportGift = () => {
   const { user } = useAuth();
   const ar = lang === "ar";
 
-  const cause = causes.find((c) => c.id === id);
+  const { cause, isLoading: causeLoading } = useCauseRow(id);
 
   const [step, setStep] = useState<Step>("choose");
   const [mode, setMode] = useState<GiftMode>("buy");
