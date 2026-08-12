@@ -12,7 +12,6 @@ import {
   Share2,
   Users,
   Navigation,
-  Info,
   Timer,
   Wallet,
 } from "lucide-react";
