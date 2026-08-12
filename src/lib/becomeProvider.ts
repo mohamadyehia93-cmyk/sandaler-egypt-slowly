@@ -1,6 +1,4 @@
-  // Arabic name is optional everywhere now — NULL means "no Arabic name" and
-  // the UI falls back to the English name for display. Never mirror English.
-  const nameAr = details?.nameAr?.trim() || null;import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 import type { LocalRole } from "@/hooks/useUserRole";
 
 const slugify = (input: string) =>
