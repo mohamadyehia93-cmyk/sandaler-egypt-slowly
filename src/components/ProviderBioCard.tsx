@@ -71,10 +71,9 @@ const ProviderBioCard = ({ providerId, roleLabel }: ProviderBioCardProps) => {
         {label[lang]}
       </h2>
       <div className="flex items-start gap-3">
-        <img
-          src={provider.avatar || "/placeholder.svg"}
-          alt={name}
-          className="w-14 h-14 rounded-full object-cover flex-shrink-0 border-2 border-primary/20 cursor-pointer"
+        <Avatar
+          src={provider.avatar}
+          name={name}
           onClick={() => navigate(`/provider/${provider.id}`)}
         />
         <div className="flex-1 min-w-0">
@@ -85,10 +84,12 @@ const ProviderBioCard = ({ providerId, roleLabel }: ProviderBioCardProps) => {
             {name}
           </p>
           {city && (
-            <p className="text-[11px] text-primary font-medium">
-              {city}{region ? ` · ${region}` : ""}
+            <p className="text-[11px] text-muted-foreground font-medium">
+              {lang === "ar" ? "مقر المنظّم: " : "Based in "}
+              <span className="text-primary">{city}{region ? ` · ${region}` : ""}</span>
             </p>
           )}
+
           {bio && (
             <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed line-clamp-3">
               {bio}
