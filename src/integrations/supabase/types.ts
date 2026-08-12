@@ -31,7 +31,7 @@ export type Database = {
           images: string[] | null
           latitude: number | null
           longitude: number | null
-          name_ar: string
+          name_ar: string | null
           name_en: string
           price_per_night: number
           rating: number | null
@@ -58,7 +58,7 @@ export type Database = {
           images?: string[] | null
           latitude?: number | null
           longitude?: number | null
-          name_ar: string
+          name_ar?: string | null
           name_en: string
           price_per_night?: number
           rating?: number | null
@@ -85,7 +85,7 @@ export type Database = {
           images?: string[] | null
           latitude?: number | null
           longitude?: number | null
-          name_ar?: string
+          name_ar?: string | null
           name_en?: string
           price_per_night?: number
           rating?: number | null
@@ -183,7 +183,7 @@ export type Database = {
           status: string | null
           stops: Json | null
           stops_count: number
-          title_ar: string
+          title_ar: string | null
           title_en: string
           translation_meta: Json
           updated_at: string
@@ -211,7 +211,7 @@ export type Database = {
           status?: string | null
           stops?: Json | null
           stops_count?: number
-          title_ar: string
+          title_ar?: string | null
           title_en: string
           translation_meta?: Json
           updated_at?: string
@@ -239,7 +239,7 @@ export type Database = {
           status?: string | null
           stops?: Json | null
           stops_count?: number
-          title_ar?: string
+          title_ar?: string | null
           title_en?: string
           translation_meta?: Json
           updated_at?: string
@@ -369,7 +369,7 @@ export type Database = {
           summary_ar: string | null
           summary_en: string | null
           supporters: number | null
-          title_ar: string
+          title_ar: string | null
           title_en: string
           translation_meta: Json
           updated_at: string
@@ -399,7 +399,7 @@ export type Database = {
           summary_ar?: string | null
           summary_en?: string | null
           supporters?: number | null
-          title_ar: string
+          title_ar?: string | null
           title_en: string
           translation_meta?: Json
           updated_at?: string
@@ -429,7 +429,7 @@ export type Database = {
           summary_ar?: string | null
           summary_en?: string | null
           supporters?: number | null
-          title_ar?: string
+          title_ar?: string | null
           title_en?: string
           translation_meta?: Json
           updated_at?: string
@@ -537,7 +537,7 @@ export type Database = {
           region_id: string | null
           slug: string | null
           status: string
-          title_ar: string
+          title_ar: string | null
           title_en: string
           translation_meta: Json
           updated_at: string
@@ -556,7 +556,7 @@ export type Database = {
           region_id?: string | null
           slug?: string | null
           status?: string
-          title_ar: string
+          title_ar?: string | null
           title_en: string
           translation_meta?: Json
           updated_at?: string
@@ -575,7 +575,7 @@ export type Database = {
           region_id?: string | null
           slug?: string | null
           status?: string
-          title_ar?: string
+          title_ar?: string | null
           title_en?: string
           translation_meta?: Json
           updated_at?: string
@@ -729,7 +729,7 @@ export type Database = {
           expertise_en: string[] | null
           id: string
           image: string | null
-          name_ar: string
+          name_ar: string | null
           name_en: string
           quote_ar: string | null
           quote_en: string | null
@@ -751,7 +751,7 @@ export type Database = {
           expertise_en?: string[] | null
           id?: string
           image?: string | null
-          name_ar: string
+          name_ar?: string | null
           name_en: string
           quote_ar?: string | null
           quote_en?: string | null
@@ -773,7 +773,7 @@ export type Database = {
           expertise_en?: string[] | null
           id?: string
           image?: string | null
-          name_ar?: string
+          name_ar?: string | null
           name_en?: string
           quote_ar?: string | null
           quote_en?: string | null
@@ -872,7 +872,7 @@ export type Database = {
           start_date: string
           status: string
           ticket_url: string | null
-          title_ar: string
+          title_ar: string | null
           title_en: string
           translation_meta: Json
           updated_at: string
@@ -902,7 +902,7 @@ export type Database = {
           start_date: string
           status?: string
           ticket_url?: string | null
-          title_ar: string
+          title_ar?: string | null
           title_en: string
           translation_meta?: Json
           updated_at?: string
@@ -932,7 +932,7 @@ export type Database = {
           start_date?: string
           status?: string
           ticket_url?: string | null
-          title_ar?: string
+          title_ar?: string | null
           title_en?: string
           translation_meta?: Json
           updated_at?: string
@@ -1054,7 +1054,7 @@ export type Database = {
           slug: string | null
           status: string | null
           theme: string | null
-          title_ar: string
+          title_ar: string | null
           title_en: string
           translation_meta: Json
           updated_at: string
@@ -1088,7 +1088,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           theme?: string | null
-          title_ar: string
+          title_ar?: string | null
           title_en: string
           translation_meta?: Json
           updated_at?: string
@@ -1122,7 +1122,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           theme?: string | null
-          title_ar?: string
+          title_ar?: string | null
           title_en?: string
           translation_meta?: Json
           updated_at?: string
@@ -1329,7 +1329,7 @@ export type Database = {
           region_id: string | null
           slug: string | null
           status: string | null
-          title_ar: string
+          title_ar: string | null
           title_en: string
           translation_meta: Json
           updated_at: string
@@ -1351,7 +1351,7 @@ export type Database = {
           region_id?: string | null
           slug?: string | null
           status?: string | null
-          title_ar: string
+          title_ar?: string | null
           title_en: string
           translation_meta?: Json
           updated_at?: string
@@ -1373,7 +1373,7 @@ export type Database = {
           region_id?: string | null
           slug?: string | null
           status?: string | null
-          title_ar?: string
+          title_ar?: string | null
           title_en?: string
           translation_meta?: Json
           updated_at?: string
@@ -1544,7 +1544,7 @@ export type Database = {
           logo: string | null
           mission_ar: string | null
           mission_en: string | null
-          name_ar: string
+          name_ar: string | null
           name_en: string
           org_type: string | null
           owner_id: string | null
@@ -1572,7 +1572,7 @@ export type Database = {
           logo?: string | null
           mission_ar?: string | null
           mission_en?: string | null
-          name_ar: string
+          name_ar?: string | null
           name_en: string
           org_type?: string | null
           owner_id?: string | null
@@ -1600,7 +1600,7 @@ export type Database = {
           logo?: string | null
           mission_ar?: string | null
           mission_en?: string | null
-          name_ar?: string
+          name_ar?: string | null
           name_en?: string
           org_type?: string | null
           owner_id?: string | null
@@ -1784,7 +1784,7 @@ export type Database = {
           slug: string | null
           status: string | null
           tags: string[] | null
-          title_ar: string
+          title_ar: string | null
           title_en: string
           translation_meta: Json
           updated_at: string
@@ -1811,7 +1811,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           tags?: string[] | null
-          title_ar: string
+          title_ar?: string | null
           title_en: string
           translation_meta?: Json
           updated_at?: string
@@ -1838,7 +1838,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           tags?: string[] | null
-          title_ar?: string
+          title_ar?: string | null
           title_en?: string
           translation_meta?: Json
           updated_at?: string
@@ -1873,7 +1873,7 @@ export type Database = {
           images: string[] | null
           latitude: number | null
           longitude: number | null
-          name_ar: string
+          name_ar: string | null
           name_en: string
           origin_story_ar: string | null
           origin_story_en: string | null
@@ -1905,7 +1905,7 @@ export type Database = {
           images?: string[] | null
           latitude?: number | null
           longitude?: number | null
-          name_ar: string
+          name_ar?: string | null
           name_en: string
           origin_story_ar?: string | null
           origin_story_en?: string | null
@@ -1937,7 +1937,7 @@ export type Database = {
           images?: string[] | null
           latitude?: number | null
           longitude?: number | null
-          name_ar?: string
+          name_ar?: string | null
           name_en?: string
           origin_story_ar?: string | null
           origin_story_en?: string | null
@@ -2040,7 +2040,7 @@ export type Database = {
           slug: string | null
           start_date: string | null
           status: string
-          title_ar: string
+          title_ar: string | null
           title_en: string
           translation_meta: Json
           updated_at: string
@@ -2063,7 +2063,7 @@ export type Database = {
           slug?: string | null
           start_date?: string | null
           status?: string
-          title_ar: string
+          title_ar?: string | null
           title_en: string
           translation_meta?: Json
           updated_at?: string
@@ -2086,7 +2086,7 @@ export type Database = {
           slug?: string | null
           start_date?: string | null
           status?: string
-          title_ar?: string
+          title_ar?: string | null
           title_en?: string
           translation_meta?: Json
           updated_at?: string
@@ -2501,7 +2501,7 @@ export type Database = {
           from_en: string | null
           id: string
           image: string | null
-          name_ar: string
+          name_ar: string | null
           name_en: string
           price: number
           provider_id: string | null
@@ -2531,7 +2531,7 @@ export type Database = {
           from_en?: string | null
           id?: string
           image?: string | null
-          name_ar: string
+          name_ar?: string | null
           name_en: string
           price?: number
           provider_id?: string | null
@@ -2561,7 +2561,7 @@ export type Database = {
           from_en?: string | null
           id?: string
           image?: string | null
-          name_ar?: string
+          name_ar?: string | null
           name_en?: string
           price?: number
           provider_id?: string | null
@@ -2638,7 +2638,7 @@ export type Database = {
           slug: string | null
           status: string | null
           theme: string | null
-          title_ar: string
+          title_ar: string | null
           title_en: string
           translation_meta: Json
           trip_type: string | null
@@ -2678,7 +2678,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           theme?: string | null
-          title_ar: string
+          title_ar?: string | null
           title_en: string
           translation_meta?: Json
           trip_type?: string | null
@@ -2718,7 +2718,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           theme?: string | null
-          title_ar?: string
+          title_ar?: string | null
           title_en?: string
           translation_meta?: Json
           trip_type?: string | null
@@ -2840,7 +2840,7 @@ export type Database = {
           longitude: number | null
           meeting_times_ar: string | null
           meeting_times_en: string | null
-          name_ar: string
+          name_ar: string | null
           name_en: string
           region_id: string | null
           role_ar: string | null
@@ -2869,7 +2869,7 @@ export type Database = {
           longitude?: number | null
           meeting_times_ar?: string | null
           meeting_times_en?: string | null
-          name_ar: string
+          name_ar?: string | null
           name_en: string
           region_id?: string | null
           role_ar?: string | null
@@ -2898,7 +2898,7 @@ export type Database = {
           longitude?: number | null
           meeting_times_ar?: string | null
           meeting_times_en?: string | null
-          name_ar?: string
+          name_ar?: string | null
           name_en?: string
           region_id?: string | null
           role_ar?: string | null

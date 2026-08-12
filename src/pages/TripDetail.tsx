@@ -52,9 +52,9 @@ const TripDetail = () => {
 
   if (!trip) return <NotFoundView context="trip" />;
 
-  const title = lang === "ar" ? trip.title_ar : trip.title_en;
-  const description = lang === "ar" ? trip.description_ar : trip.description_en;
-  const route = lang === "ar" ? trip.route_ar : trip.route_en;
+  const title = lang === "ar" ? (trip.title_ar || trip.title_en) : trip.title_en;
+  const description = lang === "ar" ? (trip.description_ar || trip.description_en) : trip.description_en;
+  const route = lang === "ar" ? (trip.route_ar || trip.route_en) : trip.route_en;
   const inclusions = lang === "ar" ? (trip.inclusions_ar || []) : (trip.inclusions_en || []);
   const exclusions = lang === "ar" ? (trip.exclusions_ar || []) : (trip.exclusions_en || []);
 
@@ -66,7 +66,7 @@ const TripDetail = () => {
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <div className="absolute top-4 right-4 flex gap-2">
-          <ShareButton title={lang === "ar" ? trip.title_ar : trip.title_en} />
+          <ShareButton title={lang === "ar" ? (trip.title_ar || trip.title_en) : trip.title_en} />
           <WishlistButton itemType="trip" itemId={trip?.id} />
         </div>
       </div>
@@ -114,7 +114,7 @@ const TripDetail = () => {
         {(() => {
           type Stop = { time?: string; title?: string; desc?: string };
           type Day = { day: number; title?: string; description?: string; stops?: Stop[] };
-          const raw = (lang === "ar" ? trip.itinerary_ar : trip.itinerary_en) as Day[] | null;
+          const raw = (lang === "ar" ? (trip.itinerary_ar || trip.itinerary_en) : trip.itinerary_en) as Day[] | null;
           const maxDays = trip.duration_days || Infinity;
           const days = (Array.isArray(raw) ? raw : [])
             .filter((d) => (d?.day ?? 0) <= maxDays)
@@ -250,10 +250,10 @@ const TripDetail = () => {
                   onClick={() => navigate(`/trip/${s.slug || s.id}`)}
                   className="snap-start shrink-0 w-44 text-start rounded-xl overflow-hidden bg-surface border border-border"
                 >
-                  <img src={s.image || "/placeholder.svg"} alt={lang === "ar" ? s.title_ar : s.title_en} className="w-full h-24 object-cover" />
+                  <img src={s.image || "/placeholder.svg"} alt={lang === "ar" ? (s.title_ar || s.title_en) : s.title_en} className="w-full h-24 object-cover" />
                   <div className="p-2">
                     <p className="text-xs font-semibold text-foreground line-clamp-2 mb-1">
-                      {lang === "ar" ? s.title_ar : s.title_en}
+                      {lang === "ar" ? (s.title_ar || s.title_en) : s.title_en}
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] text-muted-foreground">

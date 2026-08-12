@@ -9,7 +9,7 @@ import { bylineNames } from "@/lib/postByline";
 // Sample experiences/posts used to be merged into the DB results here, so a region
 // page mixed fabricated listings (with their own invented ratings and prices) in
 // with real ones. Only real rows are rendered now.
-import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents, useTrips } from "@/hooks/useListings";
+import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents, useTrips, useProducts } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
 import CausesSection from "@/components/CausesSection";
@@ -162,6 +162,7 @@ const RegionDetail = () => {
   const { data: dbPosts = [], isLoading: l4 } = usePosts();
   const { data: dbEvents = [] } = useEvents();
   const { data: dbTrips = [] } = useTrips();
+  const { data: dbProducts = [] } = useProducts();
   // City copy comes from the cities table, not the sample cityData map, so a
   // selected city can never show another city's overview.
   const { data: selectedCityRow } = useQuery({
@@ -173,8 +174,8 @@ const RegionDetail = () => {
         .eq("id", selectedCity).maybeSingle();
       if (!data) return null;
       return {
-        name: lang === "ar" ? data.name_ar : data.name_en,
-        overview: (lang === "ar" ? data.overview_ar : data.overview_en) || "",
+        name: lang === "ar" ? (data.name_ar || data.name_en) : data.name_en,
+        overview: (lang === "ar" ? (data.overview_ar || data.overview_en) : data.overview_en) || "",
       };
     },
   });
@@ -199,7 +200,7 @@ const RegionDetail = () => {
     dedupe([
       ...(dbExperiences as any[]).filter((e) => e.region_id === regionId).map((e) => ({
         id: e.slug || e.id, slug: e.slug,
-        title: { en: e.title_en, ar: e.title_ar },
+        title: { en: e.title_en, ar: e.title_ar || e.title_en },
         image: e.image, price: e.price ?? 0, rating: e.rating ?? 0,
         cityId: e.city_id, regionId: e.region_id,
       })),
@@ -210,10 +211,21 @@ const RegionDetail = () => {
     dedupe([
       ...(dbTrips as any[]).filter((tr) => tr.region_id === regionId).map((tr) => ({
         id: tr.slug || tr.id, slug: tr.slug,
-        title: { en: tr.title_en, ar: tr.title_ar },
+        title: { en: tr.title_en, ar: tr.title_ar || tr.title_en },
         route: { en: tr.route_en || "", ar: tr.route_ar || "" },
         image: tr.image, price: tr.price ?? 0,
         cityId: tr.city_id, regionId: tr.region_id,
+      })),
+    ])
+  );
+  // Products carry city_id/region_id from the seller's city picker.
+  const regionProducts = cityFilter(
+    dedupe([
+      ...(dbProducts as any[]).filter((p) => p.region_id === regionId).map((p) => ({
+        id: p.slug || p.id, slug: p.slug,
+        title: { en: p.name_en, ar: p.name_ar || p.name_en },
+        image: p.image, price: p.price ?? 0,
+        cityId: p.city_id, regionId: p.region_id,
       })),
     ])
   );
@@ -223,7 +235,7 @@ const RegionDetail = () => {
   const regionPosts = dedupe([
     ...(dbPosts as any[]).filter((p) => p.region_id === regionId).map((p) => ({
       id: p.slug || p.id, slug: p.slug,
-      title: { en: p.title_en, ar: p.title_ar },
+      title: { en: p.title_en, ar: p.title_ar || p.title_en },
       category: { en: p.category || "Article", ar: p.category || "مقال" },
       author: bylineNames(p),
       image: p.image, readTime: p.read_time_minutes ?? 5,
@@ -236,7 +248,7 @@ const RegionDetail = () => {
         .filter((w) => w.region_id === regionId && (w.status ?? "published") === "published")
         .map((w) => ({
           id: w.slug || w.id, slug: w.slug,
-          name: { en: w.name_en, ar: w.name_ar },
+          name: { en: w.name_en, ar: w.name_ar || w.name_en },
           role: { en: w.role_en || "", ar: w.role_ar || "" },
           bio: { en: w.bio_en || "", ar: w.bio_ar || "" },
           image: w.image, cityId: w.city_id, regionId: w.region_id,
@@ -249,7 +261,7 @@ const RegionDetail = () => {
       .filter((a) => a.region_id === regionId)
       .map((a) => ({
         id: a.slug || a.id,
-        title: { en: a.title_en, ar: a.title_ar },
+        title: { en: a.title_en, ar: a.title_ar || a.title_en },
         image: a.image,
         regionId: a.region_id,
         cityId: a.city_id,
@@ -432,6 +444,31 @@ const RegionDetail = () => {
                     )}
                     <span className="text-sm font-bold text-primary-dark">
                       {tr.price === 0 ? t("common.free") : `${tr.price} ${t("common.egp")}`}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionHeader>
+        )}
+
+        {/* Local Products */}
+        {regionProducts.length > 0 && (
+          <SectionHeader titleKey="section.products" onSeeAll={() => navigate("/?tab=products")}>
+            <div className="grid grid-cols-3 gap-3 px-4">
+              {regionProducts.slice(0, 3).map((p) => (
+                <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/product/${p.slug || p.id}`)}>
+                  <div className="relative h-32">
+                    {p.image ? (
+                      <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-secondary" />
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">{p.title[lang]}</h3>
+                    <span className="text-sm font-bold text-primary-dark">
+                      {p.price} {t("common.egp")}
                     </span>
                   </div>
                 </div>

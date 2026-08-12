@@ -109,7 +109,7 @@ const NewEvent = () => {
       const payload = {
         organizer_id: user.id,
         title_en: form.title_en.trim(),
-        title_ar: form.title_ar.trim(),
+        title_ar: form.title_ar.trim() || null,
         description_en: form.description_en.trim() || null,
         description_ar: form.description_ar.trim() || null,
         category: form.category,
@@ -233,7 +233,7 @@ const NewEvent = () => {
             <select className={inputClass} value={form.region_id} onChange={(e) => { set("region_id", e.target.value); set("city_id", ""); }}>
               <option value="">{lang === "ar" ? "اختر" : "Select"}</option>
               {(regions as any[]).map((r) => (
-                <option key={r.id} value={r.id}>{lang === "ar" ? r.name_ar : r.name_en}</option>
+                <option key={r.id} value={r.id}>{lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}</option>
               ))}
             </select>
           </div>
@@ -242,7 +242,7 @@ const NewEvent = () => {
             <select className={inputClass} value={form.city_id} onChange={(e) => set("city_id", e.target.value)}>
               <option value="">{lang === "ar" ? "اختر" : "Select"}</option>
               {regionCities.map((c) => (
-                <option key={c.id} value={c.id}>{lang === "ar" ? c.name_ar : c.name_en}</option>
+                <option key={c.id} value={c.id}>{lang === "ar" ? (c.name_ar || c.name_en) : c.name_en}</option>
               ))}
             </select>
           </div>

@@ -169,7 +169,7 @@ const FollowingFeed = () => {
     },
   });
 
-  const nameOf = (r: Row) => (lang === "ar" ? r.name_ar : r.name_en) || r.name_en || "";
+  const nameOf = (r: Row) => (lang === "ar" ? (r.name_ar || r.name_en) : r.name_en) || r.name_en || "";
   const href = (r: Row) => r.slug || r.id;
 
   if (!user) {
@@ -271,10 +271,10 @@ const FollowingFeed = () => {
                       className="w-full text-start border-t border-border"
                     >
                       <p className="px-3 pt-2 pb-2 text-sm font-semibold text-foreground line-clamp-2">
-                        {lang === "ar" ? c.title_ar : c.title_en}
+                        {lang === "ar" ? (c.title_ar || c.title_en) : c.title_en}
                       </p>
                       <p className="px-3 pb-2 text-xs text-muted-foreground line-clamp-2">
-                        {lang === "ar" ? c.summary_ar : c.summary_en}
+                        {lang === "ar" ? (c.summary_ar || c.summary_en) : c.summary_en}
                       </p>
                       {c.image && <img src={c.image} alt="" className="w-full h-44 object-cover" />}
                       <div className="flex items-center justify-between px-3 py-2.5">
@@ -307,10 +307,10 @@ const FollowingFeed = () => {
             const posts = peoplePosts.filter((p) => p.author_id && p.author_id === row.user_id);
             const meta =
               kind === "culture_actor"
-                ? (lang === "ar" ? row.title_ar : row.title_en) || ""
+                ? (lang === "ar" ? (row.title_ar || row.title_en) : row.title_en) || ""
                 : kind === "person"
-                ? (lang === "ar" ? row.role_ar : row.role_en) || ""
-                : (lang === "ar" ? row.tagline_ar : row.tagline_en) || row.role || "";
+                ? (lang === "ar" ? (row.role_ar || row.role_en) : row.role_en) || ""
+                : (lang === "ar" ? (row.tagline_ar || row.tagline_en) : row.tagline_en) || row.role || "";
             return (
               <article
                 key={`${kind}-${row.id}`}
@@ -348,7 +348,7 @@ const FollowingFeed = () => {
                       className="w-full text-start border-t border-border"
                     >
                       <p className="px-3 pt-2 pb-2 text-sm font-semibold text-foreground line-clamp-2">
-                        {lang === "ar" ? p.title_ar : p.title_en}
+                        {lang === "ar" ? (p.title_ar || p.title_en) : p.title_en}
                       </p>
                       {p.image && <img src={p.image} alt="" className="w-full h-40 object-cover" />}
                       <div className="flex items-center justify-between px-3 py-2.5">
@@ -408,7 +408,7 @@ const EmptySuggestions = ({
   lang: "en" | "ar";
   navigate: (path: string) => void;
 }) => {
-  const name = (r: Row) => (lang === "ar" ? r.name_ar : r.name_en) || r.name_en || "";
+  const name = (r: Row) => (lang === "ar" ? (r.name_ar || r.name_en) : r.name_en) || r.name_en || "";
   const href = (r: Row) => r.slug || r.id;
   return (
     <div className="space-y-5">
@@ -465,7 +465,7 @@ const EmptySuggestions = ({
                 key={a.id}
                 image={a.image}
                 name={name(a)}
-                meta={(lang === "ar" ? a.title_ar : a.title_en) || ""}
+                meta={(lang === "ar" ? (a.title_ar || a.title_en) : a.title_en) || ""}
                 onOpen={() => navigate(`/culture-actor/${href(a)}`)}
                 followType="culture_actor"
                 followId={a.id}
@@ -489,7 +489,7 @@ const EmptySuggestions = ({
                 key={p.id}
                 image={p.image}
                 name={name(p)}
-                meta={(lang === "ar" ? p.role_ar : p.role_en) || ""}
+                meta={(lang === "ar" ? (p.role_ar || p.role_en) : p.role_en) || ""}
                 onOpen={() => navigate(`/person/${href(p)}`)}
                 followType="person"
                 followId={p.id}

@@ -37,8 +37,8 @@ const HeroCarousel = () => {
   }
 
   const slide: any = slides[current % slides.length];
-  const title = lang === "ar" ? slide.title_ar : slide.title_en;
-  const subtitle = lang === "ar" ? slide.subtitle_ar : slide.subtitle_en;
+  const title = lang === "ar" ? (slide.title_ar || slide.title_en) : slide.title_en;
+  const subtitle = lang === "ar" ? (slide.subtitle_ar || slide.subtitle_en) : slide.subtitle_en;
   const image = randomImages[current % slides.length] || slide.image;
 
   return (

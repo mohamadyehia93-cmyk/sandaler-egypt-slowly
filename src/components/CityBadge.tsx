@@ -15,7 +15,7 @@ const CityBadge = ({ cityId, variant = "inline" }: CityBadgeProps) => {
   const city = cities?.find(c => c.id === cityId);
   if (!city) return null;
 
-  const name = lang === "ar" ? city.name_ar : city.name_en;
+  const name = lang === "ar" ? (city.name_ar || city.name_en) : city.name_en;
 
   if (variant === "overlay") {
     return (

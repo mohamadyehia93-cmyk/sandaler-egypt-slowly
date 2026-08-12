@@ -127,7 +127,7 @@ const WhosWhoDashboard = () => {
             <div className="space-y-2">
               {upcoming.map((s) => (
                 <div key={s.id} className="border border-border rounded-lg p-3">
-                  <p className="text-xs font-semibold text-foreground">{lang === "ar" ? s.title_ar : s.title_en}</p>
+                  <p className="text-xs font-semibold text-foreground">{lang === "ar" ? (s.title_ar || s.title_en) : s.title_en}</p>
                   <p className="text-[10px] text-muted-foreground mt-1">
                     {[s.meetup_date, s.meetup_time].filter(Boolean).join(" · ")}
                     {s.capacity ? ` · ${s.attendees_count ?? 0}/${s.capacity} ${lang === "ar" ? "مقاعد" : "spots"}` : ""}

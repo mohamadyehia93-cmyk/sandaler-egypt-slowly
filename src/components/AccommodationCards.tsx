@@ -22,7 +22,7 @@ const AccommodationCards = () => {
         ) : (accommodation ?? []).slice(0, 3).map((a) => (
           <div key={a.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${a.slug || a.id}`)}>
             <div className="relative h-32">
-              <img src={a.image || "/placeholder.svg"} alt={lang === "ar" ? a.name_ar : a.name_en} className="w-full h-full object-cover" />
+              <img src={a.image || "/placeholder.svg"} alt={lang === "ar" ? (a.name_ar || a.name_en) : a.name_en} className="w-full h-full object-cover" />
               <WishlistButton itemType="accommodation" itemId={a.id} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm" />
               {a.accommodation_type && (
                 <span className="absolute bottom-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
@@ -32,13 +32,13 @@ const AccommodationCards = () => {
             </div>
             <div className="p-3">
               <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-0.5">
-                {lang === "ar" ? a.name_ar : a.name_en}
+                {lang === "ar" ? (a.name_ar || a.name_en) : a.name_en}
               </h3>
               {a.host_name_en && (
                 <div className="flex items-center gap-1.5 mb-1">
                   {a.host_image && <img src={a.host_image} alt="" className="w-4 h-4 rounded-full object-cover" />}
                   <span className="text-[10px] text-primary font-medium truncate">
-                    {lang === "ar" ? a.host_name_ar : a.host_name_en}
+                    {lang === "ar" ? (a.host_name_ar || a.host_name_en) : a.host_name_en}
                   </span>
                 </div>
               )}

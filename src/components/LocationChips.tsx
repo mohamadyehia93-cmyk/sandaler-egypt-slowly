@@ -26,8 +26,8 @@ const LocationChips = ({ cityId, regionId, fallbackText, className }: LocationCh
   const region = regionId ? regions?.find((r: any) => r.id === regionId) : undefined;
 
   const chips: { key: string; label: string; href: string }[] = [];
-  if (city) chips.push({ key: `c-${city.id}`, label: lang === "ar" ? city.name_ar : city.name_en, href: `/city/${city.id}` });
-  if (region) chips.push({ key: `r-${region.id}`, label: lang === "ar" ? region.name_ar : region.name_en, href: `/region/${region.id}` });
+  if (city) chips.push({ key: `c-${city.id}`, label: lang === "ar" ? (city.name_ar || city.name_en) : city.name_en, href: `/city/${city.id}` });
+  if (region) chips.push({ key: `r-${region.id}`, label: lang === "ar" ? (region.name_ar || region.name_en) : region.name_en, href: `/region/${region.id}` });
 
   const text = (fallbackText || "").trim();
   if (chips.length === 0 && !text) return null;

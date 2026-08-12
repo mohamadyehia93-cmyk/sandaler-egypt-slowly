@@ -144,11 +144,11 @@ const ProviderProfile = () => {
 
   if (!provider) return <NotFoundView context="person" />;
 
-  const name = (lang === "ar" ? provider.name_ar : provider.name_en) || provider.name_en;
-  const bio = (lang === "ar" ? provider.bio_ar : provider.bio_en) || provider.bio_en;
-  const city = (lang === "ar" ? provider.city_ar : provider.city_en) || provider.city_en;
-  const region = (lang === "ar" ? provider.region_ar : provider.region_en) || provider.region_en;
-  const tagline = lang === "ar" ? provider.tagline_ar : provider.tagline_en;
+  const name = (lang === "ar" ? (provider.name_ar || provider.name_en) : provider.name_en) || provider.name_en;
+  const bio = (lang === "ar" ? (provider.bio_ar || provider.bio_en) : provider.bio_en) || provider.bio_en;
+  const city = (lang === "ar" ? (provider.city_ar || provider.city_en) : provider.city_en) || provider.city_en;
+  const region = (lang === "ar" ? (provider.region_ar || provider.region_en) : provider.region_en) || provider.region_en;
+  const tagline = lang === "ar" ? (provider.tagline_ar || provider.tagline_en) : provider.tagline_en;
   const specialties: { en: string; ar: string }[] = provider.specialties || [];
   const color = roleColorClass[provider.role] || "bg-primary";
   const textColor = roleTextClass[provider.role] || "text-primary";

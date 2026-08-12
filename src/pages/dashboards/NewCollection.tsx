@@ -108,9 +108,9 @@ const NewCollection = () => {
       const payload = {
         expert_id: user.id,
         title_en: form.titleEn.trim(),
-        title_ar: form.titleAr.trim(),
+        title_ar: form.titleAr.trim() || null,
         abstract_en: form.abstractEn.trim(),
-        abstract_ar: form.abstractAr.trim(),
+        abstract_ar: form.abstractAr.trim() || null,
         translation_meta: meta as any,
         discipline: form.discipline,
         region_id: form.region || null,

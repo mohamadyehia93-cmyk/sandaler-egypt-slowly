@@ -77,7 +77,7 @@ const OrganizationDetail = () => {
         }
         if (o?.city_id) {
           const { data: c } = await supabase.from("cities").select("name_en, name_ar").eq("id", o.city_id).maybeSingle();
-          if (!cancelled && c) setCityName(lang === "ar" ? c.name_ar : c.name_en);
+          if (!cancelled && c) setCityName(lang === "ar" ? (c.name_ar || c.name_en) : c.name_en);
         }
         if (o?.owner_id) {
           // Both programs.owner_id and causes.owner_id are resolved to the owning
@@ -146,12 +146,12 @@ const OrganizationDetail = () => {
   }
   if (!org) return <NotFoundView context="organization" />;
 
-  const name = lang === "ar" ? org.name_ar : org.name_en;
-  const mission = lang === "ar" ? org.mission_ar : org.mission_en;
-  const description = lang === "ar" ? org.description_ar : org.description_en;
-  const location = lang === "ar" ? org.location_ar : org.location_en;
-  const focusAreas = (lang === "ar" ? org.focus_areas_ar : org.focus_areas_en) ?? [];
-  const regionName = region ? (lang === "ar" ? region.name_ar : region.name_en) : null;
+  const name = lang === "ar" ? (org.name_ar || org.name_en) : org.name_en;
+  const mission = lang === "ar" ? (org.mission_ar || org.mission_en) : org.mission_en;
+  const description = lang === "ar" ? (org.description_ar || org.description_en) : org.description_en;
+  const location = lang === "ar" ? (org.location_ar || org.location_en) : org.location_en;
+  const focusAreas = (lang === "ar" ? (org.focus_areas_ar || org.focus_areas_en) : org.focus_areas_en) ?? [];
+  const regionName = region ? (lang === "ar" ? (region.name_ar || region.name_en) : region.name_en) : null;
   const place = location || cityName || regionName;
 
   return (
@@ -323,10 +323,10 @@ const OrganizationDetail = () => {
                 <img src={p.image || "/placeholder.svg"} alt="" className="w-14 h-14 rounded-lg object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-foreground line-clamp-1">
-                    {lang === "ar" ? p.title_ar : p.title_en}
+                    {lang === "ar" ? (p.title_ar || p.title_en) : p.title_en}
                   </p>
                   <p className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5">
-                    {lang === "ar" ? p.description_ar : p.description_en}
+                    {lang === "ar" ? (p.description_ar || p.description_en) : p.description_en}
                   </p>
                 </div>
               </div>
@@ -350,10 +350,10 @@ const OrganizationDetail = () => {
                   <img src={c.image || "/placeholder.svg"} alt="" className="w-14 h-14 rounded-lg object-cover shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-foreground line-clamp-1">
-                      {lang === "ar" ? c.title_ar : c.title_en}
+                      {lang === "ar" ? (c.title_ar || c.title_en) : c.title_en}
                     </p>
                     <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">
-                      {lang === "ar" ? c.summary_ar : c.summary_en}
+                      {lang === "ar" ? (c.summary_ar || c.summary_en) : c.summary_en}
                     </p>
                     {c.goal ? (
                       <div className="flex items-center gap-2 mt-1.5">

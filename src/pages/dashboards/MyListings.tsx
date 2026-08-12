@@ -79,7 +79,7 @@ const MyListings = () => {
                   {e.image ? <img src={e.image} alt="" className="w-full h-full object-cover" /> : <Compass className="w-6 h-6 text-muted-foreground" />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground line-clamp-1">{lang === "ar" ? e.title_ar : e.title_en}</p>
+                  <p className="text-sm font-semibold text-foreground line-clamp-1">{lang === "ar" ? (e.title_ar || e.title_en) : e.title_en}</p>
                   <p className="text-[11px] text-muted-foreground">{e.price ? `${e.price} ${lang === "ar" ? "ج.م" : "EGP"}` : "—"}</p>
                   <span className={`text-[10px] font-medium ${e.status === "published" ? "text-success" : "text-muted-foreground"}`}>
                     {e.status === "published" ? (lang === "ar" ? "منشورة" : "published") : (lang === "ar" ? "مسودة" : "draft")}

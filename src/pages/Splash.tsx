@@ -861,7 +861,7 @@ const SplashPage = () => {
                     selectedRegion === r.id ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
                   }`}
                 >
-                  {r.emoji} {lang === "ar" ? r.name_ar : r.name_en}
+                  {r.emoji} {lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}
                 </button>
               ))}
             </div>
@@ -882,7 +882,7 @@ const SplashPage = () => {
                     >
                       <MapPin className={`w-4 h-4 shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
                       <span className="text-sm font-medium text-foreground truncate">
-                        {lang === "ar" ? city.name_ar : city.name_en}
+                        {lang === "ar" ? (city.name_ar || city.name_en) : city.name_en}
                       </span>
                       {isSelected && (
                         <Check className="w-3.5 h-3.5 text-primary absolute top-2 end-2" />
@@ -1257,7 +1257,7 @@ const SplashPage = () => {
                       <p className="text-sm font-semibold text-foreground truncate">
                         {selectedCities.slice(0, 3).map(id => {
                           const city = citiesList.find(c => c.id === id);
-                          return city ? (lang === "ar" ? city.name_ar : city.name_en) : id;
+                          return city ? (lang === "ar" ? (city.name_ar || city.name_en) : city.name_en) : id;
                         }).join(", ")}
                         {selectedCities.length > 3 && ` +${selectedCities.length - 3}`}
                       </p>

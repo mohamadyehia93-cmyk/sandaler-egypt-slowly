@@ -108,7 +108,7 @@ const AmbassadorDashboard = () => {
           ) : (
             openTasks.map((t) => (
               <div key={t.id} className="py-2.5 border-b border-border last:border-0">
-                <p className="text-xs font-semibold text-foreground">{(lang === "ar" ? t.title_ar : t.title_en) || t.title_en}</p>
+                <p className="text-xs font-semibold text-foreground">{(lang === "ar" ? (t.title_ar || t.title_en) : t.title_en) || t.title_en}</p>
                 <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
                   {t.due_date && <><Clock className="w-3 h-3" />{t.due_date}</>}
                   {t.location ? ` · ${t.location}` : ""}

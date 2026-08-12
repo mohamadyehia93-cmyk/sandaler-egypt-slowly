@@ -145,9 +145,9 @@ const NewTrip = () => {
       const payload = {
         organizer_id: providerId,
         title_en: form.titleEn.trim(),
-        title_ar: form.titleAr.trim(),
+        title_ar: form.titleAr.trim() || null,
         description_en: form.descriptionEn.trim(),
-        description_ar: form.descriptionAr.trim(),
+        description_ar: form.descriptionAr.trim() || null,
         translation_meta: meta as any,
         trip_type: tripTypeValue,
         price: parseInt(form.price) || 0,

@@ -63,8 +63,8 @@ const EventDetail = () => {
   if (isLoading) return <DetailSkeleton variant="city" />;
   if (!event) return <NotFoundView context="event" />;
 
-  const title = lang === "ar" ? event.title_ar : event.title_en;
-  const description = lang === "ar" ? event.description_ar : event.description_en;
+  const title = lang === "ar" ? (event.title_ar || event.title_en) : event.title_en;
+  const description = lang === "ar" ? (event.description_ar || event.description_en) : event.description_en;
   const venue = lang === "ar" ? event.venue_ar || event.location_ar : event.venue_en || event.location_en;
   const locale = lang === "ar" ? "ar-EG" : "en-US";
 
@@ -94,8 +94,8 @@ const EventDetail = () => {
 
   const city = (cities as any[]).find((c) => c.id === event.city_id);
   const region = (regions as any[]).find((r) => r.id === event.region_id);
-  const cityName = city ? (lang === "ar" ? city.name_ar : city.name_en) : null;
-  const regionName = region ? (lang === "ar" ? region.name_ar : region.name_en) : null;
+  const cityName = city ? (lang === "ar" ? (city.name_ar || city.name_en) : city.name_en) : null;
+  const regionName = region ? (lang === "ar" ? (region.name_ar || region.name_en) : region.name_en) : null;
 
   const priceLabel = event.is_free
     ? t("common.free")

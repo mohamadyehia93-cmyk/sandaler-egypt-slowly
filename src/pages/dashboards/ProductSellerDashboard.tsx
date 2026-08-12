@@ -117,7 +117,7 @@ const ProductSellerDashboard = () => {
             </h3>
             {lowStock.map((p) => (
               <div key={p.id} className="flex items-center justify-between py-2 border-b border-destructive/10 last:border-0">
-                <span className="text-xs text-foreground">{lang === "ar" ? p.name_ar : p.name_en}</span>
+                <span className="text-xs text-foreground">{lang === "ar" ? (p.name_ar || p.name_en) : p.name_en}</span>
                 <span className="text-[10px] font-bold text-destructive">{p.stock ?? 0} {lang === "ar" ? "متبقي" : "left"}</span>
               </div>
             ))}

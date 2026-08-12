@@ -101,9 +101,9 @@ const NewArticle = () => {
       const payload = {
         author_id: user.id,
         title_en: form.titleEn.trim(),
-        title_ar: form.titleAr.trim(),
+        title_ar: form.titleAr.trim() || null,
         body_en: form.bodyEn.trim(),
-        body_ar: form.bodyAr.trim(),
+        body_ar: form.bodyAr.trim() || null,
         excerpt_en: form.bodyEn.trim() ? form.bodyEn.trim().slice(0, 160) : null,
         excerpt_ar: form.bodyAr.trim() ? form.bodyAr.trim().slice(0, 160) : null,
         translation_meta: meta as any,

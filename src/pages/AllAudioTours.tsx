@@ -107,7 +107,7 @@ const AllAudioTours = () => {
                   activeRegion === r.id ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
                 }`}
               >
-                {r.emoji} {lang === "ar" ? r.name_ar : r.name_en}
+                {r.emoji} {lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}
                 <span className="opacity-60">({count})</span>
               </button>
             );
@@ -141,7 +141,7 @@ const AllAudioTours = () => {
                     className="min-w-[260px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card cursor-pointer active:scale-[0.98] transition-transform"
                   >
                     <div className="relative h-36">
-                      <img src={a.image} alt={lang === "ar" ? a.title_ar : a.title_en} className="w-full h-full object-cover" />
+                      <img src={a.image} alt={lang === "ar" ? (a.title_ar || a.title_en) : a.title_en} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <div className="absolute top-2 left-2 flex items-center gap-1 bg-primary/90 text-primary-foreground px-2 py-0.5 rounded-full text-[10px] font-medium">
                         <Headphones className="w-3 h-3" />
@@ -155,7 +155,7 @@ const AllAudioTours = () => {
                       </button>
                       <div className="absolute bottom-2 left-2 right-2">
                         <h3 className="text-sm font-bold text-primary-foreground line-clamp-2 leading-tight">
-                          {lang === "ar" ? a.title_ar : a.title_en}
+                          {lang === "ar" ? (a.title_ar || a.title_en) : a.title_en}
                         </h3>
                       </div>
                     </div>

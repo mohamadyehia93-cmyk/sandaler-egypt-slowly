@@ -91,10 +91,10 @@ export default function RegionPage() {
     );
   }
 
-  const name = lang === "ar" ? region.name_ar : region.name_en;
-  const tagline = lang === "ar" ? region.tagline_ar : region.tagline_en;
-  const description = lang === "ar" ? region.about_ar : region.about_en;
-  const seasonalText = lang === "ar" ? region.season_highlights_ar : region.season_highlights_en;
+  const name = lang === "ar" ? (region.name_ar || region.name_en) : region.name_en;
+  const tagline = lang === "ar" ? (region.tagline_ar || region.tagline_en) : region.tagline_en;
+  const description = lang === "ar" ? (region.about_ar || region.about_en) : region.about_en;
+  const seasonalText = lang === "ar" ? (region.season_highlights_ar || region.season_highlights_en) : region.season_highlights_en;
   const seoTitle =
     lang === "ar" ? `${name} — اكتشف مصر الريفية` : `${name} — Discover Rural Egypt`;
 
@@ -197,7 +197,7 @@ export default function RegionPage() {
                             {post.category}
                           </div>
                           <h3 className="text-sm font-semibold line-clamp-2">
-                            {lang === "ar" ? post.title_ar : post.title_en}
+                            {lang === "ar" ? (post.title_ar || post.title_en) : post.title_en}
                           </h3>
                         </div>
                       </Card>
@@ -220,7 +220,7 @@ export default function RegionPage() {
                         />
                         <div className="p-2.5">
                           <h3 className="text-xs font-semibold line-clamp-2 mb-1">
-                            {lang === "ar" ? exp.title_ar : exp.title_en}
+                            {lang === "ar" ? (exp.title_ar || exp.title_en) : exp.title_en}
                           </h3>
                           <p className="text-[11px] text-primary font-semibold">
                             {exp.price === 0 ? t("region.free") : `${exp.price} ${t("common.egp")}`}
@@ -250,7 +250,7 @@ export default function RegionPage() {
                           {post.category}
                         </div>
                         <h3 className="font-semibold mb-1">
-                          {lang === "ar" ? post.title_ar : post.title_en}
+                          {lang === "ar" ? (post.title_ar || post.title_en) : post.title_en}
                         </h3>
                         <p className="text-xs text-muted-foreground">
                           {post.read_time_minutes} {t("region.min_read")}
@@ -280,7 +280,7 @@ export default function RegionPage() {
                       />
                       <div className="p-3">
                         <h3 className="text-sm font-semibold line-clamp-2 mb-1">
-                          {lang === "ar" ? exp.title_ar : exp.title_en}
+                          {lang === "ar" ? (exp.title_ar || exp.title_en) : exp.title_en}
                         </h3>
                         <p className="text-xs text-primary font-semibold">
                           {exp.price === 0 ? t("region.free") : `${exp.price} ${t("common.egp")}`}
@@ -310,7 +310,7 @@ export default function RegionPage() {
                       />
                       <div className="p-3 flex-1 min-w-0">
                         <h3 className="text-sm font-semibold line-clamp-2 mb-1">
-                          {lang === "ar" ? tour.title_ar : tour.title_en}
+                          {lang === "ar" ? (tour.title_ar || tour.title_en) : tour.title_en}
                         </h3>
                         <p className="text-xs text-muted-foreground">
                           {tour.duration_minutes} {t("region.min")} · {tour.stops_count} {t("region.stops")}

@@ -30,7 +30,7 @@ const THEME_LABEL: Record<string, { en: string; ar: string }> = {
 const PostCard = ({ p, lang, navigate }: any) => {
   const ct = p.content_type ? contentTypeConfig[p.content_type] : null;
   const CtIcon = ct?.icon;
-  const title = lang === "ar" ? p.title_ar : p.title_en;
+  const title = lang === "ar" ? (p.title_ar || p.title_en) : p.title_en;
   return (
     <div
       className="rounded-lg overflow-hidden shadow-card bg-card relative cursor-pointer"

@@ -189,7 +189,7 @@ const CityDetail = () => {
   const cityExperiences = dedupe([
     ...(dbExperiences as any[]).filter((e) => e.city_id === cityId).map((e) => ({
       id: e.slug || e.id, slug: e.slug,
-      title: { en: e.title_en, ar: e.title_ar },
+      title: { en: e.title_en, ar: e.title_ar || e.title_en },
       image: e.image, price: e.price ?? 0, rating: e.rating ?? 0,
       cityId: e.city_id, regionId: e.region_id,
     })),
@@ -197,14 +197,14 @@ const CityDetail = () => {
   const cityAudioTours = dedupe(
     (dbAudioTours as any[]).filter((a) => a.city_id === cityId).map((a) => ({
       id: a.slug || a.id, slug: a.slug,
-      title: { en: a.title_en, ar: a.title_ar },
+      title: { en: a.title_en, ar: a.title_ar || a.title_en },
       image: a.image, price: a.price ?? 0,
     }))
   );
   const cityAccommodation = dedupe([
     ...(dbAccommodations as any[]).filter((a) => a.city_id === cityId).map((a) => ({
       id: a.slug || a.id, slug: a.slug,
-      title: { en: a.name_en, ar: a.name_ar },
+      title: { en: a.name_en, ar: a.name_ar || a.name_en },
       type: { en: a.accommodation_type || "Stay", ar: a.accommodation_type || "إقامة" },
       location: { en: a.host_name_en || "", ar: a.host_name_ar || "" },
       image: a.image, price: a.price_per_night ?? 0, rating: a.rating ?? 0,
@@ -214,7 +214,7 @@ const CityDetail = () => {
   const cityProducts = dedupe([
     ...(dbProducts as any[]).filter((p) => p.city_id === cityId).map((p) => ({
       id: p.slug || p.id, slug: p.slug,
-      title: { en: p.name_en, ar: p.name_ar },
+      title: { en: p.name_en, ar: p.name_ar || p.name_en },
       village: { en: p.seller_village_en || "", ar: p.seller_village_ar || "" },
       badge: { en: (p.badges?.[0]) || "", ar: (p.badges?.[0]) || "" },
       image: p.image, price: p.price ?? 0,
@@ -226,7 +226,7 @@ const CityDetail = () => {
       .filter((w) => w.city_id === cityId && (w.status ?? "published") === "published")
       .map((w) => ({
         id: w.slug || w.id, slug: w.slug,
-        name: { en: w.name_en, ar: w.name_ar },
+        name: { en: w.name_en, ar: w.name_ar || w.name_en },
         role: { en: w.role_en || "", ar: w.role_ar || "" },
         bio: { en: w.bio_en || "", ar: w.bio_ar || "" },
         image: w.image, cityId: w.city_id,
@@ -238,7 +238,7 @@ const CityDetail = () => {
   const cityPosts = dedupe([
     ...(dbPosts as any[]).filter((p) => p.city_id === cityId).map((p) => ({
       id: p.slug || p.id, slug: p.slug,
-      title: { en: p.title_en, ar: p.title_ar },
+      title: { en: p.title_en, ar: p.title_ar || p.title_en },
       category: { en: p.category || "Article", ar: p.category || "مقال" },
       author: bylineNames(p),
       image: p.image, readTime: p.read_time_minutes ?? 5,
@@ -249,7 +249,7 @@ const CityDetail = () => {
   const cityTrips = dedupe([
     ...(dbTrips as any[]).filter((tr) => tr.city_id === cityId).map((tr) => ({
       id: tr.slug || tr.id, slug: tr.slug,
-      title: { en: tr.title_en, ar: tr.title_ar },
+      title: { en: tr.title_en, ar: tr.title_ar || tr.title_en },
       route: { en: tr.route_en || "", ar: tr.route_ar || "" },
       image: tr.image, price: tr.price ?? 0, date: tr.date || "",
       cityId: tr.city_id,
@@ -513,7 +513,7 @@ const CityDetail = () => {
               {cityTransport.slice(0, 3).map((tr) => (
                 <div key={tr.id} className="rounded-lg shadow-card bg-card p-4 flex flex-col items-center gap-2 cursor-pointer" onClick={() => navigate(`/transport/${tr.slug || tr.id}`)}>
                   {tr.image ? <img src={tr.image} alt="" className="w-10 h-10 rounded-full object-cover" /> : <span className="text-3xl">🚐</span>}
-                  <h3 className="text-xs font-semibold text-foreground text-center line-clamp-2">{lang === "ar" ? tr.name_ar : tr.name_en}</h3>
+                  <h3 className="text-xs font-semibold text-foreground text-center line-clamp-2">{lang === "ar" ? (tr.name_ar || tr.name_en) : tr.name_en}</h3>
                   <span className="text-sm font-bold text-primary-dark">{tr.price} {t("common.egp")}</span>
                 </div>
               ))}

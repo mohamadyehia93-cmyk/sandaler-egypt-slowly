@@ -124,9 +124,9 @@ const NewProduct = () => {
       const payload = {
         seller_id: providerId,
         name_en: form.nameEn.trim(),
-        name_ar: form.nameAr.trim(),
+        name_ar: form.nameAr.trim() || null,
         description_en: form.descriptionEn.trim(),
-        description_ar: form.descriptionAr.trim(),
+        description_ar: form.descriptionAr.trim() || null,
         // composite spec line — stored only in the language it was written in
         origin_story_en: (authorLang === "en" ? originStory : null) || null,
         origin_story_ar: (authorLang === "ar" ? originStory : null) || null,
