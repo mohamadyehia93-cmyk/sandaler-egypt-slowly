@@ -76,11 +76,23 @@ const NewTrip = () => {
         toast.error(lang === "ar" ? "تعذر تحميل الرحلة" : "Could not load trip");
         return;
       }
-      const routeParts = ((data.route_en || data.route_ar) || "").split(" → ").map((s: string) => s.trim()).filter(Boolean);
-      const itinSrc = Array.isArray(data.itinerary_en) && data.itinerary_en.length ? data.itinerary_en : data.itinerary_ar;
-      const itin = Array.isArray(itinSrc) ? (itinSrc as any[]) : [];
-      const incSrc = Array.isArray(data.inclusions_en) && data.inclusions_en.length ? data.inclusions_en : data.inclusions_ar;
-      const inc = Array.isArray(incSrc) ? (incSrc as any[]) : [];
+      const asArr = (v: unknown) => (Array.isArray(v) ? (v as any[]) : []);
+      setOtherLang({
+        route_en: data.route_en ?? null,
+        route_ar: data.route_ar ?? null,
+        itinerary_en: asArr(data.itinerary_en),
+        itinerary_ar: asArr(data.itinerary_ar),
+        inclusions_en: asArr(data.inclusions_en) as string[],
+        inclusions_ar: asArr(data.inclusions_ar) as string[],
+      });
+      // Show the authoring language's stored copy; fall back to the other one so
+      // the author is never faced with an empty form while data exists.
+      const routeSrc = (authorLang === "ar" ? data.route_ar || data.route_en : data.route_en || data.route_ar) || "";
+      const routeParts = routeSrc.split(" → ").map((s: string) => s.trim()).filter(Boolean);
+      const itinPref = authorLang === "ar" ? [data.itinerary_ar, data.itinerary_en] : [data.itinerary_en, data.itinerary_ar];
+      const itin = asArr(itinPref.find((v) => asArr(v).length) ?? []);
+      const incPref = authorLang === "ar" ? [data.inclusions_ar, data.inclusions_en] : [data.inclusions_en, data.inclusions_ar];
+      const inc = asArr(incPref.find((v) => asArr(v).length) ?? []);
       setForm({
         titleEn: data.title_en || "",
         titleAr: data.title_ar || "",
