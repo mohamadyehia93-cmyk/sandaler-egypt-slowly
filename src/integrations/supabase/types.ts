@@ -1863,16 +1863,25 @@ export type Database = {
       products: {
         Row: {
           badges: string[] | null
+          care_ar: string | null
+          care_en: string | null
           category: string | null
           city_id: string | null
           created_at: string
+          currency: string
+          delivery_options: Json
           description_ar: string | null
           description_en: string | null
+          dimensions: string | null
           id: string
           image: string | null
           images: string[] | null
           latitude: number | null
+          lead_time_days: number | null
           longitude: number | null
+          made_to_order: boolean
+          materials_ar: string | null
+          materials_en: string | null
           name_ar: string | null
           name_en: string
           origin_story_ar: string | null
@@ -1892,19 +1901,30 @@ export type Database = {
           stock: number | null
           translation_meta: Json
           updated_at: string
+          variants: Json
+          weight_grams: number | null
         }
         Insert: {
           badges?: string[] | null
+          care_ar?: string | null
+          care_en?: string | null
           category?: string | null
           city_id?: string | null
           created_at?: string
+          currency?: string
+          delivery_options?: Json
           description_ar?: string | null
           description_en?: string | null
+          dimensions?: string | null
           id?: string
           image?: string | null
           images?: string[] | null
           latitude?: number | null
+          lead_time_days?: number | null
           longitude?: number | null
+          made_to_order?: boolean
+          materials_ar?: string | null
+          materials_en?: string | null
           name_ar?: string | null
           name_en: string
           origin_story_ar?: string | null
@@ -1924,19 +1944,30 @@ export type Database = {
           stock?: number | null
           translation_meta?: Json
           updated_at?: string
+          variants?: Json
+          weight_grams?: number | null
         }
         Update: {
           badges?: string[] | null
+          care_ar?: string | null
+          care_en?: string | null
           category?: string | null
           city_id?: string | null
           created_at?: string
+          currency?: string
+          delivery_options?: Json
           description_ar?: string | null
           description_en?: string | null
+          dimensions?: string | null
           id?: string
           image?: string | null
           images?: string[] | null
           latitude?: number | null
+          lead_time_days?: number | null
           longitude?: number | null
+          made_to_order?: boolean
+          materials_ar?: string | null
+          materials_en?: string | null
           name_ar?: string | null
           name_en?: string
           origin_story_ar?: string | null
@@ -1956,6 +1987,8 @@ export type Database = {
           stock?: number | null
           translation_meta?: Json
           updated_at?: string
+          variants?: Json
+          weight_grams?: number | null
         }
         Relationships: [
           {
