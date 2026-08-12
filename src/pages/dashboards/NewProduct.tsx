@@ -101,7 +101,7 @@ const NewProduct = () => {
     const nameSrc = authorLang === "ar" ? form.nameAr : form.nameEn;
     const descSrc = authorLang === "ar" ? form.descriptionAr : form.descriptionEn;
     // Required-field validation needs ONE language, not both.
-    if (!nameSrc.trim() || !descSrc.trim() || !form.category || !form.price.trim()) {
+    if (!nameSrc.trim() || !descSrc.trim() || !form.category || !form.cityId || !form.price.trim()) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
