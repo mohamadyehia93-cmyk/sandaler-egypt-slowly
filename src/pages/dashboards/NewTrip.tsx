@@ -12,6 +12,7 @@ import CityPicker from "@/components/dashboard/CityPicker";
 import BilingualField from "@/components/dashboard/BilingualField";
 import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
+import type { Json } from "@/integrations/supabase/types";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Clock, Users, DollarSign, Calendar, ListChecks } from "lucide-react";
 import { toast } from "sonner";
 
@@ -76,7 +77,7 @@ const NewTrip = () => {
         toast.error(lang === "ar" ? "تعذر تحميل الرحلة" : "Could not load trip");
         return;
       }
-      const asArr = (v: unknown) => (Array.isArray(v) ? (v as any[]) : []);
+      const asArr = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
       setOtherLang({
         route_en: data.route_en ?? null,
         route_ar: data.route_ar ?? null,
@@ -106,13 +107,16 @@ const NewTrip = () => {
         regionId: data.region_id || "",
         startLocation: routeParts[0] || "",
         destinations: routeParts.length > 1 ? routeParts.slice(1) : [""],
-        itinerary: itin.length ? itin.map((i: any, idx: number) => ({ day: String(idx + 1), description: i.description || "" })) : [{ day: "1", description: "" }],
-        includes: inc.length ? inc.map((i: any) => String(i)) : [""],
+        itinerary: itin.length ? itin.map((i, idx) => ({ day: String(idx + 1), description: String((i as { description?: string })?.description || "") })) : [{ day: "1", description: "" }],
+        includes: inc.length ? inc.map((i) => String(i)) : [""],
         departureDate: data.date || "",
       });
       setMeta(((data as any).translation_meta as TranslationMeta) || {});
       setExistingImages(Array.isArray(data.images) ? (data.images as string[]) : data.image ? [data.image] : []);
     })();
+  // authorLang intentionally excluded: re-running this effect on a language
+  // toggle would overwrite in-progress edits.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, id, lang]);
 
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
@@ -187,8 +191,8 @@ const NewTrip = () => {
         // the row already stored (see otherLang guard above).
         route_en: authorLang === "en" ? route || null : otherLang.route_en,
         route_ar: authorLang === "ar" ? route || null : otherLang.route_ar,
-        itinerary_en: (authorLang === "en" ? itinerary : otherLang.itinerary_en) as any,
-        itinerary_ar: (authorLang === "ar" ? itinerary : otherLang.itinerary_ar) as any,
+        itinerary_en: (authorLang === "en" ? itinerary : otherLang.itinerary_en) as Json,
+        itinerary_ar: (authorLang === "ar" ? itinerary : otherLang.itinerary_ar) as Json,
         inclusions_en: authorLang === "en" ? inclusions : otherLang.inclusions_en ?? [],
         inclusions_ar: authorLang === "ar" ? inclusions : otherLang.inclusions_ar ?? [],
         image: images[0] || null,
