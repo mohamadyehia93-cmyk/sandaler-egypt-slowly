@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Clock, Share2, User, MapPin, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Maximize, Camera, ChevronLeft, ChevronRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { cityData } from "@/lib/sampleData";
+import CityBadge from "@/components/CityBadge";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { supabase } from "@/integrations/supabase/client";
 import { bylineNames, isEditorialPost, SANDAL_BYLINE, SANDAL_MARK } from "@/lib/postByline";
@@ -189,15 +189,7 @@ const PostDetail = () => {
             <span className="inline-block bg-primary text-primary-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full">
               {post.category[lang]}
             </span>
-            {(post as any).cityId && cityData[(post as any).cityId] && (
-              <span
-                onClick={(e) => { e.stopPropagation(); navigate(`/city/${(post as any).cityId}`); }}
-                className="inline-flex items-center gap-1 bg-background/80 backdrop-blur-sm text-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full cursor-pointer hover:bg-background/90 transition-colors"
-              >
-                <MapPin className="w-3 h-3" />
-                {cityData[(post as any).cityId].name[lang]}
-              </span>
-            )}
+            {(post as any).cityId && <CityBadge cityId={(post as any).cityId} variant="overlay" />}
           </div>
           <h1 className="text-xl font-bold text-white leading-tight">{post.title[lang]}</h1>
         </div>

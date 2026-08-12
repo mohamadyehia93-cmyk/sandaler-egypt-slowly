@@ -8,7 +8,7 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { experiences, audioTours, accommodation, trips } from "@/lib/sampleData";
+import { useExperiences, useAccommodations, useTrips, useAudioTours, useRegions } from "@/hooks/useListings";
 import BottomNav from "@/components/BottomNav";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -30,24 +30,61 @@ const quickPrompts = {
   ],
 };
 
-function buildCatalog(lang: "en" | "ar"): string {
+/**
+ * The catalog handed to the AI is built ONLY from published database rows.
+ * It used to be built from a sample-data module, so the planner recommended and
+ * deep-linked to listings that did not exist.
+ */
+function buildCatalog(
+  lang: "en" | "ar",
+  rows: {
+    experiences: any[];
+    accommodations: any[];
+    trips: any[];
+    audioTours: any[];
+    regions: any[];
+  },
+): string {
+  const regionName = (id: string | null) => {
+    const r = rows.regions.find((x) => x.id === id);
+    if (!r) return "";
+    return (lang === "ar" ? r.name_ar || r.name_en : r.name_en) || "";
+  };
   const lines: string[] = [];
-  lines.push("EXPERIENCES:");
-  experiences.slice(0, 35).forEach((e) => {
-    lines.push(`- [${e.title[lang]}](/experience/${e.id}) | ${e.region[lang]} | ${e.theme} | EGP ${e.price} | ⭐${e.rating}`);
-  });
-  lines.push("\nACCOMMODATION:");
-  accommodation.slice(0, 25).forEach((a) => {
-    lines.push(`- [${a.title[lang]}](/stay/${a.id}) | ${a.location[lang]} | ${a.type[lang]} | EGP ${a.price}/night | ⭐${a.rating}`);
-  });
-  lines.push("\nTRIPS:");
-  trips.slice(0, 16).forEach((t) => {
-    lines.push(`- [${t.title[lang]}](/trip/${t.id}) | ${t.route[lang]} | EGP ${t.price} | ${t.duration}`);
-  });
-  lines.push("\nAUDIO TOURS:");
-  audioTours.slice(0, 28).forEach((a) => {
-    lines.push(`- [${a.title[lang]}](/audio-tour/${a.id}) | ${a.region[lang]} | ${a.duration}min | ${a.price === 0 ? "Free" : `EGP ${a.price}`}`);
-  });
+  const pick = (en: string | null, ar: string | null) => (lang === "ar" ? ar || en || "" : en || "");
+
+  if (rows.experiences.length) {
+    lines.push("EXPERIENCES:");
+    rows.experiences.slice(0, 35).forEach((e) => {
+      lines.push(
+        `- [${pick(e.title_en, e.title_ar)}](/experience/${e.slug || e.id}) | ${regionName(e.region_id)} | ${e.theme ?? ""} | ${e.price ?? 0} EGP`,
+      );
+    });
+  }
+  if (rows.accommodations.length) {
+    lines.push("\nACCOMMODATION:");
+    rows.accommodations.slice(0, 25).forEach((a) => {
+      lines.push(
+        `- [${pick(a.name_en, a.name_ar)}](/stay/${a.slug || a.id}) | ${regionName(a.region_id)} | ${a.accommodation_type ?? ""} | ${a.price_per_night ?? 0} EGP/night`,
+      );
+    });
+  }
+  if (rows.trips.length) {
+    lines.push("\nTRIPS:");
+    rows.trips.slice(0, 16).forEach((t) => {
+      lines.push(
+        `- [${pick(t.title_en, t.title_ar)}](/trip/${t.slug || t.id}) | ${regionName(t.region_id)} | ${t.price ?? 0} EGP | ${t.duration_days ?? 1}d`,
+      );
+    });
+  }
+  if (rows.audioTours.length) {
+    lines.push("\nAUDIO TOURS:");
+    rows.audioTours.slice(0, 28).forEach((a) => {
+      lines.push(
+        `- [${pick(a.title_en, a.title_ar)}](/audio-tour/${a.slug || a.id}) | ${regionName(a.region_id)} | ${a.duration_minutes ?? ""}min | ${a.price ?? 0} EGP`,
+      );
+    });
+  }
   return lines.join("\n");
 }
 
@@ -250,7 +287,23 @@ const ItineraryPlanner = () => {
   const [saving, setSaving] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const catalog = useMemo(() => buildCatalog(lang), [lang]);
+  const { data: catExperiences = [] } = useExperiences();
+  const { data: catAccommodations = [] } = useAccommodations();
+  const { data: catTrips = [] } = useTrips();
+  const { data: catAudioTours = [] } = useAudioTours();
+  const { data: catRegions = [] } = useRegions();
+
+  const catalog = useMemo(
+    () =>
+      buildCatalog(lang, {
+        experiences: catExperiences as any[],
+        accommodations: catAccommodations as any[],
+        trips: catTrips as any[],
+        audioTours: catAudioTours as any[],
+        regions: catRegions as any[],
+      }),
+    [lang, catExperiences, catAccommodations, catTrips, catAudioTours, catRegions],
+  );
 
   // Load saved itinerary if ?id= is present
   useEffect(() => {

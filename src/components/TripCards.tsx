@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { MapPin, ChevronDown, Users, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { experienceThemes } from "@/lib/sampleData";
+import { EXPERIENCE_THEMES } from "@/lib/listingTaxonomy";
 import { useTrips, useRegions } from "@/hooks/useListings";
 import CityBadge from "./CityBadge";
 import { Skeleton } from "./ui/skeleton";
@@ -43,7 +43,7 @@ const TripCards = () => {
 
   // Group trips by theme, preserving order
   const grouped = useMemo(() => {
-    return experienceThemes
+    return EXPERIENCE_THEMES
       .map((th) => ({
         theme: th,
         items: filtered.filter((tr: any) => tr.theme === th.key),

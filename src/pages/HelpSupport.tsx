@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MessageCircle, Mail, Phone, ChevronDown, ChevronUp, BookOpen } from "lucide-react";
+import { ArrowLeft, MessageCircle, ChevronDown, ChevronUp, BookOpen } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useState } from "react";
 
@@ -19,7 +19,7 @@ const HelpSupport = () => {
     },
     {
       q: { en: "How does the Impact Dashboard work?", ar: "كيف تعمل لوحة التأثير؟" },
-      a: { en: "Your Impact Dashboard tracks the positive effects of your slow travel — CO₂ saved, communities supported, and causes funded through your trips.", ar: "تتابع لوحة التأثير التأثيرات الإيجابية لسفرك البطيء — CO₂ الموفر، المجتمعات المدعومة، والقضايا الممولة من رحلاتك." },
+      a: { en: "It lists the support you have actually recorded in the app — your donations and the causes you pledged to. Nothing is estimated.", ar: "تعرض الدعم المسجَّل فعلياً في التطبيق — تبرعاتك والقضايا التي دعمتها. لا يوجد أي تقدير أو تخمين." },
     },
     {
       q: { en: "Are audio tours available offline?", ar: "هل الجولات الصوتية متاحة بدون إنترنت؟" },
@@ -27,10 +27,18 @@ const HelpSupport = () => {
     },
   ];
 
+  // Only channels the app actually operates. The previous "Live Chat 9am-9pm",
+  // support inbox address and phone number did not exist.
   const contactOptions = [
-    { icon: MessageCircle, label: { en: "Live Chat", ar: "محادثة مباشرة" }, desc: { en: "Available 9am–9pm", ar: "متاح 9ص–9م" } },
-    { icon: Mail, label: { en: "Email Us", ar: "راسلنا" }, desc: { en: "help@sandal.travel", ar: "help@sandal.travel" } },
-    { icon: Phone, label: { en: "Call Us", ar: "اتصل بنا" }, desc: { en: "+20 100 000 0000", ar: "+20 100 000 0000" } },
+    {
+      icon: MessageCircle,
+      label: { en: "In-app messages", ar: "الرسائل داخل التطبيق" },
+      desc: {
+        en: "Message a host, guide or organiser directly from their listing.",
+        ar: "راسل المضيف أو المرشد أو المنظّم مباشرة من صفحة إعلانه.",
+      },
+      to: "/inbox",
+    },
   ];
 
   return (
@@ -91,7 +99,7 @@ const HelpSupport = () => {
         </h2>
         <div className="space-y-2 mb-6">
           {contactOptions.map((opt, i) => (
-            <div key={i} className="flex items-center gap-3 p-4 rounded-xl bg-card shadow-card border border-border cursor-pointer">
+            <button key={i} onClick={() => navigate(opt.to)} className="w-full text-start flex items-center gap-3 p-4 rounded-xl bg-card shadow-card border border-border cursor-pointer">
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <opt.icon className="w-5 h-5 text-primary" />
               </div>
@@ -99,7 +107,7 @@ const HelpSupport = () => {
                 <p className="text-sm font-semibold text-foreground">{opt.label[lang]}</p>
                 <p className="text-xs text-muted-foreground">{opt.desc[lang]}</p>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>

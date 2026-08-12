@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Search } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useTrips, useRegions } from "@/hooks/useListings";
-import { experienceThemes, ExperienceTheme } from "@/lib/sampleData";
+import { EXPERIENCE_THEMES, type ExperienceTheme } from "@/lib/listingTaxonomy";
 import CityBadge from "@/components/CityBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import BottomNav from "@/components/BottomNav";
@@ -77,7 +77,7 @@ const AllTrips = () => {
           >
             {lang === "ar" ? "الكل" : "All"}
           </button>
-          {experienceThemes.map((th) => (
+          {EXPERIENCE_THEMES.map((th) => (
             <button
               key={th.key}
               onClick={() => setTheme(th.key)}

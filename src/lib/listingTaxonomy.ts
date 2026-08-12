@@ -85,3 +85,21 @@ export const readableDbError = (message: string, ar: boolean): string => {
   }
   return m;
 };
+
+/**
+ * Display metadata for the six themes above. Reference/taxonomy data — it is not
+ * sample content: nothing here is presented to a visitor as a real listing.
+ * Moved out of the deleted src/lib/sampleData module.
+ */
+export const EXPERIENCE_THEMES: {
+  key: ExperienceTheme;
+  label: { en: string; ar: string };
+  emoji: string;
+}[] = [
+  { key: "nature", label: { en: "Nature", ar: "طبيعة" }, emoji: "🌿" },
+  { key: "history", label: { en: "History & Heritage", ar: "تاريخ وتراث" }, emoji: "🏛️" },
+  { key: "food", label: { en: "Food & Gastronomy", ar: "طعام وفن الطهي" }, emoji: "🍽️" },
+  { key: "adventure", label: { en: "Adventure", ar: "مغامرة" }, emoji: "🏄" },
+  { key: "culture", label: { en: "Art & Culture", ar: "فن وثقافة" }, emoji: "🎨" },
+  { key: "community", label: { en: "Community", ar: "مجتمع" }, emoji: "🤝" },
+];

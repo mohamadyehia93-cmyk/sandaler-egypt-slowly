@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Image, MapPin, MessageCircle, Heart, Share2, Plus, HelpCircle, Lightbulb, Camera } from "lucide-react";
+import { ArrowLeft, MapPin, MessageCircle, Plus, HelpCircle, Lightbulb, Camera } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,90 +10,30 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePostComments, useAddComment } from "@/hooks/usePostComments";
 import { toast } from "sonner";
 import FollowingFeed from "@/components/FollowingFeed";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type PostCategory = "memory" | "tip" | "question";
 
-interface Comment {
-  id: string;
-  author: string;
-  avatar: string;
-  text: string;
-  timeAgo: string;
-}
-
+/**
+ * HONESTY RULE: this feed renders only rows from public.community_posts.
+ * It previously shipped a hardcoded `samplePosts` array — invented authors,
+ * stock-photo avatars, fake like counts and "2d ago" timestamps — and the
+ * compose box only pushed into local state, so nothing a member wrote was
+ * ever saved. Likes and Share were also non-functional and are gone.
+ */
 interface CommunityPost {
   id: string;
-  author: string;
-  authorId: string;
-  avatar: string;
+  author_id: string;
+  author_name: string | null;
   category: PostCategory;
   content: string;
-  location?: string;
+  location: string | null;
   images: string[];
-  likes: number;
-  comments: number;
-  timeAgo: string;
-  liked: boolean;
-  commentList?: Comment[];
+  created_at: string;
 }
 
-const samplePosts: CommunityPost[] = [
-  {
-    id: "1",
-    author: "Sarah M.",
-    authorId: "sarah-m",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
-    category: "memory",
-    content: "Just had the most magical sunset felucca ride in Aswan! The colors reflecting off the Nile were absolutely breathtaking. Highly recommend going at golden hour 🌅",
-    location: "Aswan",
-    images: ["https://images.unsplash.com/photo-1568322445389-f64e0a1d44a4?w=600"],
-    likes: 42,
-    comments: 8,
-    timeAgo: "2h ago",
-    liked: false,
-  },
-  {
-    id: "2",
-    author: "Ahmed K.",
-    authorId: "ahmed-k",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
-    category: "tip",
-    content: "Pro tip: Visit the Siwa Oasis during spring (March-April). The weather is perfect, and you'll catch the date harvest season. Don't miss the salt lakes! 🌴",
-    location: "Siwa",
-    images: [],
-    likes: 67,
-    comments: 12,
-    timeAgo: "5h ago",
-    liked: true,
-  },
-  {
-    id: "3",
-    author: "Nour A.",
-    authorId: "nour-a",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100",
-    category: "question",
-    content: "Has anyone done the White Desert overnight camping trip? Looking for recommendations on local guides. Is it better to go from Cairo or Bahariya?",
-    images: [],
-    likes: 15,
-    comments: 23,
-    timeAgo: "1d ago",
-    liked: false,
-  },
-  {
-    id: "4",
-    author: "Marco R.",
-    authorId: "marco-r",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100",
-    category: "memory",
-    content: "Discovered this hidden gem in Rashid (Rosetta) — a traditional coffee house where locals gather every evening. The stories, the chai, the hospitality… unforgettable ☕",
-    location: "Rosetta",
-    images: ["https://images.unsplash.com/photo-1511920170033-f8396924c348?w=600"],
-    likes: 31,
-    comments: 5,
-    timeAgo: "2d ago",
-    liked: false,
-  },
-];
 
 const categoryConfig: Record<PostCategory, { icon: typeof Camera; label: { en: string; ar: string }; color: string }> = {
   memory: { icon: Camera, label: { en: "Memory", ar: "ذكرى" }, color: "bg-primary/10 text-primary" },
@@ -104,7 +44,6 @@ const categoryConfig: Record<PostCategory, { icon: typeof Camera; label: { en: s
 const Community = () => {
   const { t, lang } = useI18n();
   const navigate = useNavigate();
-  const [posts, setPosts] = useState(samplePosts);
   const [showCompose, setShowCompose] = useState(false);
   const [newContent, setNewContent] = useState("");
   const [newCategory, setNewCategory] = useState<PostCategory>("memory");
@@ -117,6 +56,24 @@ const Community = () => {
   const [replyingTo, setReplyingTo] = useState<Record<string, string | null>>({});
 
   const { user } = useAuth();
+  const meta = (user?.user_metadata ?? {}) as { display_name?: string; full_name?: string };
+  const displayName = meta.display_name || meta.full_name || (lang === "ar" ? "مستخدم" : "User");
+  const queryClient = useQueryClient();
+  const [posting, setPosting] = useState(false);
+
+  const { data: posts = [], isLoading } = useQuery({
+    queryKey: ["community-posts"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("community_posts")
+        .select("id, author_id, author_name, category, content, location, images, created_at")
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return (data ?? []) as CommunityPost[];
+    },
+  });
+
   const postKeys = useMemo(() => posts.map((p) => `community-${p.id}`), [posts]);
   const { data: dbComments } = usePostComments(postKeys);
   const addComment = useAddComment(postKeys);
@@ -138,23 +95,12 @@ const Community = () => {
 
   const filteredPosts = activeFilter === "all" ? posts : posts.filter((p) => p.category === activeFilter);
 
-  const handleLike = (id: string) => {
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id === id ? { ...p, liked: !p.liked, likes: p.liked ? p.likes - 1 : p.likes + 1 } : p
-      )
-    );
-  };
-
   const toggleComments = (id: string) =>
     setOpenComments((prev) => ({ ...prev, [id]: !prev[id] }));
 
   const buildAuthorPayload = () => ({
-    author_name:
-      (user!.user_metadata as any)?.display_name ||
-      (user!.user_metadata as any)?.full_name ||
-      // Never expose the full email publicly — fall back to a generic label.
-      (lang === "ar" ? "مستخدم" : "User"),
+    // Never expose the full email publicly — fall back to a generic label.
+    author_name: displayName,
     // Never persist raw external OAuth photo URLs (e.g. lh3.googleusercontent.com)
     // in publicly readable comments — they are linkable PII. Render initials instead.
     author_avatar: null,
@@ -204,26 +150,29 @@ const Community = () => {
     }
   };
 
-  const handlePost = () => {
+  const handlePost = async () => {
     if (!newContent.trim()) return;
-    const post: CommunityPost = {
-      id: Date.now().toString(),
-      author: lang === "ar" ? "أنت" : "You",
-      authorId: "me",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100",
-      category: newCategory,
-      content: newContent,
-      location: newLocation || undefined,
-      images: [],
-      likes: 0,
-      comments: 0,
-      timeAgo: lang === "ar" ? "الآن" : "Just now",
-      liked: false,
-    };
-    setPosts((prev) => [post, ...prev]);
-    setNewContent("");
-    setNewLocation("");
-    setShowCompose(false);
+    if (!requireAuth()) return;
+    setPosting(true);
+    try {
+      const { error } = await supabase.from("community_posts").insert({
+        author_id: user!.id,
+        author_name: displayName,
+        category: newCategory,
+        content: newContent.trim(),
+        location: newLocation.trim() || null,
+      });
+      if (error) throw error;
+      setNewContent("");
+      setNewLocation("");
+      setShowCompose(false);
+      await queryClient.invalidateQueries({ queryKey: ["community-posts"] });
+      toast.success(lang === "ar" ? "تم النشر" : "Posted");
+    } catch {
+      toast.error(lang === "ar" ? "فشل النشر" : "Could not post");
+    } finally {
+      setPosting(false);
+    }
   };
 
   const filters: { key: "all" | PostCategory; label: { en: string; ar: string } }[] = [
@@ -297,11 +246,8 @@ const Community = () => {
                   className="h-6 border-none bg-transparent text-xs p-0 focus-visible:ring-0"
                 />
               </div>
-              <button className="p-1.5 rounded-md bg-secondary">
-                <Image className="w-4 h-4 text-muted-foreground" />
-              </button>
             </div>
-            <Button size="sm" onClick={handlePost} disabled={!newContent.trim()}>
+            <Button size="sm" onClick={handlePost} disabled={!newContent.trim() || posting}>
               {lang === "ar" ? "نشر" : "Post"}
             </Button>
           </div>
@@ -353,6 +299,15 @@ const Community = () => {
 
       {/* Posts Feed */}
       <div className="px-4 space-y-3">
+        {isLoading && <Skeleton className="h-28 w-full rounded-xl" />}
+        {!isLoading && filteredPosts.length === 0 && (
+          <div className="text-center py-10">
+            <MessageCircle className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">
+              {lang === "ar" ? "لا توجد منشورات بعد. كن أول من يشارك." : "No posts yet. Be the first to share."}
+            </p>
+          </div>
+        )}
         {filteredPosts.map((post) => {
           const cfg = categoryConfig[post.category];
           const CatIcon = cfg.icon;
@@ -360,17 +315,22 @@ const Community = () => {
             <article key={post.id} className="bg-background rounded-xl border border-border overflow-hidden">
               {/* Post Header */}
               <div className="flex items-center gap-3 p-3 pb-0">
-                <img onClick={() => navigate(`/visitor/${post.authorId}`)} src={post.avatar} alt={post.author} className="w-9 h-9 rounded-full object-cover cursor-pointer" />
+                <div
+                  onClick={() => navigate(`/visitor/${post.author_id}`)}
+                  className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold cursor-pointer flex-shrink-0"
+                >
+                  {(post.author_name || "?").charAt(0).toUpperCase()}
+                </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span onClick={() => navigate(`/visitor/${post.authorId}`)} className="text-sm font-semibold text-foreground cursor-pointer hover:text-primary transition-colors">{post.author}</span>
+                    <span onClick={() => navigate(`/visitor/${post.author_id}`)} className="text-sm font-semibold text-foreground cursor-pointer hover:text-primary transition-colors">{post.author_name || (lang === "ar" ? "مستخدم" : "User")}</span>
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${cfg.color}`}>
                       <CatIcon className="w-3 h-3" />
                       {cfg.label[lang]}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                    <span>{post.timeAgo}</span>
+                    <span>{new Date(post.created_at).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US", { dateStyle: "medium" })}</span>
                     {post.location && (
                       <>
                         <span>·</span>
@@ -386,7 +346,7 @@ const Community = () => {
               <p className="px-3 py-2 text-sm text-foreground leading-relaxed">{post.content}</p>
 
               {/* Images */}
-              {post.images.length > 0 && (
+              {(post.images?.length ?? 0) > 0 && (
                 <div className="px-3 pb-2">
                   <img
                     src={post.images[0]}
@@ -399,15 +359,6 @@ const Community = () => {
               {/* Actions */}
               <div className="flex items-center gap-1 px-3 py-2 border-t border-border">
                 <button
-                  onClick={() => handleLike(post.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    post.liked ? "text-destructive" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <Heart className="w-4 h-4" fill={post.liked ? "currentColor" : "none"} />
-                  {post.likes}
-                </button>
-                <button
                   onClick={() => toggleComments(post.id)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     openComments[post.id] ? "text-primary" : "text-muted-foreground hover:text-foreground"
@@ -417,11 +368,8 @@ const Community = () => {
                   {(() => {
                     const t = threadsByPost[`community-${post.id}`];
                     const total = t ? t.roots.length + Object.values(t.childrenByParent).reduce((a, arr) => a + arr.length, 0) : 0;
-                    return post.comments + total;
+                    return total;
                   })()}
-                </button>
-                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground transition-all ml-auto">
-                  <Share2 className="w-4 h-4" />
                 </button>
               </div>
 
