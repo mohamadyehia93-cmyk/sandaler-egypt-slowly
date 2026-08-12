@@ -42,6 +42,8 @@ const NewProduct = () => {
     originEn: "",
     originAr: "",
     category: "",
+    cityId: "",
+    regionId: "",
     price: "",
     stock: "",
     material: "",
