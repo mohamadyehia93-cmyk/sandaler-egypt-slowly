@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 /**
  * Renders an avatar image, or the person/organisation initials when the URL is
  * missing OR fails to load. Never leaves the browser showing raw alt text.
+ * `className` fully controls size, radius and border.
  */
 const Avatar = ({
   src,
   name,
-  className = "w-14 h-14",
+  className = "w-14 h-14 rounded-full border-2 border-primary/20",
   onClick,
 }: {
   src?: string | null;
@@ -27,7 +28,7 @@ const Avatar = ({
       .join("")
       .toUpperCase() || "?";
 
-  const shared = `${className} rounded-full object-cover flex-shrink-0 border-2 border-primary/20 ${onClick ? "cursor-pointer" : ""}`;
+  const shared = `${className} object-cover flex-shrink-0 ${onClick ? "cursor-pointer" : ""}`;
 
   if (!src || broken) {
     return (
@@ -41,15 +42,7 @@ const Avatar = ({
     );
   }
 
-  return (
-    <img
-      src={src}
-      alt=""
-      onError={() => setBroken(true)}
-      onClick={onClick}
-      className={shared}
-    />
-  );
+  return <img src={src} alt="" onError={() => setBroken(true)} onClick={onClick} className={shared} />;
 };
 
 export default Avatar;
