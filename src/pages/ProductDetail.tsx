@@ -168,7 +168,11 @@ const ProductDetail = () => {
 
   const name = ar ? product.name_ar || product.name_en : product.name_en;
   const description = ar ? product.description_ar || product.description_en : product.description_en;
-  const story = ar ? product.origin_story_ar || product.origin_story_en : product.origin_story_en;
+  const rawStory = ar ? product.origin_story_ar || product.origin_story_en : product.origin_story_en;
+  // Several seeded rows copied the description into origin_story; showing the
+  // same paragraph twice reads as padding, so the duplicate is dropped.
+  const norm = (v?: string | null) => (v || "").trim().replace(/\s+/g, " ").toLowerCase();
+  const story = norm(rawStory) && norm(rawStory) !== norm(ar ? product.description_ar || product.description_en : product.description_en) ? rawStory : null;
   const providerName = seller ? (ar ? seller.name_ar || seller.name_en : seller.name_en) : null;
   const providerCity = seller ? (ar ? seller.city_ar || seller.city_en : seller.city_en) : null;
   const providerTagline = seller ? (ar ? seller.tagline_ar || seller.tagline_en : seller.tagline_en) : null;
