@@ -8,6 +8,7 @@ import { slugify, uploadImages } from "@/lib/dashboardForms";
 import { fetchMyProviderId } from "@/lib/providerRecord";
 import { tripTypeForLabel, readableDbError } from "@/lib/listingTaxonomy";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import CityPicker from "@/components/dashboard/CityPicker";
 import BilingualField from "@/components/dashboard/BilingualField";
 import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
@@ -43,6 +44,8 @@ const NewTrip = () => {
     days: "",
     maxGroup: "",
     price: "",
+    cityId: "",
+    regionId: "",
     startLocation: "",
     destinations: [""],
     itinerary: [{ day: "1", description: "" }],
@@ -72,6 +75,8 @@ const NewTrip = () => {
         days: data.duration_days != null ? String(data.duration_days) : "",
         maxGroup: data.capacity_max != null ? String(data.capacity_max) : "",
         price: data.price != null ? String(data.price) : "",
+        cityId: data.city_id || "",
+        regionId: data.region_id || "",
         startLocation: routeParts[0] || "",
         destinations: routeParts.length > 1 ? routeParts.slice(1) : [""],
         itinerary: itin.length ? itin.map((i: any, idx: number) => ({ day: String(idx + 1), description: i.description || "" })) : [{ day: "1", description: "" }],
@@ -112,7 +117,7 @@ const NewTrip = () => {
     const tripTypeValue = tripTypeForLabel(form.tripType);
     const titleSrc = authorLang === "ar" ? form.titleAr : form.titleEn;
     const descSrc = authorLang === "ar" ? form.descriptionAr : form.descriptionEn;
-    if (!titleSrc.trim() || !descSrc.trim() || !tripTypeValue || !form.price.trim()) {
+    if (!titleSrc.trim() || !descSrc.trim() || !tripTypeValue || !form.price.trim() || !form.cityId) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
@@ -148,6 +153,8 @@ const NewTrip = () => {
         price: parseInt(form.price) || 0,
         duration_days: parseInt(form.days) || 1,
         capacity_max: parseInt(form.maxGroup) || null,
+        city_id: form.cityId || null,
+        region_id: form.regionId || null,
         date: form.departureDate || null,
         route_en: authorLang === "en" ? route || null : null,
         route_ar: authorLang === "ar" ? route || null : null,
@@ -262,6 +269,19 @@ const NewTrip = () => {
           <label className={labelClass}><Calendar className="w-3.5 h-3.5 text-role-trip-organizer" />{lang === "ar" ? "تاريخ الانطلاق" : "Departure Date"}</label>
           <input type="date" className={inputClass} value={form.departureDate} onChange={(e) => set("departureDate", e.target.value)} />
         </div>
+
+        <CityPicker
+          cityId={form.cityId}
+          required
+          onChange={(cityId, regionId) => setForm((p) => ({ ...p, cityId, regionId }))}
+          labelEn="Main city (listed under)"
+          labelAr="المدينة الرئيسية (تُدرج تحتها)"
+          hintEn="If the trip spans several cities, pick the one it should be listed under. It then appears on that city's and its region's pages. Route details below stay as you write them."
+          hintAr="إذا كانت الرحلة تمر بعدة مدن، اختر المدينة التي تُدرج الرحلة تحتها. ستظهر بعدها في صفحة تلك المدينة ومنطقتها. تفاصيل المسار أدناه تبقى كما تكتبها."
+          iconClass="w-3.5 h-3.5 text-role-trip-organizer"
+          inputClass={inputClass}
+          labelClass={labelClass}
+        />
 
         <div>
           <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-trip-organizer" />{lang === "ar" ? "نقطة الانطلاق" : "Start Location"}</label>
