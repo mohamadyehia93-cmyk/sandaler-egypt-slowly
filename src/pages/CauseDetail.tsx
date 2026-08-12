@@ -181,8 +181,8 @@ const CauseDetail = () => {
       {/* Organization Bio */}
       {/* Was hardcoded providerId="p7": every cause showed the same unrelated
           organisation. Only render when this row actually has an owner. */}
-      {cause.owner_id && (
-        <ProviderBioCard providerId={cause.owner_id} roleLabel={{ en: "Supporting Organization", ar: "المنظمة الداعمة" }} />
+      {dbCause?.owner_id && (
+        <ProviderBioCard providerId={dbCause.owner_id} roleLabel={{ en: "Supporting Organization", ar: "المنظمة الداعمة" }} />
       )}
 
       {/* Sticky Bottom */}
