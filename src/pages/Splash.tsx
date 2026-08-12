@@ -406,7 +406,11 @@ const SplashPage = () => {
     }
 
     if (result.status === "error") {
-      toast.error(lang === "ar" ? "تعذّر إنشاء ملف المزوّد" : "Could not set up your provider profile");
+      console.error("becomeProvider failed:", result.error);
+      toast.error(
+        (lang === "ar" ? "تعذّر إنشاء ملف المزوّد" : "Could not set up your provider profile") +
+          (result.error ? ` — ${result.error}` : "")
+      );
       return "failed";
     }
     return "ok";
