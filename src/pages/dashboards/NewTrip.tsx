@@ -127,9 +127,12 @@ const NewTrip = () => {
       const images = [...existingImages, ...uploaded];
       const destinations = form.destinations.map((d) => d.trim()).filter(Boolean);
       const route = [form.startLocation.trim(), ...destinations].filter(Boolean).join(" → ");
+      const days = parseInt(form.days) || 1;
       const itinerary = form.itinerary
         .filter((i) => i.description.trim())
+        .slice(0, days)
         .map((i, idx) => ({ day: idx + 1, description: i.description.trim() }));
+
       const inclusions = form.includes.map((i) => i.trim()).filter(Boolean);
 
       const payload = {
