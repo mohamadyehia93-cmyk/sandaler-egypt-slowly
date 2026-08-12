@@ -14,6 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { productCategoryLabel } from "@/lib/productTaxonomy";
+import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
 import { Skeleton } from "@/components/ui/skeleton";
 import NotFoundView from "@/components/NotFound";
 
@@ -72,6 +73,27 @@ const ProductDetail = () => {
   });
 
   const sellerId = product?.seller_id ?? null;
+
+  // When the product HAS an owner, the maker identity comes from the claimed
+  // provider record — the seed text columns (seller_name_*/seller_image) are
+  // empty on owner-created rows.
+  const { data: seller } = useQuery({
+    queryKey: ["product-seller", sellerId],
+    enabled: !!sellerId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("providers")
+        .select(PROVIDER_PUBLIC_COLUMNS)
+        .eq("id", sellerId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data as unknown as {
+        name_en: string | null; name_ar: string | null; avatar: string | null;
+        city_en: string | null; city_ar: string | null; slug: string | null;
+        tagline_en: string | null; tagline_ar: string | null;
+      } | null;
+    },
+  });
 
   // More from this seller — only meaningful when the product actually has an owner.
   const { data: fromSeller = [] } = useQuery({
@@ -147,8 +169,13 @@ const ProductDetail = () => {
   const name = ar ? product.name_ar || product.name_en : product.name_en;
   const description = ar ? product.description_ar || product.description_en : product.description_en;
   const story = ar ? product.origin_story_ar || product.origin_story_en : product.origin_story_en;
-  const sellerName = ar ? product.seller_name_ar || product.seller_name_en : product.seller_name_en;
-  const sellerVillage = ar ? product.seller_village_ar || product.seller_village_en : product.seller_village_en;
+  const providerName = seller ? (ar ? seller.name_ar || seller.name_en : seller.name_en) : null;
+  const providerCity = seller ? (ar ? seller.city_ar || seller.city_en : seller.city_en) : null;
+  const providerTagline = seller ? (ar ? seller.tagline_ar || seller.tagline_en : seller.tagline_en) : null;
+  const sellerName =
+    providerName || (ar ? product.seller_name_ar || product.seller_name_en : product.seller_name_en);
+  const sellerVillage =
+    (ar ? product.seller_village_ar || product.seller_village_en : product.seller_village_en) || providerCity;
   const materials = ar ? product.materials_ar || product.materials_en : product.materials_en;
   const care = ar ? product.care_ar || product.care_en : product.care_en;
   const categoryLabel = productCategoryLabel(product.category, lang);
@@ -340,7 +367,7 @@ const ProductDetail = () => {
             <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
               <div className="flex items-center gap-3">
                 <Avatar
-                  src={product.seller_image}
+                  src={seller?.avatar || product.seller_image}
                   name={sellerName}
                   className="w-14 h-14 rounded-full border-2 border-primary/20"
                 />
@@ -349,6 +376,7 @@ const ProductDetail = () => {
                     {sellerName || (ar ? "حرفي محلي" : "Local maker")}
                   </p>
                   {sellerVillage && <p className="text-xs text-muted-foreground mt-0.5">{sellerVillage}</p>}
+                  {providerTagline && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{providerTagline}</p>}
                 </div>
               </div>
 
@@ -366,7 +394,7 @@ const ProductDetail = () => {
               {sellerId ? (
                 <div className="flex items-center gap-2 mt-3">
                   <button
-                    onClick={() => navigate(`/provider/${sellerId}`)}
+                    onClick={() => navigate(`/provider/${seller?.slug || sellerId}`)}
                     className="flex-1 h-9 rounded-xl bg-card border border-border text-xs font-semibold text-foreground"
                   >
                     {ar ? "عرض ملف الحرفي" : "View maker profile"}
