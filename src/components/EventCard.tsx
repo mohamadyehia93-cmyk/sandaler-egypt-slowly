@@ -5,7 +5,7 @@ import { EventRow, isPastEvent, eventCategoryKey } from "@/lib/eventSort";
 const EventCard = ({ event, onClick }: { event: EventRow; onClick?: () => void }) => {
   const { lang, t } = useI18n();
   const past = isPastEvent(event);
-  const title = lang === "ar" ? event.title_ar : event.title_en;
+  const title = lang === "ar" ? (event.title_ar || event.title_en) : event.title_en;
   const venue =
     lang === "ar"
       ? event.venue_ar || event.location_ar

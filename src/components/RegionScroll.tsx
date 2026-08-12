@@ -22,7 +22,7 @@ const RegionScroll = () => {
             ))
           : (regions ?? []).map((r: any) => {
               const photo = getRegionImage(r.id) ?? r.image ?? null;
-              const name = lang === "ar" ? r.name_ar : r.name_en;
+              const name = lang === "ar" ? (r.name_ar || r.name_en) : r.name_en;
               return (
                 <button
                   key={r.id}

@@ -18,7 +18,7 @@ const Partners = () => {
             ))
           : (partners ?? []).map((p: any) => {
               const isUrl = typeof p.logo === "string" && /^(https?:|\/)/.test(p.logo);
-              const name = lang === "ar" ? p.name_ar : p.name_en;
+              const name = lang === "ar" ? (p.name_ar || p.name_en) : p.name_en;
               return (
                 <div
                   key={p.id}
@@ -39,7 +39,7 @@ const Partners = () => {
                     {name}
                   </h3>
                   <span className="text-[9px] text-muted-foreground">
-                    {lang === "ar" ? p.type_ar : p.type_en}
+                    {lang === "ar" ? (p.type_ar || p.type_en) : p.type_en}
                   </span>
                 </div>
               );

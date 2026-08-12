@@ -233,7 +233,7 @@ const NewEvent = () => {
             <select className={inputClass} value={form.region_id} onChange={(e) => { set("region_id", e.target.value); set("city_id", ""); }}>
               <option value="">{lang === "ar" ? "اختر" : "Select"}</option>
               {(regions as any[]).map((r) => (
-                <option key={r.id} value={r.id}>{lang === "ar" ? r.name_ar : r.name_en}</option>
+                <option key={r.id} value={r.id}>{lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}</option>
               ))}
             </select>
           </div>
@@ -242,7 +242,7 @@ const NewEvent = () => {
             <select className={inputClass} value={form.city_id} onChange={(e) => set("city_id", e.target.value)}>
               <option value="">{lang === "ar" ? "اختر" : "Select"}</option>
               {regionCities.map((c) => (
-                <option key={c.id} value={c.id}>{lang === "ar" ? c.name_ar : c.name_en}</option>
+                <option key={c.id} value={c.id}>{lang === "ar" ? (c.name_ar || c.name_en) : c.name_en}</option>
               ))}
             </select>
           </div>

@@ -103,7 +103,7 @@ const AllCauses = () => {
               if (count === 0) return null;
               return (
                 <option key={r.id} value={r.id} className="bg-card text-foreground">
-                  {r.emoji} {lang === "ar" ? r.name_ar : r.name_en}
+                  {r.emoji} {lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}
                 </option>
               );
             })}
@@ -140,9 +140,9 @@ const AllCauses = () => {
                   {items.map((cause: any) => {
                     const goal = cause.goal || 1;
                     const progress = Math.round(((cause.raised ?? 0) / goal) * 100);
-                    const title = lang === "ar" ? cause.title_ar : cause.title_en;
-                    const category = lang === "ar" ? cause.category_ar : cause.category_en;
-                    const orgName = lang === "ar" ? cause.org_name_ar : cause.org_name_en;
+                    const title = lang === "ar" ? (cause.title_ar || cause.title_en) : cause.title_en;
+                    const category = lang === "ar" ? (cause.category_ar || cause.category_en) : cause.category_en;
+                    const orgName = lang === "ar" ? (cause.org_name_ar || cause.org_name_en) : cause.org_name_en;
                     return (
                       <div
                         key={cause.id}
@@ -199,7 +199,7 @@ const AllCauses = () => {
                                 className="w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-md bg-secondary text-secondary-foreground text-[10px] font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
                               >
                                 <MapPin className="w-3 h-3" />
-                                {r.emoji} {lang === "ar" ? r.name_ar : r.name_en}
+                                {r.emoji} {lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}
                               </button>
                             );
                           })()}

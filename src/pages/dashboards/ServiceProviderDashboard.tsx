@@ -91,7 +91,7 @@ const ServiceProviderDashboard = () => {
   ];
 
   const locale = lang === "ar" ? "ar-EG" : "en-US";
-  const title = (b: ProviderBooking) => b.experience ? (lang === "ar" ? b.experience.title_ar : b.experience.title_en) : "—";
+  const title = (b: ProviderBooking) => b.experience ? (lang === "ar" ? (b.experience.title_ar || b.experience.title_en) : b.experience.title_en) : "—";
 
   const RESOLVED = ["confirmed", "declined", "cancelled", "completed", "refunded", "expired"];
 

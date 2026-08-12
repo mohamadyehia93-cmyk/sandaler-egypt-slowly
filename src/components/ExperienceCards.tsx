@@ -46,7 +46,7 @@ const ExperienceCards = () => {
           <option value="all">{lang === "ar" ? "كل المناطق" : "All Regions"}</option>
           {regionsList.map((r) => (
             <option key={r.id} value={r.id}>
-              {lang === "ar" ? r.name_ar : r.name_en}
+              {lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}
             </option>
           ))}
         </select>
@@ -83,14 +83,14 @@ const ExperienceCards = () => {
                     <div className="relative h-32">
                       <img
                         src={e.image || "/placeholder.svg"}
-                        alt={lang === "ar" ? e.title_ar : e.title_en}
+                        alt={lang === "ar" ? (e.title_ar || e.title_en) : e.title_en}
                         className="w-full h-full object-cover"
                       />
                       <WishlistButton itemType="experience" itemId={e.id} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm" />
                     </div>
                     <div className="p-3">
                       <h4 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">
-                        {lang === "ar" ? e.title_ar : e.title_en}
+                        {lang === "ar" ? (e.title_ar || e.title_en) : e.title_en}
                       </h4>
                       {e.host_name_en && (
                         <div className="flex items-center gap-1.5 mb-1.5">
@@ -98,7 +98,7 @@ const ExperienceCards = () => {
                             <img src={e.host_image} alt="" className="w-4 h-4 rounded-full object-cover" />
                           )}
                           <span className="text-[10px] text-primary font-medium truncate">
-                            {lang === "ar" ? e.host_name_ar : e.host_name_en}
+                            {lang === "ar" ? (e.host_name_ar || e.host_name_en) : e.host_name_en}
                           </span>
                         </div>
                       )}

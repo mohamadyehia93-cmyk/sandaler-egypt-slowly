@@ -35,7 +35,7 @@ const CollectionsSection = () => {
     <SectionHeader titleKey="section.collections" onSeeAll={() => navigate("/collections")}>
       <div className="grid grid-cols-3 gap-3 px-4">
         {items.map((c) => {
-          const title = (lang === "ar" ? c.title_ar : c.title_en) || c.title_en;
+          const title = (lang === "ar" ? (c.title_ar || c.title_en) : c.title_en) || c.title_en;
           const count = collectionEntries(c.entries).length;
           return (
             <button

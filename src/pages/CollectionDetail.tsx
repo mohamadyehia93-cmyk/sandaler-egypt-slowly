@@ -54,9 +54,9 @@ const CollectionDetail = () => {
   }
 
   const expert = data?.expert ?? null;
-  const title = (lang === "ar" ? collection.title_ar : collection.title_en) || collection.title_en;
+  const title = (lang === "ar" ? (collection.title_ar || collection.title_en) : collection.title_en) || collection.title_en;
   const abstract =
-    (lang === "ar" ? collection.abstract_ar : collection.abstract_en) || collection.abstract_en || "";
+    (lang === "ar" ? (collection.abstract_ar || collection.abstract_en) : collection.abstract_en) || collection.abstract_en || "";
   const entries = collectionEntries(collection.entries);
   const refs = collectionRefs(collection.refs);
 

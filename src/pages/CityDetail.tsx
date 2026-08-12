@@ -513,7 +513,7 @@ const CityDetail = () => {
               {cityTransport.slice(0, 3).map((tr) => (
                 <div key={tr.id} className="rounded-lg shadow-card bg-card p-4 flex flex-col items-center gap-2 cursor-pointer" onClick={() => navigate(`/transport/${tr.slug || tr.id}`)}>
                   {tr.image ? <img src={tr.image} alt="" className="w-10 h-10 rounded-full object-cover" /> : <span className="text-3xl">🚐</span>}
-                  <h3 className="text-xs font-semibold text-foreground text-center line-clamp-2">{lang === "ar" ? tr.name_ar : tr.name_en}</h3>
+                  <h3 className="text-xs font-semibold text-foreground text-center line-clamp-2">{lang === "ar" ? (tr.name_ar || tr.name_en) : tr.name_en}</h3>
                   <span className="text-sm font-bold text-primary-dark">{tr.price} {t("common.egp")}</span>
                 </div>
               ))}

@@ -48,11 +48,11 @@ const ProductDetail = () => {
 
   if (!product) return <NotFoundView context="product" />;
 
-  const name = lang === "ar" ? product.name_ar : product.name_en;
-  const description = lang === "ar" ? product.description_ar : product.description_en;
-  const originStory = lang === "ar" ? product.origin_story_ar : product.origin_story_en;
-  const sellerName = lang === "ar" ? product.seller_name_ar : product.seller_name_en;
-  const sellerVillage = lang === "ar" ? product.seller_village_ar : product.seller_village_en;
+  const name = lang === "ar" ? (product.name_ar || product.name_en) : product.name_en;
+  const description = lang === "ar" ? (product.description_ar || product.description_en) : product.description_en;
+  const originStory = lang === "ar" ? (product.origin_story_ar || product.origin_story_en) : product.origin_story_en;
+  const sellerName = lang === "ar" ? (product.seller_name_ar || product.seller_name_en) : product.seller_name_en;
+  const sellerVillage = lang === "ar" ? (product.seller_village_ar || product.seller_village_en) : product.seller_village_en;
   const unitPrice = Number(product.price) || 0;
   const total = unitPrice * qty;
 

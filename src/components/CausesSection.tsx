@@ -28,10 +28,10 @@ const CausesSection = ({ regionId, cityFilter = "all" }: Props) => {
         {filtered.map((cause: any) => {
           const goal = cause.goal || 1;
           const progress = Math.round(((cause.raised ?? 0) / goal) * 100);
-          const title = lang === "ar" ? cause.title_ar : cause.title_en;
-          const summary = lang === "ar" ? cause.summary_ar : cause.summary_en;
-          const category = lang === "ar" ? cause.category_ar : cause.category_en;
-          const orgName = lang === "ar" ? cause.org_name_ar : cause.org_name_en;
+          const title = lang === "ar" ? (cause.title_ar || cause.title_en) : cause.title_en;
+          const summary = lang === "ar" ? (cause.summary_ar || cause.summary_en) : cause.summary_en;
+          const category = lang === "ar" ? (cause.category_ar || cause.category_en) : cause.category_en;
+          const orgName = lang === "ar" ? (cause.org_name_ar || cause.org_name_en) : cause.org_name_en;
           return (
             <div
               key={cause.id}

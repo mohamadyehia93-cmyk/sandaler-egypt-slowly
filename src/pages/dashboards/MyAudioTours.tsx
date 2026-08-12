@@ -59,7 +59,7 @@ const MyAudioTours = () => {
                 {e.image ? <img src={e.image} alt="" className="w-full h-full object-cover" /> : <Headphones className="w-6 h-6 text-muted-foreground" />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground line-clamp-1">{lang === "ar" ? e.title_ar : e.title_en}</p>
+                <p className="text-sm font-semibold text-foreground line-clamp-1">{lang === "ar" ? (e.title_ar || e.title_en) : e.title_en}</p>
                 <p className="text-[11px] text-muted-foreground">{e.stops_count} {lang === "ar" ? "محطات" : "stops"} · {e.duration_minutes} {lang === "ar" ? "د" : "min"}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>

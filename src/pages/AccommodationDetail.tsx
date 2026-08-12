@@ -39,9 +39,9 @@ const AccommodationDetail = () => {
 
   if (!place) return <NotFoundView context="stay" />;
 
-  const name = lang === "ar" ? place.name_ar : place.name_en;
-  const description = lang === "ar" ? place.description_ar : place.description_en;
-  const hostName = lang === "ar" ? place.host_name_ar : place.host_name_en;
+  const name = lang === "ar" ? (place.name_ar || place.name_en) : place.name_en;
+  const description = lang === "ar" ? (place.description_ar || place.description_en) : place.description_en;
+  const hostName = lang === "ar" ? (place.host_name_ar || place.host_name_en) : place.host_name_en;
   const amenities = place.amenities || [];
 
   return (

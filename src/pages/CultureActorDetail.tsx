@@ -101,12 +101,12 @@ const CultureActorDetail = () => {
   if (loading) return <div className="p-8 text-center text-muted-foreground">{lang === "ar" ? "جارٍ التحميل..." : "Loading..."}</div>;
   if (!actor) return <NotFoundView context="culture-actor" />;
 
-  const name = lang === "ar" ? actor.name_ar : actor.name_en;
+  const name = lang === "ar" ? (actor.name_ar || actor.name_en) : actor.name_en;
   const title = lang === "ar" ? (actor.title_ar ?? "") : (actor.title_en ?? "");
   const bio = lang === "ar" ? (actor.bio_ar ?? "") : (actor.bio_en ?? "");
   const quote = lang === "ar" ? (actor.quote_ar ?? "") : (actor.quote_en ?? "");
-  const expertise = (lang === "ar" ? actor.expertise_ar : actor.expertise_en) ?? [];
-  const regionName = region ? (lang === "ar" ? region.name_ar : region.name_en) : "";
+  const expertise = (lang === "ar" ? (actor.expertise_ar || actor.expertise_en) : actor.expertise_en) ?? [];
+  const regionName = region ? (lang === "ar" ? (region.name_ar || region.name_en) : region.name_en) : "";
   const accent = region?.color || "hsl(var(--primary))";
   const social = actor.social_links || {};
 
@@ -271,11 +271,11 @@ const CultureActorDetail = () => {
                 className="flex gap-3 rounded-lg bg-card shadow-card border border-border overflow-hidden cursor-pointer"
               >
                 {tour.image && (
-                  <img src={tour.image} alt={lang === "ar" ? tour.title_ar : tour.title_en} className="w-24 h-20 object-cover flex-shrink-0" />
+                  <img src={tour.image} alt={lang === "ar" ? (tour.title_ar || tour.title_en) : tour.title_en} className="w-24 h-20 object-cover flex-shrink-0" />
                 )}
                 <div className="py-2.5 pe-3 flex flex-col justify-center min-w-0">
                   <h3 className="text-xs font-semibold text-foreground line-clamp-2">
-                    {lang === "ar" ? tour.title_ar : tour.title_en}
+                    {lang === "ar" ? (tour.title_ar || tour.title_en) : tour.title_en}
                   </h3>
                   <div className="flex items-center gap-2 mt-1 text-[10px] text-muted-foreground">
                     <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{tour.duration_minutes} {lang === "ar" ? "د" : "min"}</span>
@@ -302,14 +302,14 @@ const CultureActorDetail = () => {
                 className="flex gap-3 rounded-lg bg-card shadow-card border border-border overflow-hidden cursor-pointer"
               >
                 {post.image && (
-                  <img src={post.image} alt={lang === "ar" ? post.title_ar : post.title_en} className="w-24 h-20 object-cover flex-shrink-0" />
+                  <img src={post.image} alt={lang === "ar" ? (post.title_ar || post.title_en) : post.title_en} className="w-24 h-20 object-cover flex-shrink-0" />
                 )}
                 <div className="py-2.5 pe-3 flex flex-col justify-center">
                   {post.category && (
                     <span className="text-[10px] font-medium text-primary mb-0.5">{post.category}</span>
                   )}
                   <h3 className="text-xs font-semibold text-foreground line-clamp-2">
-                    {lang === "ar" ? post.title_ar : post.title_en}
+                    {lang === "ar" ? (post.title_ar || post.title_en) : post.title_en}
                   </h3>
                   <span className="text-[10px] text-muted-foreground mt-1">
                     {post.read_time_minutes ?? 5} {lang === "ar" ? "د" : "min"}

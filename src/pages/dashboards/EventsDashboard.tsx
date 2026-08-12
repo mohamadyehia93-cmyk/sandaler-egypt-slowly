@@ -183,7 +183,7 @@ const EventsDashboard = () => {
           ) : (
             sorted.map((e) => {
               const past = isPastEvent(e);
-              const venue = lang === "ar" ? e.venue_ar : e.venue_en;
+              const venue = lang === "ar" ? (e.venue_ar || e.venue_en) : e.venue_en;
               const status = e.status || "draft";
               return (
                 <div key={e.id} className="bg-card rounded-xl shadow-card p-3 space-y-2">
@@ -193,7 +193,7 @@ const EventsDashboard = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start gap-2">
-                        <p className="text-sm font-semibold text-foreground line-clamp-1 flex-1">{lang === "ar" ? e.title_ar : e.title_en}</p>
+                        <p className="text-sm font-semibold text-foreground line-clamp-1 flex-1">{lang === "ar" ? (e.title_ar || e.title_en) : e.title_en}</p>
                         <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${eventStatusClasses(status)}`}>
                           {eventStatusLabel(status, lang)}
                         </span>

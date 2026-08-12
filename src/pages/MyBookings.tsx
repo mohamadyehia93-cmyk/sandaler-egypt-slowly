@@ -78,7 +78,7 @@ const MyBookings = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground line-clamp-1">
-                  {b.experience ? (lang === "ar" ? b.experience.title_ar : b.experience.title_en) : "—"}
+                  {b.experience ? (lang === "ar" ? (b.experience.title_ar || b.experience.title_en) : b.experience.title_en) : "—"}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
                   {new Date(b.created_at).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" })} · {b.guests} {lang === "ar" ? "أشخاص" : "guests"} · {b.total_amount_egp} {lang === "ar" ? "ج.م" : "EGP"}

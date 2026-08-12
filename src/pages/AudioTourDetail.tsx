@@ -199,9 +199,9 @@ const AudioTourDetail = () => {
 
   if (!tour) return <NotFoundView context="audio-tour" />;
 
-  const title = lang === "ar" ? tour.title_ar : tour.title_en;
-  const description = lang === "ar" ? tour.description_ar : tour.description_en;
-  const narratorName = lang === "ar" ? tour.narrator_name_ar : tour.narrator_name_en;
+  const title = lang === "ar" ? (tour.title_ar || tour.title_en) : tour.title_en;
+  const description = lang === "ar" ? (tour.description_ar || tour.description_en) : tour.description_en;
+  const narratorName = lang === "ar" ? (tour.narrator_name_ar || tour.narrator_name_en) : tour.narrator_name_en;
 
   return (
     <div className="min-h-screen bg-background pb-32">
@@ -315,10 +315,10 @@ const AudioTourDetail = () => {
         {/* Narrator */}
         {narratorName && (() => {
           const actor = narratorActor as any;
-          const displayName = actor ? (lang === "ar" ? actor.name_ar : actor.name_en) : narratorName;
-          const displayTitle = actor ? (lang === "ar" ? actor.title_ar : actor.title_en) : null;
+          const displayName = actor ? (lang === "ar" ? (actor.name_ar || actor.name_en) : actor.name_en) : narratorName;
+          const displayTitle = actor ? (lang === "ar" ? (actor.title_ar || actor.title_en) : actor.title_en) : null;
           const displayImage = actor?.image || tour.narrator_image;
-          const expertise = actor ? ((lang === "ar" ? actor.expertise_ar : actor.expertise_en) ?? []) as string[] : [];
+          const expertise = actor ? ((lang === "ar" ? (actor.expertise_ar || actor.expertise_en) : actor.expertise_en) ?? []) as string[] : [];
           const target = actor ? `/culture-actor/${actor.slug ?? actor.id}` : null;
           const Wrapper: any = target ? "button" : "div";
           return (
@@ -436,8 +436,8 @@ const AudioTourDetail = () => {
         <div className="mb-6">
           {Array.from({ length: stopsCount }).map((_, i) => {
             const stop = dbStops[i];
-            const stopLabel = stop ? (lang === "ar" ? stop.label_ar : stop.label_en) : (lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`);
-            const stopDesc = stop ? (lang === "ar" ? stop.desc_ar : stop.desc_en) : "";
+            const stopLabel = stop ? (lang === "ar" ? (stop.label_ar || stop.label_en) : stop.label_en) : (lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`);
+            const stopDesc = stop ? (lang === "ar" ? (stop.desc_ar || stop.desc_en) : stop.desc_en) : "";
             const dist = stopDistances[i];
             const isNear = dist != null && dist <= NEAR_THRESHOLD_M;
             return (

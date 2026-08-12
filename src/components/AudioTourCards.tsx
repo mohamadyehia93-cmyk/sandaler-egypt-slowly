@@ -25,7 +25,7 @@ const AudioTourCards = () => {
             className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
           >
             <div className="relative h-36">
-              <img src={a.image ?? ""} alt={lang === "ar" ? a.title_ar : a.title_en} className="w-full h-full object-cover" />
+              <img src={a.image ?? ""} alt={lang === "ar" ? (a.title_ar || a.title_en) : a.title_en} className="w-full h-full object-cover" />
               <div className="absolute inset-0 gradient-overlay" />
               <div className="absolute top-2 left-2 flex items-center gap-1 bg-primary/90 text-primary-foreground px-2 py-0.5 rounded-full text-xs font-medium">
                 <Headphones className="w-3 h-3" />
@@ -33,7 +33,7 @@ const AudioTourCards = () => {
               </div>
               <div className="absolute bottom-3 left-3 right-3">
                 <h3 className="text-sm font-bold text-primary-foreground line-clamp-2">
-                  {lang === "ar" ? a.title_ar : a.title_en}
+                  {lang === "ar" ? (a.title_ar || a.title_en) : a.title_en}
                 </h3>
               </div>
             </div>

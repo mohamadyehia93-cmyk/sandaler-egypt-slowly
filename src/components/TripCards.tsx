@@ -42,7 +42,7 @@ const TripCards = () => {
       ? lang === "ar" ? "كل المناطق" : "All Regions"
       : (() => {
           const r = regionsList.find((r) => r.id === activeRegion);
-          return r ? (lang === "ar" ? r.name_ar : r.name_en) : "";
+          return r ? (lang === "ar" ? (r.name_ar || r.name_en) : r.name_en) : "";
         })();
 
   // Group trips by theme, preserving order
@@ -80,7 +80,7 @@ const TripCards = () => {
               <DropdownMenuRadioItem value="all">{lang === "ar" ? "كل المناطق" : "All Regions"}</DropdownMenuRadioItem>
               {regionsList.map((r) => (
                 <DropdownMenuRadioItem key={r.id} value={r.id}>
-                  {r.emoji} {lang === "ar" ? r.name_ar : r.name_en}
+                  {r.emoji} {lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}
                 </DropdownMenuRadioItem>
               ))}
             </DropdownMenuRadioGroup>
@@ -199,7 +199,7 @@ const TripCards = () => {
                     <div className="relative h-32">
                       <img
                         src={tr.image || "/placeholder.svg"}
-                        alt={lang === "ar" ? tr.title_ar : tr.title_en}
+                        alt={lang === "ar" ? (tr.title_ar || tr.title_en) : tr.title_en}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -207,11 +207,11 @@ const TripCards = () => {
                       <div className="flex items-center gap-2 mb-1">
                         {tr.city_id && <CityBadge cityId={tr.city_id} />}
                         <span className="text-[10px] text-muted-foreground">
-                          {lang === "ar" ? tr.route_ar : tr.route_en}
+                          {lang === "ar" ? (tr.route_ar || tr.route_en) : tr.route_en}
                         </span>
                       </div>
                       <h4 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">
-                        {lang === "ar" ? tr.title_ar : tr.title_en}
+                        {lang === "ar" ? (tr.title_ar || tr.title_en) : tr.title_en}
                       </h4>
                       {tr.organizer_name_en && (
                         <div className="flex items-center gap-1.5 mb-2">
@@ -223,7 +223,7 @@ const TripCards = () => {
                             />
                           )}
                           <span className="text-[10px] text-primary font-medium truncate">
-                            {lang === "ar" ? tr.organizer_name_ar : tr.organizer_name_en}
+                            {lang === "ar" ? (tr.organizer_name_ar || tr.organizer_name_en) : tr.organizer_name_en}
                           </span>
                         </div>
                       )}

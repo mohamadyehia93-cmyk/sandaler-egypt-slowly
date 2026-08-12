@@ -37,7 +37,7 @@ const ExpertCollections = ({ userId }: { userId: string | null | undefined }) =>
       </h3>
       <div className="space-y-3">
         {items.map((c) => {
-          const title = (lang === "ar" ? c.title_ar : c.title_en) || c.title_en;
+          const title = (lang === "ar" ? (c.title_ar || c.title_en) : c.title_en) || c.title_en;
           const count = collectionEntries(c.entries).length;
           return (
             <button

@@ -67,18 +67,18 @@ const AllPeople = () => {
                 <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/30">
                   <img
                     src={person.image || "/placeholder.svg"}
-                    alt={lang === "ar" ? person.name_ar : person.name_en}
+                    alt={lang === "ar" ? (person.name_ar || person.name_en) : person.name_en}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <h3 className="text-xs font-semibold text-foreground text-center line-clamp-1">
-                  {lang === "ar" ? person.name_ar : person.name_en}
+                  {lang === "ar" ? (person.name_ar || person.name_en) : person.name_en}
                 </h3>
                 <p className="text-[10px] text-muted-foreground text-center line-clamp-1">
-                  {lang === "ar" ? person.role_ar : person.role_en}
+                  {lang === "ar" ? (person.role_ar || person.role_en) : person.role_en}
                 </p>
                 <div className="flex flex-wrap justify-center gap-1">
-                  {((lang === "ar" ? person.interests_ar : person.interests_en) ?? [])
+                  {((lang === "ar" ? (person.interests_ar || person.interests_en) : person.interests_en) ?? [])
                     .slice(0, 2)
                     .map((tag: string, i: number) => (
                       <span

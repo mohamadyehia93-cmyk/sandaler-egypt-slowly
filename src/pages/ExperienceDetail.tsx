@@ -277,7 +277,7 @@ const ExperienceDetail = () => {
         </span>
         <div className="flex gap-2">
           <ShareButton
-            title={lang === "ar" ? exp.title_ar : exp.title_en}
+            title={lang === "ar" ? (exp.title_ar || exp.title_en) : exp.title_en}
             className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center"
             iconClassName="w-3.5 h-3.5 text-foreground"
           />

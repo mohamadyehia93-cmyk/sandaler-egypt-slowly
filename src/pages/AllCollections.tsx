@@ -142,8 +142,8 @@ const AllCollections = () => {
           filtered.map((c) => {
             const expert = experts[c.expert_id];
             const count = collectionEntries(c.entries).length;
-            const title = (lang === "ar" ? c.title_ar : c.title_en) || c.title_en;
-            const abstract = (lang === "ar" ? c.abstract_ar : c.abstract_en) || "";
+            const title = (lang === "ar" ? (c.title_ar || c.title_en) : c.title_en) || c.title_en;
+            const abstract = (lang === "ar" ? (c.abstract_ar || c.abstract_en) : c.abstract_en) || "";
             return (
               <button
                 key={c.id}

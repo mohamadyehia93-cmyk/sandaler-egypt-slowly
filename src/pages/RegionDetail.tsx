@@ -173,8 +173,8 @@ const RegionDetail = () => {
         .eq("id", selectedCity).maybeSingle();
       if (!data) return null;
       return {
-        name: lang === "ar" ? data.name_ar : data.name_en,
-        overview: (lang === "ar" ? data.overview_ar : data.overview_en) || "",
+        name: lang === "ar" ? (data.name_ar || data.name_en) : data.name_en,
+        overview: (lang === "ar" ? (data.overview_ar || data.overview_en) : data.overview_en) || "",
       };
     },
   });

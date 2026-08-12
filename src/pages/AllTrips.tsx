@@ -25,7 +25,7 @@ const AllTrips = () => {
     return (trips ?? []).filter((tr: any) => {
       const themeMatch = activeTheme === "all" || tr.theme === activeTheme;
       const regionMatch = activeRegion === "all" || tr.region_id === activeRegion;
-      const title = lang === "ar" ? tr.title_ar : tr.title_en;
+      const title = lang === "ar" ? (tr.title_ar || tr.title_en) : tr.title_en;
       const queryMatch = !query.trim() || title?.toLowerCase().includes(query.toLowerCase());
       return themeMatch && regionMatch && queryMatch;
     });
@@ -102,7 +102,7 @@ const AllTrips = () => {
             <option value="all">{lang === "ar" ? "كل المناطق" : "All Regions"}</option>
             {regionsList.map((r) => (
               <option key={r.id} value={r.id}>
-                {lang === "ar" ? r.name_ar : r.name_en}
+                {lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}
               </option>
             ))}
           </select>
@@ -127,18 +127,18 @@ const AllTrips = () => {
             >
               <img
                 src={tr.image || "/placeholder.svg"}
-                alt={lang === "ar" ? tr.title_ar : tr.title_en}
+                alt={lang === "ar" ? (tr.title_ar || tr.title_en) : tr.title_en}
                 className="w-28 h-28 object-cover shrink-0"
               />
               <div className="flex-1 py-2 pr-3 min-w-0 flex flex-col justify-between">
                 <div>
                   <h4 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">
-                    {lang === "ar" ? tr.title_ar : tr.title_en}
+                    {lang === "ar" ? (tr.title_ar || tr.title_en) : tr.title_en}
                   </h4>
                   {tr.city_id && <CityBadge cityId={tr.city_id} />}
                   {(tr.route_en || tr.route_ar) && (
                     <p className="text-[10px] text-muted-foreground mt-1 line-clamp-1">
-                      {lang === "ar" ? tr.route_ar : tr.route_en}
+                      {lang === "ar" ? (tr.route_ar || tr.route_en) : tr.route_en}
                     </p>
                   )}
                 </div>

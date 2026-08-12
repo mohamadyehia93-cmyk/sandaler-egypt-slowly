@@ -60,7 +60,7 @@ const PersonDetail = () => {
         }
         if (p?.city_id) {
           const { data: c } = await supabase.from("cities").select("name_en, name_ar").eq("id", p.city_id).maybeSingle();
-          if (!cancelled && c) setCityName(lang === "ar" ? c.name_ar : c.name_en);
+          if (!cancelled && c) setCityName(lang === "ar" ? (c.name_ar || c.name_en) : c.name_en);
         }
         if (p?.city_id || p?.region_id) {
           let q = supabase
@@ -91,14 +91,14 @@ const PersonDetail = () => {
   }
   if (!person) return <NotFoundView context="person" />;
 
-  const name = lang === "ar" ? person.name_ar : person.name_en;
-  const role = lang === "ar" ? person.role_ar : person.role_en;
-  const bio = lang === "ar" ? person.bio_ar : person.bio_en;
-  const interests = (lang === "ar" ? person.interests_ar : person.interests_en) ?? [];
-  const places = (lang === "ar" ? person.favorite_places_ar : person.favorite_places_en) ?? [];
-  const meetingTimes = lang === "ar" ? person.meeting_times_ar : person.meeting_times_en;
-  const languages = (lang === "ar" ? person.languages_ar : person.languages_en) ?? [];
-  const regionName = region ? (lang === "ar" ? region.name_ar : region.name_en) : null;
+  const name = lang === "ar" ? (person.name_ar || person.name_en) : person.name_en;
+  const role = lang === "ar" ? (person.role_ar || person.role_en) : person.role_en;
+  const bio = lang === "ar" ? (person.bio_ar || person.bio_en) : person.bio_en;
+  const interests = (lang === "ar" ? (person.interests_ar || person.interests_en) : person.interests_en) ?? [];
+  const places = (lang === "ar" ? (person.favorite_places_ar || person.favorite_places_en) : person.favorite_places_en) ?? [];
+  const meetingTimes = lang === "ar" ? (person.meeting_times_ar || person.meeting_times_en) : person.meeting_times_en;
+  const languages = (lang === "ar" ? (person.languages_ar || person.languages_en) : person.languages_en) ?? [];
+  const regionName = region ? (lang === "ar" ? (region.name_ar || region.name_en) : region.name_en) : null;
   const accent = region?.color || "hsl(var(--primary))";
 
   return (
@@ -266,10 +266,10 @@ const PersonDetail = () => {
                 onClick={() => navigate(`/experience/${e.slug || e.id}`)}
                 className="flex gap-3 bg-card rounded-xl overflow-hidden shadow-card border border-border cursor-pointer"
               >
-                <img src={e.image || "/placeholder.svg"} alt={lang === "ar" ? e.title_ar : e.title_en} className="w-24 h-20 object-cover" />
+                <img src={e.image || "/placeholder.svg"} alt={lang === "ar" ? (e.title_ar || e.title_en) : e.title_en} className="w-24 h-20 object-cover" />
                 <div className="py-2 pe-3 flex-1 flex flex-col justify-center">
                   <h4 className="text-xs font-semibold text-foreground line-clamp-2">
-                    {lang === "ar" ? e.title_ar : e.title_en}
+                    {lang === "ar" ? (e.title_ar || e.title_en) : e.title_en}
                   </h4>
                   <span className="text-xs font-bold text-primary mt-1">
                     {e.price === 0 ? (lang === "ar" ? "مجاني" : "Free") : `${e.price} ${lang === "ar" ? "ج.م" : "EGP"}`}

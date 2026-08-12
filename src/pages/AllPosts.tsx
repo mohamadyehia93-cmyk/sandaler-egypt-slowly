@@ -159,7 +159,7 @@ const AllPosts = () => {
                           }`}
                         >
                           <span>{r.emoji}</span>
-                          <span>{lang === "ar" ? r.name_ar : r.name_en}</span>
+                          <span>{lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}</span>
                           {active && <Check className="w-3 h-3" />}
                         </button>
                       );
@@ -221,7 +221,7 @@ const AllPosts = () => {
             >
               {(() => {
                 const r = (regions as any[]).find((x) => x.id === activeRegion);
-                return r ? `${r.emoji} ${lang === "ar" ? r.name_ar : r.name_en}` : "";
+                return r ? `${r.emoji} ${lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}` : "";
               })()}
               <XIcon className="w-3 h-3" />
             </button>
