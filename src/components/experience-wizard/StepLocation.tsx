@@ -35,11 +35,6 @@ const StepLocation = ({ form, set, updateForm }: Props) => {
     return r ? (ar ? r.name_ar : r.name_en) : id;
   };
 
-  const onCityChange = (cityId: string) => {
-    const city = (cities ?? []).find((c: any) => c.id === cityId) as any;
-    updateForm({ cityId, regionId: city?.region_id ?? "" });
-  };
-
   const updateStep = (idx: number, value: string) => {
     const arr = [...form.itinerary];
     arr[idx] = { step: value };
@@ -49,31 +44,16 @@ const StepLocation = ({ form, set, updateForm }: Props) => {
   return (
     <div className="space-y-5">
       {/* General location — real city taxonomy */}
-      <div>
-        <label className={labelClass}>
-          <MapPin className="w-3.5 h-3.5 text-role-service-provider" />
-          {ar ? "الموقع العام (المدينة)" : "General Location (City)"}
-        </label>
-        <select
-          className={inputClass}
-          value={form.cityId}
-          onChange={(e) => onCityChange(e.target.value)}
-        >
-          <option value="">{ar ? "اختر المدينة..." : "Select a city..."}</option>
-          {Object.keys(grouped).map((rid) => (
-            <optgroup key={rid} label={regionName(rid)}>
-              {grouped[rid].map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
-        <p className="text-[11px] text-muted-foreground mt-1.5">
-          {ar
-            ? "اختيار المدينة يجعل تجربتك تظهر في صفحات المدينة والمنطقة."
-            : "Choosing a city makes your listing appear on that city's and region's pages."}
-        </p>
-      </div>
+      <CityPicker
+        cityId={form.cityId}
+        onChange={(cityId, regionId) => updateForm({ cityId, regionId })}
+        iconClass="w-3.5 h-3.5 text-role-service-provider"
+        inputClass={inputClass}
+        labelClass={labelClass}
+        hintEn="Choosing a city makes your listing appear on that city's and region's pages."
+        hintAr="اختيار المدينة يجعل تجربتك تظهر في صفحات المدينة والمنطقة."
+      />
+
 
       {/* Secondary free-text fallback */}
       <div>
