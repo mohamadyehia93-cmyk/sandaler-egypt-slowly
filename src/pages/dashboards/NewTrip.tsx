@@ -35,6 +35,21 @@ const NewTrip = () => {
   const [authorLang, setAuthorLang] = useState<Lang>(lang === "ar" ? "ar" : "en");
   const [meta, setMeta] = useState<TranslationMeta>({});
 
+  /**
+   * DATA-INTEGRITY GUARD.
+   * route / itinerary / inclusions are edited in ONE language at a time (the
+   * authoring language). Before this, save wrote the authored language and set
+   * the other side to null / [] unconditionally — so editing an English trip in
+   * Arabic destroyed the stored English route, itinerary and inclusions.
+   * We keep the loaded row's other-language values here and write them back
+   * untouched.
+   */
+  const [otherLang, setOtherLang] = useState<{
+    route_en: string | null; route_ar: string | null;
+    itinerary_en: unknown; itinerary_ar: unknown;
+    inclusions_en: string[] | null; inclusions_ar: string[] | null;
+  }>({ route_en: null, route_ar: null, itinerary_en: [], itinerary_ar: [], inclusions_en: [], inclusions_ar: [] });
+
   const [form, setForm] = useState({
     titleEn: "",
     titleAr: "",
