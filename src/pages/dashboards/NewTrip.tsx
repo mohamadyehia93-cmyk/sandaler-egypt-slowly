@@ -169,7 +169,12 @@ const NewTrip = () => {
         if (error) throw error;
         toast.success(lang === "ar" ? "تم نشر الرحلة بنجاح!" : "Trip published successfully!");
       }
+      // Without this the dashboard keeps showing the cached pre-edit title.
+      queryClient.invalidateQueries({ queryKey: ["my-trips"] });
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+      if (id) queryClient.invalidateQueries({ queryKey: ["trip", id] });
       navigate("/dashboard/trip-organizer/my-trips");
+
     } catch (err: any) {
       toast.error(
         readableDbError(err?.message || "", lang === "ar") ||
