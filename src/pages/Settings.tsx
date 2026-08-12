@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Globe, Bell, Moon, Shield, LogOut, ChevronRight, Eye } from "lucide-react";
+import { ArrowLeft, Globe, Bell, Moon, Shield, LogOut, ChevronRight, Eye, Repeat } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -119,14 +119,24 @@ const Settings = () => {
       title: { en: "Account", ar: "الحساب" },
       items: [
         {
+          icon: Repeat,
+          label: { en: "Switch role / Become a provider", ar: "تغيير الدور / كن مقدم خدمة" },
+          action: () => navigate("/welcome"),
+        },
+        {
           icon: LogOut,
           label: { en: "Log Out", ar: "تسجيل الخروج" },
           danger: true,
-          action: () => navigate("/welcome"),
+          action: async () => {
+            await supabase.auth.signOut();
+            toast.success(lang === "ar" ? "تم تسجيل الخروج" : "Signed out");
+            navigate("/welcome");
+          },
         },
       ],
     },
   ];
+
 
   return (
     <div className="min-h-screen bg-surface pb-20">
