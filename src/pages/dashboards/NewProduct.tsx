@@ -130,6 +130,8 @@ const NewProduct = () => {
         origin_story_en: (authorLang === "en" ? originStory : null) || null,
         origin_story_ar: (authorLang === "ar" ? originStory : null) || null,
         category: form.category,
+        city_id: form.cityId || null,
+        region_id: form.regionId || null,
         price: parseInt(form.price) || 0,
         stock: parseInt(form.stock) || 0,
         seller_village_en: form.originEn.trim() || null,
