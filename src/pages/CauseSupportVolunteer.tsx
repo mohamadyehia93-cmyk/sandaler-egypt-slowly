@@ -78,6 +78,7 @@ const CauseSupportVolunteer = () => {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  if (causeLoading) return <div className="min-h-screen bg-background" />;
   if (!cause) return <NotFoundView context="cause" />;
 
   const opp = selectedOpp !== null ? opportunities[selectedOpp] : null;

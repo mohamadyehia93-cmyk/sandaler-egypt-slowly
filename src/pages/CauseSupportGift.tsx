@@ -77,6 +77,7 @@ const CauseSupportGift = () => {
   const [notes, setNotes] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  if (causeLoading) return <div className="min-h-screen bg-background" />;
   if (!cause) return <NotFoundView context="cause" />;
 
   const pkg = selectedPkg !== null ? giftPackages[selectedPkg] : null;

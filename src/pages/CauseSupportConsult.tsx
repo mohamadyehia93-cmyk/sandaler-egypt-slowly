@@ -49,6 +49,7 @@ const CauseSupportConsult = () => {
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  if (causeLoading) return <div className="min-h-screen bg-background" />;
   if (!cause) return <NotFoundView context="cause" />;
 
   const toggleExpertise = (i: number) => {
