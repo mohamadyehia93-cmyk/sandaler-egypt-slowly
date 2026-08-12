@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchMyProviderId } from "@/lib/providerRecord";
 import {
   ArrowLeft, Plus, Pencil, Trash2, Calendar, Users, MapPin, Clock,
   CalendarCheck, CalendarClock, Send, CheckCircle2, XCircle, FileEdit, ChevronDown,
