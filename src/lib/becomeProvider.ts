@@ -44,7 +44,9 @@ async function upsertSatellite(
   slug: string,
   details?: ProviderDetails
 ): Promise<void> {
-  const nameAr = details?.nameAr?.trim() || nameEn; // these tables require name_ar
+  // Arabic name is optional on the satellite tables now — NULL means "no Arabic
+  // name" and display falls back to English. Never mirror English into Arabic.
+  const nameAr = details?.nameAr?.trim() || null;
   const labels = (details?.answerLabels || []).filter(Boolean);
   const bioEn = details?.bioEn?.trim() || null;
   const avatar = details?.avatar || null;
