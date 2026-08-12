@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,6 +26,7 @@ const NewTrip = () => {
   const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
+  const queryClient = useQueryClient();
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
@@ -127,9 +129,12 @@ const NewTrip = () => {
       const images = [...existingImages, ...uploaded];
       const destinations = form.destinations.map((d) => d.trim()).filter(Boolean);
       const route = [form.startLocation.trim(), ...destinations].filter(Boolean).join(" → ");
+      const days = parseInt(form.days) || 1;
       const itinerary = form.itinerary
         .filter((i) => i.description.trim())
+        .slice(0, days)
         .map((i, idx) => ({ day: idx + 1, description: i.description.trim() }));
+
       const inclusions = form.includes.map((i) => i.trim()).filter(Boolean);
 
       const payload = {
@@ -164,7 +169,12 @@ const NewTrip = () => {
         if (error) throw error;
         toast.success(lang === "ar" ? "تم نشر الرحلة بنجاح!" : "Trip published successfully!");
       }
+      // Without this the dashboard keeps showing the cached pre-edit title.
+      queryClient.invalidateQueries({ queryKey: ["my-trips"] });
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+      if (id) queryClient.invalidateQueries({ queryKey: ["trip", id] });
       navigate("/dashboard/trip-organizer/my-trips");
+
     } catch (err: any) {
       toast.error(
         readableDbError(err?.message || "", lang === "ar") ||
