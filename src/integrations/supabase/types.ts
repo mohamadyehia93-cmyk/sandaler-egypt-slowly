@@ -2144,7 +2144,7 @@ export type Database = {
           followers: number | null
           id: string
           languages: string | null
-          name_ar: string
+          name_ar: string | null
           name_en: string
           rating: number | null
           region_ar: string | null
@@ -2178,7 +2178,7 @@ export type Database = {
           followers?: number | null
           id?: string
           languages?: string | null
-          name_ar: string
+          name_ar?: string | null
           name_en: string
           rating?: number | null
           region_ar?: string | null
@@ -2212,7 +2212,7 @@ export type Database = {
           followers?: number | null
           id?: string
           languages?: string | null
-          name_ar?: string
+          name_ar?: string | null
           name_en?: string
           rating?: number | null
           region_ar?: string | null

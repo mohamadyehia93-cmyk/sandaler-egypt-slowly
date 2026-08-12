@@ -1,0 +1,1 @@
+ALTER TABLE public.providers ALTER COLUMN name_ar DROP NOT NULL;
