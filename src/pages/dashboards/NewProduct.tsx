@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages } from "@/lib/dashboardForms";
 import { fetchMyProviderId } from "@/lib/providerRecord";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import CityPicker from "@/components/dashboard/CityPicker";
 import BilingualField from "@/components/dashboard/BilingualField";
 import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
@@ -42,6 +43,8 @@ const NewProduct = () => {
     originEn: "",
     originAr: "",
     category: "",
+    cityId: "",
+    regionId: "",
     price: "",
     stock: "",
     material: "",
@@ -65,6 +68,8 @@ const NewProduct = () => {
         originEn: data.seller_village_en || "",
         originAr: data.seller_village_ar || "",
         category: data.category || "",
+        cityId: data.city_id || "",
+        regionId: data.region_id || "",
         price: data.price != null ? String(data.price) : "",
         stock: data.stock != null ? String(data.stock) : "",
         material: "",
@@ -97,7 +102,7 @@ const NewProduct = () => {
     const nameSrc = authorLang === "ar" ? form.nameAr : form.nameEn;
     const descSrc = authorLang === "ar" ? form.descriptionAr : form.descriptionEn;
     // Required-field validation needs ONE language, not both.
-    if (!nameSrc.trim() || !descSrc.trim() || !form.category || !form.price.trim()) {
+    if (!nameSrc.trim() || !descSrc.trim() || !form.category || !form.cityId || !form.price.trim()) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
@@ -126,6 +131,8 @@ const NewProduct = () => {
         origin_story_en: (authorLang === "en" ? originStory : null) || null,
         origin_story_ar: (authorLang === "ar" ? originStory : null) || null,
         category: form.category,
+        city_id: form.cityId || null,
+        region_id: form.regionId || null,
         price: parseInt(form.price) || 0,
         stock: parseInt(form.stock) || 0,
         seller_village_en: form.originEn.trim() || null,
@@ -222,6 +229,17 @@ const NewProduct = () => {
             <input type="number" className={inputClass} placeholder="10" value={form.stock} onChange={(e) => set("stock", e.target.value)} min="0" />
           </div>
         </div>
+
+        <CityPicker
+          cityId={form.cityId}
+          onChange={(cityId, regionId) => setForm((p) => ({ ...p, cityId, regionId }))}
+          required
+          labelEn="Main city (listed under)"
+          labelAr="المدينة الرئيسية (يُدرج تحتها)"
+          iconClass="w-3.5 h-3.5 text-role-product-seller"
+          inputClass={inputClass}
+          labelClass={labelClass}
+        />
 
         <BilingualField
           fieldEn="seller_village_en" fieldAr="seller_village_ar"
