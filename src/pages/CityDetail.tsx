@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
+import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
 import { useQuery } from "@tanstack/react-query";
@@ -482,9 +483,7 @@ const CityDetail = () => {
                 <div key={a.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${(a as any).slug || a.id}`)}>
                   <div className="relative h-32">
                     <img src={a.image} alt={a.title[lang]} className="w-full h-full object-cover" />
-                    <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
-                      <Heart className="w-4 h-4 text-foreground" />
-                    </button>
+                    <WishlistButton itemType="stay" itemId={a.id} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm" />
                     <span className="absolute bottom-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
                       {a.type[lang]}
                     </span>
@@ -530,9 +529,7 @@ const CityDetail = () => {
                 <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/product/${(p as any).slug || p.id}`)}>
                   <div className="relative h-32">
                     <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
-                    <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
-                      <Heart className="w-3.5 h-3.5 text-foreground" />
-                    </button>
+                    <WishlistButton itemType="product" itemId={p.id} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm" />
                     <span className="absolute bottom-2 left-2 bg-accent text-accent-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
                       {p.badge[lang]}
                     </span>

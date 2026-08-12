@@ -299,7 +299,10 @@ const TripCards = () => {
                         <span className="text-sm font-bold text-primary-dark">
                           {tr.price} {t("common.egp")}
                         </span>
-                        <button className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); navigate(`/booking?type=trip&id=${tr.id}`); }}
+                          className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold"
+                        >
                           {t("common.book")}
                         </button>
                       </div>

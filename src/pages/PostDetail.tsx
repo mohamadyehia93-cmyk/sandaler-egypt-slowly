@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Clock, Share2, User, MapPin, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Maximize, Camera, ChevronLeft, ChevronRight } from "lucide-react";
+import ShareButton from "@/components/ShareButton";
 import { useI18n } from "@/lib/i18n";
 import CityBadge from "@/components/CityBadge";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
@@ -173,9 +174,7 @@ const PostDetail = () => {
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <div className="absolute top-4 right-4 flex gap-2">
-          <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
-            <Share2 className="w-5 h-5 text-foreground" />
-          </button>
+          <ShareButton title={lang === "ar" ? (post as any).title_ar : (post as any).title_en} />
           <WishlistButton itemType="post" itemId={post.id} variant="bookmark" />
         </div>
         <div className="absolute bottom-4 left-4 right-4">

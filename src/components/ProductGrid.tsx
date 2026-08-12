@@ -1,3 +1,4 @@
+import WishlistButton from "@/components/WishlistButton";
 import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
@@ -22,9 +23,7 @@ const ProductGrid = () => {
           <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card">
             <div className="relative h-32">
               <img src={p.image || "/placeholder.svg"} alt={lang === "ar" ? p.name_ar : p.name_en} className="w-full h-full object-cover" />
-              <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
-                <Heart className="w-3.5 h-3.5 text-foreground" />
-              </button>
+              <WishlistButton itemType="product" itemId={p.id} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm" />
               {p.badges && p.badges.length > 0 && (
                 <span className="absolute bottom-2 left-2 bg-accent text-accent-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
                   {p.badges[0]}

@@ -2,6 +2,7 @@ import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, BookOpen, Layers, MapPin, Scale, User, ChevronRight } from "lucide-react";
+import LocationChips from "@/components/LocationChips";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
@@ -146,10 +147,7 @@ const CollectionDetail = () => {
               {entries.length} {lang === "ar" ? "عنصر" : entries.length === 1 ? "entry" : "entries"}
             </span>
             {collection.region_id && (
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" />
-                {collection.region_id}
-              </span>
+              <LocationChips regionId={collection.region_id} />
             )}
             {collection.license && (
               <span className="flex items-center gap-1">

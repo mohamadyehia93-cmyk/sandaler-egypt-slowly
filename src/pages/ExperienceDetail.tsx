@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useMemo } from "react";
 import WishlistButton from "@/components/WishlistButton";
-import { ArrowLeft, Share2, MessageCircle, Bus, Train, Plus, Minus } from "lucide-react";
+import ShareButton from "@/components/ShareButton";
+import { ArrowLeft, MessageCircle, Bus, Train, Plus, Minus } from "lucide-react";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -275,9 +276,11 @@ const ExperienceDetail = () => {
           {[regionName, t("experience.experiences_subtitle")].filter(Boolean).join(" · ")}
         </span>
         <div className="flex gap-2">
-          <button className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center">
-            <Share2 className="w-3.5 h-3.5 text-foreground" />
-          </button>
+          <ShareButton
+            title={lang === "ar" ? exp.title_ar : exp.title_en}
+            className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center"
+            iconClassName="w-3.5 h-3.5 text-foreground"
+          />
           <WishlistButton
             itemType="experience"
             itemId={exp?.id}

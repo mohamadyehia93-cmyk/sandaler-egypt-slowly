@@ -4,10 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useTranslation } from "react-i18next";
 import { SEO } from "@/components/SEO";
-import { ArrowLeft, Share2, Search } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import BottomNav from "@/components/BottomNav";
+import ShareButton from "@/components/ShareButton";
 
 export default function RegionPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -124,12 +125,11 @@ export default function RegionPage() {
               >
                 <ArrowLeft className={`w-4 h-4 ${isRTL ? "rotate-180" : ""}`} />
               </Link>
-              <button
+              <ShareButton
+                title={name}
                 className="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center shadow"
-                aria-label={t("common.share")}
-              >
-                <Share2 className="w-4 h-4" />
-              </button>
+                iconClassName="w-4 h-4"
+              />
             </div>
 
             <div className="flex-1 flex items-end p-4">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Quote, Feather, BookOpen, Share2, Instagram, Twitter, MessageCircle, Headphones, Clock, Briefcase } from "lucide-react";
+import ShareButton from "@/components/ShareButton";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
@@ -121,9 +122,7 @@ const CultureActorDetail = () => {
         <button onClick={() => navigate(-1)} className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-sm z-10">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
-        <button className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm z-10">
-          <Share2 className="w-5 h-5 text-foreground" />
-        </button>
+        <ShareButton title={lang === "ar" ? (actor as any).name_ar : (actor as any).name_en} className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm z-10" />
       </div>
 
       {/* Avatar & Name */}

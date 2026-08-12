@@ -1,7 +1,9 @@
 import MessageOwnerButton from "@/components/MessageOwnerButton";
-import { ArrowLeft, Share2, MapPin, Clock, Users, Calendar, MapPinned, Navigation2, Mountain, Award } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Users, Calendar, MapPinned, Navigation2, Mountain, Award } from "lucide-react";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import WishlistButton from "@/components/WishlistButton";
+import ShareButton from "@/components/ShareButton";
+import LocationChips from "@/components/LocationChips";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
@@ -64,18 +66,14 @@ const TripDetail = () => {
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <div className="absolute top-4 right-4 flex gap-2">
-          <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
-            <Share2 className="w-5 h-5 text-foreground" />
-          </button>
+          <ShareButton title={lang === "ar" ? trip.title_ar : trip.title_en} />
           <WishlistButton itemType="trip" itemId={trip?.id} />
         </div>
       </div>
 
       <div className="px-4 pt-4">
         <h1 className="text-xl font-bold text-foreground mb-1">{title}</h1>
-        <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
-          {route && <span className="flex items-center gap-1"><MapPin className="w-4 h-4 text-primary" /> {route}</span>}
-        </div>
+        <LocationChips cityId={trip.city_id} regionId={trip.region_id} fallbackText={route} className="mb-4" />
 
         <div className="flex gap-2 mb-6 flex-wrap">
           {trip.duration_days && (
