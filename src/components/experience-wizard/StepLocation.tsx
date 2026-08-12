@@ -1,10 +1,9 @@
-import { useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
 import { MapPin, Plus, Trash2, NotebookPen } from "lucide-react";
 import { ExperienceFormData } from "./types";
-import { useCities, useRegions } from "@/hooks/useListings";
 import { getCityCoords } from "@/lib/cityCoords";
 import LocationPicker from "@/components/dashboard/LocationPicker";
+import CityPicker from "@/components/dashboard/CityPicker";
 
 interface Props {
   form: ExperienceFormData;
@@ -18,22 +17,7 @@ const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-cent
 const StepLocation = ({ form, set, updateForm }: Props) => {
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const { data: cities } = useCities();
-  const { data: regions } = useRegions();
 
-  const grouped = useMemo(() => {
-    const byRegion: Record<string, { id: string; name: string }[]> = {};
-    (cities ?? []).forEach((c: any) => {
-      (byRegion[c.region_id] ||= []).push({ id: c.id, name: ar ? c.name_ar : c.name_en });
-    });
-    Object.values(byRegion).forEach((list) => list.sort((a, b) => a.name.localeCompare(b.name)));
-    return byRegion;
-  }, [cities, ar]);
-
-  const regionName = (id: string) => {
-    const r = (regions ?? []).find((x: any) => x.id === id) as any;
-    return r ? (ar ? r.name_ar : r.name_en) : id;
-  };
 
   const updateStep = (idx: number, value: string) => {
     const arr = [...form.itinerary];
