@@ -1,0 +1,15 @@
+ALTER TABLE public.accommodations ALTER COLUMN name_ar DROP NOT NULL;
+ALTER TABLE public.audio_tours ALTER COLUMN title_ar DROP NOT NULL;
+ALTER TABLE public.causes ALTER COLUMN title_ar DROP NOT NULL;
+ALTER TABLE public.collections ALTER COLUMN title_ar DROP NOT NULL;
+ALTER TABLE public.culture_actors ALTER COLUMN name_ar DROP NOT NULL;
+ALTER TABLE public.events ALTER COLUMN title_ar DROP NOT NULL;
+ALTER TABLE public.experiences ALTER COLUMN title_ar DROP NOT NULL;
+ALTER TABLE public.meetups ALTER COLUMN title_ar DROP NOT NULL;
+ALTER TABLE public.organizations ALTER COLUMN name_ar DROP NOT NULL;
+ALTER TABLE public.posts ALTER COLUMN title_ar DROP NOT NULL;
+ALTER TABLE public.products ALTER COLUMN name_ar DROP NOT NULL;
+ALTER TABLE public.programs ALTER COLUMN title_ar DROP NOT NULL;
+ALTER TABLE public.transport ALTER COLUMN name_ar DROP NOT NULL;
+ALTER TABLE public.trips ALTER COLUMN title_ar DROP NOT NULL;
+ALTER TABLE public.whos_who ALTER COLUMN name_ar DROP NOT NULL;
