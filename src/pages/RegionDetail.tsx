@@ -1,9 +1,14 @@
 import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned, Compass, BookOpen, Palette, Mountain } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
-import { regions, regionCities, experiences, latestPosts, audioTours, causes, cityData } from "@/lib/sampleData";
+// Sample experiences/posts used to be merged into the DB results here, so a region
+// page mixed fabricated listings (with their own invented ratings and prices) in
+// with real ones. Only real rows are rendered now.
+import { regions, regionCities, latestPosts } from "@/lib/sampleData";
 import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
@@ -128,6 +133,22 @@ const RegionDetail = () => {
   const { data: dbWhosWho = [], isLoading: l3 } = useWhosWho();
   const { data: dbPosts = [], isLoading: l4 } = usePosts();
   const { data: dbEvents = [] } = useEvents();
+  // City copy comes from the cities table, not the sample cityData map, so a
+  // selected city can never show another city's overview.
+  const { data: selectedCityRow } = useQuery({
+    queryKey: ["region-city", selectedCity, lang],
+    enabled: selectedCity !== "all",
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("cities").select("name_en, name_ar, overview_en, overview_ar")
+        .eq("id", selectedCity).maybeSingle();
+      if (!data) return null;
+      return {
+        name: lang === "ar" ? data.name_ar : data.name_en,
+        overview: (lang === "ar" ? data.overview_ar : data.overview_en) || "",
+      };
+    },
+  });
   const isLoading = l1 || l2 || l3 || l4;
 
   if (isLoading) return <DetailSkeleton variant="region" />;
@@ -146,7 +167,6 @@ const RegionDetail = () => {
         image: e.image, price: e.price ?? 0, rating: e.rating ?? 0,
         cityId: e.city_id, regionId: e.region_id,
       })),
-      ...experiences.filter((e) => e.regionId === regionId),
     ])
   );
   const regionEvents = (dbEvents as any[])
@@ -161,7 +181,6 @@ const RegionDetail = () => {
       image: p.image, readTime: p.read_time_minutes ?? 5,
       cityId: p.city_id, regionId: p.region_id,
     })) as any[],
-    ...latestPosts.filter((p) => p.regionId === regionId),
   ]);
   const regionPeople = cityFilter(
     dedupe([
@@ -251,16 +270,16 @@ const RegionDetail = () => {
       )}
 
       {/* About — show city-specific overview when a city is selected, otherwise region description */}
-      {selectedCity !== "all" && cityData[selectedCity] ? (
+      {selectedCity !== "all" && selectedCityRow?.overview ? (
         <div className="px-4 mb-2">
           <div className="flex items-center gap-2 mb-2">
             <Compass className="w-4 h-4 text-primary" />
             <h3 className="text-base font-bold text-foreground">
-              {lang === "ar" ? "عن" : "About"} {cityData[selectedCity].name[lang]}
+              {lang === "ar" ? "عن" : "About"} {selectedCityRow.name}
             </h3>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {cityData[selectedCity].about.overview[lang]}
+            {selectedCityRow.overview}
           </p>
         </div>
       ) : region.about ? (

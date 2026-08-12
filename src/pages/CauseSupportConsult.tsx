@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MessageCircle, Briefcase, Clock, Calendar, Send, CheckCircle2, ChevronRight, Check } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { causes } from "@/lib/sampleData";
+import { useCauseRow } from "@/lib/causeRow";
 import { useState } from "react";
 import NotFoundView from "@/components/NotFound";
 import { toast } from "sonner";
@@ -32,7 +32,7 @@ const CauseSupportConsult = () => {
   const { user } = useAuth();
   const ar = lang === "ar";
 
-  const cause = causes.find((c) => c.id === id);
+  const { cause, isLoading: causeLoading } = useCauseRow(id);
 
   const [step, setStep] = useState<Step>("browse");
   const [selectedExpertise, setSelectedExpertise] = useState<number[]>([]);
@@ -49,6 +49,7 @@ const CauseSupportConsult = () => {
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  if (causeLoading) return <div className="min-h-screen bg-background" />;
   if (!cause) return <NotFoundView context="cause" />;
 
   const toggleExpertise = (i: number) => {
@@ -235,9 +236,8 @@ const CauseSupportConsult = () => {
             <div className="space-y-2 mb-6">
               {[
                 { step: "1", text: { en: "Select your area of expertise and preferred format", ar: "اختر مجال خبرتك والصيغة المفضلة" } },
-                { step: "2", text: { en: "We match you with the organization's needs", ar: "نطابقك مع احتياجات المنظمة" } },
-                { step: "3", text: { en: "Schedule an introductory call", ar: "حدد موعد مكالمة تعارف" } },
-                { step: "4", text: { en: "Begin your consultation and track impact", ar: "ابدأ استشارتك وتابع التأثير" } },
+                { step: "2", text: { en: "Your offer is sent to the organisation behind this cause", ar: "يُرسل عرضك إلى المنظمة القائمة على القضية" } },
+                { step: "3", text: { en: "They contact you directly using the details you provide", ar: "يتواصلون معك مباشرة عبر البيانات التي تقدمها" } },
               ].map((s, i) => (
                 <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border">
                   <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center flex-shrink-0">

@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, CreditCard, Repeat, TrendingUp, Info, Check, ChevronRight, Clock } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { causes } from "@/lib/sampleData";
+import { useCauseRow } from "@/lib/causeRow";
 import { useState } from "react";
 import { toast } from "sonner";
 import NotFoundView from "@/components/NotFound";
@@ -39,23 +39,15 @@ const CauseSupportDonate = () => {
   const [note, setNote] = useState("");
 
 
-  const cause = causes.find((c) => c.id === id);
+  const { cause, isLoading: causeLoading } = useCauseRow(id);
+  if (causeLoading) return <div className="min-h-screen bg-background" />;
   if (!cause) return <NotFoundView context="cause" />;
 
-  const progress = Math.round((cause.raised / cause.goal) * 100);
+  // Only shown when the row genuinely carries both numbers.
+  const progress = cause.goal ? Math.round(((cause.raised || 0) / cause.goal) * 100) : null;
   const finalAmount = showCustom ? (parseInt(customAmount) || 0) : selected;
 
-  const impactExamples = [
-    { amount: 50, text: { en: "Provides clean water for 1 family for a week", ar: "توفر مياه نظيفة لعائلة لمدة أسبوع" } },
-    { amount: 100, text: { en: "Funds school supplies for 2 children", ar: "تموّل مستلزمات مدرسية لطفلين" } },
-    { amount: 250, text: { en: "Supports a local artisan workshop for a month", ar: "تدعم ورشة حرفي محلي لمدة شهر" } },
-    { amount: 500, text: { en: "Plants 50 trees in the community", ar: "تزرع 50 شجرة في المجتمع" } },
-    { amount: 1000, text: { en: "Covers medical supplies for a village clinic", ar: "تغطي مستلزمات طبية لعيادة قرية" } },
-  ];
 
-  const currentImpact = impactExamples.find((e) => e.amount <= finalAmount) 
-    ? [...impactExamples].reverse().find((e) => e.amount <= finalAmount)!
-    : impactExamples[0];
 
   const selectedPayment = paymentMethods.find(m => m.id === paymentMethod);
 
@@ -130,10 +122,14 @@ const CauseSupportDonate = () => {
               <img src={cause.image} alt={cause.title[lang]} className="w-14 h-14 rounded-lg object-cover" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground truncate">{cause.title[lang]}</p>
-                <div className="w-full h-1.5 bg-border rounded-full mt-1.5">
-                  <div className="h-full bg-primary rounded-full" style={{ width: `${Math.min(progress, 100)}%` }} />
-                </div>
-                <p className="text-[10px] text-muted-foreground mt-1">{progress}% {lang === "ar" ? "ممول" : "funded"}</p>
+                {progress !== null && (
+                  <>
+                    <div className="w-full h-1.5 bg-border rounded-full mt-1.5">
+                      <div className="h-full bg-primary rounded-full" style={{ width: `${Math.min(progress, 100)}%` }} />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-1">{progress}% {lang === "ar" ? "ممول" : "funded"}</p>
+                  </>
+                )}
               </div>
             </div>
 
@@ -181,18 +177,6 @@ const CauseSupportDonate = () => {
               </div>
             )}
 
-            {/* Impact Preview */}
-            {finalAmount > 0 && (
-              <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 mb-5">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <TrendingUp className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-semibold text-primary">
-                    {lang === "ar" ? "أثر تبرعك" : "Your Impact"}
-                  </span>
-                </div>
-                <p className="text-sm text-foreground">{currentImpact.text[lang]}</p>
-              </div>
-            )}
 
             {/* Recurring Toggle */}
             <div className="flex items-center justify-between p-4 rounded-xl bg-card shadow-card border border-border mb-5">
@@ -331,17 +315,6 @@ const CauseSupportDonate = () => {
             </div>
 
 
-            {/* Impact */}
-            <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 mb-5">
-              <div className="flex items-center gap-2 mb-1.5">
-                <TrendingUp className="w-4 h-4 text-primary" />
-                <span className="text-xs font-semibold text-primary">
-                  {lang === "ar" ? "أثر تبرعك" : "Your Impact"}
-                </span>
-              </div>
-              <p className="text-sm text-foreground">{currentImpact.text[lang]}</p>
-            </div>
-
             {/* Honest framing */}
             <div className="flex items-start gap-2 p-3 rounded-lg bg-warning/5 border border-warning/30">
               <Info className="w-4 h-4 text-warning flex-shrink-0 mt-0.5" />
@@ -391,17 +364,6 @@ const CauseSupportDonate = () => {
                   <span className="text-xs font-semibold text-foreground">{row.value}</span>
                 </div>
               ))}
-            </div>
-
-            {/* Impact */}
-            <div className="w-full rounded-xl bg-primary/5 border border-primary/20 p-4 mb-4">
-              <div className="flex items-center gap-2 mb-1.5">
-                <TrendingUp className="w-4 h-4 text-primary" />
-                <span className="text-xs font-semibold text-primary">
-                  {ar ? "الأثر المتوقع" : "Potential Impact"}
-                </span>
-              </div>
-              <p className="text-sm text-foreground">{currentImpact.text[lang]}</p>
             </div>
 
             <button

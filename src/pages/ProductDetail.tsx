@@ -2,7 +2,7 @@ import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, MapPin, ShoppingCart, Leaf, Package, Minus, Plus, X } from "lucide-react";
+import { ArrowLeft, MapPin, ShoppingCart, Leaf, Minus, Plus, X } from "lucide-react";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { toast } from "sonner";
 import WishlistButton from "@/components/WishlistButton";
@@ -167,21 +167,10 @@ const ProductDetail = () => {
           </div>
         )}
 
-        {/* Purchase Options */}
-        <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "خيارات الشراء" : "Purchase Options"}</h2>
-        <div className="space-y-2 mb-6">
-          {[
-            { icon: "📦", text: lang === "ar" ? "شحن محلي متاح" : "Local shipping available" },
-            { icon: "🎁", text: lang === "ar" ? "تغليف هدايا مجاني" : "Free gift wrapping" },
-            { icon: "🔄", text: lang === "ar" ? "إرجاع خلال ١٤ يوم" : "14-day return policy" },
-            { icon: "✅", text: lang === "ar" ? "شهادة أصالة مرفقة" : "Certificate of authenticity included" },
-          ].map((opt, i) => (
-            <div key={i} className="flex items-center gap-2 p-2.5 rounded-lg bg-surface">
-              <span className="text-base">{opt.icon}</span>
-              <span className="text-xs text-foreground">{opt.text}</span>
-            </div>
-          ))}
-        </div>
+        {/* No "Purchase Options" block: shipping, gift wrapping, returns and
+            certificates of authenticity were hardcoded promises with no column
+            backing them and no policy the platform can honour. */}
+
       </div>
 
       {/* Seller Bio */}
