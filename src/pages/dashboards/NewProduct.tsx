@@ -229,6 +229,17 @@ const NewProduct = () => {
           </div>
         </div>
 
+        <CityPicker
+          cityId={form.cityId}
+          onChange={(cityId, regionId) => setForm((p) => ({ ...p, cityId, regionId }))}
+          required
+          labelEn="Main city (listed under)"
+          labelAr="المدينة الرئيسية (يُدرج تحتها)"
+          iconClass="w-3.5 h-3.5 text-role-product-seller"
+          inputClass={inputClass}
+          labelClass={labelClass}
+        />
+
         <BilingualField
           fieldEn="seller_village_en" fieldAr="seller_village_ar"
           labelEn="Origin / Made In" labelAr="مكان الصنع"
