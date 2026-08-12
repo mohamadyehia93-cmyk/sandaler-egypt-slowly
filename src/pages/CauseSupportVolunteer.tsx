@@ -8,13 +8,17 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import NotFoundView from "@/components/NotFound";
 
-const opportunities = [
+/**
+ * These are generic categories of help a visitor can OFFER — not availability
+ * published by this cause. They previously also claimed a per-cause duration
+ * ("2-4 weeks") and remaining spots ("5 spots left"), neither of which exists
+ * anywhere in the database, so those claims were removed.
+ */
+const volunteerRoles = [
   {
     emoji: "🏗️",
     title: { en: "On-Site Community Work", ar: "عمل ميداني مجتمعي" },
     desc: { en: "Help with construction, restoration, or infrastructure projects directly in the community.", ar: "المساعدة في البناء أو الترميم أو مشاريع البنية التحتية مباشرة في المجتمع." },
-    duration: { en: "2–4 weeks", ar: "2–4 أسابيع" },
-    slots: 5,
     skills: [
       { en: "Physical fitness", ar: "لياقة بدنية" },
       { en: "Teamwork", ar: "عمل جماعي" },
@@ -24,8 +28,6 @@ const opportunities = [
     emoji: "📚",
     title: { en: "Teaching & Mentoring", ar: "تعليم وإرشاد" },
     desc: { en: "Teach English, math, or digital skills to children and young adults in the area.", ar: "تعليم الإنجليزية أو الرياضيات أو المهارات الرقمية للأطفال والشباب في المنطقة." },
-    duration: { en: "1–3 months", ar: "1–3 أشهر" },
-    slots: 8,
     skills: [
       { en: "Teaching experience", ar: "خبرة تعليمية" },
       { en: "Patience", ar: "صبر" },
@@ -35,8 +37,6 @@ const opportunities = [
     emoji: "🌿",
     title: { en: "Environmental Conservation", ar: "حماية البيئة" },
     desc: { en: "Join tree planting, clean-up drives, and wildlife preservation efforts.", ar: "شارك في زراعة الأشجار وحملات التنظيف وجهود حفظ الحياة البرية." },
-    duration: { en: "1–2 weeks", ar: "1–2 أسبوع" },
-    slots: 12,
     skills: [
       { en: "Outdoor work", ar: "عمل خارجي" },
       { en: "Environmental awareness", ar: "وعي بيئي" },
@@ -46,8 +46,6 @@ const opportunities = [
     emoji: "📸",
     title: { en: "Documentation & Storytelling", ar: "توثيق وسرد قصص" },
     desc: { en: "Photograph, film, or write stories about the community and its progress.", ar: "تصوير أو تصوير فيديو أو كتابة قصص عن المجتمع وتقدمه." },
-    duration: { en: "2–4 weeks", ar: "2–4 أسابيع" },
-    slots: 3,
     skills: [
       { en: "Photography/Writing", ar: "تصوير/كتابة" },
       { en: "Creativity", ar: "إبداع" },
@@ -81,7 +79,7 @@ const CauseSupportVolunteer = () => {
   if (causeLoading) return <div className="min-h-screen bg-background" />;
   if (!cause) return <NotFoundView context="cause" />;
 
-  const opp = selectedOpp !== null ? opportunities[selectedOpp] : null;
+  const opp = selectedOpp !== null ? volunteerRoles[selectedOpp] : null;
 
   const allSkillOptions = [
     { en: "Teaching", ar: "تعليم" },
@@ -156,7 +154,7 @@ const CauseSupportVolunteer = () => {
       full_name: fullName.trim(),
       contact_email: email.trim(),
       contact_phone: phone.trim(),
-      availability: `${startDate} · ${opp.duration[lang]}`,
+      availability: startDate,
       message: `${opp.title[lang]}\n${motivation.trim()}${skillsLine}`,
     });
 
@@ -251,7 +249,7 @@ const CauseSupportVolunteer = () => {
               {lang === "ar" ? "فرص التطوع" : "Volunteer Opportunities"}
             </h2>
             <div className="space-y-3 mb-6">
-              {opportunities.map((o, i) => (
+              {volunteerRoles.map((o, i) => (
                 <div key={i} className="p-4 rounded-xl bg-card shadow-card border border-border">
                   <div className="flex items-start gap-3 mb-3">
                     <span className="text-2xl">{o.emoji}</span>
@@ -259,10 +257,6 @@ const CauseSupportVolunteer = () => {
                       <p className="text-sm font-bold text-foreground">{o.title[lang]}</p>
                       <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{o.desc[lang]}</p>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-3">
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {o.duration[lang]}</span>
-                    <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {o.slots} {lang === "ar" ? "مكان متاح" : "spots left"}</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mb-3">
                     {o.skills.map((skill, si) => (
@@ -309,7 +303,6 @@ const CauseSupportVolunteer = () => {
               <span className="text-2xl">{opp.emoji}</span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground">{opp.title[lang]}</p>
-                <p className="text-[10px] text-muted-foreground">{opp.duration[lang]} · {opp.slots} {lang === "ar" ? "مكان" : "spots"}</p>
               </div>
             </div>
 
@@ -509,7 +502,6 @@ const CauseSupportVolunteer = () => {
               <p className="text-xs text-muted-foreground font-medium">{lang === "ar" ? "ملخص الطلب" : "Application Summary"}</p>
               {[
                 { label: { en: "Opportunity", ar: "الفرصة" }, value: opp.title[lang] },
-                { label: { en: "Duration", ar: "المدة" }, value: opp.duration[lang] },
                 { label: { en: "Start Date", ar: "تاريخ البدء" }, value: startDate },
                 { label: { en: "Reference", ar: "المرجع" }, value: `#VOL-${Date.now().toString(36).toUpperCase().slice(-6)}` },
               ].map((row, i) => (
@@ -557,7 +549,6 @@ const CauseSupportVolunteer = () => {
         <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
           <div>
             <span className="text-sm font-bold text-foreground">{opp?.title[lang]}</span>
-            <span className="text-[10px] text-muted-foreground block">{opp?.duration[lang]}</span>
           </div>
           {step === "form" && (
             <button
