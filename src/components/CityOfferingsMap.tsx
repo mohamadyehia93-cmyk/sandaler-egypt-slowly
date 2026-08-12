@@ -183,12 +183,12 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
       if (!active.has(o.category)) return false;
       if (!q) return true;
       const hay = [
-        o.title.en,
-        o.title.ar,
+        o.title?.en,
+        o.title?.ar,
         o.subtitle?.en,
         o.subtitle?.ar,
-        CAT_LABELS[o.category].en,
-        CAT_LABELS[o.category].ar,
+        CAT_LABELS[o.category]?.en,
+        CAT_LABELS[o.category]?.ar,
       ]
         .filter(Boolean)
         .join(" ")
@@ -296,7 +296,7 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
           <Marker position={center} icon={makeIcon("#1A7A74")}>
             <Popup>
               <div className="text-center">
-                <strong className="text-sm">{cityName[lang]}</strong>
+                <strong className="text-sm">{cityName?.[lang]}</strong>
                 <div className="text-[11px] text-muted-foreground mt-0.5">
                   {lang === "ar" ? "مركز المدينة" : "City center"}
                 </div>
@@ -327,14 +327,14 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
                       className="text-[10px] font-semibold uppercase tracking-wide mb-1"
                       style={{ color: CAT_COLORS[o.category] }}
                     >
-                      {CAT_LABELS[o.category][lang]}
+                      {CAT_LABELS[o.category]?.[lang]}
                     </div>
                     <strong className="text-sm block leading-tight">
-                      {o.title[lang]}
+                      {o.title?.[lang]}
                     </strong>
                     {o.subtitle && (
                       <div className="text-[11px] text-muted-foreground mt-0.5">
-                        {o.subtitle[lang]}
+                        {o.subtitle?.[lang]}
                       </div>
                     )}
                     {!precise && (
@@ -387,15 +387,15 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
                     className="text-[10px] font-semibold uppercase tracking-wide truncate"
                     style={{ color: CAT_COLORS[o.category] }}
                   >
-                    {CAT_LABELS[o.category][lang]}
+                    {CAT_LABELS[o.category]?.[lang]}
                   </span>
                 </div>
                 <h4 className="text-xs font-semibold text-foreground line-clamp-2 leading-snug">
-                  {o.title[lang]}
+                  {o.title?.[lang]}
                 </h4>
                 {o.subtitle && (
                   <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">
-                    {o.subtitle[lang]}
+                    {o.subtitle?.[lang]}
                   </p>
                 )}
                 {!precise && (

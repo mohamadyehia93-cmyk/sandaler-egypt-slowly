@@ -600,8 +600,8 @@ const CityDetail = () => {
               ...coord(p, ["lat", "latitude"], ["lng", "longitude"]),
             })),
             ...cityCauses.map((c) => ({
-              id: c.id, slug: (c as any).slug, category: "cause" as const,
-              title: c.title,
+              id: c.slug || c.id, slug: (c as any).slug, category: "cause" as const,
+              title: { en: c.title_en ?? "", ar: c.title_ar ?? c.title_en ?? "" },
               ...coord(c, ["lat", "latitude"], ["lng", "longitude"]),
             })),
           ];
