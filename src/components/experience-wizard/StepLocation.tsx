@@ -1,10 +1,9 @@
-import { useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
 import { MapPin, Plus, Trash2, NotebookPen } from "lucide-react";
 import { ExperienceFormData } from "./types";
-import { useCities, useRegions } from "@/hooks/useListings";
 import { getCityCoords } from "@/lib/cityCoords";
 import LocationPicker from "@/components/dashboard/LocationPicker";
+import CityPicker from "@/components/dashboard/CityPicker";
 
 interface Props {
   form: ExperienceFormData;
@@ -18,27 +17,7 @@ const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-cent
 const StepLocation = ({ form, set, updateForm }: Props) => {
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const { data: cities } = useCities();
-  const { data: regions } = useRegions();
 
-  const grouped = useMemo(() => {
-    const byRegion: Record<string, { id: string; name: string }[]> = {};
-    (cities ?? []).forEach((c: any) => {
-      (byRegion[c.region_id] ||= []).push({ id: c.id, name: ar ? c.name_ar : c.name_en });
-    });
-    Object.values(byRegion).forEach((list) => list.sort((a, b) => a.name.localeCompare(b.name)));
-    return byRegion;
-  }, [cities, ar]);
-
-  const regionName = (id: string) => {
-    const r = (regions ?? []).find((x: any) => x.id === id) as any;
-    return r ? (ar ? r.name_ar : r.name_en) : id;
-  };
-
-  const onCityChange = (cityId: string) => {
-    const city = (cities ?? []).find((c: any) => c.id === cityId) as any;
-    updateForm({ cityId, regionId: city?.region_id ?? "" });
-  };
 
   const updateStep = (idx: number, value: string) => {
     const arr = [...form.itinerary];
@@ -49,31 +28,16 @@ const StepLocation = ({ form, set, updateForm }: Props) => {
   return (
     <div className="space-y-5">
       {/* General location — real city taxonomy */}
-      <div>
-        <label className={labelClass}>
-          <MapPin className="w-3.5 h-3.5 text-role-service-provider" />
-          {ar ? "الموقع العام (المدينة)" : "General Location (City)"}
-        </label>
-        <select
-          className={inputClass}
-          value={form.cityId}
-          onChange={(e) => onCityChange(e.target.value)}
-        >
-          <option value="">{ar ? "اختر المدينة..." : "Select a city..."}</option>
-          {Object.keys(grouped).map((rid) => (
-            <optgroup key={rid} label={regionName(rid)}>
-              {grouped[rid].map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
-        <p className="text-[11px] text-muted-foreground mt-1.5">
-          {ar
-            ? "اختيار المدينة يجعل تجربتك تظهر في صفحات المدينة والمنطقة."
-            : "Choosing a city makes your listing appear on that city's and region's pages."}
-        </p>
-      </div>
+      <CityPicker
+        cityId={form.cityId}
+        onChange={(cityId, regionId) => updateForm({ cityId, regionId })}
+        iconClass="w-3.5 h-3.5 text-role-service-provider"
+        inputClass={inputClass}
+        labelClass={labelClass}
+        hintEn="Choosing a city makes your listing appear on that city's and region's pages."
+        hintAr="اختيار المدينة يجعل تجربتك تظهر في صفحات المدينة والمنطقة."
+      />
+
 
       {/* Secondary free-text fallback */}
       <div>
