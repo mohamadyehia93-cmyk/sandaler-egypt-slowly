@@ -452,6 +452,31 @@ const RegionDetail = () => {
           </SectionHeader>
         )}
 
+        {/* Local Products */}
+        {regionProducts.length > 0 && (
+          <SectionHeader titleKey="section.products" onSeeAll={() => navigate("/?tab=products")}>
+            <div className="grid grid-cols-3 gap-3 px-4">
+              {regionProducts.slice(0, 3).map((p) => (
+                <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/product/${p.slug || p.id}`)}>
+                  <div className="relative h-32">
+                    {p.image ? (
+                      <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-secondary" />
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">{p.title[lang]}</h3>
+                    <span className="text-sm font-bold text-primary-dark">
+                      {p.price} {t("common.egp")}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionHeader>
+        )}
+
         {/* Audio Tours */}
         {regionAudioTours.length > 0 && (
           <SectionHeader titleKey="section.audioTours" onSeeAll={() => navigate("/audio-tours")}>
