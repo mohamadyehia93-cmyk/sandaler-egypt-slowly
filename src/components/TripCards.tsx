@@ -6,6 +6,13 @@ import { EXPERIENCE_THEMES } from "@/lib/listingTaxonomy";
 import { useTrips, useRegions } from "@/hooks/useListings";
 import CityBadge from "./CityBadge";
 import { Skeleton } from "./ui/skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 type TripAccessType = "public" | "private";
 type TripDuration = "one-day" | "multi-day";
@@ -16,11 +23,8 @@ const TripCards = () => {
   const { data: trips, isLoading } = useTrips();
   const { data: dbRegions } = useRegions();
   const [activeRegion, setActiveRegion] = useState("all");
-  const [regionOpen, setRegionOpen] = useState(false);
   const [activeAccess, setActiveAccess] = useState<TripAccessType | "all">("all");
-  const [accessOpen, setAccessOpen] = useState(false);
   const [activeDuration, setActiveDuration] = useState<TripDuration | "all">("all");
-  const [durationOpen, setDurationOpen] = useState(false);
 
   const filtered = (trips ?? []).filter((tr) => {
     const regionMatch = activeRegion === "all" || tr.region_id === activeRegion;
@@ -63,68 +67,30 @@ const TripCards = () => {
       {/* Filter dropdowns row */}
       <div className="flex gap-2 px-4 mb-3 overflow-x-auto hide-scrollbar">
         {/* Region dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => {
-              setRegionOpen(!regionOpen);
-              setAccessOpen(false);
-              setDurationOpen(false);
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground shadow-card"
-          >
-            <MapPin className="w-3.5 h-3.5 text-primary" />
-            {activeRegionLabel}
-            <ChevronDown
-              className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${
-                regionOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-          {regionOpen && (
-            <div className="absolute top-full left-0 mt-1 z-30 bg-card rounded-lg shadow-elevated border border-border py-1 min-w-[160px]">
-              <button
-                onClick={() => {
-                  setActiveRegion("all");
-                  setRegionOpen(false);
-                }}
-                className={`w-full text-start px-3 py-2 text-xs ${
-                  activeRegion === "all"
-                    ? "text-primary font-semibold bg-secondary"
-                    : "text-foreground"
-                }`}
-              >
-                {lang === "ar" ? "كل المناطق" : "All Regions"}
-              </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button type="button" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground shadow-card" aria-label={lang === "ar" ? "تصفية حسب المنطقة" : "Filter by region"}>
+              <MapPin className="w-3.5 h-3.5 text-primary" />
+              {activeRegionLabel}
+              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="min-w-[180px] max-h-72 overflow-y-auto">
+            <DropdownMenuRadioGroup value={activeRegion} onValueChange={setActiveRegion}>
+              <DropdownMenuRadioItem value="all">{lang === "ar" ? "كل المناطق" : "All Regions"}</DropdownMenuRadioItem>
               {regionsList.map((r) => (
-                <button
-                  key={r.id}
-                  onClick={() => {
-                    setActiveRegion(r.id);
-                    setRegionOpen(false);
-                  }}
-                  className={`w-full text-start px-3 py-2 text-xs ${
-                    activeRegion === r.id
-                      ? "text-primary font-semibold bg-secondary"
-                      : "text-foreground"
-                  }`}
-                >
+                <DropdownMenuRadioItem key={r.id} value={r.id}>
                   {r.emoji} {lang === "ar" ? r.name_ar : r.name_en}
-                </button>
+                </DropdownMenuRadioItem>
               ))}
-            </div>
-          )}
-        </div>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Access type dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => {
-              setAccessOpen(!accessOpen);
-              setRegionOpen(false);
-              setDurationOpen(false);
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground shadow-card"
-          >
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+          <button type="button" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground shadow-card" aria-label={lang === "ar" ? "تصفية حسب نوع الرحلة" : "Filter by trip type"}>
             <Users className="w-3.5 h-3.5 text-primary" />
             {activeAccess === "all"
               ? lang === "ar"
@@ -137,14 +103,11 @@ const TripCards = () => {
               : lang === "ar"
               ? "عند الطلب"
               : "On Request"}
-            <ChevronDown
-              className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${
-                accessOpen ? "rotate-180" : ""
-              }`}
-            />
+            <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
           </button>
-          {accessOpen && (
-            <div className="absolute top-full left-0 mt-1 z-30 bg-card rounded-lg shadow-elevated border border-border py-1 min-w-[140px]">
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="min-w-[160px]">
+            <DropdownMenuRadioGroup value={activeAccess} onValueChange={(value) => setActiveAccess(value as TripAccessType | "all")}>
               {(
                 [
                   { key: "all" as const, label: { en: "All Types", ar: "كل الأنواع" } },
@@ -152,35 +115,18 @@ const TripCards = () => {
                   { key: "private" as const, label: { en: "On Request", ar: "عند الطلب" } },
                 ] as const
               ).map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setActiveAccess(key);
-                    setAccessOpen(false);
-                  }}
-                  className={`w-full text-start px-3 py-2 text-xs ${
-                    activeAccess === key
-                      ? "text-primary font-semibold bg-secondary"
-                      : "text-foreground"
-                  }`}
-                >
+                <DropdownMenuRadioItem key={key} value={key}>
                   {label[lang]}
-                </button>
+                </DropdownMenuRadioItem>
               ))}
-            </div>
-          )}
-        </div>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Duration dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => {
-              setDurationOpen(!durationOpen);
-              setRegionOpen(false);
-              setAccessOpen(false);
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground shadow-card"
-          >
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+          <button type="button" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground shadow-card" aria-label={lang === "ar" ? "تصفية حسب المدة" : "Filter by duration"}>
             <Clock className="w-3.5 h-3.5 text-primary" />
             {activeDuration === "all"
               ? lang === "ar"
@@ -193,14 +139,11 @@ const TripCards = () => {
               : lang === "ar"
               ? "متعدد الأيام"
               : "Multi-Day"}
-            <ChevronDown
-              className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${
-                durationOpen ? "rotate-180" : ""
-              }`}
-            />
+            <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
           </button>
-          {durationOpen && (
-            <div className="absolute top-full left-0 mt-1 z-30 bg-card rounded-lg shadow-elevated border border-border py-1 min-w-[140px]">
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="min-w-[160px]">
+            <DropdownMenuRadioGroup value={activeDuration} onValueChange={(value) => setActiveDuration(value as TripDuration | "all")}>
               {(
                 [
                   { key: "all" as const, label: { en: "All Durations", ar: "كل المدد" } },
@@ -208,24 +151,13 @@ const TripCards = () => {
                   { key: "multi-day" as const, label: { en: "Multi-Day", ar: "متعدد الأيام" } },
                 ] as const
               ).map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setActiveDuration(key);
-                    setDurationOpen(false);
-                  }}
-                  className={`w-full text-start px-3 py-2 text-xs ${
-                    activeDuration === key
-                      ? "text-primary font-semibold bg-secondary"
-                      : "text-foreground"
-                  }`}
-                >
+                <DropdownMenuRadioItem key={key} value={key}>
                   {label[lang]}
-                </button>
+                </DropdownMenuRadioItem>
               ))}
-            </div>
-          )}
-        </div>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Grouped vertical feed with horizontal scrollers */}
