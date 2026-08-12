@@ -207,6 +207,7 @@ const NewAudioTour = () => {
         description_ar: form.descriptionAr.trim() || null,
         translation_meta: meta as any,
         city_id: form.city.trim(),
+        theme: form.theme || null,
         duration_minutes: parseInt(form.duration) || 30,
         stops_count: cleanStops.length,
         stops: cleanStops,

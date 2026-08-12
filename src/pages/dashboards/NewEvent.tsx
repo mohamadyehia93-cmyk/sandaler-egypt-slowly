@@ -106,8 +106,16 @@ const NewEvent = () => {
         imageUrl = supabase.storage.from("listing-images").getPublicUrl(path).data.publicUrl;
       }
 
+      // ownership convention: events.organizer_id holds providers.id
+      const providerId = await fetchMyProviderId(user.id);
+      if (!providerId) {
+        toast.error(lang === "ar" ? "أكمل ملف المزود أولاً" : "Complete your provider profile first");
+        setSubmitting(false);
+        return;
+      }
+
       const payload = {
-        organizer_id: user.id,
+        organizer_id: providerId,
         title_en: form.title_en.trim(),
         title_ar: form.title_ar.trim() || null,
         description_en: form.description_en.trim() || null,

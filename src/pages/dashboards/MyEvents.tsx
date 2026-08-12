@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Plus, Pencil, Trash2, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { EventRow, isPastEvent, eventCategoryKey } from "@/lib/eventSort";
+import { fetchMyProviderId } from "@/lib/providerRecord";
 
 const MyEvents = () => {
   const { lang, t } = useI18n();
@@ -16,10 +17,13 @@ const MyEvents = () => {
   const { data: events = [], isLoading } = useQuery({
     queryKey: ["my-events", user?.id],
     queryFn: async () => {
+      // events.organizer_id holds providers.id
+      const providerId = await fetchMyProviderId(user!.id);
+      if (!providerId) return [] as EventRow[];
       const { data, error } = await supabase
         .from("events")
         .select("*")
-        .eq("organizer_id", user!.id)
+        .eq("organizer_id", providerId)
         .order("start_date", { ascending: false });
       if (error) throw error;
       return data as EventRow[];
