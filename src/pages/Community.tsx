@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Image, MapPin, MessageCircle, Heart, Share2, Plus, HelpCircle, Lightbulb, Camera } from "lucide-react";
+import { ArrowLeft, MapPin, MessageCircle, Plus, HelpCircle, Lightbulb, Camera } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,90 +10,30 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePostComments, useAddComment } from "@/hooks/usePostComments";
 import { toast } from "sonner";
 import FollowingFeed from "@/components/FollowingFeed";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type PostCategory = "memory" | "tip" | "question";
 
-interface Comment {
-  id: string;
-  author: string;
-  avatar: string;
-  text: string;
-  timeAgo: string;
-}
-
+/**
+ * HONESTY RULE: this feed renders only rows from public.community_posts.
+ * It previously shipped a hardcoded `samplePosts` array — invented authors,
+ * stock-photo avatars, fake like counts and "2d ago" timestamps — and the
+ * compose box only pushed into local state, so nothing a member wrote was
+ * ever saved. Likes and Share were also non-functional and are gone.
+ */
 interface CommunityPost {
   id: string;
-  author: string;
-  authorId: string;
-  avatar: string;
+  author_id: string;
+  author_name: string | null;
   category: PostCategory;
   content: string;
-  location?: string;
+  location: string | null;
   images: string[];
-  likes: number;
-  comments: number;
-  timeAgo: string;
-  liked: boolean;
-  commentList?: Comment[];
+  created_at: string;
 }
 
-const samplePosts: CommunityPost[] = [
-  {
-    id: "1",
-    author: "Sarah M.",
-    authorId: "sarah-m",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
-    category: "memory",
-    content: "Just had the most magical sunset felucca ride in Aswan! The colors reflecting off the Nile were absolutely breathtaking. Highly recommend going at golden hour 🌅",
-    location: "Aswan",
-    images: ["https://images.unsplash.com/photo-1568322445389-f64e0a1d44a4?w=600"],
-    likes: 42,
-    comments: 8,
-    timeAgo: "2h ago",
-    liked: false,
-  },
-  {
-    id: "2",
-    author: "Ahmed K.",
-    authorId: "ahmed-k",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
-    category: "tip",
-    content: "Pro tip: Visit the Siwa Oasis during spring (March-April). The weather is perfect, and you'll catch the date harvest season. Don't miss the salt lakes! 🌴",
-    location: "Siwa",
-    images: [],
-    likes: 67,
-    comments: 12,
-    timeAgo: "5h ago",
-    liked: true,
-  },
-  {
-    id: "3",
-    author: "Nour A.",
-    authorId: "nour-a",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100",
-    category: "question",
-    content: "Has anyone done the White Desert overnight camping trip? Looking for recommendations on local guides. Is it better to go from Cairo or Bahariya?",
-    images: [],
-    likes: 15,
-    comments: 23,
-    timeAgo: "1d ago",
-    liked: false,
-  },
-  {
-    id: "4",
-    author: "Marco R.",
-    authorId: "marco-r",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100",
-    category: "memory",
-    content: "Discovered this hidden gem in Rashid (Rosetta) — a traditional coffee house where locals gather every evening. The stories, the chai, the hospitality… unforgettable ☕",
-    location: "Rosetta",
-    images: ["https://images.unsplash.com/photo-1511920170033-f8396924c348?w=600"],
-    likes: 31,
-    comments: 5,
-    timeAgo: "2d ago",
-    liked: false,
-  },
-];
 
 const categoryConfig: Record<PostCategory, { icon: typeof Camera; label: { en: string; ar: string }; color: string }> = {
   memory: { icon: Camera, label: { en: "Memory", ar: "ذكرى" }, color: "bg-primary/10 text-primary" },
