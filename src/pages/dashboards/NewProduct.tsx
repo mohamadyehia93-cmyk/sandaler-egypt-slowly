@@ -10,6 +10,7 @@ import CityPicker from "@/components/dashboard/CityPicker";
 import BilingualField from "@/components/dashboard/BilingualField";
 import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
+import type { Json } from "@/integrations/supabase/types";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, DollarSign, Package, Ruler, Truck, Clock, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,6 +22,9 @@ const categories = [
   { en: "Palm & Wood Crafts", ar: "حرف نخيل وخشب" },
   { en: "Art & Paintings", ar: "فنون ولوحات" },
 ];
+
+type VariantJson = { label_en?: string | null; label_ar?: string | null; options?: string[] | string | null };
+type DeliveryJson = { method_en?: string | null; method_ar?: string | null; cost?: number | null; notes_en?: string | null; notes_ar?: string | null };
 
 type VariantRow = { labelEn: string; labelAr: string; options: string };
 type DeliveryRow = { methodEn: string; methodAr: string; cost: string; notesEn: string; notesAr: string };
@@ -81,7 +85,7 @@ const NewProduct = () => {
         toast.error(lang === "ar" ? "تعذر تحميل المنتج" : "Could not load product");
         return;
       }
-      const row = data as any;
+      const row = data;
       setForm({
         nameEn: row.name_en || "",
         nameAr: row.name_ar || "",
@@ -108,7 +112,7 @@ const NewProduct = () => {
       });
       setVariants(
         Array.isArray(row.variants)
-          ? row.variants.map((v: any) => ({
+          ? (row.variants as unknown as VariantJson[]).map((v) => ({
               labelEn: v?.label_en || "",
               labelAr: v?.label_ar || "",
               options: Array.isArray(v?.options) ? v.options.join(", ") : String(v?.options || ""),
@@ -117,7 +121,7 @@ const NewProduct = () => {
       );
       setDelivery(
         Array.isArray(row.delivery_options)
-          ? row.delivery_options.map((d: any) => ({
+          ? (row.delivery_options as unknown as DeliveryJson[]).map((d) => ({
               methodEn: d?.method_en || "",
               methodAr: d?.method_ar || "",
               cost: d?.cost != null ? String(d.cost) : "",
@@ -126,7 +130,7 @@ const NewProduct = () => {
             }))
           : []
       );
-      setMeta((row.translation_meta as TranslationMeta) || {});
+      setMeta((row.translation_meta as unknown as TranslationMeta) || {});
       setExistingImages(Array.isArray(row.images) ? (row.images as string[]) : row.image ? [row.image] : []);
     })();
   }, [isEdit, id, lang]);
@@ -197,8 +201,8 @@ const NewProduct = () => {
         weight_grams: form.weightGrams.trim() ? parseInt(form.weightGrams) : null,
         made_to_order: form.madeToOrder,
         lead_time_days: form.madeToOrder && form.leadTimeDays.trim() ? parseInt(form.leadTimeDays) : null,
-        variants: variantsJson as any,
-        delivery_options: deliveryJson as any,
+        variants: variantsJson as unknown as Json,
+        delivery_options: deliveryJson as unknown as Json,
         currency: form.currency.trim() || "EGP",
         category: form.category,
         city_id: form.cityId || null,
@@ -210,23 +214,23 @@ const NewProduct = () => {
         image: images[0] || null,
         images,
         status: "published",
-        translation_meta: meta as any,
+        translation_meta: meta as unknown as Json,
       };
 
       if (isEdit) {
-        const { error } = await supabase.from("products").update(payload as any).eq("id", id);
+        const { error } = await supabase.from("products").update(payload).eq("id", id);
         if (error) throw error;
         toast.success(lang === "ar" ? "تم تحديث المنتج!" : "Product updated!");
       } else {
         const { error } = await supabase
           .from("products")
-          .insert({ ...(payload as any), slug: slugify(form.nameEn || form.nameAr, user.id.slice(0, 6)) });
+          .insert({ ...payload, slug: slugify(form.nameEn || form.nameAr, user.id.slice(0, 6)) });
         if (error) throw error;
         toast.success(lang === "ar" ? "تمت إضافة المنتج بنجاح!" : "Product published successfully!");
       }
       navigate("/dashboard/product-seller/my-products");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to save product");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save product");
     } finally {
       setSubmitting(false);
     }
