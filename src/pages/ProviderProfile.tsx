@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import ShareButton from "@/components/ShareButton";
 import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -163,9 +164,7 @@ const ProviderProfile = () => {
           <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur flex items-center justify-center">
             <ArrowLeft className="w-4 h-4 text-white" />
           </button>
-          <button className="w-8 h-8 rounded-full bg-black/30 backdrop-blur flex items-center justify-center">
-            <Share2 className="w-4 h-4 text-white" />
-          </button>
+          <ShareButton title={lang === "ar" ? (provider as any).name_ar : (provider as any).name_en} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur flex items-center justify-center" iconClassName="w-4 h-4 text-white" />
         </div>
       </div>
 

@@ -1,3 +1,4 @@
+import WishlistButton from "@/components/WishlistButton";
 import { useState, useMemo } from "react";
 import { Heart } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
@@ -85,9 +86,7 @@ const ExperienceCards = () => {
                         alt={lang === "ar" ? e.title_ar : e.title_en}
                         className="w-full h-full object-cover"
                       />
-                      <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
-                        <Heart className="w-4 h-4 text-foreground" />
-                      </button>
+                      <WishlistButton itemType="experience" itemId={e.id} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm" />
                     </div>
                     <div className="p-3">
                       <h4 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">

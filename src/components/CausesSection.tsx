@@ -1,3 +1,4 @@
+import WishlistButton from "@/components/WishlistButton";
 import { Heart, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
@@ -44,9 +45,7 @@ const CausesSection = ({ regionId, cityFilter = "all" }: Props) => {
                     {category}
                   </span>
                 )}
-                <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
-                  <Heart className="w-3.5 h-3.5 text-foreground" />
-                </button>
+                <WishlistButton itemType="cause" itemId={cause.id} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm" />
               </div>
               <div className="p-3">
                 <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">{title}</h3>

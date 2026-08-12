@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned, Compass, BookOpen, Palette, Mountain } from "lucide-react";
+import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
 // Sample experiences/posts used to be merged into the DB results here, so a region
@@ -392,9 +393,7 @@ const RegionDetail = () => {
                 <div key={e.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/experience/${e.id}`)}>
                   <div className="relative h-32">
                     <img src={e.image} alt={e.title[lang]} className="w-full h-full object-cover" />
-                    <button className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm">
-                      <Heart className="w-4 h-4 text-foreground" />
-                    </button>
+                    <WishlistButton itemType="experience" itemId={e.id} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm" />
                   </div>
                   <div className="p-3">
                     <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-1">{e.title[lang]}</h3>
