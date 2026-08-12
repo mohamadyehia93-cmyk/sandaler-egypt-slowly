@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Globe, Bell, Moon, Shield, LogOut, ChevronRight, Eye } from "lucide-react";
+import { ArrowLeft, Globe, Bell, Moon, Shield, LogOut, ChevronRight, Eye, Repeat } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
