@@ -1,5 +1,6 @@
 import MessageOwnerButton from "@/components/MessageOwnerButton";
-import { ArrowLeft, Share2, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle, ChevronRight, Feather } from "lucide-react";
+import ShareButton from "@/components/ShareButton";
+import { ArrowLeft, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle, ChevronRight, Feather } from "lucide-react";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
@@ -211,9 +212,7 @@ const AudioTourDetail = () => {
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <div className="absolute top-4 right-4 flex gap-2">
-          <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
-            <Share2 className="w-5 h-5 text-foreground" />
-          </button>
+          <ShareButton title={lang === "ar" ? (tour as any).title_ar : (tour as any).title_en} />
           <WishlistButton itemType="audio_tour" itemId={tour?.id} />
         </div>
         <div className="absolute bottom-3 left-4 flex gap-2">

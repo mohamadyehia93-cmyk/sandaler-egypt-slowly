@@ -1,6 +1,8 @@
 import MessageOwnerButton from "@/components/MessageOwnerButton";
 import WishlistButton from "@/components/WishlistButton";
-import { ArrowLeft, Heart, Share2, Users, Calendar, MapPin, ExternalLink, Gift, HandHeart, UserCheck, MessageCircle } from "lucide-react";
+import ShareButton from "@/components/ShareButton";
+import LocationChips from "@/components/LocationChips";
+import { ArrowLeft, Heart, Users, Calendar, MapPin, ExternalLink, Gift, HandHeart, UserCheck, MessageCircle } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
@@ -65,9 +67,7 @@ const CauseDetail = () => {
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <div className="absolute top-4 right-4 flex gap-2">
-          <button className="p-2 rounded-full bg-background/80 backdrop-blur-sm">
-            <Share2 className="w-5 h-5 text-foreground" />
-          </button>
+          <ShareButton title={cause.title[lang]} />
           <WishlistButton itemType="cause" itemId={dbCause?.id} />
         </div>
         <div className="absolute bottom-4 left-4 right-4">
@@ -143,6 +143,8 @@ const CauseDetail = () => {
 
 
 
+        <LocationChips cityId={(dbCause as any)?.city_id} regionId={(dbCause as any)?.region_id} className="mb-6" />
+
         {/* How to Support */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "كيف تدعم" : "How to Support"}</h2>
         <div className="grid grid-cols-2 gap-3 mb-6">
@@ -192,7 +194,10 @@ const CauseDetail = () => {
           <span className="text-lg font-bold text-primary-dark">{progress}%</span>
           <span className="text-xs text-muted-foreground block">{lang === "ar" ? "مكتمل" : "funded"}</span>
         </div>
-        <button className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated">
+        <button
+          onClick={() => navigate(`/cause/${id}/donate`)}
+          className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
+        >
           {lang === "ar" ? "ادعم الآن" : "Support Now"}
         </button>
       </div>
