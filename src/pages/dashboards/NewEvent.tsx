@@ -109,7 +109,7 @@ const NewEvent = () => {
       const payload = {
         organizer_id: user.id,
         title_en: form.title_en.trim(),
-        title_ar: form.title_ar.trim(),
+        title_ar: form.title_ar.trim() || null,
         description_en: form.description_en.trim() || null,
         description_ar: form.description_ar.trim() || null,
         category: form.category,

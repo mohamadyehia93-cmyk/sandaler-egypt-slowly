@@ -59,7 +59,7 @@ const NewSession = () => {
       const { error } = await supabase.from("meetups").insert({
         organizer_id: user.id,
         title_en: form.titleEn.trim(),
-        title_ar: form.titleAr.trim(),
+        title_ar: form.titleAr.trim() || null,
         description_en: form.descriptionEn.trim() ? withType(form.descriptionEn) : null,
         description_ar: form.descriptionAr.trim() ? withType(form.descriptionAr) : null,
         meetup_date: form.date || null,

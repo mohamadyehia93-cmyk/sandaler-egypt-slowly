@@ -104,9 +104,9 @@ const NewProgram = () => {
       const payload = {
         owner_id: user.id,
         title_en: form.titleEn.trim(),
-        title_ar: form.titleAr.trim(),
+        title_ar: form.titleAr.trim() || null,
         description_en: form.descriptionEn.trim(),
-        description_ar: form.descriptionAr.trim(),
+        description_ar: form.descriptionAr.trim() || null,
         program_type: form.type,
         location_en: form.locationEn.trim() || null,
         location_ar: form.locationAr.trim() || null,

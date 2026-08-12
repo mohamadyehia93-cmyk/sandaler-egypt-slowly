@@ -171,9 +171,9 @@ const NewExperience = () => {
 
       const payload = {
         title_en: form.title_en.trim(),
-        title_ar: form.title_ar.trim(),
+        title_ar: form.title_ar.trim() || null,
         description_en: form.description_en.trim(),
-        description_ar: form.description_ar.trim(),
+        description_ar: form.description_ar.trim() || null,
         theme,
         price: parseInt(form.price) || 0,
         duration_minutes: durationMinutes || null,

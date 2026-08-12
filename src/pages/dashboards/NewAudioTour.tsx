@@ -193,7 +193,7 @@ const NewAudioTour = () => {
       const payload = {
         creator_id: user.id,
         title_en: form.titleEn.trim(),
-        title_ar: form.titleAr.trim(),
+        title_ar: form.titleAr.trim() || null,
         description_en: form.descriptionEn.trim() || null,
         description_ar: form.descriptionAr.trim() || null,
         translation_meta: meta as any,
