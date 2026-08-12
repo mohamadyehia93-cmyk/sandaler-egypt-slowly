@@ -183,6 +183,7 @@ export type Database = {
           status: string | null
           stops: Json | null
           stops_count: number
+          theme: string | null
           title_ar: string | null
           title_en: string
           translation_meta: Json
@@ -211,6 +212,7 @@ export type Database = {
           status?: string | null
           stops?: Json | null
           stops_count?: number
+          theme?: string | null
           title_ar?: string | null
           title_en: string
           translation_meta?: Json
@@ -239,6 +241,7 @@ export type Database = {
           status?: string | null
           stops?: Json | null
           stops_count?: number
+          theme?: string | null
           title_ar?: string | null
           title_en?: string
           translation_meta?: Json
