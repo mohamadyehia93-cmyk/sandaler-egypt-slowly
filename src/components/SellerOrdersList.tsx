@@ -19,6 +19,9 @@ type SellerOrder = {
   buyer_id: string | null;
   contact_name: string | null;
   contact_phone: string | null;
+  variant_selection: Record<string, string> | null;
+  delivery_method: string | null;
+  delivery_address: string | null;
   created_at: string;
   product: { name_en: string; name_ar: string } | null;
 };
@@ -43,7 +46,7 @@ const SellerOrdersList = () => {
       const owners = [user!.id, ...(providerId ? [providerId] : [])];
       const { data, error } = await supabase
         .from("orders")
-        .select("id, quantity, unit_price_egp, total_egp, status, buyer_note, buyer_id, contact_name, contact_phone, created_at, product:products(name_en, name_ar)")
+        .select("id, quantity, unit_price_egp, total_egp, status, buyer_note, buyer_id, contact_name, contact_phone, variant_selection, delivery_method, delivery_address, created_at, product:products(name_en, name_ar)")
         .in("seller_id", owners)
         .order("created_at", { ascending: false })
         .limit(20);
@@ -110,6 +113,18 @@ const SellerOrdersList = () => {
                   {orderStatusLabel(o.status, ar)}
                 </span>
               </div>
+
+              {o.variant_selection && Object.keys(o.variant_selection).length > 0 && (
+                <p className="text-[10px] text-foreground mt-1">
+                  {Object.entries(o.variant_selection).map(([k, v]) => `${k}: ${v}`).join(" · ")}
+                </p>
+              )}
+              {o.delivery_method && (
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  {ar ? "التوصيل" : "Delivery"}: {o.delivery_method}
+                  {o.delivery_address ? ` — ${o.delivery_address}` : ""}
+                </p>
+              )}
 
               {o.buyer_note && <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">{o.buyer_note}</p>}
 
