@@ -98,7 +98,7 @@ const NewAudioTour = () => {
         descriptionEn: data.description_en || "",
         descriptionAr: data.description_ar || "",
         city: data.city_id || "",
-        theme: (data as any).theme || "",
+        theme: data.theme || "",
         duration: data.duration_minutes != null ? String(data.duration_minutes) : "",
         price: data.price != null ? String(data.price) : "",
         languages: Array.isArray(data.languages) ? (data.languages as string[]) : [],
@@ -121,6 +121,9 @@ const NewAudioTour = () => {
       setExistingImages(data.image ? [data.image] : []);
       setExistingTourAudio((data as any).audio_url || null);
     })();
+  // authorLang intentionally excluded: toggling language must not reload and
+  // discard in-progress edits.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, id, lang]);
 
   const set = (key: string, value: string | string[]) => setForm((p) => ({ ...p, [key]: value }));
