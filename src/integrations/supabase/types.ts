@@ -654,6 +654,42 @@ export type Database = {
           },
         ]
       }
+      community_posts: {
+        Row: {
+          author_id: string
+          author_name: string | null
+          category: string
+          content: string
+          created_at: string
+          id: string
+          images: string[]
+          location: string | null
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          author_name?: string | null
+          category: string
+          content: string
+          created_at?: string
+          id?: string
+          images?: string[]
+          location?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          author_name?: string | null
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          images?: string[]
+          location?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string
