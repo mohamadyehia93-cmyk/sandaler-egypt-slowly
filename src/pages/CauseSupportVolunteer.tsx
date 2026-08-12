@@ -224,23 +224,11 @@ const CauseSupportVolunteer = () => {
               </div>
               <p className="text-xs text-muted-foreground">
                 {lang === "ar"
-                  ? "انضم لفريق المتطوعين واحدث تأثيراً مباشراً. نوفر الإقامة والتوجيه."
-                  : "Join our volunteer team and make a direct impact. We provide accommodation and guidance."}
+                  ? "سجّل اهتمامك بالتطوع وسيتواصل معك المنظّمون لتحديد التفاصيل."
+                  : "Register your interest and the organisers will contact you with the details."}
               </p>
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-2 mb-6">
-              {[
-                { icon: Users, value: "24", label: { en: "Volunteers", ar: "متطوع" } },
-                { icon: MapPin, value: "3", label: { en: "Locations", ar: "مواقع" } },
-                { icon: Calendar, value: "12", label: { en: "Programs/yr", ar: "برنامج/سنة" } },
-              ].map((s, i) => (
-                <div key={i} className="bg-card rounded-xl shadow-card border border-border p-3 text-center">
-                  <s.icon className="w-4 h-4 text-primary mx-auto mb-1" />
-                  <p className="text-lg font-bold text-foreground">{s.value}</p>
-                  <p className="text-[10px] text-muted-foreground">{s.label[lang]}</p>
-                </div>
               ))}
             </div>
 
@@ -275,23 +263,6 @@ const CauseSupportVolunteer = () => {
               ))}
             </div>
 
-            {/* What's Included */}
-            <h2 className="text-base font-bold text-foreground mb-3">
-              {lang === "ar" ? "ما يشمله التطوع" : "What's Included"}
-            </h2>
-            <div className="space-y-2 mb-6">
-              {[
-                { en: "Free accommodation during your stay", ar: "إقامة مجانية خلال فترة التطوع" },
-                { en: "Orientation and safety training", ar: "تدريب توجيهي وتدريب على السلامة" },
-                { en: "Certificate of participation", ar: "شهادة مشاركة" },
-                { en: "Local guide and cultural immersion", ar: "مرشد محلي وانغماس ثقافي" },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-2 p-3 rounded-lg bg-card border border-border">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span className="text-xs text-foreground">{item[lang]}</span>
-                </div>
-              ))}
-            </div>
           </>
         )}
 
