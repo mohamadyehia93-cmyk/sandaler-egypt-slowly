@@ -3,7 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Heart, Star, MapPin, ChevronDown, Users, Headphones, Clock, MapPinned, Compass, BookOpen, Palette, Mountain } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
-import { regions, regionCities, experiences, latestPosts, audioTours, causes, cityData } from "@/lib/sampleData";
+// Sample experiences/posts used to be merged into the DB results here, so a region
+// page mixed fabricated listings (with their own invented ratings and prices) in
+// with real ones. Only real rows are rendered now.
+import { regions, regionCities, latestPosts, cityData } from "@/lib/sampleData";
 import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
@@ -146,7 +149,6 @@ const RegionDetail = () => {
         image: e.image, price: e.price ?? 0, rating: e.rating ?? 0,
         cityId: e.city_id, regionId: e.region_id,
       })),
-      ...experiences.filter((e) => e.regionId === regionId),
     ])
   );
   const regionEvents = (dbEvents as any[])
@@ -161,7 +163,6 @@ const RegionDetail = () => {
       image: p.image, readTime: p.read_time_minutes ?? 5,
       cityId: p.city_id, regionId: p.region_id,
     })) as any[],
-    ...latestPosts.filter((p) => p.regionId === regionId),
   ]);
   const regionPeople = cityFilter(
     dedupe([
