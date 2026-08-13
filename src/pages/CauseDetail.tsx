@@ -2,7 +2,7 @@ import MessageOwnerButton from "@/components/MessageOwnerButton";
 import WishlistButton from "@/components/WishlistButton";
 import ShareButton from "@/components/ShareButton";
 import LocationChips from "@/components/LocationChips";
-import { ArrowLeft, Heart, Users, Calendar, MapPin, ExternalLink, Gift, HandHeart, UserCheck, MessageCircle } from "lucide-react";
+import { ArrowLeft, Info, MapPin, Gift, HandHeart, UserCheck, MessageCircle } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
@@ -53,7 +53,9 @@ const CauseDetail = () => {
   const cause = dbToLegacyCause(dbCause);
   if (!cause) return <NotFoundView context="cause" />;
   const region = (dbRegions ?? []).find((r) => r.id === cause.regionId);
-  const progress = cause.goal > 0 ? Math.round((cause.raised / cause.goal) * 100) : 0;
+  // No payment path exists and no contribution has ever been recorded, so the
+  // seeded goal / raised / supporters columns are never rendered as progress.
+  const isManaged = !!ownerId;
   const orgHref = ownerOrg ? `/organization/${(ownerOrg as any).slug || (ownerOrg as any).id}` : null;
 
 
@@ -82,23 +84,18 @@ const CauseDetail = () => {
         {/* Meta */}
         <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
           <span className="flex items-center gap-1"><MapPin className="w-4 h-4 text-primary" /> {region ? (lang === "ar" ? region.name_ar || region.name_en : region.name_en) : ""}</span>
-          <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {cause.supporters} {lang === "ar" ? "داعم" : "supporters"}</span>
         </div>
 
-        {/* Progress */}
-        <div className="bg-surface rounded-xl p-4 mb-6 border border-border">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-lg font-bold text-primary-dark">{cause.raised.toLocaleString()} {t("common.egp")}</span>
-            <span className="text-sm text-muted-foreground">{lang === "ar" ? "من" : "of"} {cause.goal.toLocaleString()} {t("common.egp")}</span>
+        {!isManaged && (
+          <div className="rounded-xl border border-border bg-card p-3 mb-6 flex items-start gap-2.5">
+            <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {lang === "ar"
+                ? "هذه القضية غير مُدارة على التطبيق حالياً: لا توجد جهة يمكنها استقبال التعهدات أو طلبات التطوع، وهي معروضة للتعريف فقط."
+                : "This cause is not currently managed on Sandal: no organisation can receive pledges or volunteer requests, so it is listed for information only."}
+            </p>
           </div>
-          <div className="w-full bg-border rounded-full h-2.5 mb-2">
-            <div className="bg-primary h-2.5 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
-          </div>
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span className="text-primary font-semibold">{progress}% {lang === "ar" ? "مكتمل" : "funded"}</span>
-            <span>{cause.supporters} {lang === "ar" ? "داعم" : "supporters"}</span>
-          </div>
-        </div>
+        )}
 
         {/* About */}
         <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "عن القضية" : "About This Cause"}</h2>
@@ -117,19 +114,12 @@ const CauseDetail = () => {
                 <div className="w-12 h-12 rounded-full bg-primary/15 flex items-center justify-center text-2xl">{cause.org.logo}</div>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-foreground">{cause.org.name[lang]}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {lang === "ar" ? `تأسست ${cause.org.founded}` : `Founded ${cause.org.founded}`} · {cause.org.members} {lang === "ar" ? "عضو" : "members"}
-                  </p>
                 </div>
                 {orgHref && (
                   <span className="text-[10px] text-primary font-semibold">
                     {lang === "ar" ? "عرض الملف" : "View profile"} →
                   </span>
                 )}
-              </div>
-              <div className="flex gap-2">
-                <span className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium">✅ {lang === "ar" ? "موثّقة" : "Verified"}</span>
-                <span className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium">📋 {lang === "ar" ? "مسجلة رسمياً" : "Registered NGO"}</span>
               </div>
             </Wrapper>
           );
@@ -151,8 +141,11 @@ const CauseDetail = () => {
           {supportOptions.map((opt) => (
             <button
               key={opt.key}
+              disabled={!isManaged}
               onClick={() => navigate(`/cause/${id}/${opt.path}`)}
-              className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border shadow-card hover:border-primary transition-colors"
+              className={`flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border shadow-card transition-colors ${
+                isManaged ? "hover:border-primary" : "opacity-50 cursor-not-allowed"
+              }`}
             >
               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${opt.color}`}>
                 <opt.icon className="w-5 h-5" />
@@ -163,22 +156,6 @@ const CauseDetail = () => {
           ))}
         </div>
 
-        {/* Impact */}
-        <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "الأثر" : "Impact So Far"}</h2>
-        <div className="grid grid-cols-3 gap-2 mb-6">
-          {[
-            { value: cause.supporters, label: { en: "Supporters", ar: "داعم" } },
-            { value: `${progress}%`, label: { en: "Funded", ar: "ممول" } },
-            { value: cause.org.members, label: { en: "Team", ar: "فريق" } },
-          ].map((stat, i) => (
-            <div key={i} className="bg-surface rounded-lg p-3 text-center border border-border">
-              <p className="text-lg font-bold text-primary-dark">{stat.value}</p>
-              <p className="text-[10px] text-muted-foreground">{stat.label[lang]}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Testimonials */}
       </div>
 
       {/* Organization Bio */}
@@ -189,17 +166,19 @@ const CauseDetail = () => {
       )}
 
       {/* Sticky Bottom */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
-        <div>
-          <span className="text-lg font-bold text-primary-dark">{progress}%</span>
-          <span className="text-xs text-muted-foreground block">{lang === "ar" ? "مكتمل" : "funded"}</span>
-        </div>
-        <button
-          onClick={() => navigate(`/cause/${id}/donate`)}
-          className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
-        >
-          {lang === "ar" ? "ادعم الآن" : "Support Now"}
-        </button>
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-end z-50">
+        {isManaged ? (
+          <button
+            onClick={() => navigate(`/cause/${id}/donate`)}
+            className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
+          >
+            {lang === "ar" ? "ادعم الآن" : "Support Now"}
+          </button>
+        ) : (
+          <span className="text-xs text-muted-foreground text-center w-full">
+            {lang === "ar" ? "الدعم غير متاح لهذه القضية حالياً" : "Support is unavailable for this cause right now"}
+          </span>
+        )}
       </div>
     </div>
   );
