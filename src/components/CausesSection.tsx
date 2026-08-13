@@ -1,5 +1,4 @@
 import WishlistButton from "@/components/WishlistButton";
-import { Heart, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useCauses } from "@/hooks/useListings";
@@ -26,8 +25,6 @@ const CausesSection = ({ regionId, cityFilter = "all" }: Props) => {
     <SectionHeader titleKey="section.causes" onSeeAll={() => navigate("/causes")}>
       <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
         {filtered.map((cause: any) => {
-          const goal = cause.goal || 1;
-          const progress = Math.round(((cause.raised ?? 0) / goal) * 100);
           const title = lang === "ar" ? (cause.title_ar || cause.title_en) : cause.title_en;
           const summary = lang === "ar" ? (cause.summary_ar || cause.summary_en) : cause.summary_en;
           const category = lang === "ar" ? (cause.category_ar || cause.category_en) : cause.category_en;
@@ -57,15 +54,6 @@ const CausesSection = ({ regionId, cityFilter = "all" }: Props) => {
                     <span className="font-medium">{orgName}</span>
                   </div>
                 )}
-                <div className="w-full bg-border rounded-full h-1.5 mb-1.5">
-                  <div className="bg-primary h-1.5 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
-                </div>
-                <div className="flex items-center justify-between text-[10px]">
-                  <span className="text-primary font-semibold">{progress}%</span>
-                  <span className="flex items-center gap-0.5 text-muted-foreground">
-                    <Users className="w-3 h-3" /> {cause.supporters ?? 0}
-                  </span>
-                </div>
               </div>
             </div>
           );

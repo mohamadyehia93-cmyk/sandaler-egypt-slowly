@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, Users, Search, MapPin } from "lucide-react";
+import { ArrowLeft, Heart, Search, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useCauses, useRegions } from "@/hooks/useListings";
@@ -138,8 +138,6 @@ const AllCauses = () => {
 
                 <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
                   {items.map((cause: any) => {
-                    const goal = cause.goal || 1;
-                    const progress = Math.round(((cause.raised ?? 0) / goal) * 100);
                     const title = lang === "ar" ? (cause.title_ar || cause.title_en) : cause.title_en;
                     const category = lang === "ar" ? (cause.category_ar || cause.category_en) : cause.category_en;
                     const orgName = lang === "ar" ? (cause.org_name_ar || cause.org_name_en) : cause.org_name_en;
@@ -175,18 +173,6 @@ const AllCauses = () => {
                               <span className="font-medium truncate">{orgName}</span>
                             </div>
                           )}
-                          <div className="w-full bg-border rounded-full h-1.5 mb-1">
-                            <div
-                              className="bg-primary h-1.5 rounded-full"
-                              style={{ width: `${Math.min(progress, 100)}%` }}
-                            />
-                          </div>
-                          <div className="flex items-center justify-between text-[10px] mb-2">
-                            <span className="text-primary font-semibold">{progress}%</span>
-                            <span className="flex items-center gap-0.5 text-muted-foreground">
-                              <Users className="w-3 h-3" /> {cause.supporters ?? 0}
-                            </span>
-                          </div>
                           {(() => {
                             const r = (regions as any[]).find((x) => x.id === cause.region_id);
                             if (!r) return null;

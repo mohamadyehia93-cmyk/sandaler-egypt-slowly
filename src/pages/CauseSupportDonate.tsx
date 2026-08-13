@@ -43,8 +43,6 @@ const CauseSupportDonate = () => {
   if (causeLoading) return <div className="min-h-screen bg-background" />;
   if (!cause) return <NotFoundView context="cause" />;
 
-  // Only shown when the row genuinely carries both numbers.
-  const progress = cause.goal ? Math.round(((cause.raised || 0) / cause.goal) * 100) : null;
   const finalAmount = showCustom ? (parseInt(customAmount) || 0) : selected;
 
 
@@ -122,13 +120,8 @@ const CauseSupportDonate = () => {
               <img src={cause.image} alt={cause.title[lang]} className="w-14 h-14 rounded-lg object-cover" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-foreground truncate">{cause.title[lang]}</p>
-                {progress !== null && (
-                  <>
-                    <div className="w-full h-1.5 bg-border rounded-full mt-1.5">
-                      <div className="h-full bg-primary rounded-full" style={{ width: `${Math.min(progress, 100)}%` }} />
-                    </div>
-                    <p className="text-[10px] text-muted-foreground mt-1">{progress}% {lang === "ar" ? "ممول" : "funded"}</p>
-                  </>
+                {cause.category[lang] && (
+                  <p className="text-xs text-muted-foreground">{cause.category[lang]}</p>
                 )}
               </div>
             </div>
