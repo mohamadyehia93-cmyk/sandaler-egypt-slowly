@@ -67,10 +67,11 @@ const WhosWhoDashboard = () => {
 
   const bottomNav = [
     { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true, path: "/dashboard/whos-who" },
-    { label: lang === "ar" ? "ملفي" : "My Profile", icon: "👤", active: false, path: "/profile" },
+    { label: lang === "ar" ? "جلساتي" : "My Sessions", icon: "📅", active: false, path: "/dashboard/whos-who/my-sessions" },
     { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false, path: "/inbox" },
-    { label: lang === "ar" ? "إعدادات" : "Settings", icon: "⚙️", active: false, path: "/profile/settings" },
+    { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false, path: "/profile" },
   ];
+
 
   return (
     <div className="min-h-screen bg-surface pb-20">
