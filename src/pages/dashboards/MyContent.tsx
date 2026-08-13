@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Plus, Trash2, Eye, FileText, Pencil, Send, Undo2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, FileText, Pencil, Send, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 const MyContent = () => {
@@ -19,7 +19,7 @@ const MyContent = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("posts")
-        .select("id, title_en, title_ar, image, category, status, created_at")
+        .select("id, slug, title_en, title_ar, image, category, status, created_at")
         .eq("author_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;

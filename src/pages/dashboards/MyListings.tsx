@@ -24,7 +24,7 @@ const MyListings = () => {
       if (!providerId) return [];
       const { data, error } = await supabase
         .from("experiences")
-        .select("id, title_en, title_ar, image, price, status, created_at")
+        .select("id, slug, title_en, title_ar, image, price, status, created_at")
         .eq("provider_id", providerId)
         .order("created_at", { ascending: false });
       if (error) throw error;

@@ -5,7 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyProviderId } from "@/lib/providerRecord";
-import { ArrowLeft, Plus, Trash2, Eye, ShoppingBag, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ShoppingBag, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 const MyProducts = () => {
@@ -23,7 +23,7 @@ const MyProducts = () => {
       const owners = [user!.id, ...(providerId ? [providerId] : [])];
       const { data, error } = await supabase
         .from("products")
-        .select("id, name_en, name_ar, image, price, stock, status, created_at")
+        .select("id, slug, name_en, name_ar, image, price, stock, status, created_at")
         .in("seller_id", owners)
         .order("created_at", { ascending: false });
       if (error) throw error;
