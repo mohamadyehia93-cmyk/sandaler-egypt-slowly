@@ -11,7 +11,7 @@ const allowedProviderRoutes = [
   "/profile/settings",
   "/profile/help",
   "/edit-profile",
-  "/settings",
+  
   "/welcome",
   "/dashboard",
   "/admin",
