@@ -1,3 +1,4 @@
+import PreviewButton from "@/components/dashboard/PreviewButton";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
@@ -67,9 +68,7 @@ const MyProducts = () => {
                 <p className="text-[11px] text-muted-foreground">{e.price ? `${e.price} ${lang === "ar" ? "ج.م" : "EGP"}` : "—"} · {lang === "ar" ? "المخزون" : "Stock"}: {e.stock ?? 0}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
-              <button onClick={() => navigate(`/product/${e.id}`)} className="p-2 rounded-lg bg-role-product-seller/10 text-role-product-seller">
-                <Eye className="w-4 h-4" />
-              </button>
+              <PreviewButton path={`/product/${e.slug || e.id}`} className="bg-role-product-seller/10 text-role-product-seller" />
               <button onClick={() => navigate(`/dashboard/product-seller/edit-product/${e.id}`)} className="p-2 rounded-lg bg-role-product-seller/10 text-role-product-seller">
                 <Pencil className="w-4 h-4" />
               </button>

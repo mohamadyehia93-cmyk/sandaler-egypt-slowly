@@ -1,3 +1,4 @@
+import PreviewButton from "@/components/dashboard/PreviewButton";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
@@ -89,9 +90,7 @@ const MyContent = () => {
                   <Send className="w-4 h-4" />
                 </button>
               )}
-              <button onClick={() => navigate(`/post/${e.id}`)} className="p-2 rounded-lg bg-role-culture-actor/10 text-role-culture-actor">
-                <Eye className="w-4 h-4" />
-              </button>
+              <PreviewButton path={`/post/${e.slug || e.id}`} className="bg-role-culture-actor/10 text-role-culture-actor" />
               <button onClick={() => navigate(`/dashboard/culture-actor/edit-article/${e.id}`)} className="p-2 rounded-lg bg-role-culture-actor/10 text-role-culture-actor">
                 <Pencil className="w-4 h-4" />
               </button>

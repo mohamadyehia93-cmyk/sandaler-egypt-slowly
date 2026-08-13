@@ -1,3 +1,4 @@
+import PreviewButton from "@/components/dashboard/PreviewButton";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
@@ -63,9 +64,7 @@ const MyAudioTours = () => {
                 <p className="text-[11px] text-muted-foreground">{e.stops_count} {lang === "ar" ? "محطات" : "stops"} · {e.duration_minutes} {lang === "ar" ? "د" : "min"}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
-              <button onClick={() => navigate(`/audio-tour/${e.id}`)} className="p-2 rounded-lg bg-role-narrator/10 text-role-narrator">
-                <Eye className="w-4 h-4" />
-              </button>
+              <PreviewButton path={`/audio-tour/${e.slug || e.id}`} className="bg-role-narrator/10 text-role-narrator" />
               <button onClick={() => navigate(`/dashboard/narrator/edit-tour/${e.id}`)} className="p-2 rounded-lg bg-role-narrator/10 text-role-narrator">
                 <Pencil className="w-4 h-4" />
               </button>

@@ -1,3 +1,4 @@
+import PreviewButton from "@/components/dashboard/PreviewButton";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
@@ -85,9 +86,7 @@ const MyListings = () => {
                     {e.status === "published" ? (lang === "ar" ? "منشورة" : "published") : (lang === "ar" ? "مسودة" : "draft")}
                   </span>
                 </div>
-                <button onClick={() => navigate(`/experience/${e.id}`)} className="p-2 rounded-lg bg-role-service-provider/10 text-role-service-provider" aria-label={lang === "ar" ? "عرض" : "View"}>
-                  <Eye className="w-4 h-4" />
-                </button>
+                <PreviewButton path={`/experience/${e.slug || e.id}`} className="bg-role-service-provider/10 text-role-service-provider" />
                 <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive" aria-label={lang === "ar" ? "حذف" : "Delete"}>
                   <Trash2 className="w-4 h-4" />
                 </button>

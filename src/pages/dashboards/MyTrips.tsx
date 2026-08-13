@@ -1,3 +1,4 @@
+import PreviewButton from "@/components/dashboard/PreviewButton";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
@@ -67,9 +68,7 @@ const MyTrips = () => {
                 <p className="text-[11px] text-muted-foreground">{e.price ? `${e.price} ${lang === "ar" ? "ج.م" : "EGP"}` : "—"}{e.date ? ` · ${e.date}` : ""}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
-              <button onClick={() => navigate(`/trip/${e.id}`)} className="p-2 rounded-lg bg-role-trip-organizer/10 text-role-trip-organizer">
-                <Eye className="w-4 h-4" />
-              </button>
+              <PreviewButton path={`/trip/${e.slug || e.id}`} className="bg-role-trip-organizer/10 text-role-trip-organizer" />
               <button onClick={() => navigate(`/dashboard/trip-organizer/edit-trip/${e.id}`)} className="p-2 rounded-lg bg-role-trip-organizer/10 text-role-trip-organizer">
                 <Pencil className="w-4 h-4" />
               </button>
