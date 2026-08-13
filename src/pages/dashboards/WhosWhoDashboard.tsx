@@ -67,10 +67,11 @@ const WhosWhoDashboard = () => {
 
   const bottomNav = [
     { label: lang === "ar" ? "لوحة التحكم" : "Dashboard", icon: "🏠", active: true, path: "/dashboard/whos-who" },
-    { label: lang === "ar" ? "ملفي" : "My Profile", icon: "👤", active: false, path: "/profile" },
+    { label: lang === "ar" ? "جلساتي" : "My Sessions", icon: "📅", active: false, path: "/dashboard/whos-who/my-sessions" },
     { label: lang === "ar" ? "الرسائل" : "Inbox", icon: "💬", active: false, path: "/inbox" },
-    { label: lang === "ar" ? "إعدادات" : "Settings", icon: "⚙️", active: false, path: "/profile/settings" },
+    { label: lang === "ar" ? "الملف" : "Profile", icon: "👤", active: false, path: "/profile" },
   ];
+
 
   return (
     <div className="min-h-screen bg-surface pb-20">
@@ -115,7 +116,7 @@ const WhosWhoDashboard = () => {
         <SessionRequestsList accentText="text-role-whos-who" />
 
         {/* Upcoming Sessions — real meetup rows */}
-        <div className="bg-card rounded-xl shadow-card p-4">
+        <div onClick={() => navigate("/dashboard/whos-who/my-sessions")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4 text-role-whos-who" />
             {lang === "ar" ? "الجلسات القادمة" : "Upcoming Sessions"}
