@@ -5,6 +5,7 @@ import { useCauseRow } from "@/lib/causeRow";
 import { useState } from "react";
 import { toast } from "sonner";
 import NotFoundView from "@/components/NotFound";
+import CauseUnmanagedNotice from "@/components/CauseUnmanagedNotice";
 import { useAuth } from "@/hooks/useAuth";
 import { submitPledge } from "@/lib/submitPledge";
 
@@ -42,6 +43,8 @@ const CauseSupportDonate = () => {
   const { cause, isLoading: causeLoading } = useCauseRow(id);
   if (causeLoading) return <div className="min-h-screen bg-background" />;
   if (!cause) return <NotFoundView context="cause" />;
+  // Ownerless cause: nobody could ever receive or answer this request.
+  if (!cause.ownerId) return <CauseUnmanagedNotice causeHref={`/cause/${id}`} />;
 
   const finalAmount = showCustom ? (parseInt(customAmount) || 0) : selected;
 
