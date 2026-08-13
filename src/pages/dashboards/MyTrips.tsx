@@ -1,10 +1,11 @@
+import PreviewButton from "@/components/dashboard/PreviewButton";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyProviderId } from "@/lib/providerRecord";
-import { ArrowLeft, Plus, Trash2, Eye, Map, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Map, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 const MyTrips = () => {
@@ -22,7 +23,7 @@ const MyTrips = () => {
       const owners = [user!.id, ...(providerId ? [providerId] : [])];
       const { data, error } = await supabase
         .from("trips")
-        .select("id, title_en, title_ar, image, price, status, date, created_at")
+        .select("id, slug, title_en, title_ar, image, price, status, date, created_at")
         .in("organizer_id", owners)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -67,9 +68,7 @@ const MyTrips = () => {
                 <p className="text-[11px] text-muted-foreground">{e.price ? `${e.price} ${lang === "ar" ? "ج.م" : "EGP"}` : "—"}{e.date ? ` · ${e.date}` : ""}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
-              <button onClick={() => navigate(`/trip/${e.id}`)} className="p-2 rounded-lg bg-role-trip-organizer/10 text-role-trip-organizer">
-                <Eye className="w-4 h-4" />
-              </button>
+              <PreviewButton path={`/trip/${e.slug || e.id}`} className="bg-role-trip-organizer/10 text-role-trip-organizer" />
               <button onClick={() => navigate(`/dashboard/trip-organizer/edit-trip/${e.id}`)} className="p-2 rounded-lg bg-role-trip-organizer/10 text-role-trip-organizer">
                 <Pencil className="w-4 h-4" />
               </button>

@@ -1,3 +1,4 @@
+import PreviewButton from "@/components/dashboard/PreviewButton";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
@@ -87,9 +88,7 @@ const MyStays = () => {
                     {e.status === "published" ? (ar ? "منشور" : "published") : (ar ? "مسودة" : "draft")}
                   </span>
                 </div>
-                <button onClick={() => navigate(`/stay/${e.slug || e.id}`)} className="p-2 rounded-lg bg-role-service-provider/10 text-role-service-provider" aria-label={ar ? "عرض" : "View"}>
-                  <Eye className="w-4 h-4" />
-                </button>
+                <PreviewButton path={`/stay/${e.slug || e.id}`} className="bg-role-service-provider/10 text-role-service-provider" />
                 <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive" aria-label={ar ? "حذف" : "Delete"}>
                   <Trash2 className="w-4 h-4" />
                 </button>

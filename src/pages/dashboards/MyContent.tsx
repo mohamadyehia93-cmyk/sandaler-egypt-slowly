@@ -1,9 +1,10 @@
+import PreviewButton from "@/components/dashboard/PreviewButton";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Plus, Trash2, Eye, FileText, Pencil, Send, Undo2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, FileText, Pencil, Send, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 const MyContent = () => {
@@ -18,7 +19,7 @@ const MyContent = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("posts")
-        .select("id, title_en, title_ar, image, category, status, created_at")
+        .select("id, slug, title_en, title_ar, image, category, status, created_at")
         .eq("author_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -89,9 +90,7 @@ const MyContent = () => {
                   <Send className="w-4 h-4" />
                 </button>
               )}
-              <button onClick={() => navigate(`/post/${e.id}`)} className="p-2 rounded-lg bg-role-culture-actor/10 text-role-culture-actor">
-                <Eye className="w-4 h-4" />
-              </button>
+              <PreviewButton path={`/post/${e.slug || e.id}`} className="bg-role-culture-actor/10 text-role-culture-actor" />
               <button onClick={() => navigate(`/dashboard/culture-actor/edit-article/${e.id}`)} className="p-2 rounded-lg bg-role-culture-actor/10 text-role-culture-actor">
                 <Pencil className="w-4 h-4" />
               </button>

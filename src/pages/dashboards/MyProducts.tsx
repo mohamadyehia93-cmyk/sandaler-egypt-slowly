@@ -1,10 +1,11 @@
+import PreviewButton from "@/components/dashboard/PreviewButton";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyProviderId } from "@/lib/providerRecord";
-import { ArrowLeft, Plus, Trash2, Eye, ShoppingBag, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ShoppingBag, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 const MyProducts = () => {
@@ -22,7 +23,7 @@ const MyProducts = () => {
       const owners = [user!.id, ...(providerId ? [providerId] : [])];
       const { data, error } = await supabase
         .from("products")
-        .select("id, name_en, name_ar, image, price, stock, status, created_at")
+        .select("id, slug, name_en, name_ar, image, price, stock, status, created_at")
         .in("seller_id", owners)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -67,9 +68,7 @@ const MyProducts = () => {
                 <p className="text-[11px] text-muted-foreground">{e.price ? `${e.price} ${lang === "ar" ? "ج.م" : "EGP"}` : "—"} · {lang === "ar" ? "المخزون" : "Stock"}: {e.stock ?? 0}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
-              <button onClick={() => navigate(`/product/${e.id}`)} className="p-2 rounded-lg bg-role-product-seller/10 text-role-product-seller">
-                <Eye className="w-4 h-4" />
-              </button>
+              <PreviewButton path={`/product/${e.slug || e.id}`} className="bg-role-product-seller/10 text-role-product-seller" />
               <button onClick={() => navigate(`/dashboard/product-seller/edit-product/${e.id}`)} className="p-2 rounded-lg bg-role-product-seller/10 text-role-product-seller">
                 <Pencil className="w-4 h-4" />
               </button>

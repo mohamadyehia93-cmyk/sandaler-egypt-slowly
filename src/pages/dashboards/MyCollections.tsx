@@ -1,9 +1,10 @@
+import PreviewButton from "@/components/dashboard/PreviewButton";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Plus, Trash2, Eye, BookOpen, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, BookOpen, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 const MyCollections = () => {
@@ -18,7 +19,7 @@ const MyCollections = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("collections")
-        .select("id, title_en, title_ar, cover_image, discipline, status, created_at")
+        .select("id, slug, title_en, title_ar, cover_image, discipline, status, created_at")
         .eq("expert_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -63,6 +64,7 @@ const MyCollections = () => {
                 <p className="text-[11px] text-muted-foreground line-clamp-1">{e.discipline}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
+              <PreviewButton path={`/collection/${e.slug || e.id}`} className="bg-role-subject-expert/10 text-role-subject-expert" />
               <button onClick={() => navigate(`/dashboard/subject-expert/edit-collection/${e.id}`)} className="p-2 rounded-lg bg-role-subject-expert/10 text-role-subject-expert">
                 <Pencil className="w-4 h-4" />
               </button>

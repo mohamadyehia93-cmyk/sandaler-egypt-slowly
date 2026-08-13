@@ -1,3 +1,4 @@
+import PreviewButton from "@/components/dashboard/PreviewButton";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
@@ -79,6 +80,7 @@ const MyEvents = () => {
                     {past ? t("events.past") : t("events.upcoming")}
                   </span>
                 </div>
+                <PreviewButton path={`/event/${e.slug || e.id}`} className="bg-primary/10 text-primary" />
                 <button onClick={() => navigate(`/dashboard/trip-organizer/new-event?id=${e.id}`)} className="p-2 rounded-lg bg-primary/10 text-primary">
                   <Pencil className="w-4 h-4" />
                 </button>
