@@ -10,6 +10,9 @@ const allowedProviderRoutes = [
   "/profile/badges",
   "/profile/settings",
   "/profile/help",
+  "/edit-profile",
+  
+  "/welcome",
   "/dashboard",
   "/admin",
   "/booking",
