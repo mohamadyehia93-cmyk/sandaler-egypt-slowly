@@ -1,0 +1,473 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { slugify, uploadImages } from "@/lib/dashboardForms";
+import { fetchMyProviderId } from "@/lib/providerRecord";
+import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import CityPicker from "@/components/dashboard/CityPicker";
+import LocationPicker from "@/components/dashboard/LocationPicker";
+import BilingualField from "@/components/dashboard/BilingualField";
+import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
+import { ACCOMMODATION_TYPES, readableDbError } from "@/lib/listingTaxonomy";
+import { cityCoords } from "@/lib/cityCoords";
+import type { Lang, TranslationMeta } from "@/lib/translation";
+import type { Json } from "@/integrations/supabase/types";
+import {
+  ArrowLeft, Image, FileText, Home, Users, BedDouble, Bath, Clock,
+  DollarSign, Check, Plus, Trash2, ScrollText, MapPin,
+} from "lucide-react";
+import { toast } from "sonner";
+
+/**
+ * Create / edit a stay. Ownership convention: accommodations.host_id holds
+ * providers.id (see src/lib/providerRecord.ts).
+ *
+ * EDIT MODE contract: every column this form writes is also read back in the
+ * prefill below — no field may be silently dropped on save. Prose fields keep
+ * BOTH languages in state so saving after editing one language never blanks
+ * the other.
+ */
+const AMENITY_PRESETS: { en: string; ar: string }[] = [
+  { en: "Wi-Fi", ar: "واي فاي" },
+  { en: "Air conditioning", ar: "تكييف" },
+  { en: "Breakfast included", ar: "إفطار مشمول" },
+  { en: "Private bathroom", ar: "حمام خاص" },
+  { en: "Hot water", ar: "مياه ساخنة" },
+  { en: "Kitchen access", ar: "استخدام المطبخ" },
+  { en: "Rooftop / terrace", ar: "سطح أو تراس" },
+  { en: "Family friendly", ar: "مناسب للعائلات" },
+  { en: "Parking", ar: "موقف سيارات" },
+];
+
+const NewAccommodation = () => {
+  const { lang } = useI18n();
+  const ar = lang === "ar";
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
+
+  const [submitting, setSubmitting] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [authorLang, setAuthorLang] = useState<Lang>(lang === "ar" ? "ar" : "en");
+  const [meta, setMeta] = useState<TranslationMeta>({});
+  const [amenities, setAmenities] = useState<string[]>([]);
+  const [amenityDraft, setAmenityDraft] = useState("");
+
+  const [form, setForm] = useState({
+    nameEn: "",
+    nameAr: "",
+    descriptionEn: "",
+    descriptionAr: "",
+    unitTypeEn: "",
+    unitTypeAr: "",
+    houseRulesEn: "",
+    houseRulesAr: "",
+    cancellationEn: "",
+    cancellationAr: "",
+    accommodationType: "",
+    cityId: "",
+    regionId: "",
+    pricePerNight: "",
+    currency: "EGP",
+    sleeps: "",
+    bedrooms: "",
+    bathrooms: "",
+    minNights: "",
+    checkIn: "",
+    checkOut: "",
+    lat: "",
+    lng: "",
+    status: "published",
+  });
+
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      const { data, error } = await supabase.from("accommodations").select("*").eq("id", id).maybeSingle();
+      if (error || !data) {
+        toast.error(ar ? "تعذر تحميل مكان الإقامة" : "Could not load this stay");
+        return;
+      }
+      const row = data as Record<string, any>;
+      setForm({
+        nameEn: row.name_en || "",
+        nameAr: row.name_ar || "",
+        descriptionEn: row.description_en || "",
+        descriptionAr: row.description_ar || "",
+        unitTypeEn: row.unit_type_en || "",
+        unitTypeAr: row.unit_type_ar || "",
+        houseRulesEn: row.house_rules_en || "",
+        houseRulesAr: row.house_rules_ar || "",
+        cancellationEn: row.cancellation_en || "",
+        cancellationAr: row.cancellation_ar || "",
+        accommodationType: row.accommodation_type || "",
+        cityId: row.city_id || "",
+        regionId: row.region_id || "",
+        pricePerNight: row.price_per_night != null ? String(row.price_per_night) : "",
+        currency: row.currency || "EGP",
+        sleeps: row.sleeps != null ? String(row.sleeps) : "",
+        bedrooms: row.bedrooms != null ? String(row.bedrooms) : "",
+        bathrooms: row.bathrooms != null ? String(row.bathrooms) : "",
+        minNights: row.min_nights != null ? String(row.min_nights) : "",
+        checkIn: row.check_in_time || "",
+        checkOut: row.check_out_time || "",
+        lat: row.latitude != null ? String(row.latitude) : "",
+        lng: row.longitude != null ? String(row.longitude) : "",
+        status: row.status || "published",
+      });
+      setAmenities(Array.isArray(row.amenities) ? row.amenities.filter(Boolean) : []);
+      setMeta((row.translation_meta as TranslationMeta) || {});
+      setExistingImages(
+        Array.isArray(row.images) && row.images.length > 0
+          ? row.images.filter(Boolean)
+          : row.image
+            ? [row.image]
+            : []
+      );
+    })();
+  }, [isEdit, id, ar]);
+
+  const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
+
+  const toggleAmenity = (label: string) =>
+    setAmenities((p) => (p.includes(label) ? p.filter((a) => a !== label) : [...p, label]));
+
+  const cityCenter = form.cityId ? cityCoords[form.cityId] : undefined;
+
+  const handleSubmit = async () => {
+    if (!user) {
+      toast.error(ar ? "يرجى تسجيل الدخول" : "Please sign in first");
+      return;
+    }
+    const nameSrc = authorLang === "ar" ? form.nameAr : form.nameEn;
+    const descSrc = authorLang === "ar" ? form.descriptionAr : form.descriptionEn;
+    if (!nameSrc.trim() || !descSrc.trim() || !form.accommodationType || !form.cityId || !form.pricePerNight.trim()) {
+      toast.error(ar ? "يرجى ملء الحقول المطلوبة" : "Please fill in the required fields");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const providerId = await fetchMyProviderId(user.id);
+      if (!providerId) {
+        toast.error(ar ? "أكمل ملف المزود أولاً" : "Complete your provider profile first");
+        setSubmitting(false);
+        return;
+      }
+      const uploaded = await uploadImages(photos, user.id);
+      const images = [...existingImages, ...uploaded];
+
+      const payload = {
+        host_id: providerId,
+        name_en: form.nameEn.trim() || null,
+        name_ar: form.nameAr.trim() || null,
+        description_en: form.descriptionEn.trim() || null,
+        description_ar: form.descriptionAr.trim() || null,
+        unit_type_en: form.unitTypeEn.trim() || null,
+        unit_type_ar: form.unitTypeAr.trim() || null,
+        house_rules_en: form.houseRulesEn.trim() || null,
+        house_rules_ar: form.houseRulesAr.trim() || null,
+        cancellation_en: form.cancellationEn.trim() || null,
+        cancellation_ar: form.cancellationAr.trim() || null,
+        accommodation_type: form.accommodationType,
+        city_id: form.cityId || null,
+        region_id: form.regionId || null,
+        price_per_night: parseInt(form.pricePerNight) || 0,
+        currency: form.currency.trim() || "EGP",
+        sleeps: form.sleeps.trim() ? parseInt(form.sleeps) : null,
+        bedrooms: form.bedrooms.trim() ? parseInt(form.bedrooms) : null,
+        bathrooms: form.bathrooms.trim() ? parseInt(form.bathrooms) : null,
+        min_nights: form.minNights.trim() ? parseInt(form.minNights) : null,
+        check_in_time: form.checkIn.trim() || null,
+        check_out_time: form.checkOut.trim() || null,
+        latitude: form.lat.trim() ? Number(form.lat) : null,
+        longitude: form.lng.trim() ? Number(form.lng) : null,
+        amenities,
+        image: images[0] || null,
+        images,
+        status: form.status,
+        translation_meta: meta as unknown as Json,
+      };
+
+      if (isEdit) {
+        const { error } = await supabase.from("accommodations").update(payload as never).eq("id", id);
+        if (error) throw error;
+        toast.success(ar ? "تم تحديث مكان الإقامة" : "Stay updated");
+      } else {
+        const { error } = await supabase
+          .from("accommodations")
+          .insert({ ...payload, slug: slugify(form.nameEn || form.nameAr, user.id.slice(0, 6)) } as never);
+        if (error) throw error;
+        toast.success(ar ? "تم نشر مكان الإقامة" : "Stay published");
+      }
+      navigate("/dashboard/service-provider/my-stays");
+    } catch (err) {
+      toast.error(readableDbError(err instanceof Error ? err.message : "Failed to save", ar));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-service-provider/40";
+  const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
+  const iconCls = "w-3.5 h-3.5 text-role-service-provider";
+
+  return (
+    <div className="min-h-screen bg-surface pb-10">
+      <header className="bg-role-service-provider text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
+        <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+        <h1 className="text-lg font-bold">
+          {isEdit ? (ar ? "تعديل مكان الإقامة" : "Edit Stay") : (ar ? "إضافة مكان إقامة" : "Add a Stay")}
+        </h1>
+      </header>
+
+      <div className="px-4 py-5 space-y-5">
+        <AuthorLangToggle value={authorLang} onChange={setAuthorLang} />
+
+        <div>
+          <label className={labelClass}><Image className={iconCls} />{ar ? "صور المكان" : "Photos"}</label>
+          <PhotoPicker
+            files={photos}
+            onChange={setPhotos}
+            max={6}
+            hint={ar ? "حتى ٦ صور" : "Up to 6 photos"}
+            existing={existingImages}
+            onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))}
+          />
+        </div>
+
+        <BilingualField
+          fieldEn="name_en" fieldAr="name_ar"
+          labelEn="Name of the stay" labelAr="اسم مكان الإقامة"
+          required
+          icon={<FileText className={iconCls} />}
+          valueEn={form.nameEn} valueAr={form.nameAr}
+          onChange={({ en, ar: a }) => setForm((p) => ({ ...p, nameEn: en, nameAr: a }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="short name of an Egyptian guesthouse, homestay or eco-lodge"
+          placeholderEn="e.g. Nubian House by the Nile" placeholderAr="مثال: بيت نوبي على النيل"
+          inputClass={inputClass} labelClass={labelClass}
+        />
+
+        <BilingualField
+          fieldEn="description_en" fieldAr="description_ar"
+          labelEn="About this place" labelAr="عن المكان"
+          required multiline rows={4}
+          icon={<FileText className={iconCls} />}
+          valueEn={form.descriptionEn} valueAr={form.descriptionAr}
+          onChange={({ en, ar: a }) => setForm((p) => ({ ...p, descriptionEn: en, descriptionAr: a }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="description of an Egyptian guesthouse or homestay for travellers"
+          placeholderEn="Describe the place, the neighbourhood and what a night here feels like..."
+          placeholderAr="اوصف المكان والحي وكيف تكون ليلة هنا..."
+          inputClass={inputClass} labelClass={labelClass}
+        />
+
+        <div>
+          <label className={labelClass}><Home className={iconCls} />{ar ? "نوع الإقامة *" : "Type of stay *"}</label>
+          <div className="flex flex-wrap gap-2">
+            {ACCOMMODATION_TYPES.map((t) => (
+              <button
+                key={t.key}
+                onClick={() => set("accommodationType", t.key)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                  form.accommodationType === t.key
+                    ? "bg-role-service-provider text-white border-role-service-provider"
+                    : "bg-card text-foreground border-border"
+                }`}
+              >
+                {t.emoji} {t.label[lang]}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <BilingualField
+          fieldEn="unit_type_en" fieldAr="unit_type_ar"
+          labelEn="Room / unit offered" labelAr="الغرفة أو الوحدة المعروضة"
+          icon={<BedDouble className={iconCls} />}
+          valueEn={form.unitTypeEn} valueAr={form.unitTypeAr}
+          onChange={({ en, ar: a }) => setForm((p) => ({ ...p, unitTypeEn: en, unitTypeAr: a }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="the specific room or unit a guest books in an Egyptian guesthouse"
+          placeholderEn="e.g. Private room with Nile view" placeholderAr="مثال: غرفة خاصة بإطلالة على النيل"
+          inputClass={inputClass} labelClass={labelClass}
+        />
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={labelClass}><DollarSign className={iconCls} />{ar ? "السعر لليلة *" : "Price per night *"}</label>
+            <input type="number" min="0" className={inputClass} placeholder="450" value={form.pricePerNight} onChange={(e) => set("pricePerNight", e.target.value)} />
+          </div>
+          <div>
+            <label className={labelClass}>{ar ? "العملة" : "Currency"}</label>
+            <input className={inputClass} maxLength={8} value={form.currency} onChange={(e) => set("currency", e.target.value)} />
+          </div>
+          <div>
+            <label className={labelClass}><Users className={iconCls} />{ar ? "يتسع لعدد" : "Sleeps"}</label>
+            <input type="number" min="1" className={inputClass} placeholder="2" value={form.sleeps} onChange={(e) => set("sleeps", e.target.value)} />
+          </div>
+          <div>
+            <label className={labelClass}><Clock className={iconCls} />{ar ? "أقل عدد ليالٍ" : "Minimum nights"}</label>
+            <input type="number" min="1" className={inputClass} placeholder="1" value={form.minNights} onChange={(e) => set("minNights", e.target.value)} />
+          </div>
+          <div>
+            <label className={labelClass}><BedDouble className={iconCls} />{ar ? "غرف النوم" : "Bedrooms"}</label>
+            <input type="number" min="0" className={inputClass} placeholder="1" value={form.bedrooms} onChange={(e) => set("bedrooms", e.target.value)} />
+          </div>
+          <div>
+            <label className={labelClass}><Bath className={iconCls} />{ar ? "الحمامات" : "Bathrooms"}</label>
+            <input type="number" min="0" className={inputClass} placeholder="1" value={form.bathrooms} onChange={(e) => set("bathrooms", e.target.value)} />
+          </div>
+          <div>
+            <label className={labelClass}>{ar ? "موعد الوصول" : "Check-in"}</label>
+            <input className={inputClass} maxLength={40} placeholder={ar ? "من ٢ ظهراً" : "From 2 PM"} value={form.checkIn} onChange={(e) => set("checkIn", e.target.value)} />
+          </div>
+          <div>
+            <label className={labelClass}>{ar ? "موعد المغادرة" : "Check-out"}</label>
+            <input className={inputClass} maxLength={40} placeholder={ar ? "حتى ١١ صباحاً" : "By 11 AM"} value={form.checkOut} onChange={(e) => set("checkOut", e.target.value)} />
+          </div>
+        </div>
+
+        <CityPicker
+          cityId={form.cityId}
+          onChange={(cityId, regionId) => setForm((p) => ({ ...p, cityId, regionId }))}
+          required
+          labelEn="Main city (listed under)"
+          labelAr="المدينة الرئيسية (يُدرج تحتها)"
+          iconClass={iconCls}
+          inputClass={inputClass}
+          labelClass={labelClass}
+        />
+
+        <div>
+          <label className={labelClass}><MapPin className={iconCls} />{ar ? "الموقع على الخريطة" : "Pin on the map"}</label>
+          <LocationPicker
+            lat={form.lat}
+            lng={form.lng}
+            fallbackCenter={cityCenter ?? null}
+            onChange={(la, ln) => setForm((p) => ({ ...p, lat: String(la), lng: String(ln) }))}
+          />
+        </div>
+
+        <div>
+          <label className={labelClass}><Check className={iconCls} />{ar ? "المرافق والخدمات" : "What's included"}</label>
+          <div className="flex flex-wrap gap-2">
+            {AMENITY_PRESETS.map((a) => {
+              const label = a[lang];
+              const active = amenities.includes(label);
+              return (
+                <button
+                  key={a.en}
+                  onClick={() => toggleAmenity(label)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                    active ? "bg-role-service-provider text-white border-role-service-provider" : "bg-card text-foreground border-border"
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+          {amenities.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {amenities.map((a) => (
+                <span key={a} className="inline-flex items-center gap-1 text-xs bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full">
+                  {a}
+                  <button onClick={() => toggleAmenity(a)} aria-label="remove"><Trash2 className="w-3 h-3 text-destructive" /></button>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-2 mt-2">
+            <input
+              className={inputClass}
+              placeholder={ar ? "أضف مرفقاً آخر" : "Add another amenity"}
+              value={amenityDraft}
+              maxLength={40}
+              onChange={(e) => setAmenityDraft(e.target.value)}
+            />
+            <button
+              onClick={() => {
+                const v = amenityDraft.trim();
+                if (!v) return;
+                if (!amenities.includes(v)) setAmenities((p) => [...p, v]);
+                setAmenityDraft("");
+              }}
+              className="px-3 rounded-xl bg-role-service-provider text-white"
+              aria-label={ar ? "إضافة" : "Add"}
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        <BilingualField
+          fieldEn="house_rules_en" fieldAr="house_rules_ar"
+          labelEn="House rules" labelAr="قواعد المنزل"
+          multiline rows={3} manualOnly
+          icon={<ScrollText className={iconCls} />}
+          valueEn={form.houseRulesEn} valueAr={form.houseRulesAr}
+          onChange={({ en, ar: a }) => setForm((p) => ({ ...p, houseRulesEn: en, houseRulesAr: a }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="house rules for guests staying in an Egyptian family guesthouse"
+          placeholderEn="e.g. No smoking indoors, quiet after 11 PM"
+          placeholderAr="مثال: ممنوع التدخين بالداخل، الهدوء بعد ١١ مساءً"
+          inputClass={inputClass} labelClass={labelClass}
+        />
+
+        <BilingualField
+          fieldEn="cancellation_en" fieldAr="cancellation_ar"
+          labelEn="Cancellation terms" labelAr="شروط الإلغاء"
+          multiline rows={3} manualOnly
+          icon={<ScrollText className={iconCls} />}
+          valueEn={form.cancellationEn} valueAr={form.cancellationAr}
+          onChange={({ en, ar: a }) => setForm((p) => ({ ...p, cancellationEn: en, cancellationAr: a }))}
+          meta={meta} onMetaChange={setMeta}
+          authorLang={authorLang}
+          context="cancellation terms a small Egyptian guesthouse sets for its guests"
+          placeholderEn="Write the terms you actually apply — guests see this as yours."
+          placeholderAr="اكتب الشروط التي تطبّقها فعلاً — الضيوف يرونها باسمك."
+          inputClass={inputClass} labelClass={labelClass}
+        />
+
+        <div>
+          <label className={labelClass}>{ar ? "حالة النشر" : "Publishing"}</label>
+          <div className="flex gap-2">
+            {[
+              { key: "published", en: "Published", arLabel: "منشور" },
+              { key: "draft", en: "Draft", arLabel: "مسودة" },
+            ].map((s) => (
+              <button
+                key={s.key}
+                onClick={() => set("status", s.key)}
+                className={`flex-1 py-2.5 rounded-xl text-xs font-semibold border ${
+                  form.status === s.key
+                    ? "bg-role-service-provider text-white border-role-service-provider"
+                    : "bg-card text-foreground border-border"
+                }`}
+              >
+                {ar ? s.arLabel : s.en}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-service-provider text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
+          {submitting
+            ? ar ? "جاري الحفظ..." : "Saving..."
+            : isEdit ? (ar ? "حفظ التغييرات" : "Save Changes") : (ar ? "نشر مكان الإقامة" : "Publish Stay")}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default NewAccommodation;

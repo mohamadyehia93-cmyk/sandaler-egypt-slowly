@@ -53,6 +53,22 @@ const ServiceProviderDashboard = () => {
     },
   });
 
+  // Stays and transport are owned by the same provider record as experiences.
+  const { data: extraCounts = { stays: 0, rides: 0 } } = useQuery({
+    queryKey: ["sp-stay-ride-counts", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const providerId = await fetchMyProviderId(user!.id);
+      if (!providerId) return { stays: 0, rides: 0 };
+      const [stays, rides] = await Promise.all([
+        supabase.from("accommodations").select("*", { count: "exact", head: true }).eq("host_id", providerId),
+        supabase.from("transport").select("*", { count: "exact", head: true }).eq("provider_id", providerId),
+      ]);
+      return { stays: stays.count ?? 0, rides: rides.count ?? 0 };
+    },
+  });
+
+
 
   const { data: bookings = [] } = useQuery({
     queryKey: ["sp-bookings", user?.id],
@@ -77,7 +93,9 @@ const ServiceProviderDashboard = () => {
   const pending = bookings.find((b) => b.status === "pending" || b.status === "pending_payment");
 
   const overview = [
-    { value: String(listingsCount), label: lang === "ar" ? "قوائم نشطة" : "Active Listings", path: "/dashboard/service-provider/my-listings" },
+    { value: String(listingsCount), label: lang === "ar" ? "تجارب" : "Experiences", path: "/dashboard/service-provider/my-listings" },
+    { value: String(extraCounts.stays), label: lang === "ar" ? "أماكن إقامة" : "Stays", path: "/dashboard/service-provider/my-stays" },
+    { value: String(extraCounts.rides), label: lang === "ar" ? "خدمات نقل" : "Transport", path: "/dashboard/service-provider/my-rides" },
     { value: String(bookingsThisWeek), label: lang === "ar" ? "حجوزات هذا الأسبوع" : "Bookings This Week", path: "/dashboard/service-provider" },
     { value: revenue.toLocaleString(), label: lang === "ar" ? "إيرادات مؤكدة" : "Confirmed Revenue", suffix: lang === "ar" ? "ج.م" : "EGP", path: "/profile/impact" },
     { value: String(bookings.length), label: lang === "ar" ? "إجمالي الحجوزات" : "Total Bookings", path: "/dashboard/service-provider" },
@@ -226,10 +244,28 @@ const ServiceProviderDashboard = () => {
 
         <OwnerReservationRequests itemTypes={["accommodation", "transport"]} accentBg="bg-role-service-provider" />
 
-        {/* Quick Action */}
-        <button onClick={() => navigate("/dashboard/service-provider/new-experience")} className="w-full bg-role-service-provider text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
-          <Plus className="w-4 h-4" /> {lang === "ar" ? "تجربة جديدة" : "New Experience"}
-        </button>
+        {/* Quick Actions — everything this role can publish */}
+        <div className="space-y-2">
+          <button onClick={() => navigate("/dashboard/service-provider/new-experience")} className="w-full bg-role-service-provider text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
+            <Plus className="w-4 h-4" /> {lang === "ar" ? "تجربة جديدة" : "New Experience"}
+          </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={() => navigate("/dashboard/service-provider/new-stay")} className="border border-role-service-provider text-role-service-provider rounded-xl py-3 font-semibold text-xs flex items-center justify-center gap-1.5">
+              <Plus className="w-3.5 h-3.5" /> {lang === "ar" ? "مكان إقامة" : "Add a Stay"}
+            </button>
+            <button onClick={() => navigate("/dashboard/service-provider/new-transport")} className="border border-role-service-provider text-role-service-provider rounded-xl py-3 font-semibold text-xs flex items-center justify-center gap-1.5">
+              <Plus className="w-3.5 h-3.5" /> {lang === "ar" ? "خدمة نقل" : "Add Transport"}
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={() => navigate("/dashboard/service-provider/my-stays")} className="border border-border bg-card rounded-xl py-2.5 font-semibold text-xs text-foreground">
+              {lang === "ar" ? "أماكن الإقامة" : "My Stays"}
+            </button>
+            <button onClick={() => navigate("/dashboard/service-provider/my-rides")} className="border border-border bg-card rounded-xl py-2.5 font-semibold text-xs text-foreground">
+              {lang === "ar" ? "خدمات النقل" : "My Transport"}
+            </button>
+          </div>
+        </div>
       </div>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-role-service-provider flex justify-around py-2 z-50">

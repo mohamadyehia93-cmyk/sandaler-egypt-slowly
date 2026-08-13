@@ -9,7 +9,7 @@ import { bylineNames } from "@/lib/postByline";
 // Sample experiences/posts used to be merged into the DB results here, so a region
 // page mixed fabricated listings (with their own invented ratings and prices) in
 // with real ones. Only real rows are rendered now.
-import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents, useTrips, useProducts } from "@/hooks/useListings";
+import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents, useTrips, useProducts, useAccommodations, useTransport } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
 import CausesSection from "@/components/CausesSection";
@@ -163,6 +163,8 @@ const RegionDetail = () => {
   const { data: dbEvents = [] } = useEvents();
   const { data: dbTrips = [] } = useTrips();
   const { data: dbProducts = [] } = useProducts();
+  const { data: dbStays = [] } = useAccommodations();
+  const { data: dbTransport = [] } = useTransport();
   // City copy comes from the cities table, not the sample cityData map, so a
   // selected city can never show another city's overview.
   const { data: selectedCityRow } = useQuery({
@@ -228,6 +230,27 @@ const RegionDetail = () => {
         cityId: p.city_id, regionId: p.region_id,
       })),
     ])
+  );
+  // Stays and transport carry city_id/region_id from the provider's city picker.
+  const regionStays = cityFilter(
+    dedupe(
+      (dbStays as any[]).filter((s) => s.region_id === regionId).map((s) => ({
+        id: s.slug || s.id, slug: s.slug,
+        title: { en: s.name_en, ar: s.name_ar || s.name_en },
+        image: s.image, price: s.price_per_night ?? 0,
+        cityId: s.city_id, regionId: s.region_id,
+      }))
+    )
+  );
+  const regionTransport = cityFilter(
+    dedupe(
+      (dbTransport as any[]).filter((tr) => tr.region_id === regionId).map((tr) => ({
+        id: tr.slug || tr.id, slug: tr.slug,
+        title: { en: tr.name_en, ar: tr.name_ar || tr.name_en },
+        image: tr.image, price: tr.price ?? 0,
+        cityId: tr.city_id, regionId: tr.region_id,
+      }))
+    )
   );
   const regionEvents = (dbEvents as any[])
     .filter((e) => e.region_id === regionId)
@@ -476,6 +499,53 @@ const RegionDetail = () => {
             </div>
           </SectionHeader>
         )}
+
+        {/* Places to Stay */}
+        {regionStays.length > 0 && (
+          <SectionHeader titleKey="section.placesToStay">
+            <div className="grid grid-cols-3 gap-3 px-4">
+              {regionStays.slice(0, 3).map((s) => (
+                <div key={s.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${s.slug || s.id}`)}>
+                  <div className="relative h-32">
+                    {s.image ? (
+                      <img src={s.image} alt={s.title[lang]} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-secondary" />
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">{s.title[lang]}</h3>
+                    <span className="text-sm font-bold text-primary-dark">{s.price} {t("common.egp")}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionHeader>
+        )}
+
+        {/* Getting Around */}
+        {regionTransport.length > 0 && (
+          <SectionHeader titleKey="section.gettingAround">
+            <div className="grid grid-cols-3 gap-3 px-4">
+              {regionTransport.slice(0, 3).map((tr) => (
+                <div key={tr.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/transport/${tr.slug || tr.id}`)}>
+                  <div className="relative h-32">
+                    {tr.image ? (
+                      <img src={tr.image} alt={tr.title[lang]} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-secondary" />
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">{tr.title[lang]}</h3>
+                    <span className="text-sm font-bold text-primary-dark">{tr.price} {t("common.egp")}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionHeader>
+        )}
+
 
         {/* Audio Tours */}
         {regionAudioTours.length > 0 && (
