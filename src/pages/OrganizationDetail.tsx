@@ -29,8 +29,6 @@ type Org = {
   location_en: string | null; location_ar: string | null;
   logo: string | null; image: string | null;
   website: string | null;
-  volunteers_count: number | null;
-  donations_total: number | null;
   focus_areas_en: string[] | null; focus_areas_ar: string[] | null;
   status: string | null;
 };
@@ -44,7 +42,7 @@ type Cause = {
   id: string; slug: string | null;
   title_en: string; title_ar: string;
   summary_en: string | null; summary_ar: string | null;
-  image: string | null; raised: number | null; goal: number | null;
+  image: string | null;
 };
 
 const isImageUrl = (v: string | null) => !!v && /^(https?:|\/)/.test(v);
@@ -90,7 +88,7 @@ const OrganizationDetail = () => {
               .order("created_at", { ascending: false }),
             supabase
               .from("causes")
-              .select("id, slug, title_en, title_ar, summary_en, summary_ar, image, raised, goal")
+              .select("id, slug, title_en, title_ar, summary_en, summary_ar, image")
               .eq("owner_id", o.owner_id)
               .order("created_at", { ascending: false }),
           ]);
@@ -264,22 +262,6 @@ const OrganizationDetail = () => {
         </div>
       </div>
 
-      {/* Quick stats */}
-      <div className="px-4 mt-3 grid grid-cols-2 gap-2">
-        <div className="bg-card rounded-xl border border-border p-3 text-center">
-          <Users className="w-4 h-4 text-primary mx-auto mb-1" />
-          <p className="text-sm font-bold text-foreground tabular-nums">{org.volunteers_count ?? 0}</p>
-          <p className="text-[10px] text-muted-foreground">{lang === "ar" ? "متطوعون" : "Volunteers"}</p>
-        </div>
-        <div className="bg-card rounded-xl border border-border p-3 text-center">
-          <HandCoins className="w-4 h-4 text-primary mx-auto mb-1" />
-          <p className="text-sm font-bold text-foreground tabular-nums">
-            {(org.donations_total ?? 0).toLocaleString()}
-          </p>
-          <p className="text-[10px] text-muted-foreground">{lang === "ar" ? "تبرعات (ج.م)" : `Donations (${t("common.egp")})`}</p>
-        </div>
-      </div>
-
       {/* Today's Status */}
       <div className="px-4 mt-4">
         {user ? (
@@ -344,7 +326,6 @@ const OrganizationDetail = () => {
           </h2>
           <div className="space-y-2">
             {causes.map((c) => {
-              const pct = c.goal ? Math.round(((c.raised ?? 0) / c.goal) * 100) : 0;
               return (
                 <div key={c.id} className="flex items-center gap-3 bg-card rounded-xl border border-border p-3">
                   <img src={c.image || "/placeholder.svg"} alt="" className="w-14 h-14 rounded-lg object-cover shrink-0" />
@@ -355,14 +336,6 @@ const OrganizationDetail = () => {
                     <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">
                       {lang === "ar" ? (c.summary_ar || c.summary_en) : c.summary_en}
                     </p>
-                    {c.goal ? (
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <div className="flex-1 bg-border rounded-full h-1">
-                          <div className="bg-primary h-1 rounded-full" style={{ width: `${Math.min(pct, 100)}%` }} />
-                        </div>
-                        <span className="text-[10px] text-primary font-semibold">{pct}%</span>
-                      </div>
-                    ) : null}
                   </div>
                 </div>
               );

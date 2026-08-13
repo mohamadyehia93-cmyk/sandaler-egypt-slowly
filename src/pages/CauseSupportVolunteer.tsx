@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import NotFoundView from "@/components/NotFound";
+import CauseUnmanagedNotice from "@/components/CauseUnmanagedNotice";
 
 /**
  * These are generic categories of help a visitor can OFFER — not availability
@@ -78,6 +79,8 @@ const CauseSupportVolunteer = () => {
 
   if (causeLoading) return <div className="min-h-screen bg-background" />;
   if (!cause) return <NotFoundView context="cause" />;
+  // Ownerless cause: nobody could ever receive or answer this request.
+  if (!cause.ownerId) return <CauseUnmanagedNotice causeHref={`/cause/${id}`} />;
 
   const opp = selectedOpp !== null ? volunteerRoles[selectedOpp] : null;
 

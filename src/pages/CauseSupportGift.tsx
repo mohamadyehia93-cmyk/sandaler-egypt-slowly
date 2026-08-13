@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import { useCauseRow } from "@/lib/causeRow";
 import { useState } from "react";
 import NotFoundView from "@/components/NotFound";
+import CauseUnmanagedNotice from "@/components/CauseUnmanagedNotice";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { submitPledge } from "@/lib/submitPledge";
@@ -81,6 +82,8 @@ const CauseSupportGift = () => {
 
   if (causeLoading) return <div className="min-h-screen bg-background" />;
   if (!cause) return <NotFoundView context="cause" />;
+  // Ownerless cause: nobody could ever receive or answer this request.
+  if (!cause.ownerId) return <CauseUnmanagedNotice causeHref={`/cause/${id}`} />;
 
   const pkg = selectedPkg !== null ? giftPackages[selectedPkg] : null;
 

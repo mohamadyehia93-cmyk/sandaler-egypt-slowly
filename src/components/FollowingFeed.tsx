@@ -113,7 +113,7 @@ const FollowingFeed = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("causes")
-        .select("id, slug, title_en, title_ar, summary_en, summary_ar, image, supporters, category_en, category_ar, owner_id")
+        .select("id, slug, title_en, title_ar, summary_en, summary_ar, image, category_en, category_ar, owner_id")
         .in("owner_id", orgOwnerIds)
         .eq("status", "published")
         .order("created_at", { ascending: false })
@@ -146,9 +146,9 @@ const FollowingFeed = () => {
       const [orgs, actors, people] = await Promise.all([
         supabase
           .from("organizations")
-          .select("id, slug, name_en, name_ar, logo, image, org_type, volunteers_count")
+          .select("id, slug, name_en, name_ar, logo, image, org_type")
           .eq("status", "published")
-          .order("volunteers_count", { ascending: false, nullsFirst: false })
+          .order("created_at", { ascending: false })
           .limit(8),
         supabase
           .from("culture_actors")
@@ -280,7 +280,7 @@ const FollowingFeed = () => {
                       <div className="flex items-center justify-between px-3 py-2.5">
                         <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <Heart className="w-3.5 h-3.5 text-primary" />
-                          {c.supporters ?? 0} {lang === "ar" ? "داعم" : "supporters"}
+                          {lang === "ar" ? (c.category_ar || c.category_en || "قضية") : (c.category_en || "Cause")}
                         </span>
                         <span className="flex items-center gap-1 text-xs font-semibold text-primary">
                           {lang === "ar" ? "اعرف المزيد" : "Learn more"}
