@@ -116,7 +116,7 @@ const WhosWhoDashboard = () => {
         <SessionRequestsList accentText="text-role-whos-who" />
 
         {/* Upcoming Sessions — real meetup rows */}
-        <div className="bg-card rounded-xl shadow-card p-4">
+        <div onClick={() => navigate("/dashboard/whos-who/my-sessions")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer hover:shadow-md transition-shadow">
           <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4 text-role-whos-who" />
             {lang === "ar" ? "الجلسات القادمة" : "Upcoming Sessions"}
