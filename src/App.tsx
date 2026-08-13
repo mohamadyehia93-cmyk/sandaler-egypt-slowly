@@ -70,6 +70,10 @@ const MyCommissions = lazy(() => import("./pages/MyCommissions.tsx"));
 const NewEvent = lazy(() => import("./pages/dashboards/NewEvent.tsx"));
 const MyEvents = lazy(() => import("./pages/dashboards/MyEvents.tsx"));
 const EventsDashboard = lazy(() => import("./pages/dashboards/EventsDashboard.tsx"));
+const NewAccommodation = lazy(() => import("./pages/dashboards/NewAccommodation.tsx"));
+const NewTransport = lazy(() => import("./pages/dashboards/NewTransport.tsx"));
+const MyStays = lazy(() => import("./pages/dashboards/MyStays.tsx"));
+const MyRides = lazy(() => import("./pages/dashboards/MyRides.tsx"));
 const ProviderProfile = lazy(() => import("./pages/ProviderProfile.tsx"));
 const CultureActorDashboard = lazy(() => import("./pages/dashboards/CultureActorDashboard.tsx"));
 const ServiceProviderDashboard = lazy(() => import("./pages/dashboards/ServiceProviderDashboard.tsx"));
@@ -221,6 +225,12 @@ const App = () => {
             <Route path="/dashboard/service-provider/my-listings" element={<MyListings />} />
             <Route path="/dashboard/service-provider/edit-experience/:id" element={<NewExperience />} />
             <Route path="/dashboard/service-provider/listing/:id/slots" element={<ExperienceSlots />} />
+            <Route path="/dashboard/service-provider/new-stay" element={<NewAccommodation />} />
+            <Route path="/dashboard/service-provider/edit-stay/:id" element={<NewAccommodation />} />
+            <Route path="/dashboard/service-provider/my-stays" element={<MyStays />} />
+            <Route path="/dashboard/service-provider/new-transport" element={<NewTransport />} />
+            <Route path="/dashboard/service-provider/edit-transport/:id" element={<NewTransport />} />
+            <Route path="/dashboard/service-provider/my-rides" element={<MyRides />} />
             <Route path="/dashboard/service-provider" element={<ServiceProviderDashboard />} />
             <Route path="/dashboard/whos-who/new-session" element={<NewSession />} />
             <Route path="/dashboard/whos-who/my-sessions" element={<MySessions />} />

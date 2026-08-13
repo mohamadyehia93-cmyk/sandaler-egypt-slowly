@@ -18,82 +18,121 @@ export type Database = {
         Row: {
           accommodation_type: string | null
           amenities: string[] | null
+          bathrooms: number | null
+          bedrooms: number | null
+          cancellation_ar: string | null
+          cancellation_en: string | null
+          check_in_time: string | null
+          check_out_time: string | null
           city_id: string | null
           created_at: string
+          currency: string
           description_ar: string | null
           description_en: string | null
           host_id: string | null
           host_image: string | null
           host_name_ar: string | null
           host_name_en: string | null
+          house_rules_ar: string | null
+          house_rules_en: string | null
           id: string
           image: string | null
           images: string[] | null
           latitude: number | null
           longitude: number | null
+          min_nights: number | null
           name_ar: string | null
           name_en: string
           price_per_night: number
           rating: number | null
           region_id: string | null
           reviews_count: number | null
+          sleeps: number | null
           slug: string | null
           status: string | null
           translation_meta: Json
+          unit_type_ar: string | null
+          unit_type_en: string | null
           updated_at: string
         }
         Insert: {
           accommodation_type?: string | null
           amenities?: string[] | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          cancellation_ar?: string | null
+          cancellation_en?: string | null
+          check_in_time?: string | null
+          check_out_time?: string | null
           city_id?: string | null
           created_at?: string
+          currency?: string
           description_ar?: string | null
           description_en?: string | null
           host_id?: string | null
           host_image?: string | null
           host_name_ar?: string | null
           host_name_en?: string | null
+          house_rules_ar?: string | null
+          house_rules_en?: string | null
           id?: string
           image?: string | null
           images?: string[] | null
           latitude?: number | null
           longitude?: number | null
+          min_nights?: number | null
           name_ar?: string | null
           name_en: string
           price_per_night?: number
           rating?: number | null
           region_id?: string | null
           reviews_count?: number | null
+          sleeps?: number | null
           slug?: string | null
           status?: string | null
           translation_meta?: Json
+          unit_type_ar?: string | null
+          unit_type_en?: string | null
           updated_at?: string
         }
         Update: {
           accommodation_type?: string | null
           amenities?: string[] | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          cancellation_ar?: string | null
+          cancellation_en?: string | null
+          check_in_time?: string | null
+          check_out_time?: string | null
           city_id?: string | null
           created_at?: string
+          currency?: string
           description_ar?: string | null
           description_en?: string | null
           host_id?: string | null
           host_image?: string | null
           host_name_ar?: string | null
           host_name_en?: string | null
+          house_rules_ar?: string | null
+          house_rules_en?: string | null
           id?: string
           image?: string | null
           images?: string[] | null
           latitude?: number | null
           longitude?: number | null
+          min_nights?: number | null
           name_ar?: string | null
           name_en?: string
           price_per_night?: number
           rating?: number | null
           region_id?: string | null
           reviews_count?: number | null
+          sleeps?: number | null
           slug?: string | null
           status?: string | null
           translation_meta?: Json
+          unit_type_ar?: string | null
+          unit_type_en?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -2538,17 +2577,27 @@ export type Database = {
           capacity: number | null
           city_id: string | null
           created_at: string
+          currency: string
+          departure_point_ar: string | null
+          departure_point_en: string | null
           description_ar: string | null
           description_en: string | null
           duration: string | null
           frequency: string | null
           from_ar: string | null
           from_en: string | null
+          hire_type: string | null
           id: string
           image: string | null
+          images: string[] | null
+          latitude: number | null
+          longitude: number | null
           name_ar: string | null
           name_en: string
+          notes_ar: string | null
+          notes_en: string | null
           price: number
+          price_basis: string | null
           provider_id: string | null
           provider_image: string | null
           provider_name_ar: string | null
@@ -2556,6 +2605,8 @@ export type Database = {
           rating: number | null
           region_id: string | null
           reviews_count: number | null
+          schedule_ar: string | null
+          schedule_en: string | null
           slug: string | null
           status: string | null
           to_ar: string | null
@@ -2568,17 +2619,27 @@ export type Database = {
           capacity?: number | null
           city_id?: string | null
           created_at?: string
+          currency?: string
+          departure_point_ar?: string | null
+          departure_point_en?: string | null
           description_ar?: string | null
           description_en?: string | null
           duration?: string | null
           frequency?: string | null
           from_ar?: string | null
           from_en?: string | null
+          hire_type?: string | null
           id?: string
           image?: string | null
+          images?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           name_ar?: string | null
           name_en: string
+          notes_ar?: string | null
+          notes_en?: string | null
           price?: number
+          price_basis?: string | null
           provider_id?: string | null
           provider_image?: string | null
           provider_name_ar?: string | null
@@ -2586,6 +2647,8 @@ export type Database = {
           rating?: number | null
           region_id?: string | null
           reviews_count?: number | null
+          schedule_ar?: string | null
+          schedule_en?: string | null
           slug?: string | null
           status?: string | null
           to_ar?: string | null
@@ -2598,17 +2661,27 @@ export type Database = {
           capacity?: number | null
           city_id?: string | null
           created_at?: string
+          currency?: string
+          departure_point_ar?: string | null
+          departure_point_en?: string | null
           description_ar?: string | null
           description_en?: string | null
           duration?: string | null
           frequency?: string | null
           from_ar?: string | null
           from_en?: string | null
+          hire_type?: string | null
           id?: string
           image?: string | null
+          images?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           name_ar?: string | null
           name_en?: string
+          notes_ar?: string | null
+          notes_en?: string | null
           price?: number
+          price_basis?: string | null
           provider_id?: string | null
           provider_image?: string | null
           provider_name_ar?: string | null
@@ -2616,6 +2689,8 @@ export type Database = {
           rating?: number | null
           region_id?: string | null
           reviews_count?: number | null
+          schedule_ar?: string | null
+          schedule_en?: string | null
           slug?: string | null
           status?: string | null
           to_ar?: string | null
