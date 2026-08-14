@@ -36,6 +36,7 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<Suggestion[]>([]);
   const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState(false);
   const debounce = useRef<ReturnType<typeof setTimeout>>();
 
   // Init the map once.
