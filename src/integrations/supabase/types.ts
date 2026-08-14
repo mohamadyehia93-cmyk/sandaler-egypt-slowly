@@ -39,6 +39,7 @@ export type Database = {
           image: string | null
           images: string[] | null
           latitude: number | null
+          listing_kind: string
           longitude: number | null
           min_nights: number | null
           name_ar: string | null
@@ -79,6 +80,7 @@ export type Database = {
           image?: string | null
           images?: string[] | null
           latitude?: number | null
+          listing_kind?: string
           longitude?: number | null
           min_nights?: number | null
           name_ar?: string | null
@@ -119,6 +121,7 @@ export type Database = {
           image?: string | null
           images?: string[] | null
           latitude?: number | null
+          listing_kind?: string
           longitude?: number | null
           min_nights?: number | null
           name_ar?: string | null
@@ -2591,6 +2594,7 @@ export type Database = {
           image: string | null
           images: string[] | null
           latitude: number | null
+          listing_kind: string
           longitude: number | null
           name_ar: string | null
           name_en: string
@@ -2633,6 +2637,7 @@ export type Database = {
           image?: string | null
           images?: string[] | null
           latitude?: number | null
+          listing_kind?: string
           longitude?: number | null
           name_ar?: string | null
           name_en: string
@@ -2675,6 +2680,7 @@ export type Database = {
           image?: string | null
           images?: string[] | null
           latitude?: number | null
+          listing_kind?: string
           longitude?: number | null
           name_ar?: string | null
           name_en?: string
