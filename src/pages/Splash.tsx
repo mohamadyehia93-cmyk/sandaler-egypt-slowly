@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { roleLabels, type UserRole, type LocalRole } from "@/hooks/useUserRole";
 import { useRegions, useCities } from "@/hooks/useListings";
 import { useAuth } from "@/hooks/useAuth";
-import { becomeProvider } from "@/lib/becomeProvider";
+import { becomeProvider, providerErrorMessage } from "@/lib/becomeProvider";
 import { uploadImages } from "@/lib/dashboardForms";
 import { supabase } from "@/integrations/supabase/client";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";

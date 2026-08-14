@@ -267,3 +267,40 @@ export async function becomeProvider(
 
 }
 
+
+/**
+ * Turns a becomeProvider error into a readable bilingual sentence. A wrong or
+ * cryptic message costs a provider their whole form, so we name the real cause.
+ */
+export function providerErrorMessage(error: string | null, lang: string): string {
+  const ar = lang === "ar";
+  const raw = error || "";
+  if (raw.startsWith("session-expired") || raw.startsWith("session-unavailable")) {
+    return ar
+      ? "انتهت صلاحية جلستك. سجّل الدخول مرة أخرى ثم أعد الإرسال — بياناتك محفوظة."
+      : "Your session expired. Sign in again and resubmit — your details are kept.";
+  }
+  if (/permission denied|row-level security|violates row-level/i.test(raw)) {
+    return ar
+      ? "لا تسمح صلاحيات الحساب بإنشاء ملف مزوّد. تواصل مع الدعم."
+      : "Your account is not permitted to create a provider profile. Contact support.";
+  }
+  if (/null value in column "(.+?)"/i.test(raw)) {
+    const col = raw.match(/null value in column "(.+?)"/i)?.[1];
+    return ar
+      ? `حقل مطلوب ناقص (${col}). أكمله ثم أعد الإرسال.`
+      : `A required field is missing (${col}). Fill it in and resubmit.`;
+  }
+  if (/duplicate key|already exists/i.test(raw)) {
+    return ar
+      ? "يوجد ملف مزوّد بهذا الاسم بالفعل. جرّب اسمًا مختلفًا."
+      : "A provider profile with these details already exists. Try a different name.";
+  }
+  if (/fetch|network|failed to/i.test(raw)) {
+    return ar
+      ? "تعذّر الاتصال بالخدمة. تحقّق من الإنترنت وأعد الإرسال — بياناتك محفوظة."
+      : "Could not reach the service. Check your connection and resubmit — your details are kept.";
+  }
+  const base = ar ? "تعذّر إنشاء ملف المزوّد" : "Could not set up your provider profile";
+  return raw ? `${base} — ${raw}` : base;
+}
