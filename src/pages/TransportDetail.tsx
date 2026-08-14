@@ -18,6 +18,7 @@ import MessageOwnerButton from "@/components/MessageOwnerButton";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { Skeleton } from "@/components/ui/skeleton";
 import NotFoundView from "@/components/NotFound";
+import { str, num } from "@/lib/rowValues";
 
 const TRANSPORT_EMOJI: Record<string, string> = {
   felucca: "⛵", "tuk-tuk": "🛺", bus: "🚌", "private-car": "🚗", boat: "🛥️",
@@ -273,15 +274,15 @@ const TransportDetail = () => {
           <h2 className="text-base font-bold text-primary-dark mb-3">{isAr ? "خيارات نقل مشابهة" : "Similar rides"}</h2>
           <div className="grid grid-cols-3 gap-3">
             {similar.map((s: Record<string, unknown> & { id: string }) => (
-              <div key={s.id} onClick={() => navigate(`/transport/${s.slug || s.id}`)}
+              <div key={s.id} onClick={() => navigate(`/transport/${str(s.slug) || s.id}`)}
                    className="rounded-lg shadow-card bg-card p-3 cursor-pointer">
-                <span className="text-3xl">{TRANSPORT_EMOJI[s.transport_type] || "🚐"}</span>
+                <span className="text-3xl">{TRANSPORT_EMOJI[str(s.transport_type)] || "🚐"}</span>
                 <h3 className="text-xs font-semibold text-foreground line-clamp-2 mt-2">
-                  {isAr ? s.name_ar || s.name_en : s.name_en}
+                  {isAr ? str(s.name_ar) || str(s.name_en) : str(s.name_en)}
                 </h3>
                 <p className="text-sm font-bold text-primary-dark mt-1">
-                  {Number(s.price || 0).toLocaleString(isAr ? "ar-EG" : "en-US")}{" "}
-                  {isAr && (s.currency || "EGP") === "EGP" ? t("common.egp") : s.currency || "EGP"}
+                  {num(s.price).toLocaleString(isAr ? "ar-EG" : "en-US")}{" "}
+                  {isAr && (str(s.currency) || "EGP") === "EGP" ? t("common.egp") : str(s.currency) || "EGP"}
                 </p>
               </div>
             ))}

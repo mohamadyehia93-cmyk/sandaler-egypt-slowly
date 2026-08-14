@@ -76,19 +76,19 @@ const MyRides = () => {
             <div key={e.id} className="bg-card rounded-xl shadow-card p-3 space-y-3">
               <div className="flex gap-3 items-center">
                 <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary shrink-0 flex items-center justify-center">
-                  {e.image ? <img src={e.image} alt="" className="w-full h-full object-cover" /> : <span className="text-2xl">{TRANSPORT_EMOJI[e.transport_type] || "🚐"}</span>}
+                  {str(e.image) ? <img src={str(e.image)} alt="" className="w-full h-full object-cover" /> : <span className="text-2xl">{TRANSPORT_EMOJI[str(e.transport_type)] || "🚐"}</span>}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground line-clamp-1">{ar ? (e.name_ar || e.name_en) : e.name_en}</p>
+                  <p className="text-sm font-semibold text-foreground line-clamp-1">{ar ? (str(e.name_ar) || str(e.name_en)) : str(e.name_en)}</p>
                   <p className="text-[11px] text-muted-foreground">
-                    {e.price ? `${e.price} ${(e.currency || "EGP") === "EGP" && ar ? "ج.م" : e.currency || "EGP"}` : "—"}
-                    {e.transport_type ? ` · ${transportTypeLabel(e.transport_type, lang)}` : ""}
+                    {num(e.price) ? `${num(e.price)} ${(str(e.currency) || "EGP") === "EGP" && ar ? "ج.م" : str(e.currency) || "EGP"}` : "—"}
+                    {str(e.transport_type) ? ` · ${transportTypeLabel(str(e.transport_type), lang)}` : ""}
                   </p>
                   <span className={`text-[10px] font-medium ${e.status === "published" ? "text-success" : "text-muted-foreground"}`}>
                     {e.status === "published" ? (ar ? "منشور" : "published") : (ar ? "مسودة" : "draft")}
                   </span>
                 </div>
-                <PreviewButton path={`/transport/${e.slug || e.id}`} className="bg-role-service-provider/10 text-role-service-provider" />
+                <PreviewButton path={`/transport/${str(e.slug) || e.id}`} className="bg-role-service-provider/10 text-role-service-provider" />
                 <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive" aria-label={ar ? "حذف" : "Delete"}>
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -97,7 +97,7 @@ const MyRides = () => {
                 <button onClick={() => navigate(`/dashboard/service-provider/edit-transport/${e.id}`)} className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-border text-[11px] font-semibold text-foreground">
                   <Pencil className="w-3.5 h-3.5" /> {ar ? "تعديل" : "Edit"}
                 </button>
-                <button onClick={() => toggleStatus(e.id, e.status)} className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-border text-[11px] font-semibold text-foreground">
+                <button onClick={() => toggleStatus(e.id, str(e.status))} className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg border border-border text-[11px] font-semibold text-foreground">
                   {e.status === "published" ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                   {e.status === "published" ? (ar ? "إخفاء" : "Unpublish") : (ar ? "نشر" : "Publish")}
                 </button>

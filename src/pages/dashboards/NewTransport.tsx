@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages } from "@/lib/dashboardForms";
 import { fetchMyProviderId } from "@/lib/providerRecord";
+import { str, strArray } from "@/lib/rowValues";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import CityPicker from "@/components/dashboard/CityPicker";
 import LocationPicker from "@/components/dashboard/LocationPicker";
@@ -82,40 +83,40 @@ const NewTransport = () => {
       }
       const row = data as Record<string, unknown>;
       setForm({
-        nameEn: row.name_en || "",
-        nameAr: row.name_ar || "",
-        descriptionEn: row.description_en || "",
-        descriptionAr: row.description_ar || "",
-        fromEn: row.from_en || "",
-        fromAr: row.from_ar || "",
-        toEn: row.to_en || "",
-        toAr: row.to_ar || "",
-        departureEn: row.departure_point_en || "",
-        departureAr: row.departure_point_ar || "",
-        scheduleEn: row.schedule_en || "",
-        scheduleAr: row.schedule_ar || "",
-        notesEn: row.notes_en || "",
-        notesAr: row.notes_ar || "",
-        transportType: row.transport_type || "",
-        hireType: row.hire_type || "",
-        priceBasis: row.price_basis || "",
-        cityId: row.city_id || "",
-        regionId: row.region_id || "",
+        nameEn: str(row.name_en) || "",
+        nameAr: str(row.name_ar) || "",
+        descriptionEn: str(row.description_en) || "",
+        descriptionAr: str(row.description_ar) || "",
+        fromEn: str(row.from_en) || "",
+        fromAr: str(row.from_ar) || "",
+        toEn: str(row.to_en) || "",
+        toAr: str(row.to_ar) || "",
+        departureEn: str(row.departure_point_en) || "",
+        departureAr: str(row.departure_point_ar) || "",
+        scheduleEn: str(row.schedule_en) || "",
+        scheduleAr: str(row.schedule_ar) || "",
+        notesEn: str(row.notes_en) || "",
+        notesAr: str(row.notes_ar) || "",
+        transportType: str(row.transport_type) || "",
+        hireType: str(row.hire_type) || "",
+        priceBasis: str(row.price_basis) || "",
+        cityId: str(row.city_id) || "",
+        regionId: str(row.region_id) || "",
         price: row.price != null ? String(row.price) : "",
-        currency: row.currency || "EGP",
+        currency: str(row.currency) || "EGP",
         capacity: row.capacity != null ? String(row.capacity) : "",
-        duration: row.duration || "",
-        frequency: row.frequency || "",
+        duration: str(row.duration) || "",
+        frequency: str(row.frequency) || "",
         lat: row.latitude != null ? String(row.latitude) : "",
         lng: row.longitude != null ? String(row.longitude) : "",
-        status: row.status || "published",
+        status: str(row.status) || "published",
       });
       setMeta((row.translation_meta as TranslationMeta) || {});
       setExistingImages(
-        Array.isArray(row.images) && row.images.length > 0
-          ? row.images.filter(Boolean)
-          : row.image
-            ? [row.image]
+        strArray(row.images).length > 0
+          ? strArray(row.images)
+          : str(row.image)
+            ? [str(row.image)]
             : []
       );
     })();

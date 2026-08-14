@@ -11,6 +11,7 @@ import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { supabase } from "@/integrations/supabase/client";
 import { accommodationTypeLabel } from "@/lib/listingTaxonomy";
 import { cn } from "@/lib/utils";
+import { str, num } from "@/lib/rowValues";
 
 import WishlistButton from "@/components/WishlistButton";
 import ShareButton from "@/components/ShareButton";
@@ -262,15 +263,15 @@ const AccommodationDetail = () => {
           <h2 className="text-base font-bold text-primary-dark mb-3">{ar ? "أماكن إقامة قريبة" : "Nearby stays"}</h2>
           <div className="grid grid-cols-3 gap-3">
             {similar.map((s: Record<string, unknown> & { id: string }) => (
-              <div key={s.id} onClick={() => navigate(`/stay/${s.slug || s.id}`)} className="rounded-lg shadow-card bg-card overflow-hidden cursor-pointer">
+              <div key={s.id} onClick={() => navigate(`/stay/${str(s.slug) || s.id}`)} className="rounded-lg shadow-card bg-card overflow-hidden cursor-pointer">
                 <div className="h-16 bg-secondary">
-                  {s.image && <img src={s.image} alt="" className="w-full h-full object-cover" />}
+                  {str(s.image) && <img src={str(s.image)} alt="" className="w-full h-full object-cover" />}
                 </div>
                 <div className="p-2">
-                  <h3 className="text-[11px] font-semibold text-foreground line-clamp-2">{ar ? s.name_ar || s.name_en : s.name_en}</h3>
+                  <h3 className="text-[11px] font-semibold text-foreground line-clamp-2">{ar ? str(s.name_ar) || str(s.name_en) : str(s.name_en)}</h3>
                   <p className="text-[10px] text-muted-foreground mt-0.5">
-                    {Number(s.price_per_night || 0).toLocaleString(ar ? "ar-EG" : "en-US")}{" "}
-                    {ar && (s.currency || "EGP") === "EGP" ? t("common.egp") : s.currency || "EGP"}
+                    {num(s.price_per_night).toLocaleString(ar ? "ar-EG" : "en-US")}{" "}
+                    {ar && (str(s.currency) || "EGP") === "EGP" ? t("common.egp") : str(s.currency) || "EGP"}
                   </p>
                 </div>
               </div>
