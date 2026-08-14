@@ -1,17 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import { Search, Loader2, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { EGYPT_CENTER } from "@/lib/cityCoords";
-
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-});
+import { loadGoogleMaps, hasGoogleMapsKey } from "@/lib/googleMaps";
 
 interface Props {
   lat: string;
@@ -21,78 +12,152 @@ interface Props {
   onChange: (lat: number, lng: number) => void;
 }
 
-const Recenter = ({ center, zoom }: { center: [number, number]; zoom?: number }) => {
-  const map = useMap();
-  useEffect(() => {
-    map.setView(center, zoom ?? map.getZoom());
-  }, [center[0], center[1], zoom]);
-  return null;
-};
+type Suggestion = { label: string; secondary: string; placeId: string };
 
-const ClickCapture = ({ onChange }: { onChange: (lat: number, lng: number) => void }) => {
-  useMapEvents({
-    click: (e) => onChange(e.latlng.lat, e.latlng.lng),
-  });
-  return null;
-};
-
-type Hit = { display_name: string; lat: string; lon: string };
-
+/**
+ * Google Maps location picker: search a real place, tap the map, or drag the
+ * marker. Reports plain lat/lng so every caller stays unchanged.
+ */
 const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
   const { lang } = useI18n();
   const ar = lang === "ar";
-  const hasPin = !!lat && !!lng && !Number.isNaN(Number(lat)) && !Number.isNaN(Number(lng));
-  const pin: [number, number] | null = hasPin ? [Number(lat), Number(lng)] : null;
 
+  const hasPin = !!lat && !!lng && !Number.isNaN(Number(lat)) && !Number.isNaN(Number(lng));
+  const pin = hasPin ? { lat: Number(lat), lng: Number(lng) } : null;
+
+  const mapEl = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | null>(null);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(!hasGoogleMapsKey());
   const [query, setQuery] = useState("");
-  const [hits, setHits] = useState<Hit[]>([]);
+  const [hits, setHits] = useState<Suggestion[]>([]);
   const [searching, setSearching] = useState(false);
-  const [recenterTo, setRecenterTo] = useState<{ center: [number, number]; zoom?: number } | null>(null);
   const debounce = useRef<ReturnType<typeof setTimeout>>();
 
-  const initialCenter = pin ?? fallbackCenter ?? EGYPT_CENTER;
-  const initialZoom = pin ? 15 : fallbackCenter ? 12 : 6;
+  // Init the map once.
+  useEffect(() => {
+    let cancelled = false;
+    loadGoogleMaps()
+      .then((maps) => {
+        if (cancelled || !mapEl.current || mapRef.current) return;
+        const center = pin ?? (fallbackCenter ? { lat: fallbackCenter[0], lng: fallbackCenter[1] } : { lat: EGYPT_CENTER[0], lng: EGYPT_CENTER[1] });
+        const map = new maps.Map(mapEl.current, {
+          center,
+          zoom: pin ? 15 : fallbackCenter ? 12 : 6,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+        });
+        map.addListener("click", (e: google.maps.MapMouseEvent) => {
+          if (e.latLng) onChangeRef.current(e.latLng.lat(), e.latLng.lng());
+        });
+        mapRef.current = map;
+        setReady(true);
+      })
+      .catch(() => !cancelled && setFailed(true));
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep the marker in sync with the reported coordinates.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    if (!pin) {
+      markerRef.current?.setMap(null);
+      markerRef.current = null;
+      return;
+    }
+    if (!markerRef.current) {
+      const marker = new google.maps.Marker({ position: pin, map, draggable: true });
+      marker.addListener("dragend", () => {
+        const p = marker.getPosition();
+        if (p) onChangeRef.current(p.lat(), p.lng());
+      });
+      markerRef.current = marker;
+    } else {
+      markerRef.current.setPosition(pin);
+    }
+    map.panTo(pin);
+  }, [ready, pin?.lat, pin?.lng]);
 
   // Follow the selected city while no pin has been dropped yet.
   useEffect(() => {
-    if (!hasPin && fallbackCenter) setRecenterTo({ center: fallbackCenter, zoom: 12 });
-  }, [fallbackCenter?.[0], fallbackCenter?.[1], hasPin]);
+    if (!ready || hasPin || !fallbackCenter || !mapRef.current) return;
+    mapRef.current.setCenter({ lat: fallbackCenter[0], lng: fallbackCenter[1] });
+    mapRef.current.setZoom(12);
+  }, [ready, hasPin, fallbackCenter?.[0], fallbackCenter?.[1]]);
 
-  // Nominatim search — debounced (1s) per OSM usage policy, one request per pause.
+  // Places (New) autocomplete — debounced so we never fan out per keystroke.
   useEffect(() => {
     if (debounce.current) clearTimeout(debounce.current);
     const q = query.trim();
-    if (q.length < 3) {
+    if (!ready || q.length < 3) {
       setHits([]);
       return;
     }
     debounce.current = setTimeout(async () => {
       setSearching(true);
       try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=eg&accept-language=${
-            ar ? "ar" : "en"
-          }&q=${encodeURIComponent(q)}`,
-          { headers: { Accept: "application/json" }, referrer: "https://sandal.lovable.app" }
+        const { AutocompleteSuggestion, AutocompleteSessionToken } = (await google.maps.importLibrary(
+          "places"
+        )) as google.maps.PlacesLibrary;
+        const { suggestions } = await AutocompleteSuggestion.fetchAutocompleteSuggestions({
+          input: q,
+          sessionToken: new AutocompleteSessionToken(),
+          includedRegionCodes: ["eg"],
+          language: ar ? "ar" : "en",
+        });
+        setHits(
+          (suggestions ?? [])
+            .map((s) => s.placePrediction)
+            .filter(Boolean)
+            .map((p) => ({
+              label: p!.mainText?.text || p!.text?.text || "",
+              secondary: p!.secondaryText?.text || "",
+              placeId: p!.placeId,
+            }))
+            .filter((h) => h.label && h.placeId)
+            .slice(0, 5)
         );
-        setHits(res.ok ? await res.json() : []);
       } catch {
         setHits([]);
       } finally {
         setSearching(false);
       }
-    }, 1000);
+    }, 400);
     return () => debounce.current && clearTimeout(debounce.current);
-  }, [query, ar]);
+  }, [query, ready, ar]);
 
-  const pick = (h: Hit) => {
-    const la = Number(h.lat);
-    const lo = Number(h.lon);
-    onChange(la, lo);
-    setRecenterTo({ center: [la, lo], zoom: 16 });
+  const pick = async (hit: Suggestion) => {
     setQuery("");
     setHits([]);
+    try {
+      const { Place } = (await google.maps.importLibrary("places")) as google.maps.PlacesLibrary;
+      const place = new Place({ id: hit.placeId });
+      await place.fetchFields({ fields: ["location"] });
+      const loc = place.location;
+      if (!loc) return;
+      onChangeRef.current(loc.lat(), loc.lng());
+      mapRef.current?.setZoom(16);
+    } catch {
+      /* leave the previous pin untouched */
+    }
   };
+
+  if (failed) {
+    return (
+      <div className="rounded-xl border border-border bg-secondary/40 px-4 py-3 text-xs text-muted-foreground">
+        {ar ? "الخريطة غير متاحة حالياً. أدخل الإحداثيات يدوياً إن لزم." : "The map is unavailable right now. Enter coordinates manually if needed."}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2" dir={ar ? "rtl" : "ltr"}>
@@ -101,7 +166,7 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={ar ? "ابحث عن مكان، مثال: فندق ماكسيم دي ليسبس" : "Search a place, e.g. Maxim Delesseps Hotel"}
+          placeholder={ar ? "ابحث عن مكان على خرائط جوجل" : "Search a place on Google Maps"}
           className="w-full bg-background border border-border rounded-xl ps-9 pe-9 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
         />
         {searching && (
@@ -109,15 +174,18 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
         )}
         {hits.length > 0 && (
           <ul className="absolute z-[500] mt-1 inset-x-0 bg-card border border-border rounded-xl overflow-hidden shadow-lg max-h-56 overflow-y-auto">
-            {hits.map((h, i) => (
-              <li key={i}>
+            {hits.map((h) => (
+              <li key={h.placeId}>
                 <button
                   type="button"
                   onClick={() => pick(h)}
                   className="w-full text-start px-3 py-2.5 text-xs text-foreground hover:bg-secondary flex gap-2 items-start"
                 >
                   <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
-                  <span className="line-clamp-2">{h.display_name}</span>
+                  <span className="line-clamp-2">
+                    {h.label}
+                    {h.secondary ? <span className="text-muted-foreground"> — {h.secondary}</span> : null}
+                  </span>
                 </button>
               </li>
             ))}
@@ -125,28 +193,7 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
         )}
       </div>
 
-      <div className="h-56 rounded-xl overflow-hidden border border-border">
-        <MapContainer center={initialCenter} zoom={initialZoom} scrollWheelZoom className="w-full h-full">
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          />
-          <ClickCapture onChange={onChange} />
-          {recenterTo && <Recenter center={recenterTo.center} zoom={recenterTo.zoom} />}
-          {pin && (
-            <Marker
-              position={pin}
-              draggable
-              eventHandlers={{
-                dragend: (e) => {
-                  const p = (e.target as L.Marker).getLatLng();
-                  onChange(p.lat, p.lng);
-                },
-              }}
-            />
-          )}
-        </MapContainer>
-      </div>
+      <div ref={mapEl} className="h-56 rounded-xl overflow-hidden border border-border bg-secondary/40" />
 
       <p className="text-[11px] text-muted-foreground">
         {pin
@@ -154,8 +201,8 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
             ? `تم تحديد الموقع: ${Number(lat).toFixed(5)}, ${Number(lng).toFixed(5)} — اسحب العلامة لتعديلها.`
             : `Pin set at ${Number(lat).toFixed(5)}, ${Number(lng).toFixed(5)} — drag it to adjust.`
           : ar
-          ? "اضغط على الخريطة لتحديد نقطة الالتقاء بدقة."
-          : "Tap the map to drop a pin on your exact meeting point."}
+          ? "اضغط على الخريطة لتحديد الموقع بدقة."
+          : "Tap the map to drop a pin on the exact spot."}
       </p>
     </div>
   );
