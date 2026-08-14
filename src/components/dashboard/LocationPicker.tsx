@@ -33,6 +33,8 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
 
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(!hasGoogleMapsKey());
+  const [rejected, setRejected] = useState(false);
+
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<Suggestion[]>([]);
   const [searching, setSearching] = useState(false);
