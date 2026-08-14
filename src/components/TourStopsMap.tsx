@@ -40,7 +40,7 @@ const userIcon = L.divIcon({
 });
 
 type Stop = {
-  label: { en: string; ar: string };
+  label?: { en?: string | null; ar?: string | null } | null;
   lat: number;
   lng: number;
 };
@@ -51,11 +51,15 @@ type Props = {
   activeStopIndex?: number;
 };
 
+/** Only stops with real finite coordinates can be drawn — anything else breaks Leaflet. */
+const isPlottable = (s: Stop | null | undefined): s is Stop =>
+  !!s && Number.isFinite(Number(s.lat)) && Number.isFinite(Number(s.lng));
+
 const FitBounds = ({ stops, userLocation }: { stops: Stop[]; userLocation?: { lat: number; lng: number } | null }) => {
   const map = useMap();
   useEffect(() => {
     if (stops.length === 0) return;
-    const points: [number, number][] = stops.map((s) => [s.lat, s.lng]);
+    const points: [number, number][] = stops.map((s) => [Number(s.lat), Number(s.lng)]);
     if (userLocation) points.push([userLocation.lat, userLocation.lng]);
     const bounds = L.latLngBounds(points);
     map.fitBounds(bounds, { padding: [40, 40] });
@@ -66,10 +70,12 @@ const FitBounds = ({ stops, userLocation }: { stops: Stop[]; userLocation?: { la
 const TourStopsMap = ({ stops, userLocation, activeStopIndex }: Props) => {
   const { lang } = useI18n();
 
-  if (stops.length === 0) return null;
+  const plottable = (stops ?? []).filter(isPlottable);
+  if (plottable.length === 0) return null;
 
-  const center: [number, number] = [stops[0].lat, stops[0].lng];
-  const polyline: [number, number][] = stops.map((s) => [s.lat, s.lng]);
+  const center: [number, number] = [Number(plottable[0].lat), Number(plottable[0].lng)];
+  const polyline: [number, number][] = plottable.map((s) => [Number(s.lat), Number(s.lng)]);
+
 
   return (
     <div className="mb-6">
@@ -82,18 +88,28 @@ const TourStopsMap = ({ stops, userLocation, activeStopIndex }: Props) => {
           attributionControl={false}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <FitBounds stops={stops} userLocation={userLocation} />
+          <FitBounds stops={plottable} userLocation={userLocation} />
           <Polyline
             positions={polyline}
             pathOptions={{ color: "hsl(174, 60%, 45%)", weight: 3, dashArray: "8, 8", opacity: 0.7 }}
           />
-          {stops.map((stop, i) => (
-            <Marker key={i} position={[stop.lat, stop.lng]} icon={createNumberedIcon(i + 1, i === activeStopIndex)}>
-              <Popup>
-                <div className="text-xs font-medium">{stop.label[lang]}</div>
-              </Popup>
-            </Marker>
-          ))}
+          {plottable.map((stop, i) => {
+            const label = stop.label?.[lang] || stop.label?.en || stop.label?.ar || "";
+            return (
+              <Marker
+                key={i}
+                position={[Number(stop.lat), Number(stop.lng)]}
+                icon={createNumberedIcon(i + 1, i === activeStopIndex)}
+              >
+                {label ? (
+                  <Popup>
+                    <div className="text-xs font-medium">{label}</div>
+                  </Popup>
+                ) : null}
+              </Marker>
+            );
+          })}
+
           {userLocation && (
             <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
               <Popup>
