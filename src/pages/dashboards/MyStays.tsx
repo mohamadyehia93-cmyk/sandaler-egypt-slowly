@@ -72,7 +72,7 @@ const MyStays = () => {
             <p className="text-sm text-muted-foreground">{ar ? "لا توجد أماكن إقامة بعد" : "No stays yet"}</p>
           </div>
         ) : (
-          items.map((e: any) => (
+          items.map((e: Record<string, unknown> & { id: string }) => (
             <div key={e.id} className="bg-card rounded-xl shadow-card p-3 space-y-3">
               <div className="flex gap-3 items-center">
                 <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary shrink-0 flex items-center justify-center">

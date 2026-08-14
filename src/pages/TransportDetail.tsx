@@ -272,7 +272,7 @@ const TransportDetail = () => {
         <section className="px-4 mt-6">
           <h2 className="text-base font-bold text-primary-dark mb-3">{isAr ? "خيارات نقل مشابهة" : "Similar rides"}</h2>
           <div className="grid grid-cols-3 gap-3">
-            {similar.map((s: any) => (
+            {similar.map((s: Record<string, unknown> & { id: string }) => (
               <div key={s.id} onClick={() => navigate(`/transport/${s.slug || s.id}`)}
                    className="rounded-lg shadow-card bg-card p-3 cursor-pointer">
                 <span className="text-3xl">{TRANSPORT_EMOJI[s.transport_type] || "🚐"}</span>

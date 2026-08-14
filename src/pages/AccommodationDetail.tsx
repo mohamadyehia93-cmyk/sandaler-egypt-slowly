@@ -261,7 +261,7 @@ const AccommodationDetail = () => {
         <section className="px-4 mt-6">
           <h2 className="text-base font-bold text-primary-dark mb-3">{ar ? "أماكن إقامة قريبة" : "Nearby stays"}</h2>
           <div className="grid grid-cols-3 gap-3">
-            {similar.map((s: any) => (
+            {similar.map((s: Record<string, unknown> & { id: string }) => (
               <div key={s.id} onClick={() => navigate(`/stay/${s.slug || s.id}`)} className="rounded-lg shadow-card bg-card overflow-hidden cursor-pointer">
                 <div className="h-16 bg-secondary">
                   {s.image && <img src={s.image} alt="" className="w-full h-full object-cover" />}
