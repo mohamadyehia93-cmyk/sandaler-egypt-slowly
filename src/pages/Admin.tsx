@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft, ShieldAlert, ShieldCheck, LogIn, Flag, CalendarCheck,
-  CheckCircle2, XCircle, Eye, Loader2,
+  CheckCircle2, XCircle, Eye, EyeOff, Loader2, BookOpen, Plus, Pencil, Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
@@ -37,6 +37,16 @@ type PendingEvent = {
   location_ar: string | null;
 };
 
+type EditorialRow = {
+  id: string;
+  slug: string | null;
+  name_en: string;
+  name_ar: string | null;
+  status: string | null;
+  city_id: string | null;
+  kind: "stay" | "ride";
+};
+
 const REPORT_STATUSES = ["pending", "reviewing", "resolved", "dismissed"] as const;
 
 const reportStatusLabel = (s: string, lang: string) => {
@@ -64,7 +74,7 @@ const Admin = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isAdmin, loading, user } = useIsAdmin();
-  const [tab, setTab] = useState<"reports" | "events">("reports");
+  const [tab, setTab] = useState<"reports" | "events" | "editorial">("reports");
   const [claiming, setClaiming] = useState(false);
 
   // A signed-in non-admin cannot read other users' rows in user_roles (RLS is
@@ -133,6 +143,54 @@ const Admin = () => {
     },
     enabled: isAdmin,
   });
+
+  // Editorial entries are Sandal's own reference information: no owner, no
+  // booking. Admin RLS allows write only where listing_kind = 'editorial'.
+  const { data: editorial = [], isLoading: editorialLoading } = useQuery({
+    queryKey: ["admin-editorial-listings"],
+    queryFn: async () => {
+      const [stays, rides] = await Promise.all([
+        supabase
+          .from("accommodations")
+          .select("id, slug, name_en, name_ar, status, city_id")
+          .eq("listing_kind", "editorial")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("transport")
+          .select("id, slug, name_en, name_ar, status, city_id")
+          .eq("listing_kind", "editorial")
+          .order("created_at", { ascending: false }),
+      ]);
+      if (stays.error) throw stays.error;
+      if (rides.error) throw rides.error;
+      return [
+        ...(stays.data ?? []).map((r) => ({ ...r, kind: "stay" as const })),
+        ...(rides.data ?? []).map((r) => ({ ...r, kind: "ride" as const })),
+      ] as unknown as EditorialRow[];
+    },
+    enabled: isAdmin,
+  });
+
+  const editorialTable = (kind: "stay" | "ride") => (kind === "stay" ? "accommodations" : "transport");
+
+  const toggleEditorialStatus = async (row: EditorialRow) => {
+    const next = row.status === "published" ? "draft" : "published";
+    const { error } = await supabase
+      .from(editorialTable(row.kind))
+      .update({ status: next } as never)
+      .eq("id", row.id);
+    if (error) return toast.error(error.message);
+    toast.success(next === "published" ? (ar ? "تم النشر" : "Published") : (ar ? "تم التحويل لمسودة" : "Moved to draft"));
+    queryClient.invalidateQueries({ queryKey: ["admin-editorial-listings"] });
+  };
+
+  const deleteEditorial = async (row: EditorialRow) => {
+    if (!window.confirm(ar ? "حذف هذا المدخل؟" : "Delete this entry?")) return;
+    const { error } = await supabase.from(editorialTable(row.kind)).delete().eq("id", row.id);
+    if (error) return toast.error(error.message);
+    toast.success(ar ? "تم الحذف" : "Deleted");
+    queryClient.invalidateQueries({ queryKey: ["admin-editorial-listings"] });
+  };
 
   const openReports = useMemo(
     () => reports.filter((r) => r.status === "pending" || r.status === "reviewing").length,
@@ -261,7 +319,7 @@ const Admin = () => {
         </div>
 
         <div className="flex gap-2">
-          {(["reports", "events"] as const).map((k) => (
+          {(["reports", "events", "editorial"] as const).map((k) => (
             <button
               key={k}
               onClick={() => setTab(k)}
@@ -273,7 +331,9 @@ const Admin = () => {
             >
               {k === "reports"
                 ? ar ? "التقارير" : "Flag reports"
-                : ar ? "الفعاليات" : "Pending events"}
+                : k === "events"
+                  ? ar ? "الفعاليات" : "Pending events"
+                  : ar ? "معلومات دليلية" : "Editorial"}
             </button>
           ))}
         </div>
@@ -382,6 +442,94 @@ const Admin = () => {
                   >
                     <Eye className="w-3.5 h-3.5" />
                     {ar ? "عرض" : "View"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {tab === "editorial" && (
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {ar
+                ? "مدخلات دليلية من إعداد سندال: معلومات عملية بلا مالك ولا حجز — مثل معدية بورسعيد."
+                : "Sandal's own reference entries: practical information with no owner and no booking — like the Port Said ferry."}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => navigate("/admin/editorial/stay/new")}
+                className="flex-1 inline-flex items-center justify-center gap-1 text-xs font-semibold py-2.5 rounded-xl bg-primary text-primary-foreground"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                {ar ? "مكان إقامة" : "New stay"}
+              </button>
+              <button
+                onClick={() => navigate("/admin/editorial/ride/new")}
+                className="flex-1 inline-flex items-center justify-center gap-1 text-xs font-semibold py-2.5 rounded-xl bg-primary text-primary-foreground"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                {ar ? "خدمة نقل" : "New ride"}
+              </button>
+            </div>
+
+            {editorialLoading && (
+              <p className="text-sm text-muted-foreground">{ar ? "جارٍ التحميل…" : "Loading…"}</p>
+            )}
+            {!editorialLoading && editorial.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                {ar ? "لا توجد مدخلات دليلية بعد." : "No editorial entries yet."}
+              </p>
+            )}
+            {editorial.map((row) => (
+              <div key={`${row.kind}-${row.id}`} className="bg-background rounded-xl border border-border p-4 space-y-2">
+                <div className="flex items-start gap-2">
+                  <BookOpen className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-foreground truncate">
+                      {ar ? row.name_ar || row.name_en : row.name_en}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {row.kind === "stay" ? (ar ? "إقامة" : "Stay") : ar ? "نقل" : "Transport"}
+                      {row.city_id ? ` · ${row.city_id}` : ""}
+                    </p>
+                  </div>
+                  <span
+                    className={`ms-auto shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                      row.status === "published" ? "bg-emerald-100 text-emerald-800" : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {row.status === "published" ? (ar ? "منشور" : "Published") : ar ? "مسودة" : "Draft"}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <button
+                    onClick={() => navigate(`/admin/editorial/${row.kind}/${row.id}`)}
+                    className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border border-border hover:bg-accent transition-colors"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                    {ar ? "تعديل" : "Edit"}
+                  </button>
+                  <button
+                    onClick={() => toggleEditorialStatus(row)}
+                    className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border border-border hover:bg-accent transition-colors"
+                  >
+                    {row.status === "published" ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    {row.status === "published" ? (ar ? "إخفاء" : "Unpublish") : ar ? "نشر" : "Publish"}
+                  </button>
+                  <button
+                    onClick={() => navigate(row.kind === "stay" ? `/stay/${row.slug || row.id}` : `/transport/${row.slug || row.id}`)}
+                    className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border border-border hover:bg-accent transition-colors"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    {ar ? "عرض" : "View"}
+                  </button>
+                  <button
+                    onClick={() => deleteEditorial(row)}
+                    className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border border-destructive/30 text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    {ar ? "حذف" : "Delete"}
                   </button>
                 </div>
               </div>
