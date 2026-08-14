@@ -461,6 +461,14 @@ const AudioTourDetail = () => {
                       {stopDesc}
                     </p>
                   )}
+                  {stop?.audio_url && (
+                    <audio
+                      controls
+                      preload="none"
+                      src={stop.audio_url}
+                      className="w-full h-8 mt-2"
+                    />
+                  )}
                   {dist != null && (
                     <div className="flex items-center gap-2 mt-1.5">
                       <span className="text-[11px] text-muted-foreground flex items-center gap-0.5">
