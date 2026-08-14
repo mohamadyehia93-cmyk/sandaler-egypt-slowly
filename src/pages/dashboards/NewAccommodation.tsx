@@ -430,35 +430,42 @@ const NewAccommodation = ({ editorial = false }: { editorial?: boolean }) => {
           </div>
         </div>
 
-        <BilingualField
-          fieldEn="house_rules_en" fieldAr="house_rules_ar"
-          labelEn="House rules" labelAr="قواعد المنزل"
-          multiline rows={3} manualOnly
-          icon={<ScrollText className={iconCls} />}
-          valueEn={form.houseRulesEn} valueAr={form.houseRulesAr}
-          onChange={({ en, ar: a }) => setForm((p) => ({ ...p, houseRulesEn: en, houseRulesAr: a }))}
-          meta={meta} onMetaChange={setMeta}
-          authorLang={authorLang}
-          context="house rules for guests staying in an Egyptian family guesthouse"
-          placeholderEn="e.g. No smoking indoors, quiet after 11 PM"
-          placeholderAr="مثال: ممنوع التدخين بالداخل، الهدوء بعد ١١ مساءً"
-          inputClass={inputClass} labelClass={labelClass}
-        />
+        {/* Editorial reference entries have no host, so no house rules and no
+            cancellation terms — nobody is party to them. */}
+        {!editorial && (
+          <>
+            <BilingualField
+              fieldEn="house_rules_en" fieldAr="house_rules_ar"
+              labelEn="House rules" labelAr="قواعد المنزل"
+              multiline rows={3} manualOnly
+              icon={<ScrollText className={iconCls} />}
+              valueEn={form.houseRulesEn} valueAr={form.houseRulesAr}
+              onChange={({ en, ar: a }) => setForm((p) => ({ ...p, houseRulesEn: en, houseRulesAr: a }))}
+              meta={meta} onMetaChange={setMeta}
+              authorLang={authorLang}
+              context="house rules for guests staying in an Egyptian family guesthouse"
+              placeholderEn="e.g. No smoking indoors, quiet after 11 PM"
+              placeholderAr="مثال: ممنوع التدخين بالداخل، الهدوء بعد ١١ مساءً"
+              inputClass={inputClass} labelClass={labelClass}
+            />
 
-        <BilingualField
-          fieldEn="cancellation_en" fieldAr="cancellation_ar"
-          labelEn="Cancellation terms" labelAr="شروط الإلغاء"
-          multiline rows={3} manualOnly
-          icon={<ScrollText className={iconCls} />}
-          valueEn={form.cancellationEn} valueAr={form.cancellationAr}
-          onChange={({ en, ar: a }) => setForm((p) => ({ ...p, cancellationEn: en, cancellationAr: a }))}
-          meta={meta} onMetaChange={setMeta}
-          authorLang={authorLang}
-          context="cancellation terms a small Egyptian guesthouse sets for its guests"
-          placeholderEn="Write the terms you actually apply — guests see this as yours."
-          placeholderAr="اكتب الشروط التي تطبّقها فعلاً — الضيوف يرونها باسمك."
-          inputClass={inputClass} labelClass={labelClass}
-        />
+            <BilingualField
+              fieldEn="cancellation_en" fieldAr="cancellation_ar"
+              labelEn="Cancellation terms" labelAr="شروط الإلغاء"
+              multiline rows={3} manualOnly
+              icon={<ScrollText className={iconCls} />}
+              valueEn={form.cancellationEn} valueAr={form.cancellationAr}
+              onChange={({ en, ar: a }) => setForm((p) => ({ ...p, cancellationEn: en, cancellationAr: a }))}
+              meta={meta} onMetaChange={setMeta}
+              authorLang={authorLang}
+              context="cancellation terms a small Egyptian guesthouse sets for its guests"
+              placeholderEn="Write the terms you actually apply — guests see this as yours."
+              placeholderAr="اكتب الشروط التي تطبّقها فعلاً — الضيوف يرونها باسمك."
+              inputClass={inputClass} labelClass={labelClass}
+            />
+          </>
+        )}
+
 
         <div>
           <label className={labelClass}>{ar ? "حالة النشر" : "Publishing"}</label>
