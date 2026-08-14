@@ -231,6 +231,14 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
         )}
       </div>
 
+      {searchError && (
+        <p className="text-[11px] text-muted-foreground">
+          {ar
+            ? "بحث الأماكن غير متاح حالياً. اضغط على الخريطة لتحديد الموقع بنفسك."
+            : "Place search isn’t available right now. Tap the map to set the spot yourself."}
+        </p>
+      )}
+
       <div ref={mapEl} className="h-56 rounded-xl overflow-hidden border border-border bg-secondary/40" />
 
       <p className="text-[11px] text-muted-foreground">
