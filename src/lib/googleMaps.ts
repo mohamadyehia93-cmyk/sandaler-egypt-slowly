@@ -33,6 +33,11 @@ export function loadGoogleMaps(): Promise<typeof google.maps> {
     const w = window as Window & {
       google?: { maps?: typeof google.maps };
       __sandalInitGoogleMaps?: () => void;
+      gm_authFailure?: () => void;
+    };
+    w.gm_authFailure = () => {
+      authFailed = true;
+      authListeners.forEach((cb) => cb());
     };
     if (w.google?.maps?.Map) {
       resolve(w.google.maps);
@@ -40,6 +45,7 @@ export function loadGoogleMaps(): Promise<typeof google.maps> {
     }
     const cbName = "__sandalInitGoogleMaps";
     w.__sandalInitGoogleMaps = () => resolve(w.google!.maps!);
+
     const script = document.createElement("script");
     const params = new URLSearchParams({
       key: BROWSER_KEY,
