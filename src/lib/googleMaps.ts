@@ -16,12 +16,16 @@ export function loadGoogleMaps(): Promise<typeof google.maps> {
   if (!BROWSER_KEY) return Promise.reject(new Error("google-maps-key-missing"));
 
   promise = new Promise((resolve, reject) => {
-    if (typeof window !== "undefined" && (window as any).google?.maps?.Map) {
-      resolve((window as any).google.maps);
+    const w = window as Window & {
+      google?: { maps?: typeof google.maps };
+      __sandalInitGoogleMaps?: () => void;
+    };
+    if (w.google?.maps?.Map) {
+      resolve(w.google.maps);
       return;
     }
     const cbName = "__sandalInitGoogleMaps";
-    (window as any)[cbName] = () => resolve((window as any).google.maps);
+    w.__sandalInitGoogleMaps = () => resolve(w.google!.maps!);
     const script = document.createElement("script");
     const params = new URLSearchParams({
       key: BROWSER_KEY,
