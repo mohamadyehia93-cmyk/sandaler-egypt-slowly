@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Search, Loader2, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { EGYPT_CENTER } from "@/lib/cityCoords";
-import { loadGoogleMaps, hasGoogleMapsKey } from "@/lib/googleMaps";
+import { loadGoogleMaps, hasGoogleMapsKey, onGoogleMapsAuthFailure } from "@/lib/googleMaps";
 
 interface Props {
   lat: string;
@@ -33,6 +33,8 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
 
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(!hasGoogleMapsKey());
+  const [rejected, setRejected] = useState(false);
+
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<Suggestion[]>([]);
   const [searching, setSearching] = useState(false);
@@ -60,11 +62,21 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
         setReady(true);
       })
       .catch(() => !cancelled && setFailed(true));
+    const off = onGoogleMapsAuthFailure(() => {
+      if (cancelled) return;
+      mapRef.current = null;
+      markerRef.current = null;
+      setReady(false);
+      setRejected(true);
+      setFailed(true);
+    });
     return () => {
       cancelled = true;
+      off();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   // Keep the marker in sync with the reported coordinates.
   useEffect(() => {
@@ -168,10 +180,15 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
               ? ar
                 ? "لم يتم إعداد خرائط جوجل لهذا التطبيق بعد. تخطَّ هذه الخطوة وحدِّد الموقع لاحقاً عند توفر الخريطة."
                 : "Google Maps isn’t set up for this app yet. Skip this step and set the spot later once the map is available."
+              : rejected
+              ? ar
+                ? `خرائط جوجل غير مسموح لها بالعمل على هذا النطاق (${window.location.hostname}). يجب إضافة النطاق إلى مفتاح الخرائط. تخطَّ هذه الخطوة وحدِّد الموقع لاحقاً.`
+                : `Google Maps isn’t authorised for this domain (${window.location.hostname}). The Maps key needs this domain added to it. Skip this step and set the spot later.`
               : ar
               ? "تعذّر تحميل الخريطة (قد تكون مشكلة اتصال). أعد المحاولة لاحقاً لتحديد الموقع."
               : "The map couldn’t load — this is usually a connection issue. Try again later to set the spot."}
           </p>
+
         </div>
       </div>
     );
