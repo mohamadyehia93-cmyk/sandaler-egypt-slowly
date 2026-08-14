@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyProviderId } from "@/lib/providerRecord";
 import { TRANSPORT_EMOJI, transportTypeLabel } from "@/lib/listingTaxonomy";
+import { str, num } from "@/lib/rowValues";
 import { ArrowLeft, Plus, Trash2, Eye, EyeOff, Pencil, Route } from "lucide-react";
 import { toast } from "sonner";
 
