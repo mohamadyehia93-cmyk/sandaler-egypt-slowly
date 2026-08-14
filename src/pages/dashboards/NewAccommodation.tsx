@@ -92,7 +92,7 @@ const NewAccommodation = () => {
         toast.error(ar ? "تعذر تحميل مكان الإقامة" : "Could not load this stay");
         return;
       }
-      const row = data as Record<string, any>;
+      const row = data as Record<string, unknown>;
       setForm({
         nameEn: row.name_en || "",
         nameAr: row.name_ar || "",
