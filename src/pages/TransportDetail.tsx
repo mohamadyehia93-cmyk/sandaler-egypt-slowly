@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
-  ArrowLeft, Clock, MapPin, Route, ArrowRight, Users, Star, Navigation, CalendarClock, Info,
+  ArrowLeft, Clock, MapPin, Route, ArrowRight, Users, Star, Navigation, CalendarClock, Info, BookOpen,
 } from "lucide-react";
 
 import { useI18n } from "@/lib/i18n";
@@ -18,6 +18,7 @@ import MessageOwnerButton from "@/components/MessageOwnerButton";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { Skeleton } from "@/components/ui/skeleton";
 import NotFoundView from "@/components/NotFound";
+import { str, num } from "@/lib/rowValues";
 
 const TRANSPORT_EMOJI: Record<string, string> = {
   felucca: "⛵", "tuk-tuk": "🛺", bus: "🚌", "private-car": "🚗", boat: "🛥️",
@@ -78,6 +79,9 @@ const TransportDetail = () => {
   const providerName = isAr ? item.provider_name_ar || item.provider_name_en : item.provider_name_en;
   const emoji = TRANSPORT_EMOJI[item.transport_type as string] || "🚐";
   const typeLabel = transportTypeLabel(item.transport_type, lang);
+  // EDITORIAL = Sandal's own reference entry (public ferry, train, etc.).
+  // HOSTED = a driver/boatman managing this ride on the app.
+  const isEditorial = item.listing_kind !== "hosted" || !item.provider_id;
 
   const photos: string[] = (Array.isArray(item.images) ? item.images.filter(Boolean) : []).length
     ? item.images.filter(Boolean)
@@ -91,7 +95,7 @@ const TransportDetail = () => {
   const basisLabel = priceBasisLabel(item.price_basis, lang) || (isAr ? "للشخص" : "per person");
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className={`min-h-screen bg-background ${isEditorial ? "pb-10" : "pb-28"}`}>
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
         <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary">
           <ArrowLeft className="w-5 h-5 text-foreground" />
@@ -134,6 +138,12 @@ const TransportDetail = () => {
             {money(item.price)} <span className="text-xs font-medium text-muted-foreground">{basisLabel}</span>
           </p>
           <div className="flex items-center gap-2 flex-wrap mt-2">
+            {isEditorial && (
+              <span className="text-[11px] font-semibold bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+                <BookOpen className="w-3 h-3" />
+                {isAr ? "معلومات سندال" : "Sandal guide info"}
+              </span>
+            )}
             {typeLabel && <span className="text-[11px] font-medium bg-primary/10 text-primary px-2.5 py-1 rounded-full">{typeLabel}</span>}
             {item.hire_type && (
               <span className="text-[11px] font-medium bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full">
@@ -247,8 +257,8 @@ const TransportDetail = () => {
         )}
       </div>
 
-      {/* OPERATOR — real profile when claimed, honest note when not */}
-      {item.provider_id ? (
+      {/* OPERATOR — only a hosted ride has one */}
+      {!isEditorial ? (
         <>
           <ProviderBioCard providerId={item.provider_id} roleLabel={{ en: "Transport provider", ar: "مقدم النقل" }} />
           <div className="mx-4 mt-3 flex">
@@ -256,14 +266,16 @@ const TransportDetail = () => {
           </div>
         </>
       ) : (
-        <div className="mx-4 mt-6 rounded-xl bg-card border border-border p-4">
-          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{isAr ? "مقدم النقل" : "Transport provider"}</h2>
-          {providerName && <p className="text-sm font-bold text-foreground">{providerName}</p>}
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-            {isAr
-              ? "هذه الخدمة غير مُدارة على التطبيق بعد، لذا لا يمكن مراسلة المزود من هنا."
-              : "This service isn't managed on the app yet, so the provider can't be messaged here."}
-          </p>
+        <div className="mx-4 mt-6 rounded-xl border border-border bg-surface p-3 flex gap-2">
+          <BookOpen className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+          <div>
+            {providerName && <p className="text-sm font-semibold text-foreground mb-1">{providerName}</p>}
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {isAr
+                ? "معلومة دليلية من سندال. هذه الخدمة غير مُدارة على التطبيق، لذا لا يوجد حجز أو مراسلة من هنا."
+                : "Practical information from Sandal. This service isn't managed on the app, so there's no booking or messaging here."}
+            </p>
+          </div>
         </div>
       )}
 
@@ -273,15 +285,15 @@ const TransportDetail = () => {
           <h2 className="text-base font-bold text-primary-dark mb-3">{isAr ? "خيارات نقل مشابهة" : "Similar rides"}</h2>
           <div className="grid grid-cols-3 gap-3">
             {similar.map((s: Record<string, unknown> & { id: string }) => (
-              <div key={s.id} onClick={() => navigate(`/transport/${s.slug || s.id}`)}
+              <div key={s.id} onClick={() => navigate(`/transport/${str(s.slug) || s.id}`)}
                    className="rounded-lg shadow-card bg-card p-3 cursor-pointer">
-                <span className="text-3xl">{TRANSPORT_EMOJI[s.transport_type] || "🚐"}</span>
+                <span className="text-3xl">{TRANSPORT_EMOJI[str(s.transport_type)] || "🚐"}</span>
                 <h3 className="text-xs font-semibold text-foreground line-clamp-2 mt-2">
-                  {isAr ? s.name_ar || s.name_en : s.name_en}
+                  {isAr ? str(s.name_ar) || str(s.name_en) : str(s.name_en)}
                 </h3>
                 <p className="text-sm font-bold text-primary-dark mt-1">
-                  {Number(s.price || 0).toLocaleString(isAr ? "ar-EG" : "en-US")}{" "}
-                  {isAr && (s.currency || "EGP") === "EGP" ? t("common.egp") : s.currency || "EGP"}
+                  {num(s.price).toLocaleString(isAr ? "ar-EG" : "en-US")}{" "}
+                  {isAr && (str(s.currency) || "EGP") === "EGP" ? t("common.egp") : str(s.currency) || "EGP"}
                 </p>
               </div>
             ))}
@@ -289,7 +301,8 @@ const TransportDetail = () => {
         </section>
       )}
 
-      {/* Request bar — no payment is taken anywhere in the app */}
+      {/* Request bar — hosted rides only; no payment is taken anywhere in the app */}
+      {!isEditorial && (
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
         <div>
           <span className="text-lg font-bold text-primary-dark">{money(item.price)}</span>
@@ -299,6 +312,7 @@ const TransportDetail = () => {
           {isAr ? "إرسال طلب" : "Send request"}
         </button>
       </div>
+      )}
     </div>
   );
 };

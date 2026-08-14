@@ -215,6 +215,11 @@ const App = () => {
             <Route path="/profile/settings" element={<Settings />} />
             <Route path="/profile/help" element={<HelpSupport />} />
             <Route path="/admin" element={<Admin />} />
+            {/* Admin editorial authoring — the same forms in ownerless mode */}
+            <Route path="/admin/editorial/stay/new" element={<NewAccommodation editorial />} />
+            <Route path="/admin/editorial/stay/:id" element={<NewAccommodation editorial />} />
+            <Route path="/admin/editorial/ride/new" element={<NewTransport editorial />} />
+            <Route path="/admin/editorial/ride/:id" element={<NewTransport editorial />} />
             <Route path="/credits" element={<Credits />} />
 
             <Route path="/dashboard/culture-actor/new-article" element={<NewArticle />} />

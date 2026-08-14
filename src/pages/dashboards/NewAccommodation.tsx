@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages } from "@/lib/dashboardForms";
 import { fetchMyProviderId } from "@/lib/providerRecord";
+import { str, strArray } from "@/lib/rowValues";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import CityPicker from "@/components/dashboard/CityPicker";
 import LocationPicker from "@/components/dashboard/LocationPicker";
@@ -41,11 +43,17 @@ const AMENITY_PRESETS: { en: string; ar: string }[] = [
   { en: "Parking", ar: "موقف سيارات" },
 ];
 
-const NewAccommodation = () => {
+/**
+ * `editorial` mode is the admin's own reference entry: no owner, no request or
+ * message actions on the public page. Regular use creates a HOSTED listing
+ * owned by the signed-in provider record.
+ */
+const NewAccommodation = ({ editorial = false }: { editorial?: boolean }) => {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
 
@@ -94,38 +102,38 @@ const NewAccommodation = () => {
       }
       const row = data as Record<string, unknown>;
       setForm({
-        nameEn: row.name_en || "",
-        nameAr: row.name_ar || "",
-        descriptionEn: row.description_en || "",
-        descriptionAr: row.description_ar || "",
-        unitTypeEn: row.unit_type_en || "",
-        unitTypeAr: row.unit_type_ar || "",
-        houseRulesEn: row.house_rules_en || "",
-        houseRulesAr: row.house_rules_ar || "",
-        cancellationEn: row.cancellation_en || "",
-        cancellationAr: row.cancellation_ar || "",
-        accommodationType: row.accommodation_type || "",
-        cityId: row.city_id || "",
-        regionId: row.region_id || "",
+        nameEn: str(row.name_en) || "",
+        nameAr: str(row.name_ar) || "",
+        descriptionEn: str(row.description_en) || "",
+        descriptionAr: str(row.description_ar) || "",
+        unitTypeEn: str(row.unit_type_en) || "",
+        unitTypeAr: str(row.unit_type_ar) || "",
+        houseRulesEn: str(row.house_rules_en) || "",
+        houseRulesAr: str(row.house_rules_ar) || "",
+        cancellationEn: str(row.cancellation_en) || "",
+        cancellationAr: str(row.cancellation_ar) || "",
+        accommodationType: str(row.accommodation_type) || "",
+        cityId: str(row.city_id) || "",
+        regionId: str(row.region_id) || "",
         pricePerNight: row.price_per_night != null ? String(row.price_per_night) : "",
-        currency: row.currency || "EGP",
+        currency: str(row.currency) || "EGP",
         sleeps: row.sleeps != null ? String(row.sleeps) : "",
         bedrooms: row.bedrooms != null ? String(row.bedrooms) : "",
         bathrooms: row.bathrooms != null ? String(row.bathrooms) : "",
         minNights: row.min_nights != null ? String(row.min_nights) : "",
-        checkIn: row.check_in_time || "",
-        checkOut: row.check_out_time || "",
+        checkIn: str(row.check_in_time) || "",
+        checkOut: str(row.check_out_time) || "",
         lat: row.latitude != null ? String(row.latitude) : "",
         lng: row.longitude != null ? String(row.longitude) : "",
-        status: row.status || "published",
+        status: str(row.status) || "published",
       });
-      setAmenities(Array.isArray(row.amenities) ? row.amenities.filter(Boolean) : []);
+      setAmenities(strArray(row.amenities));
       setMeta((row.translation_meta as TranslationMeta) || {});
       setExistingImages(
-        Array.isArray(row.images) && row.images.length > 0
-          ? row.images.filter(Boolean)
-          : row.image
-            ? [row.image]
+        strArray(row.images).length > 0
+          ? strArray(row.images)
+          : str(row.image)
+            ? [str(row.image)]
             : []
       );
     })();
@@ -151,17 +159,21 @@ const NewAccommodation = () => {
     }
     setSubmitting(true);
     try {
-      const providerId = await fetchMyProviderId(user.id);
-      if (!providerId) {
-        toast.error(ar ? "أكمل ملف المزود أولاً" : "Complete your provider profile first");
-        setSubmitting(false);
-        return;
+      let providerId: string | null = null;
+      if (!editorial) {
+        providerId = await fetchMyProviderId(user.id);
+        if (!providerId) {
+          toast.error(ar ? "أكمل ملف المزود أولاً" : "Complete your provider profile first");
+          setSubmitting(false);
+          return;
+        }
       }
       const uploaded = await uploadImages(photos, user.id);
       const images = [...existingImages, ...uploaded];
 
       const payload = {
         host_id: providerId,
+        listing_kind: editorial ? "editorial" : "hosted",
         name_en: form.nameEn.trim() || null,
         name_ar: form.nameAr.trim() || null,
         description_en: form.descriptionEn.trim() || null,
@@ -203,7 +215,7 @@ const NewAccommodation = () => {
         if (error) throw error;
         toast.success(ar ? "تم نشر مكان الإقامة" : "Stay published");
       }
-      navigate("/dashboard/service-provider/my-stays");
+      navigate(editorial ? "/admin" : "/dashboard/service-provider/my-stays");
     } catch (err) {
       toast.error(readableDbError(err instanceof Error ? err.message : "Failed to save", ar));
     } finally {
@@ -214,6 +226,16 @@ const NewAccommodation = () => {
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-service-provider/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
   const iconCls = "w-3.5 h-3.5 text-role-service-provider";
+
+  if (editorial && !adminLoading && !isAdmin) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center px-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          {ar ? "هذه الصفحة مخصّصة للمشرفين فقط." : "This page is only available to administrators."}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-surface pb-10">
