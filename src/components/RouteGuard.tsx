@@ -46,7 +46,7 @@ const RouteGuard = ({ children }: { children: React.ReactNode }) => {
     if (!isAllowed) {
       navigate(dashboardPath, { replace: true });
     }
-  }, [isProvider, isVisitorMode, dashboardPath, location.pathname, navigate]);
+  }, [isProvider, isVisitorMode, dashboardPath, location.pathname, location.search, navigate]);
 
   return <>{children}</>;
 };
