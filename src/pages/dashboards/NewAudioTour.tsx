@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages, uploadAudio } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import AudioPicker from "@/components/dashboard/AudioPicker";
+import CityPicker from "@/components/dashboard/CityPicker";
 import BilingualField from "@/components/dashboard/BilingualField";
 import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
@@ -75,6 +76,7 @@ const NewAudioTour = () => {
     descriptionEn: "",
     descriptionAr: "",
     city: "",
+    region: "",
     theme: "",
     duration: "",
     price: "",
@@ -98,6 +100,7 @@ const NewAudioTour = () => {
         descriptionEn: data.description_en || "",
         descriptionAr: data.description_ar || "",
         city: data.city_id || "",
+        region: data.region_id || "",
         theme: data.theme || "",
         duration: data.duration_minutes != null ? String(data.duration_minutes) : "",
         price: data.price != null ? String(data.price) : "",
@@ -209,7 +212,8 @@ const NewAudioTour = () => {
         description_en: form.descriptionEn.trim() || null,
         description_ar: form.descriptionAr.trim() || null,
         translation_meta: meta as any,
-        city_id: form.city.trim(),
+        city_id: form.city || null,
+        region_id: form.region || null,
         theme: form.theme || null,
         duration_minutes: parseInt(form.duration) || 30,
         stops_count: cleanStops.length,
@@ -292,15 +296,18 @@ const NewAudioTour = () => {
           inputClass={inputClass} labelClass={labelClass}
         />
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "المدينة *" : "City *"}</label>
-            <input className={inputClass} placeholder={lang === "ar" ? "القاهرة" : "Cairo"} value={form.city} onChange={(e) => set("city", e.target.value)} />
-          </div>
-          <div>
-            <label className={labelClass}><Clock className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "المدة (د)" : "Duration (min)"}</label>
-            <input type="number" className={inputClass} placeholder="45" value={form.duration} onChange={(e) => set("duration", e.target.value)} min="5" max="240" />
-          </div>
+        <CityPicker
+          cityId={form.city}
+          onChange={(cityId, regionId) => setForm((p) => ({ ...p, city: cityId, region: regionId }))}
+          required
+          iconClass="w-3.5 h-3.5 text-role-narrator"
+          inputClass={inputClass}
+          labelClass={labelClass}
+        />
+
+        <div>
+          <label className={labelClass}><Clock className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "المدة (د)" : "Duration (min)"}</label>
+          <input type="number" className={inputClass} placeholder="45" value={form.duration} onChange={(e) => set("duration", e.target.value)} min="5" max="240" />
         </div>
 
         {/* Tour narration file */}
