@@ -166,36 +166,17 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
           <p className="text-[11px] text-muted-foreground leading-relaxed">
             {noKey
               ? ar
-                ? "لم يتم إعداد خرائط جوجل لهذا التطبيق بعد. يمكنك إدخال الإحداثيات يدوياً بالأسفل، أو تخطي هذه الخطوة والعودة إليها لاحقاً."
-                : "Google Maps isn’t set up for this app yet. Enter the coordinates manually below, or skip this step and add the spot later."
+                ? "لم يتم إعداد خرائط جوجل لهذا التطبيق بعد. تخطَّ هذه الخطوة وحدِّد الموقع لاحقاً عند توفر الخريطة."
+                : "Google Maps isn’t set up for this app yet. Skip this step and set the spot later once the map is available."
               : ar
-              ? "تعذّر تحميل الخريطة (قد تكون مشكلة اتصال). أدخل الإحداثيات يدوياً بالأسفل أو أعد المحاولة لاحقاً."
-              : "The map couldn’t load — this is usually a connection issue. Enter the coordinates manually below, or try again later."}
+              ? "تعذّر تحميل الخريطة (قد تكون مشكلة اتصال). أعد المحاولة لاحقاً لتحديد الموقع."
+              : "The map couldn’t load — this is usually a connection issue. Try again later to set the spot."}
           </p>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          <input
-            type="number"
-            step="any"
-            inputMode="decimal"
-            value={lat}
-            onChange={(e) => onChange(Number(e.target.value), Number(lng) || 0)}
-            placeholder={ar ? "خط العرض" : "Latitude"}
-            className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-          />
-          <input
-            type="number"
-            step="any"
-            inputMode="decimal"
-            value={lng}
-            onChange={(e) => onChange(Number(lat) || 0, Number(e.target.value))}
-            placeholder={ar ? "خط الطول" : "Longitude"}
-            className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-          />
         </div>
       </div>
     );
   }
+
 
   return (
     <div className="space-y-2" dir={ar ? "rtl" : "ltr"}>
