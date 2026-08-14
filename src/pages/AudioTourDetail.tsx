@@ -67,13 +67,17 @@ const AudioTourDetail = () => {
     },
   });
 
-  const dbStops = (tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string; audio_url?: string | null }> | undefined) || [];
-  const stopsCount = dbStops.length || tour?.stops_count || 5;
-  const mapStops = dbStops.map((s) => ({
-    label: { en: s.label_en, ar: s.label_ar },
-    lat: s.lat,
-    lng: s.lng,
-  }));
+  const dbStops = ((tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string; audio_url?: string | null }> | undefined) || []).filter(Boolean);
+  const stopsCount = dbStops.length || tour?.stops_count || 0;
+  // Only stops the narrator actually pinned can go on the map.
+  const mapStops = dbStops
+    .filter((s) => Number.isFinite(Number(s?.lat)) && Number.isFinite(Number(s?.lng)))
+    .map((s) => ({
+      label: { en: s.label_en, ar: s.label_ar },
+      lat: Number(s.lat),
+      lng: Number(s.lng),
+    }));
+
 
   // This tour's OWN narration: the tour-level track, else the first stop clip.
   // Never fall back to another tour's audio — when there is none we say so.
