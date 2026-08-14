@@ -12,6 +12,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import RouteGuard from "@/components/RouteGuard";
 import RouteTracker from "@/components/RouteTracker";
 import Diagnostics from "./pages/Diagnostics.tsx";
+import MapProbe from "./pages/MapProbe.tsx";
 import OAuthConsent from "./pages/OAuthConsent.tsx";
 
 
@@ -270,6 +271,7 @@ const App = () => {
 
             <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
             <Route path="/diagnostics" element={<Diagnostics />} />
+            <Route path="/__mapprobe" element={<MapProbe />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
