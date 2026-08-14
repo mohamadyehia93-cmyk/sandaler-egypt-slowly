@@ -7,8 +7,6 @@
     "dev": "vite",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "build": "npm run sitemap && vite build",
-    "postbuild": "node scripts/prerender.mjs",
-    "prerender": "PRERENDER=1 npm run build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -18,31 +16,6 @@
     "i18n:check": "node scripts/check-i18n.mjs",
     "test:roles": "RUN_BACKEND_E2E=1 vitest run --config vitest.integration.config.ts",
     "roles:cycle": "node scripts/role-cycle-e2e.mjs"
-  },
-  "reactSnap": {
-    "source": "dist",
-    "minifyHtml": {
-      "collapseWhitespace": false,
-      "removeComments": false
-    },
-    "puppeteerArgs": [
-      "--no-sandbox",
-      "--disable-setuid-sandbox"
-    ],
-    "include": [
-      "/",
-      "/audio-tours",
-      "/trips",
-      "/causes",
-      "/people",
-      "/posts",
-      "/login",
-      "/signup",
-      "/regions/nile-delta",
-      "/regions/suez-canal",
-      "/regions/upper-egypt",
-      "/regions/frontiers"
-    ]
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
