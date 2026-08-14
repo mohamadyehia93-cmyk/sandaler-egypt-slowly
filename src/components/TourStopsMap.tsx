@@ -88,18 +88,28 @@ const TourStopsMap = ({ stops, userLocation, activeStopIndex }: Props) => {
           attributionControl={false}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <FitBounds stops={stops} userLocation={userLocation} />
+          <FitBounds stops={plottable} userLocation={userLocation} />
           <Polyline
             positions={polyline}
             pathOptions={{ color: "hsl(174, 60%, 45%)", weight: 3, dashArray: "8, 8", opacity: 0.7 }}
           />
-          {stops.map((stop, i) => (
-            <Marker key={i} position={[stop.lat, stop.lng]} icon={createNumberedIcon(i + 1, i === activeStopIndex)}>
-              <Popup>
-                <div className="text-xs font-medium">{stop.label[lang]}</div>
-              </Popup>
-            </Marker>
-          ))}
+          {plottable.map((stop, i) => {
+            const label = stop.label?.[lang] || stop.label?.en || stop.label?.ar || "";
+            return (
+              <Marker
+                key={i}
+                position={[Number(stop.lat), Number(stop.lng)]}
+                icon={createNumberedIcon(i + 1, i === activeStopIndex)}
+              >
+                {label ? (
+                  <Popup>
+                    <div className="text-xs font-medium">{label}</div>
+                  </Popup>
+                ) : null}
+              </Marker>
+            );
+          })}
+
           {userLocation && (
             <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
               <Popup>
