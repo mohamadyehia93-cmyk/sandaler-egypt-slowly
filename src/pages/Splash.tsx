@@ -407,12 +407,12 @@ const SplashPage = () => {
 
     if (result.status === "error") {
       console.error("becomeProvider failed:", result.error);
-      toast.error(
-        (lang === "ar" ? "تعذّر إنشاء ملف المزوّد" : "Could not set up your provider profile") +
-          (result.error ? ` — ${result.error}` : "")
-      );
+      // Never lose the typed form: we only toast and return, so name/bio/photo
+      // and the quiz answers all stay in state for another attempt.
+      toast.error(providerErrorMessage(result.error, lang));
       return "failed";
     }
+
     return "ok";
   };
 
