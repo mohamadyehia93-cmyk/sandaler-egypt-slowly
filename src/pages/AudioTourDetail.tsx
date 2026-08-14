@@ -440,8 +440,10 @@ const AudioTourDetail = () => {
         <div className="mb-6">
           {Array.from({ length: stopsCount }).map((_, i) => {
             const stop = dbStops[i];
-            const stopLabel = stop ? (lang === "ar" ? (stop.label_ar || stop.label_en) : stop.label_en) : (lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`);
-            const stopDesc = stop ? (lang === "ar" ? (stop.desc_ar || stop.desc_en) : stop.desc_en) : "";
+            // Fall back to the other language rather than showing nothing:
+            // narrators often author a stop in one language only.
+            const stopLabel = stop ? (lang === "ar" ? (stop.label_ar || stop.label_en) : (stop.label_en || stop.label_ar)) : (lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`);
+            const stopDesc = stop ? (lang === "ar" ? (stop.desc_ar || stop.desc_en) : (stop.desc_en || stop.desc_ar)) : "";
             const dist = stopDistances[i];
             const isNear = dist != null && dist <= NEAR_THRESHOLD_M;
             return (
