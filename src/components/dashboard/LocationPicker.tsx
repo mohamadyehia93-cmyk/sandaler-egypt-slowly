@@ -114,6 +114,7 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
           includedRegionCodes: ["eg"],
           language: ar ? "ar" : "en",
         });
+        setSearchError(false);
         setHits(
           (suggestions ?? [])
             .map((s) => s.placePrediction)
@@ -128,6 +129,7 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
         );
       } catch {
         setHits([]);
+        setSearchError(true);
       } finally {
         setSearching(false);
       }
