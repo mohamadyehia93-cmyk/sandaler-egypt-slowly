@@ -34,6 +34,11 @@ const AccommodationCards = () => {
               <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-0.5">
                 {lang === "ar" ? (a.name_ar || a.name_en) : a.name_en}
               </h3>
+              {a.listing_kind !== "hosted" && (
+                <span className="inline-block mb-1 text-[9px] font-medium text-muted-foreground border border-border rounded-full px-1.5 py-0.5">
+                  {lang === "ar" ? "معلومات صندل" : "Sandal info"}
+                </span>
+              )}
               {a.host_name_en && (
                 <div className="flex items-center gap-1.5 mb-1">
                   {a.host_image && <img src={a.host_image} alt="" className="w-4 h-4 rounded-full object-cover" />}
