@@ -9,7 +9,21 @@ const CHANNEL = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID a
 
 let promise: Promise<typeof google.maps> | null = null;
 
+/** Google calls window.gm_authFailure when the key is rejected for this domain. */
+let authFailed = false;
+const authListeners = new Set<() => void>();
+
+export const hasGoogleMapsAuthFailed = () => authFailed;
+
+/** Subscribe to key/domain rejection; returns an unsubscribe function. */
+export function onGoogleMapsAuthFailure(cb: () => void) {
+  if (authFailed) cb();
+  authListeners.add(cb);
+  return () => authListeners.delete(cb);
+}
+
 export const hasGoogleMapsKey = () => !!BROWSER_KEY;
+
 
 export function loadGoogleMaps(): Promise<typeof google.maps> {
   if (promise) return promise;
