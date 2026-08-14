@@ -180,10 +180,15 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
               ? ar
                 ? "لم يتم إعداد خرائط جوجل لهذا التطبيق بعد. تخطَّ هذه الخطوة وحدِّد الموقع لاحقاً عند توفر الخريطة."
                 : "Google Maps isn’t set up for this app yet. Skip this step and set the spot later once the map is available."
+              : rejected
+              ? ar
+                ? `خرائط جوجل غير مسموح لها بالعمل على هذا النطاق (${window.location.hostname}). يجب إضافة النطاق إلى مفتاح الخرائط. تخطَّ هذه الخطوة وحدِّد الموقع لاحقاً.`
+                : `Google Maps isn’t authorised for this domain (${window.location.hostname}). The Maps key needs this domain added to it. Skip this step and set the spot later.`
               : ar
               ? "تعذّر تحميل الخريطة (قد تكون مشكلة اتصال). أعد المحاولة لاحقاً لتحديد الموقع."
               : "The map couldn’t load — this is usually a connection issue. Try again later to set the spot."}
           </p>
+
         </div>
       </div>
     );
