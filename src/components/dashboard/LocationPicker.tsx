@@ -36,6 +36,7 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<Suggestion[]>([]);
   const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState(false);
   const debounce = useRef<ReturnType<typeof setTimeout>>();
 
   // Init the map once.
@@ -114,6 +115,7 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
           includedRegionCodes: ["eg"],
           language: ar ? "ar" : "en",
         });
+        setSearchError(false);
         setHits(
           (suggestions ?? [])
             .map((s) => s.placePrediction)
@@ -128,6 +130,7 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
         );
       } catch {
         setHits([]);
+        setSearchError(true);
       } finally {
         setSearching(false);
       }
@@ -152,9 +155,44 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
   };
 
   if (failed) {
+    const noKey = !hasGoogleMapsKey();
     return (
-      <div className="rounded-xl border border-border bg-secondary/40 px-4 py-3 text-xs text-muted-foreground">
-        {ar ? "الخريطة غير متاحة حالياً. أدخل الإحداثيات يدوياً إن لزم." : "The map is unavailable right now. Enter coordinates manually if needed."}
+      <div className="space-y-2" dir={ar ? "rtl" : "ltr"}>
+        <div className="rounded-xl border border-border bg-secondary/40 px-4 py-3 space-y-1">
+          <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+            {ar ? "الخريطة غير متاحة" : "Map unavailable"}
+          </p>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            {noKey
+              ? ar
+                ? "لم يتم إعداد خرائط جوجل لهذا التطبيق بعد. يمكنك إدخال الإحداثيات يدوياً بالأسفل، أو تخطي هذه الخطوة والعودة إليها لاحقاً."
+                : "Google Maps isn’t set up for this app yet. Enter the coordinates manually below, or skip this step and add the spot later."
+              : ar
+              ? "تعذّر تحميل الخريطة (قد تكون مشكلة اتصال). أدخل الإحداثيات يدوياً بالأسفل أو أعد المحاولة لاحقاً."
+              : "The map couldn’t load — this is usually a connection issue. Enter the coordinates manually below, or try again later."}
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            type="number"
+            step="any"
+            inputMode="decimal"
+            value={lat}
+            onChange={(e) => onChange(Number(e.target.value), Number(lng) || 0)}
+            placeholder={ar ? "خط العرض" : "Latitude"}
+            className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+          <input
+            type="number"
+            step="any"
+            inputMode="decimal"
+            value={lng}
+            onChange={(e) => onChange(Number(lat) || 0, Number(e.target.value))}
+            placeholder={ar ? "خط الطول" : "Longitude"}
+            className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+        </div>
       </div>
     );
   }
@@ -192,6 +230,14 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
           </ul>
         )}
       </div>
+
+      {searchError && (
+        <p className="text-[11px] text-muted-foreground">
+          {ar
+            ? "بحث الأماكن غير متاح حالياً. اضغط على الخريطة لتحديد الموقع بنفسك."
+            : "Place search isn’t available right now. Tap the map to set the spot yourself."}
+        </p>
+      )}
 
       <div ref={mapEl} className="h-56 rounded-xl overflow-hidden border border-border bg-secondary/40" />
 
