@@ -152,9 +152,44 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
   };
 
   if (failed) {
+    const noKey = !hasGoogleMapsKey();
     return (
-      <div className="rounded-xl border border-border bg-secondary/40 px-4 py-3 text-xs text-muted-foreground">
-        {ar ? "الخريطة غير متاحة حالياً. أدخل الإحداثيات يدوياً إن لزم." : "The map is unavailable right now. Enter coordinates manually if needed."}
+      <div className="space-y-2" dir={ar ? "rtl" : "ltr"}>
+        <div className="rounded-xl border border-border bg-secondary/40 px-4 py-3 space-y-1">
+          <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+            {ar ? "الخريطة غير متاحة" : "Map unavailable"}
+          </p>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            {noKey
+              ? ar
+                ? "لم يتم إعداد خرائط جوجل لهذا التطبيق بعد. يمكنك إدخال الإحداثيات يدوياً بالأسفل، أو تخطي هذه الخطوة والعودة إليها لاحقاً."
+                : "Google Maps isn’t set up for this app yet. Enter the coordinates manually below, or skip this step and add the spot later."
+              : ar
+              ? "تعذّر تحميل الخريطة (قد تكون مشكلة اتصال). أدخل الإحداثيات يدوياً بالأسفل أو أعد المحاولة لاحقاً."
+              : "The map couldn’t load — this is usually a connection issue. Enter the coordinates manually below, or try again later."}
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            type="number"
+            step="any"
+            inputMode="decimal"
+            value={lat}
+            onChange={(e) => onChange(Number(e.target.value), Number(lng) || 0)}
+            placeholder={ar ? "خط العرض" : "Latitude"}
+            className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+          <input
+            type="number"
+            step="any"
+            inputMode="decimal"
+            value={lng}
+            onChange={(e) => onChange(Number(lat) || 0, Number(e.target.value))}
+            placeholder={ar ? "خط الطول" : "Longitude"}
+            className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+        </div>
       </div>
     );
   }
