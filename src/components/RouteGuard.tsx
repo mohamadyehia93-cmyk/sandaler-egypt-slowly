@@ -32,6 +32,9 @@ const RouteGuard = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!isProvider || isVisitorMode || !dashboardPath) return;
 
+    // Dashboard "Preview" opens public pages with ?preview=1 — never bounce those.
+    if (new URLSearchParams(location.search).get("preview") === "1") return;
+
     const path = location.pathname;
 
     // Allow dashboard routes and allowed shared routes
@@ -39,10 +42,11 @@ const RouteGuard = ({ children }: { children: React.ReactNode }) => {
       path.startsWith("/dashboard") ||
       allowedProviderRoutes.some((r) => path === r || path.startsWith(r + "/"));
 
+
     if (!isAllowed) {
       navigate(dashboardPath, { replace: true });
     }
-  }, [isProvider, isVisitorMode, dashboardPath, location.pathname, navigate]);
+  }, [isProvider, isVisitorMode, dashboardPath, location.pathname, location.search, navigate]);
 
   return <>{children}</>;
 };

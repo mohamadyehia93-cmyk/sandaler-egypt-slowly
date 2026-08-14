@@ -20,15 +20,19 @@ const PreviewButton = ({
   const label = lang === "ar" ? "معاينة" : "Preview";
 
   const open = () => {
-    const url = `${window.location.origin}${path}`;
+    const target = path.includes("?") ? `${path}&preview=1` : `${path}?preview=1`;
+    const url = `${window.location.origin}${target}`;
     let win: Window | null = null;
     try {
       win = window.open(url, "_blank", "noopener,noreferrer");
     } catch {
       win = null;
     }
-    if (!win) navigate(path);
+    // Popups are blocked inside sandboxed iframes (editor preview) — fall back
+    // to an in-app navigation so the button always does something.
+    if (!win) navigate(target);
   };
+
 
   return (
     <button
