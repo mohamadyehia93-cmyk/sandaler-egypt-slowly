@@ -440,8 +440,10 @@ const AudioTourDetail = () => {
         <div className="mb-6">
           {Array.from({ length: stopsCount }).map((_, i) => {
             const stop = dbStops[i];
-            const stopLabel = stop ? (lang === "ar" ? (stop.label_ar || stop.label_en) : stop.label_en) : (lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`);
-            const stopDesc = stop ? (lang === "ar" ? (stop.desc_ar || stop.desc_en) : stop.desc_en) : "";
+            // Fall back to the other language rather than showing nothing:
+            // narrators often author a stop in one language only.
+            const stopLabel = stop ? (lang === "ar" ? (stop.label_ar || stop.label_en) : (stop.label_en || stop.label_ar)) : (lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`);
+            const stopDesc = stop ? (lang === "ar" ? (stop.desc_ar || stop.desc_en) : (stop.desc_en || stop.desc_ar)) : "";
             const dist = stopDistances[i];
             const isNear = dist != null && dist <= NEAR_THRESHOLD_M;
             return (
@@ -458,6 +460,14 @@ const AudioTourDetail = () => {
                     <p dir="auto" className="text-[12px] text-muted-foreground leading-relaxed mt-1 text-start">
                       {stopDesc}
                     </p>
+                  )}
+                  {stop?.audio_url && (
+                    <audio
+                      controls
+                      preload="none"
+                      src={stop.audio_url}
+                      className="w-full h-8 mt-2"
+                    />
                   )}
                   {dist != null && (
                     <div className="flex items-center gap-2 mt-1.5">
