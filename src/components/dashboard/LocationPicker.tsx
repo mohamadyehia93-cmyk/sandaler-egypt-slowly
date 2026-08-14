@@ -62,11 +62,21 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
         setReady(true);
       })
       .catch(() => !cancelled && setFailed(true));
+    const off = onGoogleMapsAuthFailure(() => {
+      if (cancelled) return;
+      mapRef.current = null;
+      markerRef.current = null;
+      setReady(false);
+      setRejected(true);
+      setFailed(true);
+    });
     return () => {
       cancelled = true;
+      off();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   // Keep the marker in sync with the reported coordinates.
   useEffect(() => {
