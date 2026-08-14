@@ -164,15 +164,34 @@ export async function becomeProvider(
   details?: ProviderDetails,
   options?: { force?: boolean }
 ): Promise<BecomeProviderResult> {
-  const { data: auth } = await supabase.auth.getUser();
-  const user = auth.user;
-  if (!user) return { status: "error", error: "not-authenticated" };
+  // Resolve the identity AT SUBMIT TIME. getSession() reads (and refreshes)
+  // the locally persisted session and never fails on a transient network
+  // hiccup; getUser() round-trips to the auth server and returns null on any
+  // network/JWT error, which previously surfaced as a misleading
+  // "not-authenticated" even though the user was signed in.
+  const { data: sessionData } = await supabase.auth.getSession();
+  let user = sessionData.session?.user ?? null;
+  if (!user) {
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    user = authData.user ?? null;
+    if (!user) {
+      return {
+        status: "error",
+        error: authError?.message
+          ? `session-unavailable: ${authError.message}`
+          : "session-expired",
+      };
+    }
+  }
 
-  const { data: existing } = await supabase
+  const { data: existing, error: existingError } = await supabase
     .from("providers")
     .select("role")
     .eq("user_id", user.id)
     .maybeSingle();
+
+  if (existingError) return { status: "error", error: existingError.message };
+
 
   const currentRole = (existing?.role as LocalRole | undefined) ?? null;
   if (currentRole && currentRole !== role && !options?.force) {
@@ -248,3 +267,40 @@ export async function becomeProvider(
 
 }
 
+
+/**
+ * Turns a becomeProvider error into a readable bilingual sentence. A wrong or
+ * cryptic message costs a provider their whole form, so we name the real cause.
+ */
+export function providerErrorMessage(error: string | null, lang: string): string {
+  const ar = lang === "ar";
+  const raw = error || "";
+  if (raw.startsWith("session-expired") || raw.startsWith("session-unavailable")) {
+    return ar
+      ? "انتهت صلاحية جلستك. سجّل الدخول مرة أخرى ثم أعد الإرسال — بياناتك محفوظة."
+      : "Your session expired. Sign in again and resubmit — your details are kept.";
+  }
+  if (/permission denied|row-level security|violates row-level/i.test(raw)) {
+    return ar
+      ? "لا تسمح صلاحيات الحساب بإنشاء ملف مزوّد. تواصل مع الدعم."
+      : "Your account is not permitted to create a provider profile. Contact support.";
+  }
+  if (/null value in column "(.+?)"/i.test(raw)) {
+    const col = raw.match(/null value in column "(.+?)"/i)?.[1];
+    return ar
+      ? `حقل مطلوب ناقص (${col}). أكمله ثم أعد الإرسال.`
+      : `A required field is missing (${col}). Fill it in and resubmit.`;
+  }
+  if (/duplicate key|already exists/i.test(raw)) {
+    return ar
+      ? "يوجد ملف مزوّد بهذا الاسم بالفعل. جرّب اسمًا مختلفًا."
+      : "A provider profile with these details already exists. Try a different name.";
+  }
+  if (/fetch|network|failed to/i.test(raw)) {
+    return ar
+      ? "تعذّر الاتصال بالخدمة. تحقّق من الإنترنت وأعد الإرسال — بياناتك محفوظة."
+      : "Could not reach the service. Check your connection and resubmit — your details are kept.";
+  }
+  const base = ar ? "تعذّر إنشاء ملف المزوّد" : "Could not set up your provider profile";
+  return raw ? `${base} — ${raw}` : base;
+}

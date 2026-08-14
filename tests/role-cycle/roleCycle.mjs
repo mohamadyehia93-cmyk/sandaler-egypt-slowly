@@ -40,6 +40,7 @@ export const ROLE_CONTENT = {
   },
   "service-provider": {
     table: "experiences",
+    ownerIsProviderRecord: true,
     ownerColumn: "provider_id",
     create: (t) => ({ title_en: `E2E Experience ${t}`, title_ar: `تجربة ${t}`, price: 250, status: "published" }),
     edit: () => ({ price: 300 }),
@@ -64,12 +65,14 @@ export const ROLE_CONTENT = {
   },
   "product-seller": {
     table: "products",
+    ownerIsProviderRecord: true,
     ownerColumn: "seller_id",
     create: (t) => ({ name_en: `E2E Product ${t}`, name_ar: `منتج ${t}`, price: 120, status: "published" }),
     edit: () => ({ price: 150 }),
   },
   "trip-organizer": {
     table: "trips",
+    ownerIsProviderRecord: true,
     ownerColumn: "organizer_id",
     create: (t) => ({ title_en: `E2E Trip ${t}`, title_ar: `رحلة ${t}`, price: 900, status: "published" }),
     edit: () => ({ price: 950 }),
@@ -174,7 +177,20 @@ export async function runRoleCycle(role, { keep = false } = {}) {
   await becomeProvider(sb, user, role);
   steps.onboarding = true;
 
-  const payload = { ...spec.create(token), [spec.ownerColumn]: user.id };
+  // Ownership convention: experiences/products/trips owner columns hold
+  // providers.id (the provider RECORD id), not the auth user id.
+  let ownerId = user.id;
+  if (spec.ownerIsProviderRecord) {
+    const { data: prov, error: provError } = await sb
+      .from("providers")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (provError || !prov?.id) throw new Error(`provider record lookup failed for ${role}`);
+    ownerId = prov.id;
+  }
+
+  const payload = { ...spec.create(token), [spec.ownerColumn]: ownerId };
   const { data: created, error: createError } = await sb
     .from(spec.table)
     .insert(payload)
@@ -193,7 +209,7 @@ export async function runRoleCycle(role, { keep = false } = {}) {
   const { data: listed, error: listError } = await sb
     .from(spec.table)
     .select("id")
-    .eq(spec.ownerColumn, user.id);
+    .eq(spec.ownerColumn, ownerId);
   if (listError) throw new Error(`list of ${spec.table} failed: ${listError.message}`);
   if (!listed.some((row) => row.id === created.id)) throw new Error(`created row missing from owner list of ${spec.table}`);
   steps.list = true;
