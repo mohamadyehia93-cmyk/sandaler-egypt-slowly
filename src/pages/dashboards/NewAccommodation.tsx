@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify, uploadImages } from "@/lib/dashboardForms";
 import { fetchMyProviderId } from "@/lib/providerRecord";
@@ -42,11 +43,17 @@ const AMENITY_PRESETS: { en: string; ar: string }[] = [
   { en: "Parking", ar: "موقف سيارات" },
 ];
 
-const NewAccommodation = () => {
+/**
+ * `editorial` mode is the admin's own reference entry: no owner, no request or
+ * message actions on the public page. Regular use creates a HOSTED listing
+ * owned by the signed-in provider record.
+ */
+const NewAccommodation = ({ editorial = false }: { editorial?: boolean }) => {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
 
@@ -152,17 +159,21 @@ const NewAccommodation = () => {
     }
     setSubmitting(true);
     try {
-      const providerId = await fetchMyProviderId(user.id);
-      if (!providerId) {
-        toast.error(ar ? "أكمل ملف المزود أولاً" : "Complete your provider profile first");
-        setSubmitting(false);
-        return;
+      let providerId: string | null = null;
+      if (!editorial) {
+        providerId = await fetchMyProviderId(user.id);
+        if (!providerId) {
+          toast.error(ar ? "أكمل ملف المزود أولاً" : "Complete your provider profile first");
+          setSubmitting(false);
+          return;
+        }
       }
       const uploaded = await uploadImages(photos, user.id);
       const images = [...existingImages, ...uploaded];
 
       const payload = {
         host_id: providerId,
+        listing_kind: editorial ? "editorial" : "hosted",
         name_en: form.nameEn.trim() || null,
         name_ar: form.nameAr.trim() || null,
         description_en: form.descriptionEn.trim() || null,
@@ -204,7 +215,7 @@ const NewAccommodation = () => {
         if (error) throw error;
         toast.success(ar ? "تم نشر مكان الإقامة" : "Stay published");
       }
-      navigate("/dashboard/service-provider/my-stays");
+      navigate(editorial ? "/admin" : "/dashboard/service-provider/my-stays");
     } catch (err) {
       toast.error(readableDbError(err instanceof Error ? err.message : "Failed to save", ar));
     } finally {
@@ -215,6 +226,16 @@ const NewAccommodation = () => {
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-service-provider/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
   const iconCls = "w-3.5 h-3.5 text-role-service-provider";
+
+  if (editorial && !adminLoading && !isAdmin) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center px-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          {ar ? "هذه الصفحة مخصّصة للمشرفين فقط." : "This page is only available to administrators."}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-surface pb-10">
