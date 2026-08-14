@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Search, Loader2, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { EGYPT_CENTER } from "@/lib/cityCoords";
-import { loadGoogleMaps, hasGoogleMapsKey } from "@/lib/googleMaps";
+import { loadGoogleMaps, hasGoogleMapsKey, onGoogleMapsAuthFailure } from "@/lib/googleMaps";
 
 interface Props {
   lat: string;
