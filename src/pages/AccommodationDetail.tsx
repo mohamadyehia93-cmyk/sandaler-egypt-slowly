@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
-  ArrowLeft, Star, Users, BedDouble, Bath, Clock, Check, CalendarIcon, ScrollText, Moon,
+  ArrowLeft, Star, Users, BedDouble, Bath, Clock, Check, CalendarIcon, ScrollText, Moon, BookOpen,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -79,6 +79,9 @@ const AccommodationDetail = () => {
   const hostName = ar ? place.host_name_ar || place.host_name_en : place.host_name_en;
   const amenities: string[] = (place.amenities || []).filter(Boolean);
   const typeLabel = accommodationTypeLabel(place.accommodation_type, lang);
+  // EDITORIAL = Sandal's own reference entry (no owner, nothing to book).
+  // HOSTED = a real person's home, managed by them.
+  const isEditorial = place.listing_kind !== "hosted" || !place.host_id;
 
   const photos: string[] = (Array.isArray(place.images) ? place.images.filter(Boolean) : []).length
     ? place.images.filter(Boolean)
@@ -100,7 +103,7 @@ const AccommodationDetail = () => {
   ].filter(Boolean) as { icon: typeof Users; label: string; value: string }[];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className={`min-h-screen bg-background ${isEditorial ? "pb-10" : "pb-24"}`}>
       <div className="h-11 flex items-center justify-between px-4 bg-card sticky top-0 z-40">
         <button onClick={() => navigate(-1)} className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center">
           <ArrowLeft className="w-4 h-4 text-foreground" />
@@ -144,6 +147,12 @@ const AccommodationDetail = () => {
           {money(place.price_per_night)} <span className="text-xs font-medium text-muted-foreground">{t("common.perNight")}</span>
         </p>
         <div className="flex items-center gap-2 flex-wrap mt-2">
+          {isEditorial && (
+            <span className="text-[11px] font-semibold bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full inline-flex items-center gap-1">
+              <BookOpen className="w-3 h-3" />
+              {ar ? "معلومات سندال" : "Sandal guide info"}
+            </span>
+          )}
           {typeLabel && <span className="text-[11px] font-medium bg-primary/10 text-primary px-2.5 py-1 rounded-full">{typeLabel}</span>}
           {unitType && <span className="text-[11px] font-medium bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full">{unitType}</span>}
           {place.rating > 0 && place.reviews_count > 0 && (
@@ -212,7 +221,8 @@ const AccommodationDetail = () => {
           </>
         )}
 
-        {/* PREFERRED DATE — the host confirms availability; no live calendar exists */}
+        {/* PREFERRED DATE — hosted stays only; editorial entries take no requests */}
+        {!isEditorial && (<>
         <h2 className="text-base font-bold text-primary-dark mb-3 mt-6">{ar ? "التاريخ المفضل" : "Preferred date"}</h2>
         <Popover>
           <PopoverTrigger asChild>
@@ -235,27 +245,30 @@ const AccommodationDetail = () => {
         <p className="text-[11px] text-muted-foreground">
           {ar ? "يؤكد المضيف التوافر بعد إرسال طلبك." : "The host confirms availability after you send your request."}
         </p>
+        </>)}
+
+        {/* EDITORIAL LABEL — honest about what this page is */}
+        {isEditorial && (
+          <div className="mt-6 rounded-xl border border-border bg-surface p-3 flex gap-2">
+            <BookOpen className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {ar
+                ? "معلومة دليلية من سندال. هذا المكان غير مُدار على التطبيق، لذا لا يمكن الحجز أو المراسلة من هنا."
+                : "Practical information from Sandal. This place isn't managed on the app, so it can't be booked or messaged here."}
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* HOST — real identity when the profile is claimed, honest note when not */}
-      {place.host_id ? (
+      {/* HOST — only a hosted stay has one */}
+      {!isEditorial ? (
         <>
           <ProviderBioCard providerId={place.host_id} roleLabel={{ en: "Your host", ar: "مضيفك" }} />
           <div className="mx-4 mt-3 flex">
             <MessageOwnerButton ownerId={place.host_id} kind="provider" label={ar ? "مراسلة المضيف" : "Message host"} />
           </div>
         </>
-      ) : (
-        <div className="mx-4 mt-6 rounded-xl bg-card border border-border p-4">
-          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{ar ? "مضيفك" : "Your host"}</h2>
-          {hostName && <p className="text-sm font-bold text-foreground">{hostName}</p>}
-          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-            {ar
-              ? "هذا المكان غير مُدار على التطبيق بعد، لذا لا يمكن مراسلة المضيف من هنا."
-              : "This stay isn't managed on the app yet, so the host can't be messaged here."}
-          </p>
-        </div>
-      )}
+      ) : null}
 
       {/* SIMILAR — always last */}
       {similar && similar.length > 0 && (
@@ -280,7 +293,8 @@ const AccommodationDetail = () => {
         </section>
       )}
 
-      {/* REQUEST BAR — no payment is taken anywhere in the app */}
+      {/* REQUEST BAR — hosted stays only; no payment is taken anywhere in the app */}
+      {!isEditorial && (
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
         <div>
           <span className="text-lg font-bold text-primary-dark">{money(place.price_per_night)}</span>
@@ -293,6 +307,7 @@ const AccommodationDetail = () => {
           {ar ? "إرسال طلب" : "Send request"}
         </button>
       </div>
+      )}
     </div>
   );
 };
