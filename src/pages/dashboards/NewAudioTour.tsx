@@ -7,6 +7,7 @@ import { slugify, uploadImages, uploadAudio } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import AudioPicker from "@/components/dashboard/AudioPicker";
 import CityPicker from "@/components/dashboard/CityPicker";
+import LocationPicker from "@/components/dashboard/LocationPicker";
 import BilingualField from "@/components/dashboard/BilingualField";
 import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
