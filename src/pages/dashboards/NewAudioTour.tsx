@@ -387,22 +387,21 @@ const NewAudioTour = () => {
                 <textarea dir="ltr" className={`${inputClass} min-h-[56px] resize-none`} placeholder="Short description (English) — what the visitor sees/hears here" value={s.desc_en} onChange={(e) => updateStop(i, "desc_en", e.target.value)} maxLength={200} />
                 <textarea dir="rtl" className={`${inputClass} min-h-[56px] resize-none text-right`} placeholder="وصف مختصر (عربي) — ما يراه الزائر ويسمعه هنا" value={s.desc_ar} onChange={(e) => updateStop(i, "desc_ar", e.target.value)} maxLength={200} />
 
-                {/* Coordinates — used by the player's GPS proximity + route map */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="text-[10px] font-semibold text-muted-foreground mb-1 flex items-center gap-1">
-                      <Navigation className="w-2.5 h-2.5" />
-                      {lang === "ar" ? "خط العرض" : "Latitude"}
-                    </label>
-                    <input dir="ltr" type="number" step="any" className={inputClass} placeholder="30.0444" value={s.lat} onChange={(e) => updateStop(i, "lat", e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-semibold text-muted-foreground mb-1 flex items-center gap-1">
-                      <Navigation className="w-2.5 h-2.5" />
-                      {lang === "ar" ? "خط الطول" : "Longitude"}
-                    </label>
-                    <input dir="ltr" type="number" step="any" className={inputClass} placeholder="31.2357" value={s.lng} onChange={(e) => updateStop(i, "lng", e.target.value)} />
-                  </div>
+                {/* Location — used by the player's GPS proximity + route map */}
+                <div>
+                  <label className="text-[10px] font-semibold text-muted-foreground mb-1 flex items-center gap-1">
+                    <Navigation className="w-2.5 h-2.5" />
+                    {lang === "ar" ? "موقع المحطة على الخريطة" : "Stop location on the map"}
+                  </label>
+                  <LocationPicker
+                    lat={s.lat}
+                    lng={s.lng}
+                    onChange={(la, lo) =>
+                      setStops((prev) =>
+                        prev.map((stop, idx) => (idx === i ? { ...stop, lat: String(la), lng: String(lo) } : stop))
+                      )
+                    }
+                  />
                 </div>
 
                 {/* Optional per-stop clip */}
