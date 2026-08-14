@@ -1,0 +1,1 @@
+ALTER TABLE public.transport ALTER COLUMN capacity DROP DEFAULT;
