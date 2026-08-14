@@ -292,15 +292,18 @@ const NewAudioTour = () => {
           inputClass={inputClass} labelClass={labelClass}
         />
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "المدينة *" : "City *"}</label>
-            <input className={inputClass} placeholder={lang === "ar" ? "القاهرة" : "Cairo"} value={form.city} onChange={(e) => set("city", e.target.value)} />
-          </div>
-          <div>
-            <label className={labelClass}><Clock className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "المدة (د)" : "Duration (min)"}</label>
-            <input type="number" className={inputClass} placeholder="45" value={form.duration} onChange={(e) => set("duration", e.target.value)} min="5" max="240" />
-          </div>
+        <CityPicker
+          cityId={form.city}
+          onChange={(cityId, regionId) => setForm((p) => ({ ...p, city: cityId, region: regionId }))}
+          required
+          iconClass="w-3.5 h-3.5 text-role-narrator"
+          inputClass={inputClass}
+          labelClass={labelClass}
+        />
+
+        <div>
+          <label className={labelClass}><Clock className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "المدة (د)" : "Duration (min)"}</label>
+          <input type="number" className={inputClass} placeholder="45" value={form.duration} onChange={(e) => set("duration", e.target.value)} min="5" max="240" />
         </div>
 
         {/* Tour narration file */}
