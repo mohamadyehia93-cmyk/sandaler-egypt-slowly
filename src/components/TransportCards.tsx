@@ -23,6 +23,11 @@ const TransportCards = () => {
             <h3 className="text-xs font-semibold text-foreground text-center line-clamp-2">
               {lang === "ar" ? (tr.name_ar || tr.name_en) : tr.name_en}
             </h3>
+            {tr.listing_kind !== "hosted" && (
+              <span className="text-[9px] font-medium text-muted-foreground border border-border rounded-full px-1.5 py-0.5">
+                {lang === "ar" ? "معلومات صندل" : "Sandal info"}
+              </span>
+            )}
             {tr.provider_name_en && (
               <div className="flex items-center gap-1 mt-0.5">
                 {tr.provider_image && <img src={tr.provider_image} alt="" className="w-3.5 h-3.5 rounded-full object-cover" />}
