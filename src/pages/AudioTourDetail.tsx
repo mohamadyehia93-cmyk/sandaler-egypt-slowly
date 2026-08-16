@@ -523,14 +523,52 @@ const AudioTourDetail = () => {
           </div>
         )}
 
-        {/* Turn-by-turn guidance to the next stop */}
-        {dbStops.length > 0 && (
+        {/* Written walking directions — readable without playing any audio */}
+        {(() => {
+          const dirOf = (i: number) => {
+            const s = dbStops[i];
+            if (!s) return "";
+            return (lang === "ar" ? s.directions_ar || s.directions_en : s.directions_en || s.directions_ar) || "";
+          };
+          const labelOf = (i: number) => {
+            const s = dbStops[i];
+            if (!s) return lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`;
+            return (lang === "ar" ? s.label_ar || s.label_en : s.label_en || s.label_ar) || "";
+          };
+          const rows = [
+            { i: activeStopIndex, text: dirOf(activeStopIndex), current: true },
+            { i: activeStopIndex + 1, text: dirOf(activeStopIndex + 1), current: false },
+          ].filter((r) => r.i < stopsCount && !!r.text);
+          if (rows.length === 0) return null;
+          return (
+            <div className="mb-4 rounded-xl bg-surface border border-border p-3 space-y-3">
+              <p className="text-[11px] font-bold text-primary uppercase tracking-wide flex items-center gap-1.5">
+                <Footprints className="w-3.5 h-3.5" />
+                {lang === "ar" ? "تعليمات المشي" : "Walking directions"}
+              </p>
+              {rows.map((r) => (
+                <div key={r.i} className="text-start">
+                  <p className="text-[10px] font-semibold text-muted-foreground">
+                    {r.current
+                      ? (lang === "ar" ? `إلى المحطة الحالية: ${labelOf(r.i)}` : `To current stop: ${labelOf(r.i)}`)
+                      : (lang === "ar" ? `إلى المحطة التالية: ${labelOf(r.i)}` : `To next stop: ${labelOf(r.i)}`)}
+                  </p>
+                  <p dir="auto" className="text-[13px] text-foreground leading-relaxed mt-0.5">{r.text}</p>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+
+        {/* Turn-by-turn guidance to the next stop (GPS mode only) */}
+        {dbStops.length > 0 && !virtualMode && (
           <TurnByTurnGuidance
             stops={dbStops}
             activeStopIndex={activeStopIndex}
             userCoords={userLoc.coords ? { lat: userLoc.coords.lat, lng: userLoc.coords.lng } : null}
           />
         )}
+
 
         {/* Route Map */}
         {mapStops.length > 0 && (
