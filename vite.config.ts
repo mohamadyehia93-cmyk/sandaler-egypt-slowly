@@ -38,6 +38,10 @@ export default defineConfig(({ mode }) => {
     "import.meta.env.VITE_SUPABASE_PROJECT_ID": JSON.stringify(
       pick(env.VITE_SUPABASE_PROJECT_ID, FALLBACK_SUPABASE_PROJECT_ID),
     ),
+    // See FALLBACK_GOOGLE_MAPS_BROWSER_KEY above for why this has a hardcoded fallback.
+    "import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY": JSON.stringify(
+      pick(env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY, FALLBACK_GOOGLE_MAPS_BROWSER_KEY),
+    ),
   },
   server: {
     host: "::",
