@@ -50,17 +50,18 @@ export const routeUrl = (
   const destination = used[used.length - 1];
   const waypoints = used.slice(1, -1);
 
-  const params = new URLSearchParams({
-    api: "1",
-    origin: pair(origin),
-    destination: pair(destination),
-    travelmode,
-  });
-  if (waypoints.length > 0) params.set("waypoints", waypoints.map(pair).join("|"));
+  const parts = [
+    "api=1",
+    `origin=${pair(origin)}`,
+    `destination=${pair(destination)}`,
+    `travelmode=${travelmode}`,
+  ];
+  if (waypoints.length > 0) parts.push(`waypoints=${waypoints.map(pair).join("|")}`);
 
   return {
-    url: `https://www.google.com/maps/dir/?api=1&${params.toString().replace(/^api=1&/, "")}`,
+    url: `https://www.google.com/maps/dir/?${parts.join("&")}`,
     includedCount: used.length,
     truncatedTo: truncated ? used.length : null,
   };
 };
+
