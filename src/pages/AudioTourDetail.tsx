@@ -77,6 +77,13 @@ const AudioTourDetail = () => {
       lat: Number(s.lat),
       lng: Number(s.lng),
     }));
+  // Google Maps navigation links. Travel mode is always walking: `theme` on
+  // audio_tours is a content topic (History, Food, ...), never a transport mode.
+  const startPoint = dbStops.find((s) => hasCoords(s));
+  const startNavUrl = startPoint ? directionsToUrl(startPoint, "walking") : null;
+  const fullRoute = routeUrl(dbStops, "walking");
+
+
 
 
   // This tour's OWN narration: the tour-level track, else the first stop clip.
