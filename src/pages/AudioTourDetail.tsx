@@ -757,6 +757,42 @@ const AudioTourDetail = () => {
                     </p>
                   )}
 
+                  {/* Nested segments — what you hear once you're standing here.
+                      Structure is visible without playing anything. */}
+                  {(() => {
+                    const segs = (Array.isArray(stop?.segments) ? stop!.segments! : []).filter(
+                      (g) => (g?.title_en || g?.title_ar || g?.desc_en || g?.desc_ar || g?.audio_url)
+                    );
+                    if (segs.length === 0) return null;
+                    return (
+                      <div data-testid={`stop-${i}-segments`} className="mt-2 ps-3 border-s-2 border-primary/25 space-y-2">
+                        <p className="text-[10px] font-semibold text-primary uppercase tracking-wide flex items-center gap-1">
+                          <Layers className="w-3 h-3" />
+                          {lang === "ar" ? `${segs.length} مقاطع في هذه المحطة` : `${segs.length} segments at this stop`}
+                        </p>
+                        {segs.map((g, j) => {
+                          const segTitle = (lang === "ar" ? g.title_ar || g.title_en : g.title_en || g.title_ar) || "";
+                          const segDesc = (lang === "ar" ? g.desc_ar || g.desc_en : g.desc_en || g.desc_ar) || "";
+                          return (
+                            <div key={j} className="text-start">
+                              {segTitle && (
+                                <p dir="auto" className="text-[12px] font-semibold text-foreground">
+                                  {j + 1}. {segTitle}
+                                </p>
+                              )}
+                              {segDesc && (
+                                <p dir="auto" className="text-[11px] text-muted-foreground leading-relaxed">{segDesc}</p>
+                              )}
+                              {g.audio_url && (
+                                <audio controls preload="none" src={g.audio_url} className="w-full h-8 mt-1" />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+
                   {stop?.audio_url && (
                     <audio
                       controls
