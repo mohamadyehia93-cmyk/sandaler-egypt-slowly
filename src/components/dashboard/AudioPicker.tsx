@@ -60,7 +60,7 @@ const AudioPicker = ({
     <div>
       {label && (
         <label className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
-          <Mic className="w-3.5 h-3.5 text-role-narrator" />
+          <Mic className="w-3.5 h-3.5 text-role-culture-actor" />
           {label}
         </label>
       )}
@@ -77,7 +77,7 @@ const AudioPicker = ({
         <div className="bg-card border border-border rounded-xl p-3 space-y-2">
           <div className="flex items-center gap-2">
             {uploading ? (
-              <Loader2 className="w-4 h-4 text-role-narrator animate-spin shrink-0" />
+              <Loader2 className="w-4 h-4 text-role-culture-actor animate-spin shrink-0" />
             ) : (
               <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
             )}
@@ -109,7 +109,7 @@ const AudioPicker = ({
             <p className="text-[11px] font-semibold text-foreground flex-1">
               {lang === "ar" ? "ملف صوتي مرفوع" : "Audio uploaded"}
             </p>
-            <button type="button" onClick={() => inputRef.current?.click()} className="text-[10px] font-semibold text-role-narrator">
+            <button type="button" onClick={() => inputRef.current?.click()} className="text-[10px] font-semibold text-role-culture-actor">
               {lang === "ar" ? "استبدال" : "Replace"}
             </button>
             {onRemoveExisting && (

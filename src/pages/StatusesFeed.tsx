@@ -16,9 +16,6 @@ const roleTextClass: Record<string, string> = {
   "trip-organizer": "text-role-trip-organizer",
   "product-seller": "text-role-product-seller",
   organization: "text-role-organization",
-  ambassador: "text-role-ambassador",
-  narrator: "text-role-narrator",
-  "subject-expert": "text-role-subject-expert",
   "whos-who": "text-primary",
 };
 

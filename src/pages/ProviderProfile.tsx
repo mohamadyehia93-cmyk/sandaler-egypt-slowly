@@ -32,7 +32,6 @@ const roleColorClass: Record<string, string> = {
   "trip-organizer": "bg-role-trip-organizer",
   "product-seller": "bg-role-product-seller",
   "organization": "bg-role-organization",
-  "ambassador": "bg-role-ambassador",
 };
 
 const roleTextClass: Record<string, string> = {
@@ -43,7 +42,6 @@ const roleTextClass: Record<string, string> = {
   "trip-organizer": "text-role-trip-organizer",
   "product-seller": "text-role-product-seller",
   "organization": "text-role-organization",
-  "ambassador": "text-role-ambassador",
 };
 
 const roleLabels: Record<string, { en: string; ar: string }> = {
@@ -65,7 +63,6 @@ const listingRoutes: Record<string, string> = {
   "trip-organizer": "/trip",
   "product-seller": "/product",
   "organization": "/cause",
-  "ambassador": "/person",
 };
 
 const listingSectionLabels: Record<string, { en: string; ar: string }> = {

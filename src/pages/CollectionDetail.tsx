@@ -91,7 +91,7 @@ const CollectionDetail = () => {
         <div className="bg-card rounded-xl shadow-card p-4">
           <div className="flex items-center gap-2 flex-wrap mb-2">
             {collection.discipline && (
-              <span className="text-[10px] font-semibold bg-role-subject-expert text-white px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-semibold bg-role-culture-actor text-white px-2 py-0.5 rounded-full">
                 {collection.discipline}
               </span>
             )}
@@ -183,7 +183,7 @@ const CollectionDetail = () => {
             {entries.map((e, i) => (
               <li key={i} className="bg-card rounded-xl shadow-card p-4">
                 <div className="flex items-start gap-2">
-                  <span className="text-[10px] font-bold text-role-subject-expert mt-0.5 shrink-0">
+                  <span className="text-[10px] font-bold text-role-culture-actor mt-0.5 shrink-0">
                     {i + 1}
                   </span>
                   <div className="min-w-0">
