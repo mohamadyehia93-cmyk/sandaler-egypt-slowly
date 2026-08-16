@@ -22,6 +22,31 @@ import { directionsToUrl, routeUrl, hasCoords } from "@/lib/mapsLinks";
 
 const NEAR_THRESHOLD_M = 50; // when within 50m, mark stop as "near you"
 
+/**
+ * A nested SEGMENT is heard once the listener has ARRIVED at its stop, so it
+ * deliberately carries no coordinates and no walking directions — only the stop
+ * has those (and only stops feed the map + Google Maps route).
+ */
+type TourSegment = { title_en?: string; title_ar?: string; desc_en?: string; desc_ar?: string; audio_url?: string | null };
+type TourStop = {
+  label_en: string; label_ar: string; lat: number; lng: number;
+  desc_en?: string; desc_ar?: string; directions_en?: string; directions_ar?: string;
+  audio_url?: string | null;
+  /** Optional; absent on every tour authored before segments existed. */
+  segments?: TourSegment[];
+};
+
+/** One playable unit: either a stop's own clip, or one segment inside a stop. */
+type PlayItem = {
+  stopIndex: number;
+  /** null when the item is the stop's own single clip. */
+  segIndex: number | null;
+  segCount: number;
+  src: string;
+  title_en: string;
+  title_ar: string;
+};
+
 
 const formatTime = (seconds: number) => {
   const m = Math.floor(seconds / 60);
