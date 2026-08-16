@@ -173,14 +173,21 @@ const LocationPicker = ({ lat, lng, fallbackCenter, onChange }: Props) => {
         <div className="rounded-xl border border-border bg-secondary/40 px-4 py-3 space-y-1">
           <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-            {ar ? "الخريطة غير متاحة" : "Map unavailable"}
+            {noKey
+              ? ar
+                ? "الخريطة غير مُهيّأة"
+                : "Maps not configured"
+              : ar
+              ? "الخريطة غير متاحة"
+              : "Map unavailable"}
           </p>
           <p className="text-[11px] text-muted-foreground leading-relaxed">
             {noKey
               ? ar
-                ? "لم يتم إعداد خرائط جوجل لهذا التطبيق بعد. تخطَّ هذه الخطوة وحدِّد الموقع لاحقاً عند توفر الخريطة."
-                : "Google Maps isn’t set up for this app yet. Skip this step and set the spot later once the map is available."
+                ? "لم يتم تضمين مفتاح خرائط جوجل في هذه النسخة من التطبيق. يلزم إعادة نشر التطبيق بعد ربط خرائط جوجل. يمكنك تخطي هذه الخطوة وتحديد الموقع لاحقاً."
+                : "This build of the app was compiled without a Google Maps key, so the map can’t load here. The app needs to be republished after the Maps connector is linked. Skip this step and set the spot later."
               : rejected
+
               ? ar
                 ? `خرائط جوجل غير مسموح لها بالعمل على هذا النطاق (${window.location.hostname}). يجب إضافة النطاق إلى مفتاح الخرائط. تخطَّ هذه الخطوة وحدِّد الموقع لاحقاً.`
                 : `Google Maps isn’t authorised for this domain (${window.location.hostname}). The Maps key needs this domain added to it. Skip this step and set the spot later.`
