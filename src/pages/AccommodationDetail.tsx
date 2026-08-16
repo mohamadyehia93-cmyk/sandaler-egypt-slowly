@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
-  ArrowLeft, Star, Users, BedDouble, Bath, Clock, Check, CalendarIcon, ScrollText, Moon, BookOpen,
+  ArrowLeft, Users, BedDouble, Bath, Clock, Check, CalendarIcon, ScrollText, Moon, BookOpen,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -155,12 +155,6 @@ const AccommodationDetail = () => {
           )}
           {typeLabel && <span className="text-[11px] font-medium bg-primary/10 text-primary px-2.5 py-1 rounded-full">{typeLabel}</span>}
           {unitType && <span className="text-[11px] font-medium bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full">{unitType}</span>}
-          {place.rating > 0 && place.reviews_count > 0 && (
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              {place.rating} ({place.reviews_count})
-            </span>
-          )}
         </div>
         <LocationChips cityId={place.city_id} regionId={place.region_id} className="mt-2" />
 
