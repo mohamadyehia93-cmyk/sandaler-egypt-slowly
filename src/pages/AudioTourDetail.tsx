@@ -650,6 +650,16 @@ const AudioTourDetail = () => {
       {/* Audio Player — only when this tour has its own narration */}
       {audioSrc ? (
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
+          {virtualMode && stopsCount > 0 && (
+            <p dir="auto" className="text-[10px] text-muted-foreground mb-1 text-start truncate">
+              {lang === "ar" ? "الآن" : "Now playing"} · {activeStopIndex + 1}/{stopsCount}
+              {" · "}
+              {(() => {
+                const s = dbStops[activeStopIndex];
+                return s ? (lang === "ar" ? s.label_ar || s.label_en : s.label_en || s.label_ar) : "";
+              })()}
+            </p>
+          )}
           <div className="flex items-center gap-2 mb-2">
             <span className="text-[10px] text-muted-foreground w-10 text-right">{formatTime(currentTime)}</span>
             <Slider value={[progressPercent]} max={100} step={0.1} onValueChange={handleSeek} className="flex-1" />
@@ -658,15 +668,26 @@ const AudioTourDetail = () => {
           <div className="flex items-center justify-between">
             <button onClick={cycleSpeed} className="text-[10px] font-bold text-muted-foreground w-10">{playbackRate}x</button>
             <div className="flex items-center gap-4">
-              <button onClick={skipBackward}><SkipBack className="w-5 h-5 text-foreground" /></button>
+              <button
+                aria-label={virtualMode ? (lang === "ar" ? "المحطة السابقة" : "Previous stop") : (lang === "ar" ? "رجوع ١٥ ثانية" : "Back 15 seconds")}
+                onClick={() => (virtualMode ? goToVirtualStop(-1) : skipBackward())}
+              >
+                <SkipBack className="w-5 h-5 text-foreground" />
+              </button>
               <button onClick={togglePlay} className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                 {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
               </button>
-              <button onClick={skipForward}><SkipForward className="w-5 h-5 text-foreground" /></button>
+              <button
+                aria-label={virtualMode ? (lang === "ar" ? "المحطة التالية" : "Next stop") : (lang === "ar" ? "تقديم ١٥ ثانية" : "Forward 15 seconds")}
+                onClick={() => (virtualMode ? goToVirtualStop(1) : skipForward())}
+              >
+                <SkipForward className="w-5 h-5 text-foreground" />
+              </button>
             </div>
             <button onClick={toggleMute}>{isMuted ? <VolumeX className="w-5 h-5 text-muted-foreground" /> : <Volume2 className="w-5 h-5 text-foreground" />}</button>
           </div>
         </div>
+
       ) : (
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
           <div className="flex items-start gap-2 text-muted-foreground">
