@@ -2,16 +2,21 @@ import { useState, useEffect, useCallback, createContext, useContext, ReactNode 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
+/**
+ * Sandal has six roles. `subject-expert` and `narrator` were merged into
+ * `culture-actor` (one place to publish articles, audio tours and collections)
+ * and `ambassador` became an admin-granted capability in `user_roles`, not a
+ * role. Legacy strings are simply not recognised any more: a provider row that
+ * still held one would resolve to "visitor" rather than break — the accounts
+ * themselves were migrated.
+ */
 export type LocalRole =
   | "culture-actor"
   | "service-provider"
   | "whos-who"
   | "organization"
-  | "ambassador"
   | "product-seller"
-  | "trip-organizer"
-  | "subject-expert"
-  | "narrator";
+  | "trip-organizer";
 
 export type UserRole = "visitor" | LocalRole;
 
@@ -31,11 +36,8 @@ const roleDashboardPaths: Record<LocalRole, string> = {
   "service-provider": "/dashboard/service-provider",
   "whos-who": "/dashboard/whos-who",
   "organization": "/dashboard/organization",
-  "ambassador": "/dashboard/ambassador",
   "product-seller": "/dashboard/product-seller",
   "trip-organizer": "/dashboard/trip-organizer",
-  "subject-expert": "/dashboard/subject-expert",
-  "narrator": "/dashboard/narrator",
 };
 
 export const roleLabels: Record<UserRole, { en: string; ar: string }> = {
@@ -44,12 +46,10 @@ export const roleLabels: Record<UserRole, { en: string; ar: string }> = {
   "service-provider": { en: "Service Provider", ar: "مقدم خدمة" },
   "whos-who": { en: "Who's Who", ar: "شخصية بارزة" },
   organization: { en: "Organization", ar: "مؤسسة" },
-  ambassador: { en: "Ambassador", ar: "سفير" },
   "product-seller": { en: "Product Seller", ar: "بائع منتجات" },
   "trip-organizer": { en: "Trip Organizer", ar: "منظم رحلات" },
-  "subject-expert": { en: "Subject Expert", ar: "خبير متخصص" },
-  "narrator": { en: "Narrator", ar: "راوي" },
 };
+
 
 const UserRoleContext = createContext<UserRoleContextType | null>(null);
 
