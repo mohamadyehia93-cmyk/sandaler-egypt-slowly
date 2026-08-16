@@ -194,6 +194,9 @@ const NewAudioTour = () => {
           label_ar: authorLang === "ar" ? s.name.trim() : s.nameOther.trim(),
           desc_en: s.desc_en.trim(),
           desc_ar: s.desc_ar.trim(),
+          directions_en: s.directions_en.trim(),
+          directions_ar: s.directions_ar.trim(),
+
           lat: parseCoord(s.lat, 90),
           lng: parseCoord(s.lng, 180),
           audio_url: stopAudio || null,
