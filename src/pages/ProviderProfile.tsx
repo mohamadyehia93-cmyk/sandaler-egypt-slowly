@@ -282,7 +282,7 @@ const ProviderProfile = () => {
           )}
         </div>
 
-        {/* Knowledge collections (subject-expert output; expert_id = providers.user_id) */}
+        {/* Knowledge collections (culture-actor output; expert_id = providers.user_id) */}
         <ExpertCollections userId={provider.user_id} />
 
         {/* Specialties */}

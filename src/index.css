@@ -57,11 +57,8 @@ html, body {
     --role-service-provider: 204 64% 44%;
     --role-whos-who: 281 47% 41%;
     --role-organization: 6 63% 46%;
-    --role-ambassador: 28 80% 52%;
     --role-product-seller: 207 64% 29%;
     --role-trip-organizer: 282 47% 36%;
-    --role-subject-expert: 168 75% 27%;
-    --role-narrator: 174 64% 36%;
 
     /* Sidebar (shadcn default - keep) */
     --sidebar-background: 0 0% 98%;
