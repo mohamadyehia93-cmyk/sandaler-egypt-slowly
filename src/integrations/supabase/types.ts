@@ -18,6 +18,8 @@ export type Database = {
         Row: {
           accommodation_type: string | null
           amenities: string[] | null
+          amenities_ar: string[]
+          amenities_en: string[]
           bathrooms: number | null
           bedrooms: number | null
           cancellation_ar: string | null
@@ -59,6 +61,8 @@ export type Database = {
         Insert: {
           accommodation_type?: string | null
           amenities?: string[] | null
+          amenities_ar?: string[]
+          amenities_en?: string[]
           bathrooms?: number | null
           bedrooms?: number | null
           cancellation_ar?: string | null
@@ -100,6 +104,8 @@ export type Database = {
         Update: {
           accommodation_type?: string | null
           amenities?: string[] | null
+          amenities_ar?: string[]
+          amenities_en?: string[]
           bathrooms?: number | null
           bedrooms?: number | null
           cancellation_ar?: string | null
