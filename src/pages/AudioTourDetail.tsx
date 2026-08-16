@@ -17,6 +17,8 @@ import { useUserLocation, distanceMeters, formatDistance } from "@/hooks/useUser
 import { useOfflineTour, useOnlineStatus } from "@/hooks/useOfflineTour";
 import { toast } from "sonner";
 import NotFoundView from "@/components/NotFound";
+import { directionsToUrl, routeUrl, hasCoords } from "@/lib/mapsLinks";
+
 
 const NEAR_THRESHOLD_M = 50; // when within 50m, mark stop as "near you"
 
