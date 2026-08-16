@@ -216,7 +216,7 @@ const AudioTourDetail = () => {
     };
   // playbackRate intentionally excluded: cycleSpeed applies it in place.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tour?.id, activeSrc, usesPlaylist, virtualIndex, clipStops.length, virtualMode]);
+  }, [tour?.id, activeSrc, usesPlaylist, playIndex, playItems.length, virtualMode]);
 
 
 
