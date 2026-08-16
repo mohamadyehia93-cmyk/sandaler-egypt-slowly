@@ -22,7 +22,7 @@ import ExpertCollections from "@/components/ExpertCollections";
 type ProviderRole =
   | "culture-actor" | "service-provider" | "accommodation-host"
   | "transport-provider" | "trip-organizer" | "product-seller"
-  | "organization" | "ambassador";
+  | "organization";
 
 const roleColorClass: Record<string, string> = {
   "culture-actor": "bg-role-culture-actor",
@@ -52,7 +52,6 @@ const roleLabels: Record<string, { en: string; ar: string }> = {
   "trip-organizer": { en: "Trip Organizer", ar: "منظم رحلات" },
   "product-seller": { en: "Product Seller", ar: "بائع منتجات" },
   "organization": { en: "Organization", ar: "مؤسسة" },
-  "ambassador": { en: "Ambassador", ar: "سفير" },
 };
 
 const listingRoutes: Record<string, string> = {
@@ -73,7 +72,6 @@ const listingSectionLabels: Record<string, { en: string; ar: string }> = {
   "trip-organizer": { en: "Trips", ar: "رحلات" },
   "product-seller": { en: "Products", ar: "منتجات" },
   "organization": { en: "Programs & Causes", ar: "برامج وقضايا" },
-  "ambassador": { en: "Verified Providers", ar: "مزودون موثقون" },
 };
 
 // Map role to the table + column that links listings back.
