@@ -13,7 +13,7 @@ import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
 import ScriptMeter from "@/components/dashboard/ScriptMeter";
 import { estimateSeconds, formatDurationShort } from "@/lib/scriptEstimate";
-import { ArrowLeft, FileText, MapPin, Clock, Tag, Languages, DollarSign, Plus, Trash2, Mic, Image as ImageIcon, Navigation, Timer, Footprints } from "lucide-react";
+import { ArrowLeft, ArrowUp, ArrowDown, FileText, MapPin, Clock, Tag, Languages, DollarSign, Plus, Trash2, Mic, Image as ImageIcon, Navigation, Timer, Footprints, Layers } from "lucide-react";
 import { toast } from "sonner";
 
 const themes = [
