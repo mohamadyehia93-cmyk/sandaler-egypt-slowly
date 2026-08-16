@@ -159,7 +159,7 @@ const NewAudioTour = () => {
               // Segments are additive: a stop saved before this feature simply
               // has no `segments` key and prefills as an empty list.
               segments: Array.isArray(s.segments)
-                ? (s.segments as any[]).map((g: any) => ({
+                ? (s.segments as StoredSegment[]).map((g) => ({
                     title_en: g.title_en || "",
                     title_ar: g.title_ar || "",
                     desc_en: g.desc_en || "",
