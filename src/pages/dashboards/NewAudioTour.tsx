@@ -156,6 +156,18 @@ const NewAudioTour = () => {
               lng: s.lng != null ? String(s.lng) : "",
               audioFile: null,
               audioUrl: s.audio_url || null,
+              // Segments are additive: a stop saved before this feature simply
+              // has no `segments` key and prefills as an empty list.
+              segments: Array.isArray(s.segments)
+                ? (s.segments as any[]).map((g: any) => ({
+                    title_en: g.title_en || "",
+                    title_ar: g.title_ar || "",
+                    desc_en: g.desc_en || "",
+                    desc_ar: g.desc_ar || "",
+                    audioFile: null,
+                    audioUrl: g.audio_url || null,
+                  }))
+                : [],
             }))
           : [emptyStop()]
       );
@@ -181,14 +193,36 @@ const NewAudioTour = () => {
   const updateStop = <K extends keyof StopDraft>(i: number, key: K, v: StopDraft[K]) =>
     setStops((s) => s.map((stop, idx) => (idx === i ? { ...stop, [key]: v } : stop)));
 
+  const mutateSegments = (stopIdx: number, fn: (segs: SegmentDraft[]) => SegmentDraft[]) =>
+    setStops((s) => s.map((stop, idx) => (idx === stopIdx ? { ...stop, segments: fn(stop.segments) } : stop)));
+
+  const addSegment = (stopIdx: number) => mutateSegments(stopIdx, (segs) => [...segs, emptySegment()]);
+  const removeSegment = (stopIdx: number, segIdx: number) =>
+    mutateSegments(stopIdx, (segs) => segs.filter((_, i) => i !== segIdx));
+  const moveSegment = (stopIdx: number, segIdx: number, delta: -1 | 1) =>
+    mutateSegments(stopIdx, (segs) => {
+      const to = segIdx + delta;
+      if (to < 0 || to >= segs.length) return segs;
+      const next = [...segs];
+      [next[segIdx], next[to]] = [next[to], next[segIdx]];
+      return next;
+    });
+  const updateSegment = <K extends keyof SegmentDraft>(stopIdx: number, segIdx: number, key: K, v: SegmentDraft[K]) =>
+    mutateSegments(stopIdx, (segs) => segs.map((g, i) => (i === segIdx ? { ...g, [key]: v } : g)));
+
   /**
-   * Total estimated narration time: per stop take the longer of the English and
-   * Arabic script estimates (a narrator records one language per pass).
+   * Total estimated narration time: for each stop and each of its segments take
+   * the longer of the English and Arabic script estimates (a narrator records
+   * one language per pass).
    */
+  const longer = (en: string, ar: string) => Math.max(estimateSeconds(en, "en"), estimateSeconds(ar, "ar"));
   const totalEstimateSeconds = useMemo(
     () =>
       stops.reduce(
-        (sum, s) => sum + Math.max(estimateSeconds(s.desc_en, "en"), estimateSeconds(s.desc_ar, "ar")),
+        (sum, s) =>
+          sum +
+          longer(s.desc_en, s.desc_ar) +
+          s.segments.reduce((sub, g) => sub + longer(g.desc_en, g.desc_ar), 0),
         0
       ),
     [stops]
