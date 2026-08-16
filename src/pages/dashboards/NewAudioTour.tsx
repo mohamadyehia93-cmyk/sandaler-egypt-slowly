@@ -560,6 +560,104 @@ const NewAudioTour = () => {
                   onRemoveExisting={() => updateStop(i, "audioUrl", null)}
                   uploading={submitting && uploadStage === `stop-audio-${i + 1}`}
                 />
+
+                {/* Segments — what the listener hears once they ARRIVE here.
+                    No coordinates and no directions: they're already standing here. */}
+                <div className="rounded-xl border border-dashed border-role-narrator/40 bg-role-narrator/5 p-3 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[11px] font-bold text-role-narrator flex items-center gap-1.5">
+                        <Layers className="w-3 h-3" />
+                        {lang === "ar" ? "مقاطع داخل المحطة" : "Segments within this stop"}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
+                        {lang === "ar"
+                          ? "التعليمات أعلاه توضّح كيف يصل المستمع إلى هنا. المقاطع هي ما يسمعه بعد الوصول — بلا موقع أو اتجاهات."
+                          : "The directions above are how the listener GETS here. Segments are what they hear once they ARRIVE — no location, no directions."}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => addSegment(i)}
+                      className="text-[10px] font-semibold text-role-narrator flex items-center gap-1 shrink-0"
+                    >
+                      <Plus className="w-3 h-3" /> {lang === "ar" ? "إضافة مقطع" : "Add segment"}
+                    </button>
+                  </div>
+
+                  {s.segments.map((g, j) => (
+                    <div key={j} className="bg-card border border-border rounded-xl p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-role-narrator">
+                          {lang === "ar" ? `المقطع ${j + 1}` : `Segment ${j + 1}`}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => moveSegment(i, j, -1)}
+                            disabled={j === 0}
+                            aria-label={lang === "ar" ? "لأعلى" : "Move up"}
+                            className="p-1 text-muted-foreground disabled:opacity-30"
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => moveSegment(i, j, 1)}
+                            disabled={j === s.segments.length - 1}
+                            aria-label={lang === "ar" ? "لأسفل" : "Move down"}
+                            className="p-1 text-muted-foreground disabled:opacity-30"
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={() => removeSegment(i, j)} className="text-destructive p-1">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                      <input
+                        dir="ltr"
+                        className={inputClass}
+                        placeholder="Segment title (English)"
+                        value={g.title_en}
+                        onChange={(e) => updateSegment(i, j, "title_en", e.target.value)}
+                        maxLength={120}
+                      />
+                      <input
+                        dir="rtl"
+                        className={`${inputClass} text-right`}
+                        placeholder="عنوان المقطع (عربي)"
+                        value={g.title_ar}
+                        onChange={(e) => updateSegment(i, j, "title_ar", e.target.value)}
+                        maxLength={120}
+                      />
+                      <textarea
+                        dir="ltr"
+                        className={`${inputClass} min-h-[56px] resize-none`}
+                        placeholder="Script (English) — what the narrator says about this detail"
+                        value={g.desc_en}
+                        onChange={(e) => updateSegment(i, j, "desc_en", e.target.value)}
+                        maxLength={1200}
+                      />
+                      <ScriptMeter text={g.desc_en} scriptLang="en" audioFile={g.audioFile} audioUrl={g.audioUrl} />
+                      <textarea
+                        dir="rtl"
+                        className={`${inputClass} min-h-[56px] resize-none text-right`}
+                        placeholder="النص (عربي) — ما يقوله الراوي عن هذا التفصيل"
+                        value={g.desc_ar}
+                        onChange={(e) => updateSegment(i, j, "desc_ar", e.target.value)}
+                        maxLength={1200}
+                      />
+                      <ScriptMeter text={g.desc_ar} scriptLang="ar" audioFile={g.audioFile} audioUrl={g.audioUrl} />
+                      <AudioPicker
+                        compact
+                        label={lang === "ar" ? "مقطع صوتي للمقطع (اختياري)" : "Segment audio clip (optional)"}
+                        file={g.audioFile}
+                        onChange={(f) => updateSegment(i, j, "audioFile", f)}
+                        existingUrl={g.audioUrl}
+                        onRemoveExisting={() => updateSegment(i, j, "audioUrl", null)}
+                        uploading={submitting && uploadStage === `segment-audio-${i + 1}-${j + 1}`}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
