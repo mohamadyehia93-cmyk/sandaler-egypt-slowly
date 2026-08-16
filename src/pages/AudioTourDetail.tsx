@@ -67,7 +67,7 @@ const AudioTourDetail = () => {
     },
   });
 
-  const dbStops = ((tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string; audio_url?: string | null }> | undefined) || []).filter(Boolean);
+  const dbStops = ((tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string; directions_en?: string; directions_ar?: string; audio_url?: string | null }> | undefined) || []).filter(Boolean);
   const stopsCount = dbStops.length || tour?.stops_count || 0;
   // Only stops the narrator actually pinned can go on the map.
   const mapStops = dbStops
@@ -86,8 +86,25 @@ const AudioTourDetail = () => {
     dbStops.find((s) => !!s.audio_url)?.audio_url ||
     null;
 
+  // ---- Virtual (podcast) mode -------------------------------------------
+  // Plays the tour straight through with no GPS: for listeners who are not
+  // physically there. Works with per-stop clips (a playlist that auto-advances)
+  // AND with a single full-tour file (skip jumps between stop segments).
+  const clipStops = useMemo(
+    () => dbStops.map((s, index) => ({ ...s, index })).filter((s) => !!s.audio_url),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tour?.id, stopsCount]
+  );
+  const [virtualMode, setVirtualMode] = useState(false);
+  const [virtualIndex, setVirtualIndex] = useState(0);
+  const autoplayNextRef = useRef(false);
+  const usesPlaylist = virtualMode && clipStops.length > 1;
+  const activeSrc = usesPlaylist
+    ? clipStops[Math.min(virtualIndex, clipStops.length - 1)]?.audio_url || audioSrc
+    : audioSrc;
+
   useEffect(() => {
-    if (!audioSrc) {
+    if (!activeSrc) {
       audioRef.current = null;
       setIsLoaded(false);
       setIsPlaying(false);
@@ -95,13 +112,30 @@ const AudioTourDetail = () => {
       setCurrentTime(0);
       return;
     }
-    const audio = new Audio(audioSrc);
+    const audio = new Audio(activeSrc);
     audio.preload = "metadata";
+    audio.playbackRate = playbackRate;
     audioRef.current = audio;
 
-    const onLoaded = () => { setDuration(audio.duration); setIsLoaded(true); };
+    const onLoaded = () => {
+      setDuration(audio.duration);
+      setIsLoaded(true);
+      if (autoplayNextRef.current) {
+        autoplayNextRef.current = false;
+        audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+      }
+    };
     const onTimeUpdate = () => setCurrentTime(audio.duration ? audio.currentTime : 0);
-    const onEnded = () => { setIsPlaying(false); setCurrentTime(0); setActiveStopIndex(0); };
+    const onEnded = () => {
+      setCurrentTime(0);
+      if (usesPlaylist && virtualIndex < clipStops.length - 1) {
+        autoplayNextRef.current = true;
+        setVirtualIndex((i) => i + 1);
+        return;
+      }
+      setIsPlaying(false);
+      if (!virtualMode) setActiveStopIndex(0);
+    };
 
     audio.addEventListener("loadedmetadata", onLoaded);
     audio.addEventListener("timeupdate", onTimeUpdate);
@@ -114,7 +148,10 @@ const AudioTourDetail = () => {
       audio.removeEventListener("ended", onEnded);
       audio.src = "";
     };
-  }, [tour?.id, audioSrc]);
+  // playbackRate intentionally excluded: cycleSpeed applies it in place.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tour?.id, activeSrc, usesPlaylist, virtualIndex, clipStops.length, virtualMode]);
+
 
 
   // Distances from user to each stop (with valid lat/lng)
