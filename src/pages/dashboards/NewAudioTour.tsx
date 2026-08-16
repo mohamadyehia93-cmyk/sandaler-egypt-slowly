@@ -385,6 +385,22 @@ const NewAudioTour = () => {
               <Plus className="w-3 h-3" /> {lang === "ar" ? "إضافة محطة" : "Add stop"}
             </button>
           </div>
+
+          {/* Total spoken-time estimate across all stops (informational) */}
+          <div className="mb-3 rounded-xl bg-role-narrator/10 border border-role-narrator/25 px-3 py-2">
+            <p className="text-[11px] font-semibold text-role-narrator flex items-center gap-1.5">
+              <Timer className="w-3 h-3" />
+              {lang === "ar"
+                ? `إجمالي وقت السرد التقديري: ${formatDurationShort(totalEstimateSeconds, lang)}`
+                : `Estimated total narration: ${formatDurationShort(totalEstimateSeconds, lang)}`}
+            </p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              {lang === "ar"
+                ? "تقدير إرشادي فقط (١٣٠ كلمة/دقيقة للإنجليزية، ١١٠ للعربية) — لا يمنع النشر."
+                : "Guidance only (130 wpm English, 110 wpm Arabic) — never blocks publishing."}
+            </p>
+          </div>
+
           <div className="space-y-3">
             {stops.map((s, i) => (
               <div key={i} className="bg-card border border-border rounded-xl p-3 space-y-2">
@@ -398,7 +414,25 @@ const NewAudioTour = () => {
                 </div>
                 <input className={inputClass} placeholder={lang === "ar" ? "اسم المكان" : "Place name"} value={s.name} onChange={(e) => updateStop(i, "name", e.target.value)} />
                 <textarea dir="ltr" className={`${inputClass} min-h-[56px] resize-none`} placeholder="Short description (English) — what the visitor sees/hears here" value={s.desc_en} onChange={(e) => updateStop(i, "desc_en", e.target.value)} maxLength={200} />
+                <ScriptMeter text={s.desc_en} scriptLang="en" audioFile={s.audioFile} audioUrl={s.audioUrl} />
                 <textarea dir="rtl" className={`${inputClass} min-h-[56px] resize-none text-right`} placeholder="وصف مختصر (عربي) — ما يراه الزائر ويسمعه هنا" value={s.desc_ar} onChange={(e) => updateStop(i, "desc_ar", e.target.value)} maxLength={200} />
+                <ScriptMeter text={s.desc_ar} scriptLang="ar" audioFile={s.audioFile} audioUrl={s.audioUrl} />
+
+                {/* Walking directions from the previous stop to this one */}
+                <div>
+                  <label className="text-[10px] font-semibold text-muted-foreground mb-1 flex items-center gap-1">
+                    <Footprints className="w-2.5 h-2.5" />
+                    {lang === "ar" ? "تعليمات المشي إلى هذه المحطة" : "Walking directions to this stop"}
+                  </label>
+                  <textarea dir="ltr" className={`${inputClass} min-h-[48px] resize-none`} placeholder="Directions (English) — e.g. Walk south along Mohamed Ali St; the mosque is on your right" value={s.directions_en} onChange={(e) => updateStop(i, "directions_en", e.target.value)} maxLength={300} />
+                  <textarea dir="rtl" className={`${inputClass} min-h-[48px] resize-none text-right mt-2`} placeholder="التعليمات (عربي) — مثال: امشِ جنوباً في شارع محمد علي، والمسجد على يمينك" value={s.directions_ar} onChange={(e) => updateStop(i, "directions_ar", e.target.value)} maxLength={300} />
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    {lang === "ar"
+                      ? `${i === 0 ? "كيف يصل المستمع إلى نقطة البداية" : "كيف ينتقل المستمع من المحطة السابقة إلى هنا"} — وليس محتوى المحطة نفسها.`
+                      : `${i === 0 ? "How the listener reaches the starting point" : "How the listener walks from the previous stop to here"} — not the stop's content.`}
+                  </p>
+                </div>
+
 
                 {/* Location — used by the player's GPS proximity + route map */}
                 <div>
