@@ -69,7 +69,12 @@ const AudioTourDetail = () => {
     },
   });
 
-  const dbStops = ((tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string; directions_en?: string; directions_ar?: string; audio_url?: string | null }> | undefined) || []).filter(Boolean);
+/** A nested segment: heard once the listener has ARRIVED at its stop. Never has coordinates. */
+type TourSegment = { title_en?: string; title_ar?: string; desc_en?: string; desc_ar?: string; audio_url?: string | null };
+type TourStop = { label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string; directions_en?: string; directions_ar?: string; audio_url?: string | null; segments?: TourSegment[] };
+
+const AudioTourDetailInner = () => null;
+
   const stopsCount = dbStops.length || tour?.stops_count || 0;
   // Only stops the narrator actually pinned can go on the map.
   const mapStops = dbStops
