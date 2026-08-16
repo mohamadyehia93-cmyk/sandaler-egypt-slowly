@@ -1,6 +1,6 @@
 import MessageOwnerButton from "@/components/MessageOwnerButton";
 import ShareButton from "@/components/ShareButton";
-import { ArrowLeft, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle, ChevronRight, Feather, Footprints } from "lucide-react";
+import { ArrowLeft, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle, ChevronRight, Feather, Footprints, Layers } from "lucide-react";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
@@ -21,6 +21,31 @@ import { directionsToUrl, routeUrl, hasCoords } from "@/lib/mapsLinks";
 
 
 const NEAR_THRESHOLD_M = 50; // when within 50m, mark stop as "near you"
+
+/**
+ * A nested SEGMENT is heard once the listener has ARRIVED at its stop, so it
+ * deliberately carries no coordinates and no walking directions — only the stop
+ * has those (and only stops feed the map + Google Maps route).
+ */
+type TourSegment = { title_en?: string; title_ar?: string; desc_en?: string; desc_ar?: string; audio_url?: string | null };
+type TourStop = {
+  label_en: string; label_ar: string; lat: number; lng: number;
+  desc_en?: string; desc_ar?: string; directions_en?: string; directions_ar?: string;
+  audio_url?: string | null;
+  /** Optional; absent on every tour authored before segments existed. */
+  segments?: TourSegment[];
+};
+
+/** One playable unit: either a stop's own clip, or one segment inside a stop. */
+type PlayItem = {
+  stopIndex: number;
+  /** null when the item is the stop's own single clip. */
+  segIndex: number | null;
+  segCount: number;
+  src: string;
+  title_en: string;
+  title_ar: string;
+};
 
 
 const formatTime = (seconds: number) => {
@@ -69,7 +94,9 @@ const AudioTourDetail = () => {
     },
   });
 
-  const dbStops = ((tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string; directions_en?: string; directions_ar?: string; audio_url?: string | null }> | undefined) || []).filter(Boolean);
+  const dbStops = ((tour?.stops as TourStop[] | undefined) || []).filter(Boolean);
+
+
   const stopsCount = dbStops.length || tour?.stops_count || 0;
   // Only stops the narrator actually pinned can go on the map.
   const mapStops = dbStops
@@ -88,29 +115,59 @@ const AudioTourDetail = () => {
 
 
 
-  // This tour's OWN narration: the tour-level track, else the first stop clip.
+  // This tour's OWN narration: the tour-level track, else the first stop clip,
+  // else the first segment clip (a stop may carry audio only on its segments).
   // Never fall back to another tour's audio — when there is none we say so.
   const audioSrc =
     ((tour as any)?.audio_url as string | null | undefined) ||
     dbStops.find((s) => !!s.audio_url)?.audio_url ||
+    dbStops.flatMap((s) => (Array.isArray(s.segments) ? s.segments : [])).find((g) => !!g?.audio_url)?.audio_url ||
     null;
 
-  // ---- Virtual (podcast) mode -------------------------------------------
-  // Plays the tour straight through with no GPS: for listeners who are not
-  // physically there. Works with per-stop clips (a playlist that auto-advances)
-  // AND with a single full-tour file (skip jumps between stop segments).
-  const clipStops = useMemo(
-    () => dbStops.map((s, index) => ({ ...s, index })).filter((s) => !!s.audio_url),
+  // ---- Playlist: stops and their nested segments -------------------------
+  // A flat list of playable units in tour order. A stop WITH segments yields one
+  // item per segment; a stop without segments yields its own single clip, exactly
+  // as before. Used by virtual (podcast) mode across the whole tour, and by GPS
+  // mode to auto-advance segments once the listener has arrived at a stop.
+  const playItems = useMemo<PlayItem[]>(() => {
+    const items: PlayItem[] = [];
+    dbStops.forEach((s, stopIndex) => {
+      const segs = (Array.isArray(s.segments) ? s.segments : []).filter((g) => !!g?.audio_url);
+      if (segs.length) {
+        segs.forEach((g, segIndex) =>
+          items.push({
+            stopIndex,
+            segIndex,
+            segCount: segs.length,
+            src: g.audio_url as string,
+            title_en: g.title_en || "",
+            title_ar: g.title_ar || "",
+          })
+        );
+      } else if (s.audio_url) {
+        items.push({
+          stopIndex,
+          segIndex: null,
+          segCount: 0,
+          src: s.audio_url,
+          title_en: s.label_en || "",
+          title_ar: s.label_ar || "",
+        });
+      }
+    });
+    return items;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tour?.id, stopsCount]
-  );
+  }, [tour?.id, stopsCount]);
+
+  const hasSegmentItems = playItems.some((it) => it.segIndex !== null);
   const [virtualMode, setVirtualMode] = useState(false);
-  const [virtualIndex, setVirtualIndex] = useState(0);
+  const [playIndex, setPlayIndex] = useState(0);
   const autoplayNextRef = useRef(false);
-  const usesPlaylist = virtualMode && clipStops.length > 1;
-  const activeSrc = usesPlaylist
-    ? clipStops[Math.min(virtualIndex, clipStops.length - 1)]?.audio_url || audioSrc
-    : audioSrc;
+  // Segmented tours use the playlist in GPS mode too, so segments can advance on
+  // their own once the listener arrives. Unsegmented tours keep today's behaviour.
+  const usesPlaylist = playItems.length > 1 && (virtualMode || hasSegmentItems);
+  const currentItem = usesPlaylist ? playItems[Math.min(playIndex, playItems.length - 1)] : null;
+  const activeSrc = currentItem?.src || audioSrc;
 
   useEffect(() => {
     if (!activeSrc) {
@@ -137,9 +194,11 @@ const AudioTourDetail = () => {
     const onTimeUpdate = () => setCurrentTime(audio.duration ? audio.currentTime : 0);
     const onEnded = () => {
       setCurrentTime(0);
-      if (usesPlaylist && virtualIndex < clipStops.length - 1) {
+      // Auto-advance: to the next segment inside this stop, then across the stop
+      // boundary to the next stop's first segment.
+      if (usesPlaylist && playIndex < playItems.length - 1) {
         autoplayNextRef.current = true;
-        setVirtualIndex((i) => i + 1);
+        setPlayIndex((i) => i + 1);
         return;
       }
       setIsPlaying(false);
@@ -159,7 +218,7 @@ const AudioTourDetail = () => {
     };
   // playbackRate intentionally excluded: cycleSpeed applies it in place.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tour?.id, activeSrc, usesPlaylist, virtualIndex, clipStops.length, virtualMode]);
+  }, [tour?.id, activeSrc, usesPlaylist, playIndex, playItems.length, virtualMode]);
 
 
 
@@ -183,12 +242,12 @@ const AudioTourDetail = () => {
     return best;
   }, [stopDistances]);
 
-  // Sync active stop: virtual playlist position, else nearest stop when
-  // geo-following, else audio progress.
+  // Sync active stop: playlist position, else nearest stop when geo-following,
+  // else audio progress through a single full-tour track.
   useEffect(() => {
     if (usesPlaylist) {
-      const target = clipStops[Math.min(virtualIndex, clipStops.length - 1)];
-      if (target) setActiveStopIndex(target.index);
+      const target = playItems[Math.min(playIndex, playItems.length - 1)];
+      if (target) setActiveStopIndex(target.stopIndex);
       return;
     }
     if (!virtualMode && followGeo && geoEnabled && nearestStopIndex >= 0) {
@@ -199,7 +258,23 @@ const AudioTourDetail = () => {
       const progress = currentTime / duration;
       setActiveStopIndex(Math.min(Math.floor(progress * stopsCount), stopsCount - 1));
     }
-  }, [currentTime, duration, stopsCount, followGeo, geoEnabled, nearestStopIndex, usesPlaylist, virtualMode, virtualIndex, clipStops]);
+  }, [currentTime, duration, stopsCount, followGeo, geoEnabled, nearestStopIndex, usesPlaylist, virtualMode, playIndex, playItems]);
+
+  // GPS mode: arriving at a stop jumps the playlist to that stop's FIRST segment.
+  // Once inside a stop we leave the playlist alone so segments advance on their
+  // own without needing further GPS fixes.
+  useEffect(() => {
+    if (!usesPlaylist || virtualMode) return;
+    if (!followGeo || !geoEnabled || nearestStopIndex < 0) return;
+    const first = playItems.findIndex((it) => it.stopIndex === nearestStopIndex);
+    if (first < 0) return;
+    const cur = playItems[Math.min(playIndex, playItems.length - 1)];
+    if (cur && cur.stopIndex === nearestStopIndex) return;
+    autoplayNextRef.current = isPlaying;
+    setPlayIndex(first);
+    // isPlaying intentionally excluded: it must not re-trigger the jump.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usesPlaylist, virtualMode, followGeo, geoEnabled, nearestStopIndex, playItems, playIndex]);
 
   const enableGeo = useCallback(() => {
     setVirtualMode(false);
@@ -208,14 +283,18 @@ const AudioTourDetail = () => {
     toast.success(lang === "ar" ? "تم تفعيل الموقع - الجولة ستتبع تحركك" : "Location on — the tour will follow your steps");
   }, [lang]);
 
-  /** Move between stops in virtual mode (playlist hop, or seek within one track). */
+  /**
+   * Step through the playlist: between segments inside a stop, then across the
+   * boundary into the neighbouring stop. Falls back to seeking within a single
+   * full-tour track when there is no playlist.
+   */
   const goToVirtualStop = useCallback(
     (delta: 1 | -1) => {
       if (usesPlaylist) {
-        const next = Math.min(Math.max(virtualIndex + delta, 0), clipStops.length - 1);
-        if (next === virtualIndex) return;
+        const next = Math.min(Math.max(playIndex + delta, 0), playItems.length - 1);
+        if (next === playIndex) return;
         autoplayNextRef.current = isPlaying;
-        setVirtualIndex(next);
+        setPlayIndex(next);
         return;
       }
       const audio = audioRef.current;
@@ -225,7 +304,7 @@ const AudioTourDetail = () => {
       setCurrentTime(audio.currentTime);
       setActiveStopIndex(target);
     },
-    [usesPlaylist, virtualIndex, clipStops.length, isPlaying, duration, stopsCount, activeStopIndex]
+    [usesPlaylist, playIndex, playItems.length, isPlaying, duration, stopsCount, activeStopIndex]
   );
 
   const toggleVirtualMode = useCallback(() => {
@@ -233,7 +312,7 @@ const AudioTourDetail = () => {
       const next = !prev;
       if (next) {
         setFollowGeo(false);
-        setVirtualIndex(0);
+        setPlayIndex(0);
         autoplayNextRef.current = false;
       }
       return next;
@@ -680,6 +759,42 @@ const AudioTourDetail = () => {
                     </p>
                   )}
 
+                  {/* Nested segments — what you hear once you're standing here.
+                      Structure is visible without playing anything. */}
+                  {(() => {
+                    const segs = (Array.isArray(stop?.segments) ? stop!.segments! : []).filter(
+                      (g) => (g?.title_en || g?.title_ar || g?.desc_en || g?.desc_ar || g?.audio_url)
+                    );
+                    if (segs.length === 0) return null;
+                    return (
+                      <div data-testid={`stop-${i}-segments`} className="mt-2 ps-3 border-s-2 border-primary/25 space-y-2">
+                        <p className="text-[10px] font-semibold text-primary uppercase tracking-wide flex items-center gap-1">
+                          <Layers className="w-3 h-3" />
+                          {lang === "ar" ? `${segs.length} مقاطع في هذه المحطة` : `${segs.length} segments at this stop`}
+                        </p>
+                        {segs.map((g, j) => {
+                          const segTitle = (lang === "ar" ? g.title_ar || g.title_en : g.title_en || g.title_ar) || "";
+                          const segDesc = (lang === "ar" ? g.desc_ar || g.desc_en : g.desc_en || g.desc_ar) || "";
+                          return (
+                            <div key={j} className="text-start">
+                              {segTitle && (
+                                <p dir="auto" className="text-[12px] font-semibold text-foreground">
+                                  {j + 1}. {segTitle}
+                                </p>
+                              )}
+                              {segDesc && (
+                                <p dir="auto" className="text-[11px] text-muted-foreground leading-relaxed">{segDesc}</p>
+                              )}
+                              {g.audio_url && (
+                                <audio controls preload="none" src={g.audio_url} className="w-full h-8 mt-1" />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+
                   {stop?.audio_url && (
                     <audio
                       controls
@@ -725,11 +840,25 @@ const AudioTourDetail = () => {
       {/* Audio Player — only when this tour has its own narration */}
       {audioSrc ? (
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
-          {virtualMode && stopsCount > 0 && (
-            <p dir="auto" className="text-[10px] text-muted-foreground mb-1 text-start truncate">
-              {lang === "ar" ? "الآن" : "Now playing"} · {activeStopIndex + 1}/{stopsCount}
+          {(virtualMode || usesPlaylist) && stopsCount > 0 && (
+            <p dir="auto" data-testid="now-playing" className="text-[10px] text-muted-foreground mb-1 text-start truncate">
+              {lang === "ar"
+                ? `المحطة ${activeStopIndex + 1} من ${stopsCount}`
+                : `Stop ${activeStopIndex + 1} of ${stopsCount}`}
+              {currentItem?.segIndex != null && (
+                <>
+                  {" · "}
+                  {lang === "ar"
+                    ? `المقطع ${currentItem.segIndex + 1} من ${currentItem.segCount}`
+                    : `Segment ${currentItem.segIndex + 1} of ${currentItem.segCount}`}
+                </>
+              )}
               {" · "}
               {(() => {
+                if (currentItem) {
+                  const t = lang === "ar" ? currentItem.title_ar || currentItem.title_en : currentItem.title_en || currentItem.title_ar;
+                  if (t) return t;
+                }
                 const s = dbStops[activeStopIndex];
                 return s ? (lang === "ar" ? s.label_ar || s.label_en : s.label_en || s.label_ar) : "";
               })()}
@@ -744,17 +873,19 @@ const AudioTourDetail = () => {
             <button onClick={cycleSpeed} className="text-[10px] font-bold text-muted-foreground w-10">{playbackRate}x</button>
             <div className="flex items-center gap-4">
               <button
-                aria-label={virtualMode ? (lang === "ar" ? "المحطة السابقة" : "Previous stop") : (lang === "ar" ? "رجوع ١٥ ثانية" : "Back 15 seconds")}
-                onClick={() => (virtualMode ? goToVirtualStop(-1) : skipBackward())}
+                data-testid="skip-back"
+                aria-label={virtualMode || usesPlaylist ? (lang === "ar" ? "السابق" : "Previous") : (lang === "ar" ? "رجوع ١٥ ثانية" : "Back 15 seconds")}
+                onClick={() => (virtualMode || usesPlaylist ? goToVirtualStop(-1) : skipBackward())}
               >
                 <SkipBack className="w-5 h-5 text-foreground" />
               </button>
-              <button onClick={togglePlay} className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+              <button data-testid="play-toggle" onClick={togglePlay} className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                 {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
               </button>
               <button
-                aria-label={virtualMode ? (lang === "ar" ? "المحطة التالية" : "Next stop") : (lang === "ar" ? "تقديم ١٥ ثانية" : "Forward 15 seconds")}
-                onClick={() => (virtualMode ? goToVirtualStop(1) : skipForward())}
+                data-testid="skip-forward"
+                aria-label={virtualMode || usesPlaylist ? (lang === "ar" ? "التالي" : "Next") : (lang === "ar" ? "تقديم ١٥ ثانية" : "Forward 15 seconds")}
+                onClick={() => (virtualMode || usesPlaylist ? goToVirtualStop(1) : skipForward())}
               >
                 <SkipForward className="w-5 h-5 text-foreground" />
               </button>

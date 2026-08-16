@@ -13,7 +13,7 @@ import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
 import ScriptMeter from "@/components/dashboard/ScriptMeter";
 import { estimateSeconds, formatDurationShort } from "@/lib/scriptEstimate";
-import { ArrowLeft, FileText, MapPin, Clock, Tag, Languages, DollarSign, Plus, Trash2, Mic, Image as ImageIcon, Navigation, Timer, Footprints } from "lucide-react";
+import { ArrowLeft, ArrowUp, ArrowDown, FileText, MapPin, Clock, Tag, Languages, DollarSign, Plus, Trash2, Mic, Image as ImageIcon, Navigation, Timer, Footprints, Layers } from "lucide-react";
 import { toast } from "sonner";
 
 const themes = [
@@ -24,6 +24,38 @@ const themes = [
   { en: "Spiritual", ar: "روحاني" },
   { en: "Nature", ar: "طبيعة" },
 ];
+
+/**
+ * A SEGMENT lives INSIDE a stop: something the narrator talks about once the
+ * listener has already arrived. Deliberately has NO coordinates and NO walking
+ * directions — those belong to the stop.
+ */
+type SegmentDraft = {
+  title_en: string;
+  title_ar: string;
+  desc_en: string;
+  desc_ar: string;
+  audioFile: File | null;
+  audioUrl: string | null;
+};
+
+/** Segment shape as persisted inside the stops jsonb. */
+type StoredSegment = {
+  title_en?: string;
+  title_ar?: string;
+  desc_en?: string;
+  desc_ar?: string;
+  audio_url?: string | null;
+};
+
+const emptySegment = (): SegmentDraft => ({
+  title_en: "",
+  title_ar: "",
+  desc_en: "",
+  desc_ar: "",
+  audioFile: null,
+  audioUrl: null,
+});
 
 type StopDraft = {
   /** Label in the authoring language. */
@@ -45,6 +77,8 @@ type StopDraft = {
   audioFile: File | null;
   /** Already-uploaded clip URL (edit mode). */
   audioUrl: string | null;
+  /** Optional nested segments heard at this stop. */
+  segments: SegmentDraft[];
 };
 
 const emptyStop = (): StopDraft => ({
@@ -58,6 +92,7 @@ const emptyStop = (): StopDraft => ({
   lng: "",
   audioFile: null,
   audioUrl: null,
+  segments: [],
 });
 
 
@@ -130,6 +165,18 @@ const NewAudioTour = () => {
               lng: s.lng != null ? String(s.lng) : "",
               audioFile: null,
               audioUrl: s.audio_url || null,
+              // Segments are additive: a stop saved before this feature simply
+              // has no `segments` key and prefills as an empty list.
+              segments: Array.isArray(s.segments)
+                ? (s.segments as StoredSegment[]).map((g) => ({
+                    title_en: g.title_en || "",
+                    title_ar: g.title_ar || "",
+                    desc_en: g.desc_en || "",
+                    desc_ar: g.desc_ar || "",
+                    audioFile: null,
+                    audioUrl: g.audio_url || null,
+                  }))
+                : [],
             }))
           : [emptyStop()]
       );
@@ -155,14 +202,36 @@ const NewAudioTour = () => {
   const updateStop = <K extends keyof StopDraft>(i: number, key: K, v: StopDraft[K]) =>
     setStops((s) => s.map((stop, idx) => (idx === i ? { ...stop, [key]: v } : stop)));
 
+  const mutateSegments = (stopIdx: number, fn: (segs: SegmentDraft[]) => SegmentDraft[]) =>
+    setStops((s) => s.map((stop, idx) => (idx === stopIdx ? { ...stop, segments: fn(stop.segments) } : stop)));
+
+  const addSegment = (stopIdx: number) => mutateSegments(stopIdx, (segs) => [...segs, emptySegment()]);
+  const removeSegment = (stopIdx: number, segIdx: number) =>
+    mutateSegments(stopIdx, (segs) => segs.filter((_, i) => i !== segIdx));
+  const moveSegment = (stopIdx: number, segIdx: number, delta: -1 | 1) =>
+    mutateSegments(stopIdx, (segs) => {
+      const to = segIdx + delta;
+      if (to < 0 || to >= segs.length) return segs;
+      const next = [...segs];
+      [next[segIdx], next[to]] = [next[to], next[segIdx]];
+      return next;
+    });
+  const updateSegment = <K extends keyof SegmentDraft>(stopIdx: number, segIdx: number, key: K, v: SegmentDraft[K]) =>
+    mutateSegments(stopIdx, (segs) => segs.map((g, i) => (i === segIdx ? { ...g, [key]: v } : g)));
+
   /**
-   * Total estimated narration time: per stop take the longer of the English and
-   * Arabic script estimates (a narrator records one language per pass).
+   * Total estimated narration time: for each stop and each of its segments take
+   * the longer of the English and Arabic script estimates (a narrator records
+   * one language per pass).
    */
+  const longer = (en: string, ar: string) => Math.max(estimateSeconds(en, "en"), estimateSeconds(ar, "ar"));
   const totalEstimateSeconds = useMemo(
     () =>
       stops.reduce(
-        (sum, s) => sum + Math.max(estimateSeconds(s.desc_en, "en"), estimateSeconds(s.desc_ar, "ar")),
+        (sum, s) =>
+          sum +
+          longer(s.desc_en, s.desc_ar) +
+          s.segments.reduce((sub, g) => sub + longer(g.desc_en, g.desc_ar), 0),
         0
       ),
     [stops]
@@ -205,6 +274,26 @@ const NewAudioTour = () => {
         setUploadStage(`stop-audio-${i + 1}`);
         let stopAudio = s.audioUrl;
         if (s.audioFile) stopAudio = await uploadAudio(s.audioFile, user.id);
+
+        // Nested segments: keep only those with a title in either language, and
+        // upload any newly picked clip. Both languages are written verbatim —
+        // English is never mirrored into Arabic.
+        const keptSegments = s.segments.filter((g) => g.title_en.trim() || g.title_ar.trim());
+        const cleanSegments: StoredSegment[] = [];
+        for (let j = 0; j < keptSegments.length; j++) {
+          const g = keptSegments[j];
+          setUploadStage(`segment-audio-${i + 1}-${j + 1}`);
+          let segAudio = g.audioUrl;
+          if (g.audioFile) segAudio = await uploadAudio(g.audioFile, user.id);
+          cleanSegments.push({
+            title_en: g.title_en.trim(),
+            title_ar: g.title_ar.trim(),
+            desc_en: g.desc_en.trim(),
+            desc_ar: g.desc_ar.trim(),
+            audio_url: segAudio || null,
+          });
+        }
+
         cleanStops.push({
           label_en: authorLang === "en" ? s.name.trim() : s.nameOther.trim(),
           label_ar: authorLang === "ar" ? s.name.trim() : s.nameOther.trim(),
@@ -216,6 +305,9 @@ const NewAudioTour = () => {
           lat: parseCoord(s.lat, 90),
           lng: parseCoord(s.lng, 180),
           audio_url: stopAudio || null,
+          // Omit the key entirely when empty so untouched tours keep their exact
+          // previous shape.
+          ...(cleanSegments.length ? { segments: cleanSegments } : {}),
         });
       }
       setUploadStage(null);
@@ -280,7 +372,7 @@ const NewAudioTour = () => {
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
 
   const submitLabel = submitting
-    ? uploadStage === "tour-audio" || uploadStage?.startsWith("stop-audio")
+    ? uploadStage === "tour-audio" || uploadStage?.startsWith("stop-audio") || uploadStage?.startsWith("segment-audio")
       ? lang === "ar" ? "جارٍ رفع الصوت..." : "Uploading audio..."
       : lang === "ar" ? "جاري الحفظ..." : "Saving..."
     : isEdit
@@ -477,6 +569,104 @@ const NewAudioTour = () => {
                   onRemoveExisting={() => updateStop(i, "audioUrl", null)}
                   uploading={submitting && uploadStage === `stop-audio-${i + 1}`}
                 />
+
+                {/* Segments — what the listener hears once they ARRIVE here.
+                    No coordinates and no directions: they're already standing here. */}
+                <div className="rounded-xl border border-dashed border-role-narrator/40 bg-role-narrator/5 p-3 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[11px] font-bold text-role-narrator flex items-center gap-1.5">
+                        <Layers className="w-3 h-3" />
+                        {lang === "ar" ? "مقاطع داخل المحطة" : "Segments within this stop"}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
+                        {lang === "ar"
+                          ? "التعليمات أعلاه توضّح كيف يصل المستمع إلى هنا. المقاطع هي ما يسمعه بعد الوصول — بلا موقع أو اتجاهات."
+                          : "The directions above are how the listener GETS here. Segments are what they hear once they ARRIVE — no location, no directions."}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => addSegment(i)}
+                      className="text-[10px] font-semibold text-role-narrator flex items-center gap-1 shrink-0"
+                    >
+                      <Plus className="w-3 h-3" /> {lang === "ar" ? "إضافة مقطع" : "Add segment"}
+                    </button>
+                  </div>
+
+                  {s.segments.map((g, j) => (
+                    <div key={j} className="bg-card border border-border rounded-xl p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-role-narrator">
+                          {lang === "ar" ? `المقطع ${j + 1}` : `Segment ${j + 1}`}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => moveSegment(i, j, -1)}
+                            disabled={j === 0}
+                            aria-label={lang === "ar" ? "لأعلى" : "Move up"}
+                            className="p-1 text-muted-foreground disabled:opacity-30"
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => moveSegment(i, j, 1)}
+                            disabled={j === s.segments.length - 1}
+                            aria-label={lang === "ar" ? "لأسفل" : "Move down"}
+                            className="p-1 text-muted-foreground disabled:opacity-30"
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={() => removeSegment(i, j)} className="text-destructive p-1">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                      <input
+                        dir="ltr"
+                        className={inputClass}
+                        placeholder="Segment title (English)"
+                        value={g.title_en}
+                        onChange={(e) => updateSegment(i, j, "title_en", e.target.value)}
+                        maxLength={120}
+                      />
+                      <input
+                        dir="rtl"
+                        className={`${inputClass} text-right`}
+                        placeholder="عنوان المقطع (عربي)"
+                        value={g.title_ar}
+                        onChange={(e) => updateSegment(i, j, "title_ar", e.target.value)}
+                        maxLength={120}
+                      />
+                      <textarea
+                        dir="ltr"
+                        className={`${inputClass} min-h-[56px] resize-none`}
+                        placeholder="Script (English) — what the narrator says about this detail"
+                        value={g.desc_en}
+                        onChange={(e) => updateSegment(i, j, "desc_en", e.target.value)}
+                        maxLength={1200}
+                      />
+                      <ScriptMeter text={g.desc_en} scriptLang="en" audioFile={g.audioFile} audioUrl={g.audioUrl} />
+                      <textarea
+                        dir="rtl"
+                        className={`${inputClass} min-h-[56px] resize-none text-right`}
+                        placeholder="النص (عربي) — ما يقوله الراوي عن هذا التفصيل"
+                        value={g.desc_ar}
+                        onChange={(e) => updateSegment(i, j, "desc_ar", e.target.value)}
+                        maxLength={1200}
+                      />
+                      <ScriptMeter text={g.desc_ar} scriptLang="ar" audioFile={g.audioFile} audioUrl={g.audioUrl} />
+                      <AudioPicker
+                        compact
+                        label={lang === "ar" ? "مقطع صوتي للمقطع (اختياري)" : "Segment audio clip (optional)"}
+                        file={g.audioFile}
+                        onChange={(f) => updateSegment(i, j, "audioFile", f)}
+                        existingUrl={g.audioUrl}
+                        onRemoveExisting={() => updateSegment(i, j, "audioUrl", null)}
+                        uploading={submitting && uploadStage === `segment-audio-${i + 1}-${j + 1}`}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
