@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
+import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
 import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
