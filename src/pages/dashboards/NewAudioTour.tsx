@@ -121,6 +121,9 @@ const NewAudioTour = () => {
               nameOther: (authorLang === "ar" ? s.label_en : s.label_ar) || "",
               desc_en: s.desc_en || "",
               desc_ar: s.desc_ar || "",
+              directions_en: s.directions_en || "",
+              directions_ar: s.directions_ar || "",
+
               lat: s.lat != null ? String(s.lat) : "",
               lng: s.lng != null ? String(s.lng) : "",
               audioFile: null,
