@@ -155,6 +155,20 @@ const NewAudioTour = () => {
   const updateStop = <K extends keyof StopDraft>(i: number, key: K, v: StopDraft[K]) =>
     setStops((s) => s.map((stop, idx) => (idx === i ? { ...stop, [key]: v } : stop)));
 
+  /**
+   * Total estimated narration time: per stop take the longer of the English and
+   * Arabic script estimates (a narrator records one language per pass).
+   */
+  const totalEstimateSeconds = useMemo(
+    () =>
+      stops.reduce(
+        (sum, s) => sum + Math.max(estimateSeconds(s.desc_en, "en"), estimateSeconds(s.desc_ar, "ar")),
+        0
+      ),
+    [stops]
+  );
+
+
   /** Parse a coordinate field; returns null when blank or out of range. */
   const parseCoord = (raw: string, max: number): number | null => {
     const n = parseFloat(raw);
