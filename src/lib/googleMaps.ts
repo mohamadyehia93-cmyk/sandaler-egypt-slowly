@@ -24,10 +24,26 @@ export function onGoogleMapsAuthFailure(cb: () => void) {
 
 export const hasGoogleMapsKey = () => !!BROWSER_KEY;
 
+/** Env var Vite inlines at build time; named in warnings so misconfig is obvious. */
+export const GOOGLE_MAPS_KEY_ENV_VAR = "VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY";
+
+let warned = false;
+function warnMissingKey() {
+  if (warned) return;
+  warned = true;
+  console.warn(
+    `[googleMaps] Maps disabled: ${GOOGLE_MAPS_KEY_ENV_VAR} was not present when this bundle was built. ` +
+      "Vite inlines VITE_* values at build time, so the app must be rebuilt after the Google Maps connector is linked."
+  );
+}
 
 export function loadGoogleMaps(): Promise<typeof google.maps> {
   if (promise) return promise;
-  if (!BROWSER_KEY) return Promise.reject(new Error("google-maps-key-missing"));
+  if (!BROWSER_KEY) {
+    warnMissingKey();
+    return Promise.reject(new Error("google-maps-key-missing"));
+  }
+
 
   promise = new Promise((resolve, reject) => {
     const w = window as Window & {
