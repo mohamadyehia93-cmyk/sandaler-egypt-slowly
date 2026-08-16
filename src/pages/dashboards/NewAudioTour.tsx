@@ -34,6 +34,9 @@ type StopDraft = {
   nameOther: string;
   desc_en: string;
   desc_ar: string;
+  /** Walking instruction from the PREVIOUS stop to this one. */
+  directions_en: string;
+  directions_ar: string;
   lat: string;
   lng: string;
   /** Newly picked clip, uploaded on save. */
@@ -47,11 +50,14 @@ const emptyStop = (): StopDraft => ({
   nameOther: "",
   desc_en: "",
   desc_ar: "",
+  directions_en: "",
+  directions_ar: "",
   lat: "",
   lng: "",
   audioFile: null,
   audioUrl: null,
 });
+
 
 const NewAudioTour = () => {
   const { lang } = useI18n();
