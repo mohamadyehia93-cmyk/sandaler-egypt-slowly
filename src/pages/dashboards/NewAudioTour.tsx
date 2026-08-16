@@ -265,6 +265,26 @@ const NewAudioTour = () => {
         setUploadStage(`stop-audio-${i + 1}`);
         let stopAudio = s.audioUrl;
         if (s.audioFile) stopAudio = await uploadAudio(s.audioFile, user.id);
+
+        // Nested segments: keep only those with a title in either language, and
+        // upload any newly picked clip. Both languages are written verbatim —
+        // English is never mirrored into Arabic.
+        const keptSegments = s.segments.filter((g) => g.title_en.trim() || g.title_ar.trim());
+        const cleanSegments: any[] = [];
+        for (let j = 0; j < keptSegments.length; j++) {
+          const g = keptSegments[j];
+          setUploadStage(`segment-audio-${i + 1}-${j + 1}`);
+          let segAudio = g.audioUrl;
+          if (g.audioFile) segAudio = await uploadAudio(g.audioFile, user.id);
+          cleanSegments.push({
+            title_en: g.title_en.trim(),
+            title_ar: g.title_ar.trim(),
+            desc_en: g.desc_en.trim(),
+            desc_ar: g.desc_ar.trim(),
+            audio_url: segAudio || null,
+          });
+        }
+
         cleanStops.push({
           label_en: authorLang === "en" ? s.name.trim() : s.nameOther.trim(),
           label_ar: authorLang === "ar" ? s.name.trim() : s.nameOther.trim(),
@@ -276,6 +296,9 @@ const NewAudioTour = () => {
           lat: parseCoord(s.lat, 90),
           lng: parseCoord(s.lng, 180),
           audio_url: stopAudio || null,
+          // Omit the key entirely when empty so untouched tours keep their exact
+          // previous shape.
+          ...(cleanSegments.length ? { segments: cleanSegments } : {}),
         });
       }
       setUploadStage(null);
