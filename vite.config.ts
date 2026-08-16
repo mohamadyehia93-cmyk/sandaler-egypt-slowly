@@ -12,6 +12,15 @@ const FALLBACK_SUPABASE_URL = `https://${FALLBACK_SUPABASE_PROJECT_ID}.supabase.
 const FALLBACK_SUPABASE_PUBLISHABLE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lYWNjY2J3cHpycmNvYW5sb2p3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MjI1OTIsImV4cCI6MjA5MDk5ODU5Mn0.0tiOl8gFP5JEwp8apSWNSDLHHCI-4P1EOQeuAxljV-w";
 
+// Google Maps BROWSER key. Hardcoded on purpose: the hosted publish build runs
+// without VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY in its environment, so the
+// key compiled to undefined and Rollup tree-shook the Maps loader away — every
+// location picker fell back to "Maps not configured" on the live site. A Maps
+// *browser* key is public by design (secured by HTTP-referrer restrictions, not
+// secrecy), so shipping it in the bundle is expected. Do NOT remove this fallback
+// without first confirming the hosted build injects the connector env var.
+const FALLBACK_GOOGLE_MAPS_BROWSER_KEY = "AIzaSyBmvJph4LmrbtW7skeczzpBIyb9WWzFKo4";
+
 const pick = (value: string | undefined, fallback: string) =>
   value && value.trim() !== "" && value !== "undefined" ? value : fallback;
 
