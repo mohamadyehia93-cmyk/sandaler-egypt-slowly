@@ -240,12 +240,12 @@ const AudioTourDetail = () => {
     return best;
   }, [stopDistances]);
 
-  // Sync active stop: virtual playlist position, else nearest stop when
-  // geo-following, else audio progress.
+  // Sync active stop: playlist position, else nearest stop when geo-following,
+  // else audio progress through a single full-tour track.
   useEffect(() => {
     if (usesPlaylist) {
-      const target = clipStops[Math.min(virtualIndex, clipStops.length - 1)];
-      if (target) setActiveStopIndex(target.index);
+      const target = playItems[Math.min(playIndex, playItems.length - 1)];
+      if (target) setActiveStopIndex(target.stopIndex);
       return;
     }
     if (!virtualMode && followGeo && geoEnabled && nearestStopIndex >= 0) {
@@ -256,7 +256,23 @@ const AudioTourDetail = () => {
       const progress = currentTime / duration;
       setActiveStopIndex(Math.min(Math.floor(progress * stopsCount), stopsCount - 1));
     }
-  }, [currentTime, duration, stopsCount, followGeo, geoEnabled, nearestStopIndex, usesPlaylist, virtualMode, virtualIndex, clipStops]);
+  }, [currentTime, duration, stopsCount, followGeo, geoEnabled, nearestStopIndex, usesPlaylist, virtualMode, playIndex, playItems]);
+
+  // GPS mode: arriving at a stop jumps the playlist to that stop's FIRST segment.
+  // Once inside a stop we leave the playlist alone so segments advance on their
+  // own without needing further GPS fixes.
+  useEffect(() => {
+    if (!usesPlaylist || virtualMode) return;
+    if (!followGeo || !geoEnabled || nearestStopIndex < 0) return;
+    const first = playItems.findIndex((it) => it.stopIndex === nearestStopIndex);
+    if (first < 0) return;
+    const cur = playItems[Math.min(playIndex, playItems.length - 1)];
+    if (cur && cur.stopIndex === nearestStopIndex) return;
+    autoplayNextRef.current = isPlaying;
+    setPlayIndex(first);
+    // isPlaying intentionally excluded: it must not re-trigger the jump.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usesPlaylist, virtualMode, followGeo, geoEnabled, nearestStopIndex, playItems, playIndex]);
 
   const enableGeo = useCallback(() => {
     setVirtualMode(false);
@@ -265,14 +281,18 @@ const AudioTourDetail = () => {
     toast.success(lang === "ar" ? "تم تفعيل الموقع - الجولة ستتبع تحركك" : "Location on — the tour will follow your steps");
   }, [lang]);
 
-  /** Move between stops in virtual mode (playlist hop, or seek within one track). */
+  /**
+   * Step through the playlist: between segments inside a stop, then across the
+   * boundary into the neighbouring stop. Falls back to seeking within a single
+   * full-tour track when there is no playlist.
+   */
   const goToVirtualStop = useCallback(
     (delta: 1 | -1) => {
       if (usesPlaylist) {
-        const next = Math.min(Math.max(virtualIndex + delta, 0), clipStops.length - 1);
-        if (next === virtualIndex) return;
+        const next = Math.min(Math.max(playIndex + delta, 0), playItems.length - 1);
+        if (next === playIndex) return;
         autoplayNextRef.current = isPlaying;
-        setVirtualIndex(next);
+        setPlayIndex(next);
         return;
       }
       const audio = audioRef.current;
@@ -282,7 +302,7 @@ const AudioTourDetail = () => {
       setCurrentTime(audio.currentTime);
       setActiveStopIndex(target);
     },
-    [usesPlaylist, virtualIndex, clipStops.length, isPlaying, duration, stopsCount, activeStopIndex]
+    [usesPlaylist, playIndex, playItems.length, isPlaying, duration, stopsCount, activeStopIndex]
   );
 
   const toggleVirtualMode = useCallback(() => {
@@ -290,7 +310,7 @@ const AudioTourDetail = () => {
       const next = !prev;
       if (next) {
         setFollowGeo(false);
-        setVirtualIndex(0);
+        setPlayIndex(0);
         autoplayNextRef.current = false;
       }
       return next;
