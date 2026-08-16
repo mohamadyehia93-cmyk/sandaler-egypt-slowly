@@ -1,6 +1,6 @@
 import MessageOwnerButton from "@/components/MessageOwnerButton";
 import ShareButton from "@/components/ShareButton";
-import { ArrowLeft, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle, ChevronRight, Feather } from "lucide-react";
+import { ArrowLeft, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle, ChevronRight, Feather, Footprints } from "lucide-react";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
@@ -67,7 +67,7 @@ const AudioTourDetail = () => {
     },
   });
 
-  const dbStops = ((tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string; audio_url?: string | null }> | undefined) || []).filter(Boolean);
+  const dbStops = ((tour?.stops as Array<{ label_en: string; label_ar: string; lat: number; lng: number; desc_en?: string; desc_ar?: string; directions_en?: string; directions_ar?: string; audio_url?: string | null }> | undefined) || []).filter(Boolean);
   const stopsCount = dbStops.length || tour?.stops_count || 0;
   // Only stops the narrator actually pinned can go on the map.
   const mapStops = dbStops
@@ -86,8 +86,25 @@ const AudioTourDetail = () => {
     dbStops.find((s) => !!s.audio_url)?.audio_url ||
     null;
 
+  // ---- Virtual (podcast) mode -------------------------------------------
+  // Plays the tour straight through with no GPS: for listeners who are not
+  // physically there. Works with per-stop clips (a playlist that auto-advances)
+  // AND with a single full-tour file (skip jumps between stop segments).
+  const clipStops = useMemo(
+    () => dbStops.map((s, index) => ({ ...s, index })).filter((s) => !!s.audio_url),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tour?.id, stopsCount]
+  );
+  const [virtualMode, setVirtualMode] = useState(false);
+  const [virtualIndex, setVirtualIndex] = useState(0);
+  const autoplayNextRef = useRef(false);
+  const usesPlaylist = virtualMode && clipStops.length > 1;
+  const activeSrc = usesPlaylist
+    ? clipStops[Math.min(virtualIndex, clipStops.length - 1)]?.audio_url || audioSrc
+    : audioSrc;
+
   useEffect(() => {
-    if (!audioSrc) {
+    if (!activeSrc) {
       audioRef.current = null;
       setIsLoaded(false);
       setIsPlaying(false);
@@ -95,13 +112,30 @@ const AudioTourDetail = () => {
       setCurrentTime(0);
       return;
     }
-    const audio = new Audio(audioSrc);
+    const audio = new Audio(activeSrc);
     audio.preload = "metadata";
+    audio.playbackRate = playbackRate;
     audioRef.current = audio;
 
-    const onLoaded = () => { setDuration(audio.duration); setIsLoaded(true); };
+    const onLoaded = () => {
+      setDuration(audio.duration);
+      setIsLoaded(true);
+      if (autoplayNextRef.current) {
+        autoplayNextRef.current = false;
+        audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+      }
+    };
     const onTimeUpdate = () => setCurrentTime(audio.duration ? audio.currentTime : 0);
-    const onEnded = () => { setIsPlaying(false); setCurrentTime(0); setActiveStopIndex(0); };
+    const onEnded = () => {
+      setCurrentTime(0);
+      if (usesPlaylist && virtualIndex < clipStops.length - 1) {
+        autoplayNextRef.current = true;
+        setVirtualIndex((i) => i + 1);
+        return;
+      }
+      setIsPlaying(false);
+      if (!virtualMode) setActiveStopIndex(0);
+    };
 
     audio.addEventListener("loadedmetadata", onLoaded);
     audio.addEventListener("timeupdate", onTimeUpdate);
@@ -114,7 +148,10 @@ const AudioTourDetail = () => {
       audio.removeEventListener("ended", onEnded);
       audio.src = "";
     };
-  }, [tour?.id, audioSrc]);
+  // playbackRate intentionally excluded: cycleSpeed applies it in place.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tour?.id, activeSrc, usesPlaylist, virtualIndex, clipStops.length, virtualMode]);
+
 
 
   // Distances from user to each stop (with valid lat/lng)
@@ -137,9 +174,15 @@ const AudioTourDetail = () => {
     return best;
   }, [stopDistances]);
 
-  // Sync active stop with audio progress, OR with nearest stop when geo-following
+  // Sync active stop: virtual playlist position, else nearest stop when
+  // geo-following, else audio progress.
   useEffect(() => {
-    if (followGeo && geoEnabled && nearestStopIndex >= 0) {
+    if (usesPlaylist) {
+      const target = clipStops[Math.min(virtualIndex, clipStops.length - 1)];
+      if (target) setActiveStopIndex(target.index);
+      return;
+    }
+    if (!virtualMode && followGeo && geoEnabled && nearestStopIndex >= 0) {
       setActiveStopIndex(nearestStopIndex);
       return;
     }
@@ -147,13 +190,47 @@ const AudioTourDetail = () => {
       const progress = currentTime / duration;
       setActiveStopIndex(Math.min(Math.floor(progress * stopsCount), stopsCount - 1));
     }
-  }, [currentTime, duration, stopsCount, followGeo, geoEnabled, nearestStopIndex]);
+  }, [currentTime, duration, stopsCount, followGeo, geoEnabled, nearestStopIndex, usesPlaylist, virtualMode, virtualIndex, clipStops]);
 
   const enableGeo = useCallback(() => {
+    setVirtualMode(false);
     setGeoEnabled(true);
     setFollowGeo(true);
     toast.success(lang === "ar" ? "تم تفعيل الموقع - الجولة ستتبع تحركك" : "Location on — the tour will follow your steps");
   }, [lang]);
+
+  /** Move between stops in virtual mode (playlist hop, or seek within one track). */
+  const goToVirtualStop = useCallback(
+    (delta: 1 | -1) => {
+      if (usesPlaylist) {
+        const next = Math.min(Math.max(virtualIndex + delta, 0), clipStops.length - 1);
+        if (next === virtualIndex) return;
+        autoplayNextRef.current = isPlaying;
+        setVirtualIndex(next);
+        return;
+      }
+      const audio = audioRef.current;
+      if (!audio || !duration || stopsCount === 0) return;
+      const target = Math.min(Math.max(activeStopIndex + delta, 0), stopsCount - 1);
+      audio.currentTime = (target / stopsCount) * duration;
+      setCurrentTime(audio.currentTime);
+      setActiveStopIndex(target);
+    },
+    [usesPlaylist, virtualIndex, clipStops.length, isPlaying, duration, stopsCount, activeStopIndex]
+  );
+
+  const toggleVirtualMode = useCallback(() => {
+    setVirtualMode((prev) => {
+      const next = !prev;
+      if (next) {
+        setFollowGeo(false);
+        setVirtualIndex(0);
+        autoplayNextRef.current = false;
+      }
+      return next;
+    });
+  }, []);
+
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
@@ -380,8 +457,40 @@ const AudioTourDetail = () => {
           </>
         )}
 
-        {/* Geo CTA / status */}
-        {mapStops.length > 0 && (
+        {/* Playback mode: on-location (GPS) vs virtual / podcast mode */}
+        {audioSrc && (
+          <div className="mb-3 rounded-xl bg-surface border border-border p-1 flex gap-1">
+            <button
+              onClick={() => { if (virtualMode) toggleVirtualMode(); }}
+              className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-colors ${
+                !virtualMode ? "bg-primary text-primary-foreground" : "text-foreground"
+              }`}
+            >
+              <Navigation className="w-3.5 h-3.5" />
+              {lang === "ar" ? "أنا في المكان" : "I'm on location"}
+            </button>
+            <button
+              onClick={() => { if (!virtualMode) toggleVirtualMode(); }}
+              className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-colors ${
+                virtualMode ? "bg-primary text-primary-foreground" : "text-foreground"
+              }`}
+            >
+              <Headphones className="w-3.5 h-3.5" />
+              {lang === "ar" ? "استمع من أي مكان" : "Listen from anywhere"}
+            </button>
+          </div>
+        )}
+        {virtualMode && (
+          <p className="text-[11px] text-muted-foreground mb-3 leading-snug">
+            {lang === "ar"
+              ? "التشغيل الافتراضي: تُشغَّل المحطات بالترتيب وتنتقل تلقائياً — بدون موقع أو GPS."
+              : "Virtual playback: stops play in order and advance automatically — no location or GPS needed."}
+          </p>
+        )}
+
+        {/* Geo CTA / status — hidden in virtual mode */}
+        {mapStops.length > 0 && !virtualMode && (
+
           <div className="mb-3">
             {!geoEnabled ? (
               <button
@@ -414,14 +523,52 @@ const AudioTourDetail = () => {
           </div>
         )}
 
-        {/* Turn-by-turn guidance to the next stop */}
-        {dbStops.length > 0 && (
+        {/* Written walking directions — readable without playing any audio */}
+        {(() => {
+          const dirOf = (i: number) => {
+            const s = dbStops[i];
+            if (!s) return "";
+            return (lang === "ar" ? s.directions_ar || s.directions_en : s.directions_en || s.directions_ar) || "";
+          };
+          const labelOf = (i: number) => {
+            const s = dbStops[i];
+            if (!s) return lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`;
+            return (lang === "ar" ? s.label_ar || s.label_en : s.label_en || s.label_ar) || "";
+          };
+          const rows = [
+            { i: activeStopIndex, text: dirOf(activeStopIndex), current: true },
+            { i: activeStopIndex + 1, text: dirOf(activeStopIndex + 1), current: false },
+          ].filter((r) => r.i < stopsCount && !!r.text);
+          if (rows.length === 0) return null;
+          return (
+            <div className="mb-4 rounded-xl bg-surface border border-border p-3 space-y-3">
+              <p className="text-[11px] font-bold text-primary uppercase tracking-wide flex items-center gap-1.5">
+                <Footprints className="w-3.5 h-3.5" />
+                {lang === "ar" ? "تعليمات المشي" : "Walking directions"}
+              </p>
+              {rows.map((r) => (
+                <div key={r.i} className="text-start">
+                  <p className="text-[10px] font-semibold text-muted-foreground">
+                    {r.current
+                      ? (lang === "ar" ? `إلى المحطة الحالية: ${labelOf(r.i)}` : `To current stop: ${labelOf(r.i)}`)
+                      : (lang === "ar" ? `إلى المحطة التالية: ${labelOf(r.i)}` : `To next stop: ${labelOf(r.i)}`)}
+                  </p>
+                  <p dir="auto" className="text-[13px] text-foreground leading-relaxed mt-0.5">{r.text}</p>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+
+        {/* Turn-by-turn guidance to the next stop (GPS mode only) */}
+        {dbStops.length > 0 && !virtualMode && (
           <TurnByTurnGuidance
             stops={dbStops}
             activeStopIndex={activeStopIndex}
             userCoords={userLoc.coords ? { lat: userLoc.coords.lat, lng: userLoc.coords.lng } : null}
           />
         )}
+
 
         {/* Route Map */}
         {mapStops.length > 0 && (
@@ -456,11 +603,22 @@ const AudioTourDetail = () => {
                 </div>
                 <div className="flex-1 pt-1">
                   <p className="text-sm font-semibold text-foreground">{stopLabel}</p>
+                  {(() => {
+                    const d = stop ? (lang === "ar" ? stop.directions_ar || stop.directions_en : stop.directions_en || stop.directions_ar) : "";
+                    if (!d) return null;
+                    return (
+                      <p dir="auto" className="text-[12px] text-primary leading-relaxed mt-1 flex items-start gap-1.5 text-start">
+                        <Footprints className="w-3 h-3 mt-0.5 shrink-0" />
+                        <span>{d}</span>
+                      </p>
+                    );
+                  })()}
                   {stopDesc && (
                     <p dir="auto" className="text-[12px] text-muted-foreground leading-relaxed mt-1 text-start">
                       {stopDesc}
                     </p>
                   )}
+
                   {stop?.audio_url && (
                     <audio
                       controls
@@ -492,6 +650,16 @@ const AudioTourDetail = () => {
       {/* Audio Player — only when this tour has its own narration */}
       {audioSrc ? (
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
+          {virtualMode && stopsCount > 0 && (
+            <p dir="auto" className="text-[10px] text-muted-foreground mb-1 text-start truncate">
+              {lang === "ar" ? "الآن" : "Now playing"} · {activeStopIndex + 1}/{stopsCount}
+              {" · "}
+              {(() => {
+                const s = dbStops[activeStopIndex];
+                return s ? (lang === "ar" ? s.label_ar || s.label_en : s.label_en || s.label_ar) : "";
+              })()}
+            </p>
+          )}
           <div className="flex items-center gap-2 mb-2">
             <span className="text-[10px] text-muted-foreground w-10 text-right">{formatTime(currentTime)}</span>
             <Slider value={[progressPercent]} max={100} step={0.1} onValueChange={handleSeek} className="flex-1" />
@@ -500,15 +668,26 @@ const AudioTourDetail = () => {
           <div className="flex items-center justify-between">
             <button onClick={cycleSpeed} className="text-[10px] font-bold text-muted-foreground w-10">{playbackRate}x</button>
             <div className="flex items-center gap-4">
-              <button onClick={skipBackward}><SkipBack className="w-5 h-5 text-foreground" /></button>
+              <button
+                aria-label={virtualMode ? (lang === "ar" ? "المحطة السابقة" : "Previous stop") : (lang === "ar" ? "رجوع ١٥ ثانية" : "Back 15 seconds")}
+                onClick={() => (virtualMode ? goToVirtualStop(-1) : skipBackward())}
+              >
+                <SkipBack className="w-5 h-5 text-foreground" />
+              </button>
               <button onClick={togglePlay} className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                 {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
               </button>
-              <button onClick={skipForward}><SkipForward className="w-5 h-5 text-foreground" /></button>
+              <button
+                aria-label={virtualMode ? (lang === "ar" ? "المحطة التالية" : "Next stop") : (lang === "ar" ? "تقديم ١٥ ثانية" : "Forward 15 seconds")}
+                onClick={() => (virtualMode ? goToVirtualStop(1) : skipForward())}
+              >
+                <SkipForward className="w-5 h-5 text-foreground" />
+              </button>
             </div>
             <button onClick={toggleMute}>{isMuted ? <VolumeX className="w-5 h-5 text-muted-foreground" /> : <Volume2 className="w-5 h-5 text-foreground" />}</button>
           </div>
         </div>
+
       ) : (
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
           <div className="flex items-start gap-2 text-muted-foreground">
