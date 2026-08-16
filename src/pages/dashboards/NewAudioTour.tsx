@@ -363,7 +363,7 @@ const NewAudioTour = () => {
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
 
   const submitLabel = submitting
-    ? uploadStage === "tour-audio" || uploadStage?.startsWith("stop-audio")
+    ? uploadStage === "tour-audio" || uploadStage?.startsWith("stop-audio") || uploadStage?.startsWith("segment-audio")
       ? lang === "ar" ? "جارٍ رفع الصوت..." : "Uploading audio..."
       : lang === "ar" ? "جاري الحفظ..." : "Saving..."
     : isEdit
