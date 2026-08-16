@@ -17,6 +17,8 @@ import { useUserLocation, distanceMeters, formatDistance } from "@/hooks/useUser
 import { useOfflineTour, useOnlineStatus } from "@/hooks/useOfflineTour";
 import { toast } from "sonner";
 import NotFoundView from "@/components/NotFound";
+import { directionsToUrl, routeUrl, hasCoords } from "@/lib/mapsLinks";
+
 
 const NEAR_THRESHOLD_M = 50; // when within 50m, mark stop as "near you"
 
@@ -77,6 +79,13 @@ const AudioTourDetail = () => {
       lat: Number(s.lat),
       lng: Number(s.lng),
     }));
+  // Google Maps navigation links. Travel mode is always walking: `theme` on
+  // audio_tours is a content topic (History, Food, ...), never a transport mode.
+  const startPoint = dbStops.find((s) => hasCoords(s));
+  const startNavUrl = startPoint ? directionsToUrl(startPoint, "walking") : null;
+  const fullRoute = routeUrl(dbStops, "walking");
+
+
 
 
   // This tour's OWN narration: the tour-level track, else the first stop clip.
@@ -309,6 +318,45 @@ const AudioTourDetail = () => {
           <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {tour.duration_minutes} {lang === "ar" ? "دقيقة" : "min"}</span>
           <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {stopsCount} {lang === "ar" ? "محطات" : "stops"}</span>
         </div>
+
+        {/* Google Maps navigation — small text actions, never competing with Play */}
+        {(startNavUrl || fullRoute) && (
+          <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+            {startNavUrl && (
+              <a
+                href={startNavUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="nav-to-start"
+                className="text-xs font-semibold text-primary flex items-center gap-1.5"
+              >
+                <Navigation className="w-3.5 h-3.5" />
+                {lang === "ar" ? "الاتجاهات إلى نقطة البداية" : "Directions to the start"}
+              </a>
+            )}
+            {fullRoute && (
+              <a
+                href={fullRoute.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="nav-full-route"
+                className="text-xs font-semibold text-primary flex items-center gap-1.5"
+              >
+                <Footprints className="w-3.5 h-3.5" />
+                {lang === "ar" ? "المسار كامل في خرائط جوجل" : "Whole route in Google Maps"}
+              </a>
+            )}
+            {fullRoute?.truncatedTo && (
+              <span className="text-[11px] text-muted-foreground w-full">
+                {lang === "ar"
+                  ? `تعرض خرائط جوجل أول ${fullRoute.truncatedTo} محطات فقط (حدّ نقاط الطريق).`
+                  : `Google Maps shows the first ${fullRoute.truncatedTo} stops only (waypoint limit).`}
+              </span>
+            )}
+          </div>
+        )}
+
+
 
         {/* Offline banner */}
         {!isOnline && (
@@ -556,7 +604,20 @@ const AudioTourDetail = () => {
                   <p dir="auto" className="text-[13px] text-foreground leading-relaxed mt-0.5">{r.text}</p>
                 </div>
               ))}
+              {startNavUrl && (
+                <a
+                  href={startNavUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="nav-to-start-card"
+                  className="text-xs font-semibold text-primary flex items-center gap-1.5"
+                >
+                  <Navigation className="w-3.5 h-3.5" />
+                  {lang === "ar" ? "الاتجاهات إلى نقطة البداية" : "Directions to the start"}
+                </a>
+              )}
             </div>
+
           );
         })()}
 
@@ -639,6 +700,20 @@ const AudioTourDetail = () => {
                       )}
                     </div>
                   )}
+                  {/* Per-stop navigation — only when the narrator pinned this stop */}
+                  {hasCoords(stop) && (
+                    <a
+                      href={directionsToUrl(stop, "walking")}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-testid={`nav-stop-${i}`}
+                      className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold text-primary"
+                    >
+                      <Navigation className="w-3 h-3" />
+                      {lang === "ar" ? "الاتجاهات" : "Directions"}
+                    </a>
+                  )}
+
                 </div>
               </div>
             );
