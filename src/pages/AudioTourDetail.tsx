@@ -604,7 +604,20 @@ const AudioTourDetail = () => {
                   <p dir="auto" className="text-[13px] text-foreground leading-relaxed mt-0.5">{r.text}</p>
                 </div>
               ))}
+              {startNavUrl && (
+                <a
+                  href={startNavUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="nav-to-start-card"
+                  className="text-xs font-semibold text-primary flex items-center gap-1.5"
+                >
+                  <Navigation className="w-3.5 h-3.5" />
+                  {lang === "ar" ? "الاتجاهات إلى نقطة البداية" : "Directions to the start"}
+                </a>
+              )}
             </div>
+
           );
         })()}
 
