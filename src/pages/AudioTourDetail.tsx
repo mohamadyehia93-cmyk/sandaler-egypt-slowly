@@ -115,11 +115,13 @@ const AudioTourDetail = () => {
 
 
 
-  // This tour's OWN narration: the tour-level track, else the first stop clip.
+  // This tour's OWN narration: the tour-level track, else the first stop clip,
+  // else the first segment clip (a stop may carry audio only on its segments).
   // Never fall back to another tour's audio — when there is none we say so.
   const audioSrc =
     ((tour as any)?.audio_url as string | null | undefined) ||
     dbStops.find((s) => !!s.audio_url)?.audio_url ||
+    dbStops.flatMap((s) => (Array.isArray(s.segments) ? s.segments : [])).find((g) => !!g?.audio_url)?.audio_url ||
     null;
 
   // ---- Playlist: stops and their nested segments -------------------------
