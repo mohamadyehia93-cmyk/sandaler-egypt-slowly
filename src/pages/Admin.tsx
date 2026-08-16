@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Button } from "@/components/ui/button";
 import { eventStatusClasses, eventStatusLabel } from "@/lib/eventSort";
+import AdminAmbassadors from "@/components/admin/AdminAmbassadors";
 
 type FlagReport = {
   id: string;
@@ -74,7 +75,7 @@ const Admin = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isAdmin, loading, user } = useIsAdmin();
-  const [tab, setTab] = useState<"reports" | "events" | "editorial">("reports");
+  const [tab, setTab] = useState<"reports" | "events" | "editorial" | "people">("reports");
   const [claiming, setClaiming] = useState(false);
 
   // A signed-in non-admin cannot read other users' rows in user_roles (RLS is
@@ -318,12 +319,12 @@ const Admin = () => {
           </div>
         </div>
 
-        <div className="flex gap-2">
-          {(["reports", "events", "editorial"] as const).map((k) => (
+        <div className="grid grid-cols-4 gap-2">
+          {(["reports", "events", "editorial", "people"] as const).map((k) => (
             <button
               key={k}
               onClick={() => setTab(k)}
-              className={`flex-1 text-xs font-semibold py-2 rounded-full border transition-colors ${
+              className={`text-[11px] font-semibold py-2 rounded-full border transition-colors ${
                 tab === k
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-background text-muted-foreground border-border"
@@ -333,10 +334,14 @@ const Admin = () => {
                 ? ar ? "التقارير" : "Flag reports"
                 : k === "events"
                   ? ar ? "الفعاليات" : "Pending events"
-                  : ar ? "معلومات دليلية" : "Editorial"}
+                  : k === "editorial"
+                    ? ar ? "معلومات دليلية" : "Editorial"
+                    : ar ? "الحسابات" : "People"}
             </button>
           ))}
         </div>
+
+        {tab === "people" && <AdminAmbassadors />}
 
         {tab === "reports" && (
           <div className="space-y-3">
