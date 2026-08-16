@@ -130,7 +130,7 @@ const NewCollection = () => {
         if (error) throw error;
         toast.success(lang === "ar" ? "تم نشر المجموعة بنجاح!" : "Collection published successfully!");
       }
-      navigate("/dashboard/subject-expert/my-collections");
+      navigate("/dashboard/culture-actor/my-collections");
     } catch (err: any) {
       toast.error(err.message || "Failed to save collection");
     } finally {
@@ -139,19 +139,19 @@ const NewCollection = () => {
   };
 
 
-  const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-subject-expert/40";
+  const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-culture-actor/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
 
   return (
     <div className="min-h-screen bg-surface pb-10">
-      <header className="bg-role-subject-expert text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
+      <header className="bg-role-culture-actor text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل المجموعة" : "Edit Collection") : (lang === "ar" ? "مجموعة جديدة" : "New Collection")}</h1>
       </header>
 
       <div className="px-4 py-5 space-y-5">
         <div>
-          <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-subject-expert" />{lang === "ar" ? "صورة الغلاف" : "Cover Image"}</label>
+          <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "صورة الغلاف" : "Cover Image"}</label>
           <PhotoPicker files={photos} onChange={setPhotos} max={1} hint={lang === "ar" ? "صورة غلاف المجموعة" : "Collection cover image"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
@@ -162,7 +162,7 @@ const NewCollection = () => {
           fieldEn="title_en" fieldAr="title_ar"
           labelEn="Collection Title" labelAr="عنوان المجموعة"
           required manualOnly maxLength={120}
-          icon={<FileText className="w-3.5 h-3.5 text-role-subject-expert" />}
+          icon={<FileText className="w-3.5 h-3.5 text-role-culture-actor" />}
           valueEn={form.titleEn} valueAr={form.titleAr}
           onChange={({ en, ar }) => setForm((p) => ({ ...p, titleEn: en, titleAr: ar }))}
           meta={meta} onMetaChange={setMeta}
@@ -176,7 +176,7 @@ const NewCollection = () => {
           fieldEn="abstract_en" fieldAr="abstract_ar"
           labelEn="Abstract" labelAr="الملخص"
           required manualOnly multiline rows={6} maxLength={2000}
-          icon={<FileText className="w-3.5 h-3.5 text-role-subject-expert" />}
+          icon={<FileText className="w-3.5 h-3.5 text-role-culture-actor" />}
           valueEn={form.abstractEn} valueAr={form.abstractAr}
           onChange={({ en, ar }) => setForm((p) => ({ ...p, abstractEn: en, abstractAr: ar }))}
           meta={meta} onMetaChange={setMeta}
@@ -187,10 +187,10 @@ const NewCollection = () => {
         />
 
         <div>
-          <label className={labelClass}><Tag className="w-3.5 h-3.5 text-role-subject-expert" />{lang === "ar" ? "التخصص *" : "Discipline *"}</label>
+          <label className={labelClass}><Tag className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "التخصص *" : "Discipline *"}</label>
           <div className="flex flex-wrap gap-2">
             {disciplines.map((d, i) => (
-              <button key={i} onClick={() => set("discipline", d.en)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${form.discipline === d.en ? "bg-role-subject-expert text-white border-role-subject-expert" : "bg-card text-foreground border-border"}`}>
+              <button key={i} onClick={() => set("discipline", d.en)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${form.discipline === d.en ? "bg-role-culture-actor text-white border-role-culture-actor" : "bg-card text-foreground border-border"}`}>
                 {lang === "ar" ? d.ar : d.en}
               </button>
             ))}
@@ -198,25 +198,25 @@ const NewCollection = () => {
         </div>
 
         <div>
-          <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-subject-expert" />{lang === "ar" ? "المنطقة" : "Region"}</label>
+          <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "المنطقة" : "Region"}</label>
           <input className={inputClass} placeholder={lang === "ar" ? "مثال: دلتا النيل" : "e.g. Nile Delta"} value={form.region} onChange={(e) => set("region", e.target.value)} maxLength={80} />
         </div>
 
         {/* Collection Entries */}
         <div>
-          <label className={labelClass}><BookOpen className="w-3.5 h-3.5 text-role-subject-expert" />{lang === "ar" ? "عناصر المجموعة" : "Collection Entries"}</label>
+          <label className={labelClass}><BookOpen className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "عناصر المجموعة" : "Collection Entries"}</label>
           <div className="space-y-3">
             {form.entries.map((entry, i) => (
               <div key={i} className="bg-card rounded-xl p-3 space-y-2 border border-border">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-role-subject-expert">{lang === "ar" ? `عنصر ${i + 1}` : `Entry ${i + 1}`}</span>
+                  <span className="text-[10px] font-bold text-role-culture-actor">{lang === "ar" ? `عنصر ${i + 1}` : `Entry ${i + 1}`}</span>
                   {form.entries.length > 1 && <button onClick={() => removeEntry(i)} className="text-destructive"><Trash2 className="w-3.5 h-3.5" /></button>}
                 </div>
                 <input className={inputClass} placeholder={lang === "ar" ? "عنوان العنصر" : "Entry title"} value={entry.title} onChange={(e) => updateEntry(i, "title", e.target.value)} maxLength={100} />
                 <textarea className={`${inputClass} min-h-[60px] resize-none`} placeholder={lang === "ar" ? "ملخص مختصر..." : "Brief summary..."} value={entry.summary} onChange={(e) => updateEntry(i, "summary", e.target.value)} maxLength={500} />
               </div>
             ))}
-            <button onClick={addEntry} className="flex items-center gap-1 text-xs font-medium text-role-subject-expert"><Plus className="w-3.5 h-3.5" /> {lang === "ar" ? "إضافة عنصر" : "Add entry"}</button>
+            <button onClick={addEntry} className="flex items-center gap-1 text-xs font-medium text-role-culture-actor"><Plus className="w-3.5 h-3.5" /> {lang === "ar" ? "إضافة عنصر" : "Add entry"}</button>
           </div>
         </div>
 
@@ -230,11 +230,11 @@ const NewCollection = () => {
                 {form.references.length > 1 && <button onClick={() => removeRef(i)} className="p-2 text-destructive"><Trash2 className="w-4 h-4" /></button>}
               </div>
             ))}
-            <button onClick={addRef} className="flex items-center gap-1 text-xs font-medium text-role-subject-expert"><Plus className="w-3.5 h-3.5" /> {lang === "ar" ? "إضافة مرجع" : "Add reference"}</button>
+            <button onClick={addRef} className="flex items-center gap-1 text-xs font-medium text-role-culture-actor"><Plus className="w-3.5 h-3.5" /> {lang === "ar" ? "إضافة مرجع" : "Add reference"}</button>
           </div>
         </div>
 
-        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-subject-expert text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-culture-actor text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
           {submitting ? (lang === "ar" ? "جاري الحفظ..." : "Saving...") : isEdit ? (lang === "ar" ? "حفظ التغييرات" : "Save Changes") : (lang === "ar" ? "نشر المجموعة" : "Publish Collection")}
         </button>
       </div>

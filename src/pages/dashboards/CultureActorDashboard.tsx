@@ -3,11 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, FileText, Bookmark, Headphones, Users, Plus, Sparkles, ChevronRight, Bell, Briefcase } from "lucide-react";
+import { ArrowLeft, FileText, Bookmark, Headphones, Users, Plus, Sparkles, ChevronRight, Bell, Briefcase, BookOpen, Mic } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
 import ActorCommissionsList from "@/components/ActorCommissionsList";
+import SessionRequestsList from "@/components/SessionRequestsList";
 
 // Static editorial copy curated by the Sandal team — NOT personalised and not
 // backed by any table. Do not present these as generated suggestions.
@@ -105,6 +106,19 @@ const CultureActorDashboard = () => {
         followers = followRes.count ?? 0;
       }
 
+      // Tours this user authored (creator_id), distinct from tours they only
+      // narrate for someone else (counted separately below).
+      const [ownTours, myCollections] = await Promise.all([
+        supabase
+          .from("audio_tours")
+          .select("id", { count: "exact", head: true })
+          .eq("creator_id", user!.id),
+        supabase
+          .from("collections")
+          .select("id", { count: "exact", head: true })
+          .eq("expert_id", user!.id),
+      ]);
+
       const { count: pendingCommissions } = await supabase
         .from("commissions")
         .select("id", { count: "exact", head: true })
@@ -113,6 +127,8 @@ const CultureActorDashboard = () => {
 
       return {
         pendingCommissions: pendingCommissions ?? 0,
+        ownTours: ownTours.count ?? 0,
+        collections: myCollections.count ?? 0,
         published: published.count ?? 0,
         drafts: drafts.count ?? 0,
         saves,
@@ -211,6 +227,16 @@ const CultureActorDashboard = () => {
             <span className="text-lg font-bold text-foreground block">{stats?.pendingCommissions ?? 0}</span>
             <span className="text-[10px] text-muted-foreground">{lang === "ar" ? "تكليفات بانتظار الرد" : "Pending commissions"}</span>
           </div>
+          <div onClick={() => navigate("/dashboard/culture-actor/my-tours")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer active:scale-[0.97] transition-transform">
+            <Mic className="w-4 h-4 text-role-culture-actor mb-1" />
+            <span className="text-lg font-bold text-foreground block">{stats?.ownTours ?? 0}</span>
+            <span className="text-[10px] text-muted-foreground">{lang === "ar" ? "جولاتي الصوتية" : "My audio tours"}</span>
+          </div>
+          <div onClick={() => navigate("/dashboard/culture-actor/my-collections")} className="bg-card rounded-xl shadow-card p-4 cursor-pointer active:scale-[0.97] transition-transform">
+            <BookOpen className="w-4 h-4 text-role-culture-actor mb-1" />
+            <span className="text-lg font-bold text-foreground block">{stats?.collections ?? 0}</span>
+            <span className="text-[10px] text-muted-foreground">{lang === "ar" ? "مجموعات معرفية" : "Collections"}</span>
+          </div>
           <div className="bg-card rounded-xl shadow-card p-4">
             <Users className="w-4 h-4 text-role-culture-actor mb-1" />
             <span className="text-lg font-bold text-foreground block">{stats?.followers ?? 0}</span>
@@ -219,6 +245,9 @@ const CultureActorDashboard = () => {
         </div>
 
         <ActorCommissionsList />
+
+        {/* Session requests: inherited from the retired subject-expert role */}
+        <SessionRequestsList accentText="text-role-culture-actor" />
 
         {/* Static content prompts (editorial copy, not personalised) */}
         <div className="bg-card rounded-xl shadow-card p-4">
@@ -241,6 +270,14 @@ const CultureActorDashboard = () => {
           <button onClick={() => navigate("/dashboard/culture-actor/new-article")} className="w-full bg-role-culture-actor text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
             <Plus className="w-4 h-4" /> {lang === "ar" ? "مقال جديد" : "New Article"}
           </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={() => navigate("/dashboard/culture-actor/new-tour")} className="border-2 border-role-culture-actor text-role-culture-actor rounded-xl py-3 font-semibold text-xs flex items-center justify-center gap-1.5">
+              <Headphones className="w-4 h-4" /> {lang === "ar" ? "جولة صوتية" : "New Audio Tour"}
+            </button>
+            <button onClick={() => navigate("/dashboard/culture-actor/new-collection")} className="border-2 border-role-culture-actor text-role-culture-actor rounded-xl py-3 font-semibold text-xs flex items-center justify-center gap-1.5">
+              <BookOpen className="w-4 h-4" /> {lang === "ar" ? "مجموعة جديدة" : "New Collection"}
+            </button>
+          </div>
           <button onClick={() => navigate("/dashboard/culture-actor/my-content")} className="w-full border-2 border-role-culture-actor text-role-culture-actor rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
             <FileText className="w-4 h-4" /> {lang === "ar" ? "إدارة محتواي" : "Manage My Content"}
             <ChevronRight className="w-4 h-4" />

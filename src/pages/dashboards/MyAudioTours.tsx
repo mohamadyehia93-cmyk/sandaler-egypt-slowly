@@ -38,7 +38,7 @@ const MyAudioTours = () => {
 
   return (
     <div className="min-h-screen bg-surface pb-24">
-      <header className="bg-role-narrator text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
+      <header className="bg-role-culture-actor text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{lang === "ar" ? "جولاتي الصوتية" : "My Audio Tours"}</h1>
       </header>
@@ -64,8 +64,8 @@ const MyAudioTours = () => {
                 <p className="text-[11px] text-muted-foreground">{e.stops_count} {lang === "ar" ? "محطات" : "stops"} · {e.duration_minutes} {lang === "ar" ? "د" : "min"}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
-              <PreviewButton path={`/audio-tour/${e.slug || e.id}`} className="bg-role-narrator/10 text-role-narrator" />
-              <button onClick={() => navigate(`/dashboard/narrator/edit-tour/${e.id}`)} className="p-2 rounded-lg bg-role-narrator/10 text-role-narrator">
+              <PreviewButton path={`/audio-tour/${e.slug || e.id}`} className="bg-role-culture-actor/10 text-role-culture-actor" />
+              <button onClick={() => navigate(`/dashboard/culture-actor/edit-tour/${e.id}`)} className="p-2 rounded-lg bg-role-culture-actor/10 text-role-culture-actor">
                 <Pencil className="w-4 h-4" />
               </button>
               <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
@@ -75,7 +75,7 @@ const MyAudioTours = () => {
           ))
         )}
 
-        <button onClick={() => navigate("/dashboard/narrator/new-tour")} className="w-full bg-role-narrator text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2 mt-2">
+        <button onClick={() => navigate("/dashboard/culture-actor/new-tour")} className="w-full bg-role-culture-actor text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2 mt-2">
           <Plus className="w-4 h-4" /> {lang === "ar" ? "جولة جديدة" : "New Tour"}
         </button>
       </div>

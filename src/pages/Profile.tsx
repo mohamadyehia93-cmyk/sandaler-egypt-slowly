@@ -9,6 +9,7 @@ import { useUserRole, roleLabels } from "@/hooks/useUserRole";
 import { VisitorModeProfileToggle } from "@/components/VisitorModeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useIsAmbassador } from "@/hooks/useIsAmbassador";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -28,6 +29,7 @@ const Profile = () => {
   const { role } = useUserRole();
   const { user, loading, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { isAmbassador } = useIsAmbassador();
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
   const [itineraries, setItineraries] = useState<SavedItinerary[]>([]);
 
@@ -102,6 +104,8 @@ const Profile = () => {
   ];
 
   const menuItems = [
+    // Ambassador is a capability, so its entry point lives here rather than in a dashboard.
+    ...(isAmbassador ? [{ label: lang === "ar" ? "إبلاغ عن مشكلة" : "Flag an issue", path: "/flag-issue" }] : []),
     ...(isAdmin ? [{ label: lang === "ar" ? "لوحة الإدارة" : "Admin panel", path: "/admin" }] : []),
     { label: lang === "ar" ? "تذاكري" : "My Tickets", path: "/tickets" },
     { label: lang === "ar" ? "طلباتي" : "My Orders", path: "/orders" },

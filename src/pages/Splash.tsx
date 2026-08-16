@@ -41,6 +41,8 @@ const roleQuestions: Record<string, RoleQuestion[]> = {
         { key: "video", icon: Eye, label: { en: "Video & Film", ar: "فيديو وأفلام" } },
         { key: "music-folklore", icon: Music, label: { en: "Music & Folklore", ar: "موسيقى وفلكلور" } },
         { key: "heritage", icon: Landmark, label: { en: "Heritage Research", ar: "بحث تراثي" } },
+        { key: "audio-tours", icon: Headphones, label: { en: "Audio Tours", ar: "جولات صوتية" } },
+        { key: "collections", icon: BookOpen, label: { en: "Curated Collections", ar: "مجموعات منسّقة" } },
       ],
       multi: true,
     },
@@ -144,62 +146,6 @@ const roleQuestions: Record<string, RoleQuestion[]> = {
       multi: true,
     },
   ],
-  "ambassador": [
-    {
-      title: { en: "What will you verify?", ar: "ماذا ستتحقق منه؟" },
-      subtitle: { en: "Select areas you can review", ar: "اختر المجالات التي يمكنك مراجعتها" },
-      options: [
-        { key: "experiences-amb", icon: Compass, label: { en: "Experiences", ar: "تجارب" } },
-        { key: "stays-amb", icon: Home, label: { en: "Accommodations", ar: "أماكن إقامة" } },
-        { key: "transport-amb", icon: Truck, label: { en: "Transport", ar: "مواصلات" } },
-        { key: "products-amb", icon: ShoppingBag, label: { en: "Products", ar: "منتجات" } },
-        { key: "causes-amb", icon: Heart, label: { en: "Causes", ar: "قضايا" } },
-        { key: "content-amb", icon: BookOpen, label: { en: "Content & Posts", ar: "محتوى ومنشورات" } },
-      ],
-      multi: true,
-    },
-  ],
-  "subject-expert": [
-    {
-      title: { en: "What topics do you curate?", ar: "ما المواضيع التي تنظمها؟" },
-      subtitle: { en: "Select your knowledge domains", ar: "اختر مجالات معرفتك" },
-      options: [
-        { key: "history-expert", icon: Landmark, label: { en: "History & Heritage", ar: "تاريخ وتراث" } },
-        { key: "ecology", icon: Leaf, label: { en: "Ecology & Nature", ar: "بيئة وطبيعة" } },
-        { key: "architecture-expert", icon: Building2, label: { en: "Architecture", ar: "عمارة" } },
-        { key: "ethnography", icon: Users, label: { en: "Ethnography & Folklore", ar: "إثنوغرافيا وفلكلور" } },
-        { key: "gastronomy", icon: UtensilsCrossed, label: { en: "Food & Gastronomy", ar: "طعام وفن الطبخ" } },
-        { key: "archaeology", icon: Globe, label: { en: "Archaeology", ar: "آثار" } },
-      ],
-      multi: true,
-    },
-  ],
-  "narrator": [
-    {
-      title: { en: "What do you narrate?", ar: "ماذا تروي؟" },
-      subtitle: { en: "Select your audio topics", ar: "اختر مواضيعك الصوتية" },
-      options: [
-        { key: "heritage-audio", icon: Landmark, label: { en: "Heritage & History", ar: "تراث وتاريخ" } },
-        { key: "city-walks", icon: Compass, label: { en: "City Walks", ar: "مشي في المدينة" } },
-        { key: "nature-audio", icon: Leaf, label: { en: "Nature Trails", ar: "مسارات طبيعية" } },
-        { key: "folklore-audio", icon: Music, label: { en: "Folklore & Music", ar: "فلكلور وموسيقى" } },
-        { key: "food-audio", icon: UtensilsCrossed, label: { en: "Food Stories", ar: "قصص الطعام" } },
-        { key: "oral-history", icon: Mic, label: { en: "Oral Histories", ar: "تاريخ شفوي" } },
-      ],
-      multi: true,
-    },
-    {
-      title: { en: "Which languages do you narrate in?", ar: "بأي لغات تروي؟" },
-      subtitle: { en: "Select all that apply", ar: "اختر كل ما ينطبق" },
-      options: [
-        { key: "narrate-ar", icon: Globe, label: { en: "Arabic", ar: "العربية" } },
-        { key: "narrate-en", icon: Globe, label: { en: "English", ar: "الإنجليزية" } },
-        { key: "narrate-fr", icon: Globe, label: { en: "French", ar: "الفرنسية" } },
-        { key: "narrate-de", icon: Globe, label: { en: "German", ar: "الألمانية" } },
-      ],
-      multi: true,
-    },
-  ],
 };
 
 const topRoles = [
@@ -208,15 +154,12 @@ const topRoles = [
 ];
 
 const localRoles = [
-  { key: "culture-actor", icon: Pen, label: { en: "Culture Actor", ar: "فاعل ثقافي" }, desc: { en: "Share your community's story", ar: "شارك قصة مجتمعك" } },
+  { key: "culture-actor", icon: Pen, label: { en: "Culture Actor", ar: "فاعل ثقافي" }, desc: { en: "Write, narrate audio tours, curate collections", ar: "اكتب، وسجّل جولات صوتية، ونسّق مجموعات" } },
   { key: "service-provider", icon: Briefcase, label: { en: "Service Provider", ar: "مقدم خدمة" }, desc: { en: "List experiences & activities", ar: "اعرض تجارب وأنشطة" } },
   { key: "whos-who", icon: Star, label: { en: "Who's Who", ar: "شخصية بارزة" }, desc: { en: "Be recognized as a local figure", ar: "كن شخصية محلية معروفة" } },
   { key: "trip-organizer", icon: Map, label: { en: "Trip Organizer", ar: "منظم رحلات" }, desc: { en: "Create & lead group trips", ar: "أنشئ وقُد رحلات جماعية" } },
   { key: "product-seller", icon: ShoppingBag, label: { en: "Product Seller", ar: "بائع منتجات" }, desc: { en: "Sell local crafts & goods", ar: "بِع حرفاً ومنتجات محلية" } },
   { key: "organization", icon: Building2, label: { en: "Organization", ar: "منظمة" }, desc: { en: "Recruit volunteers & donors", ar: "اجذب متطوعين ومتبرعين" } },
-  { key: "ambassador", icon: Shield, label: { en: "Ambassador", ar: "سفير" }, desc: { en: "Verify & support providers", ar: "تحقق وادعم المقدمين" } },
-  { key: "subject-expert", icon: GraduationCap, label: { en: "Subject Expert", ar: "خبير متخصص" }, desc: { en: "Curate knowledge & collections", ar: "نظّم المعرفة والمجموعات" } },
-  { key: "narrator", icon: Mic, label: { en: "Narrator", ar: "راوي" }, desc: { en: "Record & publish audio tours", ar: "سجّل وانشر جولات صوتية" } },
 ];
 
 const allRoles = [topRoles[0], ...localRoles];
@@ -262,9 +205,6 @@ const onboardingToUserRole: Record<string, UserRole> = {
   "trip-organizer": "trip-organizer",
   "product-seller": "product-seller",
   "organization": "organization",
-  "ambassador": "ambassador",
-  "subject-expert": "subject-expert",
-  "narrator": "narrator",
 };
 
 const SplashPage = () => {
@@ -299,11 +239,8 @@ const SplashPage = () => {
     "service-provider": "/dashboard/service-provider",
     "whos-who": "/dashboard/whos-who",
     "organization": "/dashboard/organization",
-    "ambassador": "/dashboard/ambassador",
     "product-seller": "/dashboard/product-seller",
     "trip-organizer": "/dashboard/trip-organizer",
-    "subject-expert": "/dashboard/subject-expert",
-    "narrator": "/dashboard/narrator",
   };
 
   const persistPersonalization = async () => {

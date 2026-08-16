@@ -16,9 +16,6 @@ const roleTextClass: Record<string, string> = {
   "trip-organizer": "text-role-trip-organizer",
   "product-seller": "text-role-product-seller",
   organization: "text-role-organization",
-  ambassador: "text-role-ambassador",
-  narrator: "text-role-narrator",
-  "subject-expert": "text-role-subject-expert",
   "whos-who": "text-primary",
 };
 
@@ -30,9 +27,6 @@ const roleLabels: Record<string, { en: string; ar: string }> = {
   "trip-organizer": { en: "Trip Organizer", ar: "منظّم رحلات" },
   "product-seller": { en: "Seller", ar: "بائع" },
   organization: { en: "Organization", ar: "منظمة" },
-  ambassador: { en: "Ambassador", ar: "سفير" },
-  narrator: { en: "Narrator", ar: "راوي" },
-  "subject-expert": { en: "Expert", ar: "خبير" },
   "whos-who": { en: "Local", ar: "شخصية" },
 };
 
