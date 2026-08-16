@@ -700,6 +700,20 @@ const AudioTourDetail = () => {
                       )}
                     </div>
                   )}
+                  {/* Per-stop navigation — only when the narrator pinned this stop */}
+                  {hasCoords(stop) && (
+                    <a
+                      href={directionsToUrl(stop, "walking")}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-testid={`nav-stop-${i}`}
+                      className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold text-primary"
+                    >
+                      <Navigation className="w-3 h-3" />
+                      {lang === "ar" ? "الاتجاهات" : "Directions"}
+                    </a>
+                  )}
+
                 </div>
               </div>
             );
