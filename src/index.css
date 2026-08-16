@@ -53,6 +53,8 @@ html, body {
 
     /* Role accent colors */
     --role-visitor: 162 76% 24%;
+    /* ambassador is a capability, not a role — kept for the flag-issue surface */
+    --role-ambassador: 28 80% 52%;
     --role-culture-actor: 207 64% 29%;
     --role-service-provider: 204 64% 44%;
     --role-whos-who: 281 47% 41%;
