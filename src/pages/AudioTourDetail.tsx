@@ -457,8 +457,40 @@ const AudioTourDetail = () => {
           </>
         )}
 
-        {/* Geo CTA / status */}
-        {mapStops.length > 0 && (
+        {/* Playback mode: on-location (GPS) vs virtual / podcast mode */}
+        {audioSrc && (
+          <div className="mb-3 rounded-xl bg-surface border border-border p-1 flex gap-1">
+            <button
+              onClick={() => { if (virtualMode) toggleVirtualMode(); }}
+              className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-colors ${
+                !virtualMode ? "bg-primary text-primary-foreground" : "text-foreground"
+              }`}
+            >
+              <Navigation className="w-3.5 h-3.5" />
+              {lang === "ar" ? "أنا في المكان" : "I'm on location"}
+            </button>
+            <button
+              onClick={() => { if (!virtualMode) toggleVirtualMode(); }}
+              className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-colors ${
+                virtualMode ? "bg-primary text-primary-foreground" : "text-foreground"
+              }`}
+            >
+              <Headphones className="w-3.5 h-3.5" />
+              {lang === "ar" ? "استمع من أي مكان" : "Listen from anywhere"}
+            </button>
+          </div>
+        )}
+        {virtualMode && (
+          <p className="text-[11px] text-muted-foreground mb-3 leading-snug">
+            {lang === "ar"
+              ? "التشغيل الافتراضي: تُشغَّل المحطات بالترتيب وتنتقل تلقائياً — بدون موقع أو GPS."
+              : "Virtual playback: stops play in order and advance automatically — no location or GPS needed."}
+          </p>
+        )}
+
+        {/* Geo CTA / status — hidden in virtual mode */}
+        {mapStops.length > 0 && !virtualMode && (
+
           <div className="mb-3">
             {!geoEnabled ? (
               <button
