@@ -39,6 +39,15 @@ type SegmentDraft = {
   audioUrl: string | null;
 };
 
+/** Segment shape as persisted inside the stops jsonb. */
+type StoredSegment = {
+  title_en?: string;
+  title_ar?: string;
+  desc_en?: string;
+  desc_ar?: string;
+  audio_url?: string | null;
+};
+
 const emptySegment = (): SegmentDraft => ({
   title_en: "",
   title_ar: "",
