@@ -79,11 +79,8 @@ const CultureActorDashboard = lazy(() => import("./pages/dashboards/CultureActor
 const ServiceProviderDashboard = lazy(() => import("./pages/dashboards/ServiceProviderDashboard.tsx"));
 const WhosWhoDashboard = lazy(() => import("./pages/dashboards/WhosWhoDashboard.tsx"));
 const OrganizationDashboard = lazy(() => import("./pages/dashboards/OrganizationDashboard.tsx"));
-const AmbassadorDashboard = lazy(() => import("./pages/dashboards/AmbassadorDashboard.tsx"));
 const ProductSellerDashboard = lazy(() => import("./pages/dashboards/ProductSellerDashboard.tsx"));
 const TripOrganizerDashboard = lazy(() => import("./pages/dashboards/TripOrganizerDashboard.tsx"));
-const SubjectExpertDashboard = lazy(() => import("./pages/dashboards/SubjectExpertDashboard.tsx"));
-const NarratorDashboard = lazy(() => import("./pages/dashboards/NarratorDashboard.tsx"));
 const MyAudioTours = lazy(() => import("./pages/dashboards/MyAudioTours.tsx"));
 const NewAudioTour = lazy(() => import("./pages/dashboards/NewAudioTour.tsx"));
 const NewExperience = lazy(() => import("./pages/dashboards/NewExperience.tsx"));
@@ -115,7 +112,6 @@ const MyProducts = lazy(() => import("./pages/dashboards/MyProducts.tsx"));
 const MyTrips = lazy(() => import("./pages/dashboards/MyTrips.tsx"));
 const MyPrograms = lazy(() => import("./pages/dashboards/MyPrograms.tsx"));
 const MyCollections = lazy(() => import("./pages/dashboards/MyCollections.tsx"));
-const MyTasks = lazy(() => import("./pages/dashboards/MyTasks.tsx"));
 const MySessions = lazy(() => import("./pages/dashboards/MySessions.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
 const Credits = lazy(() => import("./pages/Credits.tsx"));
@@ -220,11 +216,19 @@ const App = () => {
             <Route path="/admin/editorial/stay/:id" element={<NewAccommodation editorial />} />
             <Route path="/admin/editorial/ride/new" element={<NewTransport editorial />} />
             <Route path="/admin/editorial/ride/:id" element={<NewTransport editorial />} />
+            <Route path="/flag-issue" element={<NewFlagReport />} />
+            <Route path="/flag-issue/:id" element={<NewFlagReport />} />
             <Route path="/credits" element={<Credits />} />
 
             <Route path="/dashboard/culture-actor/new-article" element={<NewArticle />} />
             <Route path="/dashboard/culture-actor/edit-article/:id" element={<NewArticle />} />
             <Route path="/dashboard/culture-actor/my-content" element={<MyContent />} />
+            <Route path="/dashboard/culture-actor/new-collection" element={<NewCollection />} />
+            <Route path="/dashboard/culture-actor/edit-collection/:id" element={<NewCollection />} />
+            <Route path="/dashboard/culture-actor/my-collections" element={<MyCollections />} />
+            <Route path="/dashboard/culture-actor/new-tour" element={<NewAudioTour />} />
+            <Route path="/dashboard/culture-actor/edit-tour/:id" element={<NewAudioTour />} />
+            <Route path="/dashboard/culture-actor/my-tours" element={<MyAudioTours />} />
             <Route path="/dashboard/culture-actor" element={<CultureActorDashboard />} />
             <Route path="/dashboard/service-provider/new-experience" element={<NewExperience />} />
             <Route path="/dashboard/service-provider/my-listings" element={<MyListings />} />
@@ -244,10 +248,6 @@ const App = () => {
             <Route path="/dashboard/organization/edit-program/:id" element={<NewProgram />} />
             <Route path="/dashboard/organization/my-programs" element={<MyPrograms />} />
             <Route path="/dashboard/organization" element={<OrganizationDashboard />} />
-            <Route path="/dashboard/ambassador/flag-issue" element={<NewFlagReport />} />
-            <Route path="/dashboard/ambassador/edit-report/:id" element={<NewFlagReport />} />
-            <Route path="/dashboard/ambassador/my-tasks" element={<MyTasks />} />
-            <Route path="/dashboard/ambassador" element={<AmbassadorDashboard />} />
             <Route path="/dashboard/product-seller/new-product" element={<NewProduct />} />
             <Route path="/dashboard/product-seller/edit-product/:id" element={<NewProduct />} />
             <Route path="/dashboard/product-seller/my-products" element={<MyProducts />} />
@@ -259,14 +259,6 @@ const App = () => {
             <Route path="/dashboard/trip-organizer/my-events" element={<MyEvents />} />
             <Route path="/dashboard/trip-organizer/events" element={<EventsDashboard />} />
             <Route path="/dashboard/trip-organizer" element={<TripOrganizerDashboard />} />
-            <Route path="/dashboard/subject-expert/new-collection" element={<NewCollection />} />
-            <Route path="/dashboard/subject-expert/edit-collection/:id" element={<NewCollection />} />
-            <Route path="/dashboard/subject-expert/my-collections" element={<MyCollections />} />
-            <Route path="/dashboard/subject-expert" element={<SubjectExpertDashboard />} />
-            <Route path="/dashboard/narrator/new-tour" element={<NewAudioTour />} />
-            <Route path="/dashboard/narrator/edit-tour/:id" element={<NewAudioTour />} />
-            <Route path="/dashboard/narrator/my-tours" element={<MyAudioTours />} />
-            <Route path="/dashboard/narrator" element={<NarratorDashboard />} />
 
             <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
             <Route path="/diagnostics" element={<Diagnostics />} />
