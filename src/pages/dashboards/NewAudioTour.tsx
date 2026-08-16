@@ -279,7 +279,7 @@ const NewAudioTour = () => {
         // upload any newly picked clip. Both languages are written verbatim —
         // English is never mirrored into Arabic.
         const keptSegments = s.segments.filter((g) => g.title_en.trim() || g.title_ar.trim());
-        const cleanSegments: any[] = [];
+        const cleanSegments: StoredSegment[] = [];
         for (let j = 0; j < keptSegments.length; j++) {
           const g = keptSegments[j];
           setUploadStage(`segment-audio-${i + 1}-${j + 1}`);
