@@ -319,6 +319,45 @@ const AudioTourDetail = () => {
           <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {stopsCount} {lang === "ar" ? "محطات" : "stops"}</span>
         </div>
 
+        {/* Google Maps navigation — small text actions, never competing with Play */}
+        {(startNavUrl || fullRoute) && (
+          <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+            {startNavUrl && (
+              <a
+                href={startNavUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="nav-to-start"
+                className="text-xs font-semibold text-primary flex items-center gap-1.5"
+              >
+                <Navigation className="w-3.5 h-3.5" />
+                {lang === "ar" ? "الاتجاهات إلى نقطة البداية" : "Directions to the start"}
+              </a>
+            )}
+            {fullRoute && (
+              <a
+                href={fullRoute.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="nav-full-route"
+                className="text-xs font-semibold text-primary flex items-center gap-1.5"
+              >
+                <Footprints className="w-3.5 h-3.5" />
+                {lang === "ar" ? "المسار كامل في خرائط جوجل" : "Whole route in Google Maps"}
+              </a>
+            )}
+            {fullRoute?.truncatedTo && (
+              <span className="text-[11px] text-muted-foreground w-full">
+                {lang === "ar"
+                  ? `تعرض خرائط جوجل أول ${fullRoute.truncatedTo} محطات فقط (حدّ نقاط الطريق).`
+                  : `Google Maps shows the first ${fullRoute.truncatedTo} stops only (waypoint limit).`}
+              </span>
+            )}
+          </div>
+        )}
+
+
+
         {/* Offline banner */}
         {!isOnline && (
           <div className="mb-3 flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-amber-900">
