@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,7 +11,9 @@ import LocationPicker from "@/components/dashboard/LocationPicker";
 import BilingualField from "@/components/dashboard/BilingualField";
 import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
-import { ArrowLeft, FileText, MapPin, Clock, Tag, Languages, DollarSign, Plus, Trash2, Mic, Image as ImageIcon, Navigation } from "lucide-react";
+import ScriptMeter from "@/components/dashboard/ScriptMeter";
+import { estimateSeconds, formatDurationShort } from "@/lib/scriptEstimate";
+import { ArrowLeft, FileText, MapPin, Clock, Tag, Languages, DollarSign, Plus, Trash2, Mic, Image as ImageIcon, Navigation, Timer, Footprints } from "lucide-react";
 import { toast } from "sonner";
 
 const themes = [
