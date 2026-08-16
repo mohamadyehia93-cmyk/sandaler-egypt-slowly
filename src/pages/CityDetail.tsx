@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, Star, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
+import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
 import WishlistButton from "@/components/WishlistButton";
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
@@ -207,7 +207,7 @@ const CityDetail = () => {
       title: { en: a.name_en, ar: a.name_ar || a.name_en },
       type: { en: a.accommodation_type || "Stay", ar: a.accommodation_type || "إقامة" },
       location: { en: a.host_name_en || "", ar: a.host_name_ar || "" },
-      image: a.image, price: a.price_per_night ?? 0, rating: a.rating ?? 0,
+      image: a.image, price: a.price_per_night ?? 0,
       cityId: a.city_id,
     })),
   ]);
@@ -491,14 +491,9 @@ const CityDetail = () => {
                   <div className="p-3">
                     <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-0.5">{a.title[lang]}</h3>
                     <p className="text-xs text-muted-foreground mb-2">{a.location[lang]}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold text-primary-dark">
-                        {a.price} {t("common.egp")}<span className="text-xs font-normal text-muted-foreground">{t("common.perNight")}</span>
-                      </span>
-                      <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
-                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {a.rating}
-                      </span>
-                    </div>
+                    <span className="text-sm font-bold text-primary-dark">
+                      {a.price} {t("common.egp")}<span className="text-xs font-normal text-muted-foreground">{t("common.perNight")}</span>
+                    </span>
                   </div>
                 </div>
               ))}

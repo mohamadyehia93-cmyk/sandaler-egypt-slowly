@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
-  ArrowLeft, Clock, MapPin, Route, ArrowRight, Users, Star, Navigation, CalendarClock, Info, BookOpen,
+  ArrowLeft, Clock, MapPin, Route, ArrowRight, Users, Navigation, CalendarClock, Info, BookOpen,
 } from "lucide-react";
 
 import { useI18n } from "@/lib/i18n";
@@ -148,11 +148,6 @@ const TransportDetail = () => {
             {item.hire_type && (
               <span className="text-[11px] font-medium bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full">
                 {hireTypeLabel(item.hire_type, lang)}
-              </span>
-            )}
-            {item.rating > 0 && item.reviews_count > 0 && (
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />{item.rating} ({item.reviews_count})
               </span>
             )}
           </div>

@@ -14,7 +14,7 @@ import BilingualField from "@/components/dashboard/BilingualField";
 import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import { ACCOMMODATION_TYPES, readableDbError } from "@/lib/listingTaxonomy";
 import { cityCoords } from "@/lib/cityCoords";
-import type { Lang, TranslationMeta } from "@/lib/translation";
+import { markMachine, translateText, type Lang, type TranslationMeta } from "@/lib/translation";
 import type { Json } from "@/integrations/supabase/types";
 import {
   ArrowLeft, Image, FileText, Home, Users, BedDouble, Bath, Clock,
@@ -62,8 +62,13 @@ const NewAccommodation = ({ editorial = false }: { editorial?: boolean }) => {
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [authorLang, setAuthorLang] = useState<Lang>(lang === "ar" ? "ar" : "en");
   const [meta, setMeta] = useState<TranslationMeta>({});
-  const [amenities, setAmenities] = useState<string[]>([]);
+  // Amenities are stored as two parallel arrays (amenities_en / amenities_ar).
+  // In the form they are kept as pairs so both languages stay aligned.
+  const [amenities, setAmenities] = useState<{ en: string; ar: string }[]>([]);
   const [amenityDraft, setAmenityDraft] = useState("");
+  const [amenityBusy, setAmenityBusy] = useState(false);
+  const [listingKind, setListingKind] = useState<string>(editorial ? "editorial" : "hosted");
+  const [kindMismatch, setKindMismatch] = useState(false);
 
   const [form, setForm] = useState({
     nameEn: "",
@@ -127,7 +132,18 @@ const NewAccommodation = ({ editorial = false }: { editorial?: boolean }) => {
         lng: row.longitude != null ? String(row.longitude) : "",
         status: str(row.status) || "published",
       });
-      setAmenities(strArray(row.amenities));
+      // listing_kind belongs to the ROW, never to the route that opened the form.
+      const rowKind = str(row.listing_kind) || "editorial";
+      setListingKind(rowKind);
+      setKindMismatch(rowKind !== (editorial ? "editorial" : "hosted"));
+      const en = strArray(row.amenities_en);
+      const arr = strArray(row.amenities_ar);
+      const legacy = strArray(row.amenities);
+      const enList = en.length ? en : legacy;
+      const len = Math.max(enList.length, arr.length);
+      setAmenities(
+        Array.from({ length: len }, (_, i) => ({ en: enList[i] || "", ar: arr[i] || "" }))
+      );
       setMeta((row.translation_meta as TranslationMeta) || {});
       setExistingImages(
         strArray(row.images).length > 0
@@ -137,12 +153,43 @@ const NewAccommodation = ({ editorial = false }: { editorial?: boolean }) => {
             : []
       );
     })();
-  }, [isEdit, id, ar]);
+  }, [isEdit, id, ar, editorial]);
 
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
-  const toggleAmenity = (label: string) =>
-    setAmenities((p) => (p.includes(label) ? p.filter((a) => a !== label) : [...p, label]));
+  const togglePreset = (preset: { en: string; ar: string }) =>
+    setAmenities((p) =>
+      p.some((a) => a.en === preset.en || a.ar === preset.ar)
+        ? p.filter((a) => a.en !== preset.en && a.ar !== preset.ar)
+        : [...p, { ...preset }]
+    );
+  const removeAmenity = (idx: number) => setAmenities((p) => p.filter((_, i) => i !== idx));
+  const setAmenitySide = (idx: number, side: Lang, value: string) =>
+    setAmenities((p) => p.map((a, i) => (i === idx ? { ...a, [side]: value } : a)));
+
+  /** Adds the typed amenity in the author's language and machine-fills the other side. */
+  const addAmenity = async () => {
+    const v = amenityDraft.trim();
+    if (!v) return;
+    const pair = authorLang === "ar" ? { en: "", ar: v } : { en: v, ar: "" };
+    setAmenities((p) => [...p, pair]);
+    setAmenityDraft("");
+    const idx = amenities.length;
+    setAmenityBusy(true);
+    const res = await translateText({
+      text: v,
+      from: authorLang,
+      to: authorLang === "ar" ? "en" : "ar",
+      context: "a single amenity offered by an Egyptian guesthouse (short label)",
+    });
+    setAmenityBusy(false);
+    if (res.ok) {
+      setAmenities((p) =>
+        p.map((a, i) => (i === idx ? (authorLang === "ar" ? { ...a, en: res.translation } : { ...a, ar: res.translation }) : a))
+      );
+      setMeta((m) => markMachine(m, authorLang === "ar" ? "amenities_en" : "amenities_ar", authorLang));
+    }
+  };
 
   const cityCenter = form.cityId ? cityCoords[form.cityId] : undefined;
 
@@ -173,7 +220,8 @@ const NewAccommodation = ({ editorial = false }: { editorial?: boolean }) => {
 
       const payload = {
         host_id: providerId,
-        listing_kind: editorial ? "editorial" : "hosted",
+        // CREATE derives the kind from the surface; EDIT preserves the row's own kind.
+        listing_kind: isEdit ? listingKind : editorial ? "editorial" : "hosted",
         name_en: form.nameEn.trim() || null,
         name_ar: form.nameAr.trim() || null,
         description_en: form.descriptionEn.trim() || null,
@@ -197,7 +245,8 @@ const NewAccommodation = ({ editorial = false }: { editorial?: boolean }) => {
         check_out_time: form.checkOut.trim() || null,
         latitude: form.lat.trim() ? Number(form.lat) : null,
         longitude: form.lng.trim() ? Number(form.lng) : null,
-        amenities,
+        amenities_en: amenities.map((a) => a.en.trim()).filter(Boolean),
+        amenities_ar: amenities.map((a) => a.ar.trim()).filter(Boolean),
         image: images[0] || null,
         images,
         status: form.status,
@@ -226,6 +275,18 @@ const NewAccommodation = ({ editorial = false }: { editorial?: boolean }) => {
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-service-provider/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
   const iconCls = "w-3.5 h-3.5 text-role-service-provider";
+
+  if (isEdit && kindMismatch) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center px-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          {ar
+            ? "لا يمكن تعديل هذا السجل من هنا: نوع الإدراج لا يطابق هذه الشاشة."
+            : "This record can't be edited here — its listing kind doesn't match this screen."}
+        </p>
+      </div>
+    );
+  }
 
   if (editorial && !adminLoading && !isAdmin) {
     return (
@@ -381,53 +442,73 @@ const NewAccommodation = ({ editorial = false }: { editorial?: boolean }) => {
         <div>
           <label className={labelClass}><Check className={iconCls} />{ar ? "المرافق والخدمات" : "What's included"}</label>
           <div className="flex flex-wrap gap-2">
-            {AMENITY_PRESETS.map((a) => {
-              const label = a[lang];
-              const active = amenities.includes(label);
+            {AMENITY_PRESETS.map((preset) => {
+              const active = amenities.some((a) => a.en === preset.en || a.ar === preset.ar);
               return (
                 <button
-                  key={a.en}
-                  onClick={() => toggleAmenity(label)}
+                  key={preset.en}
+                  onClick={() => togglePreset(preset)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                     active ? "bg-role-service-provider text-white border-role-service-provider" : "bg-card text-foreground border-border"
                   }`}
                 >
-                  {label}
+                  {preset[lang]}
                 </button>
               );
             })}
           </div>
+
           {amenities.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {amenities.map((a) => (
-                <span key={a} className="inline-flex items-center gap-1 text-xs bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full">
-                  {a}
-                  <button onClick={() => toggleAmenity(a)} aria-label="remove"><Trash2 className="w-3 h-3 text-destructive" /></button>
-                </span>
+            <div className="space-y-2 mt-3">
+              {amenities.map((a, i) => (
+                <div key={i} className="flex gap-2 items-center">
+                  <input
+                    className={inputClass}
+                    dir="ltr"
+                    placeholder="English"
+                    value={a.en}
+                    maxLength={40}
+                    onChange={(e) => setAmenitySide(i, "en", e.target.value)}
+                  />
+                  <input
+                    className={inputClass}
+                    dir="rtl"
+                    placeholder="العربية"
+                    value={a.ar}
+                    maxLength={40}
+                    onChange={(e) => setAmenitySide(i, "ar", e.target.value)}
+                  />
+                  <button onClick={() => removeAmenity(i)} aria-label="remove" className="p-2">
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </button>
+                </div>
               ))}
             </div>
           )}
+
           <div className="flex gap-2 mt-2">
             <input
               className={inputClass}
+              dir={authorLang === "ar" ? "rtl" : "ltr"}
               placeholder={ar ? "أضف مرفقاً آخر" : "Add another amenity"}
               value={amenityDraft}
               maxLength={40}
               onChange={(e) => setAmenityDraft(e.target.value)}
             />
             <button
-              onClick={() => {
-                const v = amenityDraft.trim();
-                if (!v) return;
-                if (!amenities.includes(v)) setAmenities((p) => [...p, v]);
-                setAmenityDraft("");
-              }}
-              className="px-3 rounded-xl bg-role-service-provider text-white"
+              onClick={addAmenity}
+              disabled={amenityBusy}
+              className="px-3 rounded-xl bg-role-service-provider text-white disabled:opacity-60"
               aria-label={ar ? "إضافة" : "Add"}
             >
               <Plus className="w-4 h-4" />
             </button>
           </div>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            {ar
+              ? "اكتب المرفق بلغتك وستُترجم اللغة الأخرى آليًا — يمكنك تعديلها."
+              : "Type an amenity in your language; the other side is machine-filled and editable."}
+          </p>
         </div>
 
         {/* Editorial reference entries have no host, so no house rules and no

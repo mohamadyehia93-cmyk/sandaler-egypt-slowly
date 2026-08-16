@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
-  ArrowLeft, Star, Users, BedDouble, Bath, Clock, Check, CalendarIcon, ScrollText, Moon, BookOpen,
+  ArrowLeft, Users, BedDouble, Bath, Clock, Check, CalendarIcon, ScrollText, Moon, BookOpen,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -77,7 +77,11 @@ const AccommodationDetail = () => {
   const houseRules = ar ? place.house_rules_ar || place.house_rules_en : place.house_rules_en;
   const cancellation = ar ? place.cancellation_ar || place.cancellation_en : place.cancellation_en;
   const hostName = ar ? place.host_name_ar || place.host_name_en : place.host_name_en;
-  const amenities: string[] = (place.amenities || []).filter(Boolean);
+  // Amenities live in two parallel arrays; show the reader's language and fall
+  // back to the other when only one was authored.
+  const amenEn: string[] = (place.amenities_en || place.amenities || []).filter(Boolean);
+  const amenAr: string[] = (place.amenities_ar || []).filter(Boolean);
+  const amenities: string[] = (ar ? (amenAr.length ? amenAr : amenEn) : (amenEn.length ? amenEn : amenAr));
   const typeLabel = accommodationTypeLabel(place.accommodation_type, lang);
   // EDITORIAL = Sandal's own reference entry (no owner, nothing to book).
   // HOSTED = a real person's home, managed by them.
@@ -155,12 +159,6 @@ const AccommodationDetail = () => {
           )}
           {typeLabel && <span className="text-[11px] font-medium bg-primary/10 text-primary px-2.5 py-1 rounded-full">{typeLabel}</span>}
           {unitType && <span className="text-[11px] font-medium bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full">{unitType}</span>}
-          {place.rating > 0 && place.reviews_count > 0 && (
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              {place.rating} ({place.reviews_count})
-            </span>
-          )}
         </div>
         <LocationChips cityId={place.city_id} regionId={place.region_id} className="mt-2" />
 

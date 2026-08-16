@@ -48,6 +48,8 @@ const NewTransport = ({ editorial = false }: { editorial?: boolean }) => {
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [authorLang, setAuthorLang] = useState<Lang>(lang === "ar" ? "ar" : "en");
   const [meta, setMeta] = useState<TranslationMeta>({});
+  const [listingKind, setListingKind] = useState<string>(editorial ? "editorial" : "hosted");
+  const [kindMismatch, setKindMismatch] = useState(false);
 
   const [form, setForm] = useState({
     nameEn: "",
@@ -117,6 +119,10 @@ const NewTransport = ({ editorial = false }: { editorial?: boolean }) => {
         lng: row.longitude != null ? String(row.longitude) : "",
         status: str(row.status) || "published",
       });
+      // listing_kind belongs to the ROW, never to the route that opened the form.
+      const rowKind = str(row.listing_kind) || "editorial";
+      setListingKind(rowKind);
+      setKindMismatch(rowKind !== (editorial ? "editorial" : "hosted"));
       setMeta((row.translation_meta as TranslationMeta) || {});
       setExistingImages(
         strArray(row.images).length > 0
@@ -126,7 +132,7 @@ const NewTransport = ({ editorial = false }: { editorial?: boolean }) => {
             : []
       );
     })();
-  }, [isEdit, id, ar]);
+  }, [isEdit, id, ar, editorial]);
 
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
   const cityCenter = form.cityId ? cityCoords[form.cityId] : undefined;
@@ -158,7 +164,8 @@ const NewTransport = ({ editorial = false }: { editorial?: boolean }) => {
 
       const payload = {
         provider_id: providerId,
-        listing_kind: editorial ? "editorial" : "hosted",
+        // CREATE derives the kind from the surface; EDIT preserves the row's own kind.
+        listing_kind: isEdit ? listingKind : editorial ? "editorial" : "hosted",
         name_en: form.nameEn.trim() || null,
         name_ar: form.nameAr.trim() || null,
         description_en: form.descriptionEn.trim() || null,
@@ -214,6 +221,18 @@ const NewTransport = ({ editorial = false }: { editorial?: boolean }) => {
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
   const iconCls = "w-3.5 h-3.5 text-role-service-provider";
   const isFixedRoute = form.hireType !== "on-demand";
+
+  if (isEdit && kindMismatch) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center px-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          {ar
+            ? "لا يمكن تعديل هذا السجل من هنا: نوع الإدراج لا يطابق هذه الشاشة."
+            : "This record can't be edited here — its listing kind doesn't match this screen."}
+        </p>
+      </div>
+    );
+  }
 
   if (editorial && !adminLoading && !isAdmin) {
     return (
