@@ -77,7 +77,11 @@ const AccommodationDetail = () => {
   const houseRules = ar ? place.house_rules_ar || place.house_rules_en : place.house_rules_en;
   const cancellation = ar ? place.cancellation_ar || place.cancellation_en : place.cancellation_en;
   const hostName = ar ? place.host_name_ar || place.host_name_en : place.host_name_en;
-  const amenities: string[] = (place.amenities || []).filter(Boolean);
+  // Amenities live in two parallel arrays; show the reader's language and fall
+  // back to the other when only one was authored.
+  const amenEn: string[] = (place.amenities_en || place.amenities || []).filter(Boolean);
+  const amenAr: string[] = (place.amenities_ar || []).filter(Boolean);
+  const amenities: string[] = (ar ? (amenAr.length ? amenAr : amenEn) : (amenEn.length ? amenEn : amenAr));
   const typeLabel = accommodationTypeLabel(place.accommodation_type, lang);
   // EDITORIAL = Sandal's own reference entry (no owner, nothing to book).
   // HOSTED = a real person's home, managed by them.

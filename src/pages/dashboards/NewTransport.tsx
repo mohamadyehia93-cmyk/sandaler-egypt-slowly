@@ -158,7 +158,8 @@ const NewTransport = ({ editorial = false }: { editorial?: boolean }) => {
 
       const payload = {
         provider_id: providerId,
-        listing_kind: editorial ? "editorial" : "hosted",
+        // CREATE derives the kind from the surface; EDIT preserves the row's own kind.
+        listing_kind: isEdit ? listingKind : editorial ? "editorial" : "hosted",
         name_en: form.nameEn.trim() || null,
         name_ar: form.nameAr.trim() || null,
         description_en: form.descriptionEn.trim() || null,
