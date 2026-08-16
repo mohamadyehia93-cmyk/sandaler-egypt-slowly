@@ -802,11 +802,25 @@ const AudioTourDetail = () => {
       {/* Audio Player — only when this tour has its own narration */}
       {audioSrc ? (
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
-          {virtualMode && stopsCount > 0 && (
-            <p dir="auto" className="text-[10px] text-muted-foreground mb-1 text-start truncate">
-              {lang === "ar" ? "الآن" : "Now playing"} · {activeStopIndex + 1}/{stopsCount}
+          {(virtualMode || usesPlaylist) && stopsCount > 0 && (
+            <p dir="auto" data-testid="now-playing" className="text-[10px] text-muted-foreground mb-1 text-start truncate">
+              {lang === "ar"
+                ? `المحطة ${activeStopIndex + 1} من ${stopsCount}`
+                : `Stop ${activeStopIndex + 1} of ${stopsCount}`}
+              {currentItem?.segIndex != null && (
+                <>
+                  {" · "}
+                  {lang === "ar"
+                    ? `المقطع ${currentItem.segIndex + 1} من ${currentItem.segCount}`
+                    : `Segment ${currentItem.segIndex + 1} of ${currentItem.segCount}`}
+                </>
+              )}
               {" · "}
               {(() => {
+                if (currentItem) {
+                  const t = lang === "ar" ? currentItem.title_ar || currentItem.title_en : currentItem.title_en || currentItem.title_ar;
+                  if (t) return t;
+                }
                 const s = dbStops[activeStopIndex];
                 return s ? (lang === "ar" ? s.label_ar || s.label_en : s.label_en || s.label_ar) : "";
               })()}
@@ -821,17 +835,19 @@ const AudioTourDetail = () => {
             <button onClick={cycleSpeed} className="text-[10px] font-bold text-muted-foreground w-10">{playbackRate}x</button>
             <div className="flex items-center gap-4">
               <button
-                aria-label={virtualMode ? (lang === "ar" ? "المحطة السابقة" : "Previous stop") : (lang === "ar" ? "رجوع ١٥ ثانية" : "Back 15 seconds")}
-                onClick={() => (virtualMode ? goToVirtualStop(-1) : skipBackward())}
+                data-testid="skip-back"
+                aria-label={virtualMode || usesPlaylist ? (lang === "ar" ? "السابق" : "Previous") : (lang === "ar" ? "رجوع ١٥ ثانية" : "Back 15 seconds")}
+                onClick={() => (virtualMode || usesPlaylist ? goToVirtualStop(-1) : skipBackward())}
               >
                 <SkipBack className="w-5 h-5 text-foreground" />
               </button>
-              <button onClick={togglePlay} className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+              <button data-testid="play-toggle" onClick={togglePlay} className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                 {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
               </button>
               <button
-                aria-label={virtualMode ? (lang === "ar" ? "المحطة التالية" : "Next stop") : (lang === "ar" ? "تقديم ١٥ ثانية" : "Forward 15 seconds")}
-                onClick={() => (virtualMode ? goToVirtualStop(1) : skipForward())}
+                data-testid="skip-forward"
+                aria-label={virtualMode || usesPlaylist ? (lang === "ar" ? "التالي" : "Next") : (lang === "ar" ? "تقديم ١٥ ثانية" : "Forward 15 seconds")}
+                onClick={() => (virtualMode || usesPlaylist ? goToVirtualStop(1) : skipForward())}
               >
                 <SkipForward className="w-5 h-5 text-foreground" />
               </button>
