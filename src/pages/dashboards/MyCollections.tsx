@@ -38,7 +38,7 @@ const MyCollections = () => {
 
   return (
     <div className="min-h-screen bg-surface pb-24">
-      <header className="bg-role-subject-expert text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
+      <header className="bg-role-culture-actor text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{lang === "ar" ? "مجموعاتي" : "My Collections"}</h1>
       </header>
@@ -64,8 +64,8 @@ const MyCollections = () => {
                 <p className="text-[11px] text-muted-foreground line-clamp-1">{e.discipline}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
-              <PreviewButton path={`/collection/${e.slug || e.id}`} className="bg-role-subject-expert/10 text-role-subject-expert" />
-              <button onClick={() => navigate(`/dashboard/subject-expert/edit-collection/${e.id}`)} className="p-2 rounded-lg bg-role-subject-expert/10 text-role-subject-expert">
+              <PreviewButton path={`/collection/${e.slug || e.id}`} className="bg-role-culture-actor/10 text-role-culture-actor" />
+              <button onClick={() => navigate(`/dashboard/culture-actor/edit-collection/${e.id}`)} className="p-2 rounded-lg bg-role-culture-actor/10 text-role-culture-actor">
                 <Pencil className="w-4 h-4" />
               </button>
               <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
@@ -75,7 +75,7 @@ const MyCollections = () => {
           ))
         )}
 
-        <button onClick={() => navigate("/dashboard/subject-expert/new-collection")} className="w-full bg-role-subject-expert text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2 mt-2">
+        <button onClick={() => navigate("/dashboard/culture-actor/new-collection")} className="w-full bg-role-culture-actor text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2 mt-2">
           <Plus className="w-4 h-4" /> {lang === "ar" ? "مجموعة جديدة" : "New Collection"}
         </button>
       </div>

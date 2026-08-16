@@ -88,7 +88,7 @@ const NewFlagReport = () => {
         if (error) throw error;
         toast.success(lang === "ar" ? "تم إرسال البلاغ بنجاح!" : "Report submitted successfully!");
       }
-      navigate("/dashboard/ambassador/my-tasks");
+      navigate("/profile");
     } catch (err: any) {
       toast.error(err.message || "Failed to save report");
     } finally {

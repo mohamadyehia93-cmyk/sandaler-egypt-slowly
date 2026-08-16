@@ -359,7 +359,7 @@ const NewAudioTour = () => {
         if (error) throw error;
         toast.success(lang === "ar" ? "تم نشر الجولة الصوتية بنجاح!" : "Audio tour published successfully!");
       }
-      navigate("/dashboard/narrator/my-tours");
+      navigate("/dashboard/culture-actor/my-tours");
     } catch (err: any) {
       toast.error(err.message || "Failed to save audio tour");
     } finally {
@@ -368,7 +368,7 @@ const NewAudioTour = () => {
     }
   };
 
-  const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-narrator/40";
+  const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-culture-actor/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
 
   const submitLabel = submitting
@@ -381,7 +381,7 @@ const NewAudioTour = () => {
 
   return (
     <div className="min-h-screen bg-surface pb-10">
-      <header className="bg-role-narrator text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
+      <header className="bg-role-culture-actor text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل الجولة" : "Edit Audio Tour") : (lang === "ar" ? "جولة صوتية جديدة" : "New Audio Tour")}</h1>
       </header>
@@ -393,7 +393,7 @@ const NewAudioTour = () => {
           fieldEn="title_en" fieldAr="title_ar"
           labelEn="Tour Title" labelAr="عنوان الجولة"
           required
-          icon={<FileText className="w-3.5 h-3.5 text-role-narrator" />}
+          icon={<FileText className="w-3.5 h-3.5 text-role-culture-actor" />}
           valueEn={form.titleEn} valueAr={form.titleAr}
           onChange={({ en, ar }) => setForm((p) => ({ ...p, titleEn: en, titleAr: ar }))}
           meta={meta} onMetaChange={setMeta}
@@ -407,7 +407,7 @@ const NewAudioTour = () => {
           fieldEn="description_en" fieldAr="description_ar"
           labelEn="Tour Description" labelAr="وصف الجولة"
           multiline rows={4} maxLength={1000}
-          icon={<FileText className="w-3.5 h-3.5 text-role-narrator" />}
+          icon={<FileText className="w-3.5 h-3.5 text-role-culture-actor" />}
           valueEn={form.descriptionEn} valueAr={form.descriptionAr}
           onChange={({ en, ar }) => setForm((p) => ({ ...p, descriptionEn: en, descriptionAr: ar }))}
           meta={meta} onMetaChange={setMeta}
@@ -421,13 +421,13 @@ const NewAudioTour = () => {
           cityId={form.city}
           onChange={(cityId, regionId) => setForm((p) => ({ ...p, city: cityId, region: regionId }))}
           required
-          iconClass="w-3.5 h-3.5 text-role-narrator"
+          iconClass="w-3.5 h-3.5 text-role-culture-actor"
           inputClass={inputClass}
           labelClass={labelClass}
         />
 
         <div>
-          <label className={labelClass}><Clock className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "المدة (د)" : "Duration (min)"}</label>
+          <label className={labelClass}><Clock className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "المدة (د)" : "Duration (min)"}</label>
           <input type="number" className={inputClass} placeholder="45" value={form.duration} onChange={(e) => set("duration", e.target.value)} min="5" max="240" />
         </div>
 
@@ -449,10 +449,10 @@ const NewAudioTour = () => {
         </div>
 
         <div>
-          <label className={labelClass}><Tag className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "الموضوع *" : "Theme *"}</label>
+          <label className={labelClass}><Tag className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "الموضوع *" : "Theme *"}</label>
           <div className="flex flex-wrap gap-2">
             {themes.map((t, i) => (
-              <button key={i} onClick={() => set("theme", t.en)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${form.theme === t.en ? "bg-role-narrator text-white border-role-narrator" : "bg-card text-foreground border-border"}`}>
+              <button key={i} onClick={() => set("theme", t.en)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${form.theme === t.en ? "bg-role-culture-actor text-white border-role-culture-actor" : "bg-card text-foreground border-border"}`}>
                 {lang === "ar" ? t.ar : t.en}
               </button>
             ))}
@@ -460,10 +460,10 @@ const NewAudioTour = () => {
         </div>
 
         <div>
-          <label className={labelClass}><Languages className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "لغات السرد" : "Narration Languages"}</label>
+          <label className={labelClass}><Languages className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "لغات السرد" : "Narration Languages"}</label>
           <div className="flex flex-wrap gap-2">
             {[{ k: "ar", l: lang === "ar" ? "العربية" : "Arabic" }, { k: "en", l: lang === "ar" ? "الإنجليزية" : "English" }, { k: "fr", l: lang === "ar" ? "الفرنسية" : "French" }].map((o) => (
-              <button key={o.k} onClick={() => toggleLang(o.k)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${form.languages.includes(o.k) ? "bg-role-narrator text-white border-role-narrator" : "bg-card text-foreground border-border"}`}>
+              <button key={o.k} onClick={() => toggleLang(o.k)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${form.languages.includes(o.k) ? "bg-role-culture-actor text-white border-role-culture-actor" : "bg-card text-foreground border-border"}`}>
                 {o.l}
               </button>
             ))}
@@ -471,7 +471,7 @@ const NewAudioTour = () => {
         </div>
 
         <div>
-          <label className={labelClass}><DollarSign className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "السعر الإرشادي (ج.م)" : "Indicative Price (EGP)"}</label>
+          <label className={labelClass}><DollarSign className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "السعر الإرشادي (ج.م)" : "Indicative Price (EGP)"}</label>
           <input type="number" className={inputClass} placeholder="0" value={form.price} onChange={(e) => set("price", e.target.value)} min="0" />
           <p className="text-[10px] text-muted-foreground mt-1">
             {lang === "ar"
@@ -481,22 +481,22 @@ const NewAudioTour = () => {
         </div>
 
         <div>
-          <label className={labelClass}><ImageIcon className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "صورة الغلاف" : "Cover Image"}</label>
+          <label className={labelClass}><ImageIcon className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "صورة الغلاف" : "Cover Image"}</label>
           <PhotoPicker files={photos} onChange={setPhotos} max={1} hint={lang === "ar" ? "اضغط لرفع صورة" : "Tap to upload image"} existing={existingImages} onRemoveExisting={(url) => setExistingImages((p) => p.filter((u) => u !== url))} />
         </div>
 
         {/* Stops */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-narrator" />{lang === "ar" ? "محطات الجولة *" : "Tour Stops *"}</label>
-            <button onClick={addStop} className="text-[10px] font-semibold text-role-narrator flex items-center gap-1">
+            <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "محطات الجولة *" : "Tour Stops *"}</label>
+            <button onClick={addStop} className="text-[10px] font-semibold text-role-culture-actor flex items-center gap-1">
               <Plus className="w-3 h-3" /> {lang === "ar" ? "إضافة محطة" : "Add stop"}
             </button>
           </div>
 
           {/* Total spoken-time estimate across all stops (informational) */}
-          <div className="mb-3 rounded-xl bg-role-narrator/10 border border-role-narrator/25 px-3 py-2">
-            <p className="text-[11px] font-semibold text-role-narrator flex items-center gap-1.5">
+          <div className="mb-3 rounded-xl bg-role-culture-actor/10 border border-role-culture-actor/25 px-3 py-2">
+            <p className="text-[11px] font-semibold text-role-culture-actor flex items-center gap-1.5">
               <Timer className="w-3 h-3" />
               {lang === "ar"
                 ? `إجمالي وقت السرد التقديري: ${formatDurationShort(totalEstimateSeconds, lang)}`
@@ -513,7 +513,7 @@ const NewAudioTour = () => {
             {stops.map((s, i) => (
               <div key={i} className="bg-card border border-border rounded-xl p-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-role-narrator">{lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`}</span>
+                  <span className="text-[10px] font-bold text-role-culture-actor">{lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`}</span>
                   {stops.length > 1 && (
                     <button onClick={() => removeStop(i)} className="text-destructive p-1">
                       <Trash2 className="w-3.5 h-3.5" />
@@ -572,10 +572,10 @@ const NewAudioTour = () => {
 
                 {/* Segments — what the listener hears once they ARRIVE here.
                     No coordinates and no directions: they're already standing here. */}
-                <div className="rounded-xl border border-dashed border-role-narrator/40 bg-role-narrator/5 p-3 space-y-3">
+                <div className="rounded-xl border border-dashed border-role-culture-actor/40 bg-role-culture-actor/5 p-3 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-[11px] font-bold text-role-narrator flex items-center gap-1.5">
+                      <p className="text-[11px] font-bold text-role-culture-actor flex items-center gap-1.5">
                         <Layers className="w-3 h-3" />
                         {lang === "ar" ? "مقاطع داخل المحطة" : "Segments within this stop"}
                       </p>
@@ -587,7 +587,7 @@ const NewAudioTour = () => {
                     </div>
                     <button
                       onClick={() => addSegment(i)}
-                      className="text-[10px] font-semibold text-role-narrator flex items-center gap-1 shrink-0"
+                      className="text-[10px] font-semibold text-role-culture-actor flex items-center gap-1 shrink-0"
                     >
                       <Plus className="w-3 h-3" /> {lang === "ar" ? "إضافة مقطع" : "Add segment"}
                     </button>
@@ -596,7 +596,7 @@ const NewAudioTour = () => {
                   {s.segments.map((g, j) => (
                     <div key={j} className="bg-card border border-border rounded-xl p-3 space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-role-narrator">
+                        <span className="text-[10px] font-bold text-role-culture-actor">
                           {lang === "ar" ? `المقطع ${j + 1}` : `Segment ${j + 1}`}
                         </span>
                         <div className="flex items-center gap-1">
@@ -672,7 +672,7 @@ const NewAudioTour = () => {
           </div>
         </div>
 
-        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-narrator text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60 flex items-center justify-center gap-2">
+        <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-culture-actor text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60 flex items-center justify-center gap-2">
           {submitting && <Mic className="w-4 h-4 animate-pulse" />}
           {submitLabel}
         </button>
