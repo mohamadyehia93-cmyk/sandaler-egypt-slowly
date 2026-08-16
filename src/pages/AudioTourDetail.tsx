@@ -174,9 +174,15 @@ const AudioTourDetail = () => {
     return best;
   }, [stopDistances]);
 
-  // Sync active stop with audio progress, OR with nearest stop when geo-following
+  // Sync active stop: virtual playlist position, else nearest stop when
+  // geo-following, else audio progress.
   useEffect(() => {
-    if (followGeo && geoEnabled && nearestStopIndex >= 0) {
+    if (usesPlaylist) {
+      const target = clipStops[Math.min(virtualIndex, clipStops.length - 1)];
+      if (target) setActiveStopIndex(target.index);
+      return;
+    }
+    if (!virtualMode && followGeo && geoEnabled && nearestStopIndex >= 0) {
       setActiveStopIndex(nearestStopIndex);
       return;
     }
@@ -184,13 +190,47 @@ const AudioTourDetail = () => {
       const progress = currentTime / duration;
       setActiveStopIndex(Math.min(Math.floor(progress * stopsCount), stopsCount - 1));
     }
-  }, [currentTime, duration, stopsCount, followGeo, geoEnabled, nearestStopIndex]);
+  }, [currentTime, duration, stopsCount, followGeo, geoEnabled, nearestStopIndex, usesPlaylist, virtualMode, virtualIndex, clipStops]);
 
   const enableGeo = useCallback(() => {
+    setVirtualMode(false);
     setGeoEnabled(true);
     setFollowGeo(true);
     toast.success(lang === "ar" ? "تم تفعيل الموقع - الجولة ستتبع تحركك" : "Location on — the tour will follow your steps");
   }, [lang]);
+
+  /** Move between stops in virtual mode (playlist hop, or seek within one track). */
+  const goToVirtualStop = useCallback(
+    (delta: 1 | -1) => {
+      if (usesPlaylist) {
+        const next = Math.min(Math.max(virtualIndex + delta, 0), clipStops.length - 1);
+        if (next === virtualIndex) return;
+        autoplayNextRef.current = isPlaying;
+        setVirtualIndex(next);
+        return;
+      }
+      const audio = audioRef.current;
+      if (!audio || !duration || stopsCount === 0) return;
+      const target = Math.min(Math.max(activeStopIndex + delta, 0), stopsCount - 1);
+      audio.currentTime = (target / stopsCount) * duration;
+      setCurrentTime(audio.currentTime);
+      setActiveStopIndex(target);
+    },
+    [usesPlaylist, virtualIndex, clipStops.length, isPlaying, duration, stopsCount, activeStopIndex]
+  );
+
+  const toggleVirtualMode = useCallback(() => {
+    setVirtualMode((prev) => {
+      const next = !prev;
+      if (next) {
+        setFollowGeo(false);
+        setVirtualIndex(0);
+        autoplayNextRef.current = false;
+      }
+      return next;
+    });
+  }, []);
+
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
