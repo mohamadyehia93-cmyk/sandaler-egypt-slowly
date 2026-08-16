@@ -192,9 +192,11 @@ const AudioTourDetail = () => {
     const onTimeUpdate = () => setCurrentTime(audio.duration ? audio.currentTime : 0);
     const onEnded = () => {
       setCurrentTime(0);
-      if (usesPlaylist && virtualIndex < clipStops.length - 1) {
+      // Auto-advance: to the next segment inside this stop, then across the stop
+      // boundary to the next stop's first segment.
+      if (usesPlaylist && playIndex < playItems.length - 1) {
         autoplayNextRef.current = true;
-        setVirtualIndex((i) => i + 1);
+        setPlayIndex((i) => i + 1);
         return;
       }
       setIsPlaying(false);
