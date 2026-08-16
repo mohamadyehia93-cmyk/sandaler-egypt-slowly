@@ -603,11 +603,22 @@ const AudioTourDetail = () => {
                 </div>
                 <div className="flex-1 pt-1">
                   <p className="text-sm font-semibold text-foreground">{stopLabel}</p>
+                  {(() => {
+                    const d = stop ? (lang === "ar" ? stop.directions_ar || stop.directions_en : stop.directions_en || stop.directions_ar) : "";
+                    if (!d) return null;
+                    return (
+                      <p dir="auto" className="text-[12px] text-primary leading-relaxed mt-1 flex items-start gap-1.5 text-start">
+                        <Footprints className="w-3 h-3 mt-0.5 shrink-0" />
+                        <span>{d}</span>
+                      </p>
+                    );
+                  })()}
                   {stopDesc && (
                     <p dir="auto" className="text-[12px] text-muted-foreground leading-relaxed mt-1 text-start">
                       {stopDesc}
                     </p>
                   )}
+
                   {stop?.audio_url && (
                     <audio
                       controls
