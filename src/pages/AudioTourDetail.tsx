@@ -122,22 +122,50 @@ const AudioTourDetail = () => {
     dbStops.find((s) => !!s.audio_url)?.audio_url ||
     null;
 
-  // ---- Virtual (podcast) mode -------------------------------------------
-  // Plays the tour straight through with no GPS: for listeners who are not
-  // physically there. Works with per-stop clips (a playlist that auto-advances)
-  // AND with a single full-tour file (skip jumps between stop segments).
-  const clipStops = useMemo(
-    () => dbStops.map((s, index) => ({ ...s, index })).filter((s) => !!s.audio_url),
+  // ---- Playlist: stops and their nested segments -------------------------
+  // A flat list of playable units in tour order. A stop WITH segments yields one
+  // item per segment; a stop without segments yields its own single clip, exactly
+  // as before. Used by virtual (podcast) mode across the whole tour, and by GPS
+  // mode to auto-advance segments once the listener has arrived at a stop.
+  const playItems = useMemo<PlayItem[]>(() => {
+    const items: PlayItem[] = [];
+    dbStops.forEach((s, stopIndex) => {
+      const segs = (Array.isArray(s.segments) ? s.segments : []).filter((g) => !!g?.audio_url);
+      if (segs.length) {
+        segs.forEach((g, segIndex) =>
+          items.push({
+            stopIndex,
+            segIndex,
+            segCount: segs.length,
+            src: g.audio_url as string,
+            title_en: g.title_en || "",
+            title_ar: g.title_ar || "",
+          })
+        );
+      } else if (s.audio_url) {
+        items.push({
+          stopIndex,
+          segIndex: null,
+          segCount: 0,
+          src: s.audio_url,
+          title_en: s.label_en || "",
+          title_ar: s.label_ar || "",
+        });
+      }
+    });
+    return items;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tour?.id, stopsCount]
-  );
+  }, [tour?.id, stopsCount]);
+
+  const hasSegmentItems = playItems.some((it) => it.segIndex !== null);
   const [virtualMode, setVirtualMode] = useState(false);
-  const [virtualIndex, setVirtualIndex] = useState(0);
+  const [playIndex, setPlayIndex] = useState(0);
   const autoplayNextRef = useRef(false);
-  const usesPlaylist = virtualMode && clipStops.length > 1;
-  const activeSrc = usesPlaylist
-    ? clipStops[Math.min(virtualIndex, clipStops.length - 1)]?.audio_url || audioSrc
-    : audioSrc;
+  // Segmented tours use the playlist in GPS mode too, so segments can advance on
+  // their own once the listener arrives. Unsegmented tours keep today's behaviour.
+  const usesPlaylist = playItems.length > 1 && (virtualMode || hasSegmentItems);
+  const currentItem = usesPlaylist ? playItems[Math.min(playIndex, playItems.length - 1)] : null;
+  const activeSrc = currentItem?.src || audioSrc;
 
   useEffect(() => {
     if (!activeSrc) {
