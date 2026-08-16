@@ -25,6 +25,29 @@ const themes = [
   { en: "Nature", ar: "طبيعة" },
 ];
 
+/**
+ * A SEGMENT lives INSIDE a stop: something the narrator talks about once the
+ * listener has already arrived. Deliberately has NO coordinates and NO walking
+ * directions — those belong to the stop.
+ */
+type SegmentDraft = {
+  title_en: string;
+  title_ar: string;
+  desc_en: string;
+  desc_ar: string;
+  audioFile: File | null;
+  audioUrl: string | null;
+};
+
+const emptySegment = (): SegmentDraft => ({
+  title_en: "",
+  title_ar: "",
+  desc_en: "",
+  desc_ar: "",
+  audioFile: null,
+  audioUrl: null,
+});
+
 type StopDraft = {
   /** Label in the authoring language. */
   name: string;
@@ -45,6 +68,8 @@ type StopDraft = {
   audioFile: File | null;
   /** Already-uploaded clip URL (edit mode). */
   audioUrl: string | null;
+  /** Optional nested segments heard at this stop. */
+  segments: SegmentDraft[];
 };
 
 const emptyStop = (): StopDraft => ({
@@ -58,6 +83,7 @@ const emptyStop = (): StopDraft => ({
   lng: "",
   audioFile: null,
   audioUrl: null,
+  segments: [],
 });
 
 
