@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Upload, FileText, MapPin, Tag, AlertTriangle, Image } from "lucide-react";
+import { ArrowLeft, Upload, FileText, MapPin, Tag, AlertTriangle, Image, Loader2, ShieldAlert } from "lucide-react";
+import { useIsAmbassador } from "@/hooks/useIsAmbassador";
 import { toast } from "sonner";
 
 const issueTypes = [
@@ -25,6 +26,7 @@ const NewFlagReport = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isAmbassador, loading: capLoading } = useIsAmbassador();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const [submitting, setSubmitting] = useState(false);
@@ -98,6 +100,36 @@ const NewFlagReport = () => {
 
 
 
+
+  // Flag reporting is gated on the ambassador capability an admin grants.
+  if (capLoading) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user || !isAmbassador) {
+    return (
+      <div className="min-h-screen bg-surface flex flex-col items-center justify-center px-6 gap-3 text-center">
+        <div className="w-16 h-16 rounded-full bg-role-ambassador/10 flex items-center justify-center">
+          <ShieldAlert className="w-8 h-8 text-role-ambassador" />
+        </div>
+        <h2 className="text-lg font-bold text-foreground">
+          {lang === "ar" ? "الإبلاغ متاح للسفراء" : "Flag reporting is for ambassadors"}
+        </h2>
+        <p className="text-sm text-muted-foreground max-w-xs">
+          {lang === "ar"
+            ? "صفة السفير تُمنح من إدارة صندل. تواصل معنا إذا أردت المساعدة في التحقق من المقدمين."
+            : "The ambassador capability is granted by the Sandal team. Get in touch if you would like to help verify providers."}
+        </p>
+        <button onClick={() => navigate("/profile")} className="mt-1 text-sm font-semibold text-primary">
+          {lang === "ar" ? "العودة إلى الملف الشخصي" : "Back to profile"}
+        </button>
+      </div>
+    );
+  }
 
   const inputClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-role-ambassador/40";
   const labelClass = "text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5";
