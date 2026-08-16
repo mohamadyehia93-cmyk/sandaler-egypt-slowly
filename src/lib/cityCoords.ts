@@ -37,5 +37,5 @@ export const cityCoords: Record<string, [number, number]> = {
 export const getCityCoords = (cityId?: string | null): [number, number] | null =>
   (cityId && cityCoords[cityId]) || null;
 
-export const mapsUrl = (lat: number, lng: number) =>
-  `https://www.google.com/maps?q=${lat},${lng}`;
+/** Kept for existing call sites; the single URL builder lives in @/lib/mapsLinks. */
+export { placeUrl as mapsUrl } from "@/lib/mapsLinks";
