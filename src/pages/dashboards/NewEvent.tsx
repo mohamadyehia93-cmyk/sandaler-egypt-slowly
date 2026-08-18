@@ -8,6 +8,7 @@ import { fetchMyProviderId } from "@/lib/providerRecord";
 import { useCities, useRegions } from "@/hooks/useListings";
 import { ArrowLeft, Upload, FileText, Tag, MapPin, Calendar, Clock, DollarSign, Ticket, Users } from "lucide-react";
 import { toast } from "sonner";
+import CategoryChips from "@/components/CategoryChips";
 import { eventStatusClasses, eventStatusLabel } from "@/lib/eventSort";
 
 const CATEGORIES = ["festival", "exhibition", "concert", "workshop", "performance", "market"];
@@ -227,13 +228,12 @@ const NewEvent = () => {
 
         <div>
           <label className={labelClass}><Tag className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "النوع" : "Category"}</label>
-          <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map((c) => (
-              <button key={c} onClick={() => set("category", c)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${form.category === c ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"}`}>
-                {t(`event.category.${c}`)}
-              </button>
-            ))}
-          </div>
+          <CategoryChips
+            options={CATEGORIES.map((c) => ({ value: c, label: t(`event.category.${c}`) }))}
+            value={form.category}
+            onChange={(v) => set("category", v)}
+            selectedClass="bg-primary text-primary-foreground border-primary"
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-3">

@@ -10,6 +10,7 @@ import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin } from "lucide-react";
 import { toast } from "sonner";
+import CategoryChips from "@/components/CategoryChips";
 
 const categories = [
   { en: "Heritage & History", ar: "تراث وتاريخ" },
@@ -186,13 +187,12 @@ const NewArticle = () => {
         {/* Category */}
         <div>
           <label className={labelClass}><Tag className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "الفئة *" : "Category *"}</label>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat, i) => (
-              <button key={i} onClick={() => set("category", cat.en)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${form.category === cat.en ? "bg-role-culture-actor text-white border-role-culture-actor" : "bg-card text-foreground border-border"}`}>
-                {lang === "ar" ? cat.ar : cat.en}
-              </button>
-            ))}
-          </div>
+          <CategoryChips
+            options={categories.map((c) => ({ value: c.en, label: lang === "ar" ? c.ar : c.en }))}
+            value={form.category}
+            onChange={(v) => set("category", v)}
+            selectedClass="bg-role-culture-actor text-white border-role-culture-actor"
+          />
         </div>
 
         {/* Location */}

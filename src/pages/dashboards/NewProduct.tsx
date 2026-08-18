@@ -13,6 +13,7 @@ import type { Lang, TranslationMeta } from "@/lib/translation";
 import type { Json } from "@/integrations/supabase/types";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, DollarSign, Package, Ruler, Truck, Clock, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import CategoryChips from "@/components/CategoryChips";
 
 import { PRODUCT_CATEGORIES as categories } from "@/lib/productTaxonomy";
 
@@ -279,13 +280,12 @@ const NewProduct = () => {
 
         <div>
           <label className={labelClass}><Tag className={iconCls} />{lang === "ar" ? "الفئة *" : "Category *"}</label>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat, i) => (
-              <button key={i} onClick={() => set("category", cat.en)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${form.category === cat.en ? "bg-role-product-seller text-white border-role-product-seller" : "bg-card text-foreground border-border"}`}>
-                {lang === "ar" ? cat.ar : cat.en}
-              </button>
-            ))}
-          </div>
+          <CategoryChips
+            options={categories.map((c) => ({ value: c.en, label: lang === "ar" ? c.ar : c.en }))}
+            value={form.category}
+            onChange={(v) => set("category", v)}
+            selectedClass="bg-role-product-seller text-white border-role-product-seller"
+          />
         </div>
 
         <div className="grid grid-cols-3 gap-3">

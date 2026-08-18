@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Plus, Pencil, Trash2, Calendar } from "lucide-react";
 import { toast } from "sonner";
-import { EventRow, isPastEvent, eventCategoryKey } from "@/lib/eventSort";
+import { EventRow, isPastEvent, eventCategoryText } from "@/lib/eventSort";
 import { fetchMyProviderId } from "@/lib/providerRecord";
 
 const MyEvents = () => {
@@ -74,7 +74,7 @@ const MyEvents = () => {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-foreground line-clamp-1">{lang === "ar" ? (e.title_ar || e.title_en) : e.title_en}</p>
                   <p className="text-[11px] text-muted-foreground">
-                    {new Date(e.start_date).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" })} · {t(eventCategoryKey(e.category))}
+                    {new Date(e.start_date).toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" })} · {eventCategoryText(e.category, t)}
                   </p>
                   <span className={`text-[10px] font-medium ${past ? "text-muted-foreground" : "text-success"}`}>
                     {past ? t("events.past") : t("events.upcoming")}
