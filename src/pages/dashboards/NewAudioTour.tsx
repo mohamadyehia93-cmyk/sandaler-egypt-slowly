@@ -15,6 +15,7 @@ import ScriptMeter from "@/components/dashboard/ScriptMeter";
 import { estimateSeconds, formatDurationShort } from "@/lib/scriptEstimate";
 import { ArrowLeft, ArrowUp, ArrowDown, FileText, MapPin, Clock, Tag, Languages, DollarSign, Plus, Trash2, Mic, Image as ImageIcon, Navigation, Timer, Footprints, Layers } from "lucide-react";
 import { toast } from "sonner";
+import CategoryChips from "@/components/CategoryChips";
 
 const themes = [
   { en: "History", ar: "تاريخ" },
@@ -450,13 +451,12 @@ const NewAudioTour = () => {
 
         <div>
           <label className={labelClass}><Tag className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "الموضوع *" : "Theme *"}</label>
-          <div className="flex flex-wrap gap-2">
-            {themes.map((t, i) => (
-              <button key={i} onClick={() => set("theme", t.en)} className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${form.theme === t.en ? "bg-role-culture-actor text-white border-role-culture-actor" : "bg-card text-foreground border-border"}`}>
-                {lang === "ar" ? t.ar : t.en}
-              </button>
-            ))}
-          </div>
+          <CategoryChips
+            options={themes.map((th) => ({ value: th.en, label: lang === "ar" ? th.ar : th.en }))}
+            value={form.theme}
+            onChange={(v) => set("theme", v)}
+            selectedClass="bg-role-culture-actor text-white border-role-culture-actor"
+          />
         </div>
 
         <div>
