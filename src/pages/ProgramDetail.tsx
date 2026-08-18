@@ -26,19 +26,48 @@ const ProgramDetail = () => {
   });
 
   const ownerId = (data as any)?.owner_id ?? null;
-  const { data: org } = useQuery({
-    queryKey: ["program-owner-org", ownerId],
+  const { data: owner } = useQuery({
+    queryKey: ["program-owner-profile", ownerId],
     enabled: !!ownerId,
     queryFn: async () => {
-      const { data: rows } = await supabase
+      const { data: orgs } = await supabase
         .from("organizations")
-        .select("id, slug, name_en, name_ar, logo")
+        .select("id, slug, name_en, name_ar, logo, description_en, description_ar, mission_en, mission_ar")
         .eq("owner_id", ownerId)
         .eq("status", "published")
         .limit(1);
-      return (rows?.[0] as any) ?? null;
+      const orgRow = orgs?.[0] as any;
+      if (orgRow) {
+        return {
+          href: `/organization/${orgRow.slug || orgRow.id}`,
+          logo: orgRow.logo as string | null,
+          name_en: orgRow.name_en as string,
+          name_ar: orgRow.name_ar as string | null,
+          about_en: (orgRow.description_en || orgRow.mission_en) as string | null,
+          about_ar: (orgRow.description_ar || orgRow.mission_ar) as string | null,
+        };
+      }
+      // Some programs are published by a provider profile rather than an
+      // organisations row — fall back to that so the section is never empty.
+      const { data: provs } = await supabase
+        .from("providers")
+        .select("id, slug, name_en, name_ar, avatar, bio_en, bio_ar, tagline_en, tagline_ar")
+        .eq("user_id", ownerId)
+        .eq("status", "published")
+        .limit(1);
+      const prov = provs?.[0] as any;
+      if (!prov) return null;
+      return {
+        href: `/provider/${prov.slug || prov.id}`,
+        logo: prov.avatar as string | null,
+        name_en: prov.name_en as string,
+        name_ar: prov.name_ar as string | null,
+        about_en: (prov.bio_en || prov.tagline_en) as string | null,
+        about_ar: (prov.bio_ar || prov.tagline_ar) as string | null,
+      };
     },
   });
+
 
   if (isLoading) return <div className="min-h-screen bg-background p-4 space-y-4"><Skeleton className="h-64 w-full" /><Skeleton className="h-28 w-full" /></div>;
   if (!data) return <NotFoundView context="program" />;
