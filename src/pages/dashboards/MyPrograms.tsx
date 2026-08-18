@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Plus, Trash2, HeartHandshake, Pencil } from "lucide-react";
 import { toast } from "sonner";
+import PreviewButton from "@/components/dashboard/PreviewButton";
 
 const MyPrograms = () => {
   const { lang } = useI18n();
@@ -21,6 +22,20 @@ const MyPrograms = () => {
         .select("id, title_en, title_ar, image, program_type, status, start_date, created_at")
         .eq("owner_id", user!.id)
         .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: org } = useQuery({
+    queryKey: ["my-org-slug", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("organizations")
+        .select("id, slug")
+        .eq("owner_id", user!.id)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -63,6 +78,12 @@ const MyPrograms = () => {
                 <p className="text-[11px] text-muted-foreground line-clamp-1">{e.program_type}{e.start_date ? ` · ${e.start_date}` : ""}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
+              {(org?.slug || org?.id) && (
+                <PreviewButton
+                  path={`/organization/${org.slug || org.id}`}
+                  className="bg-role-organization/10 text-role-organization"
+                />
+              )}
               <button onClick={() => navigate(`/dashboard/organization/edit-program/${e.id}`)} className="p-2 rounded-lg bg-role-organization/10 text-role-organization">
                 <Pencil className="w-4 h-4" />
               </button>
