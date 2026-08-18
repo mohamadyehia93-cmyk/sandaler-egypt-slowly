@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import {
-  EventRow, isPastEvent, sortEventsUpcomingFirst, eventCategoryKey,
+  EventRow, isPastEvent, sortEventsUpcomingFirst, eventCategoryText,
   eventStatusClasses, eventStatusLabel,
 } from "@/lib/eventSort";
 import EventAttendees from "@/components/EventAttendees";
@@ -223,7 +223,7 @@ const EventsDashboard = () => {
                             <Users className="w-3 h-3" /> {e.capacity.toLocaleString(locale)}
                           </span>
                         )}
-                        <span className="text-[10px] text-muted-foreground">· {t(eventCategoryKey(e.category))}</span>
+                        <span className="text-[10px] text-muted-foreground">· {eventCategoryText(e.category, t)}</span>
                       </div>
                       {e.review_notes && (
                         <p className="text-[11px] text-destructive mt-1">

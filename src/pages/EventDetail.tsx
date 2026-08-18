@@ -20,7 +20,7 @@ import { useI18n } from "@/lib/i18n";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { useCities, useRegions } from "@/hooks/useListings";
 import { supabase } from "@/integrations/supabase/client";
-import { EventRow, isPastEvent, eventCategoryKey, eventCategoryText, sortEventsUpcomingFirst } from "@/lib/eventSort";
+import { EventRow, isPastEvent, eventCategoryText, sortEventsUpcomingFirst } from "@/lib/eventSort";
 import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";

@@ -1,6 +1,6 @@
 import { Calendar, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { EventRow, isPastEvent, eventCategoryKey } from "@/lib/eventSort";
+import { EventRow, isPastEvent, eventCategoryText } from "@/lib/eventSort";
 
 const EventCard = ({ event, onClick }: { event: EventRow; onClick?: () => void }) => {
   const { lang, t } = useI18n();
@@ -13,7 +13,7 @@ const EventCard = ({ event, onClick }: { event: EventRow; onClick?: () => void }
   const locale = lang === "ar" ? "ar-EG" : "en-US";
   const start = new Date(event.start_date);
   const dateLabel = start.toLocaleDateString(locale, { day: "numeric", month: "short" });
-  const categoryLabel = t(eventCategoryKey(event.category));
+  const categoryLabel = eventCategoryText(event.category, t);
 
   return (
     <div
