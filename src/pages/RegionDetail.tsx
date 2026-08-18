@@ -425,6 +425,8 @@ const RegionDetail = () => {
         {/* Events */}
         <EventsSection events={regionEvents} />
 
+        <ProgramsSection programs={regionPrograms} />
+
         {/* Experiences */}
         {regionExperiences.length > 0 && (
           <SectionHeader titleKey="section.experiences" onSeeAll={() => navigate("/?tab=experiences")}>
