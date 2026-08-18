@@ -543,13 +543,8 @@ const CityDetail = () => {
           </SectionHeader>
         )}
 
-        {/* Causes */}
-        <ProgramsSection programs={cityPrograms} />
-
-        {/* Causes */}
-        {cityCauses.length > 0 && (
-          <CausesSection regionId={city.regionId} cityFilter={cityId || ""} />
-        )}
+        {/* Programs & Causes — one merged feed with per-item labels */}
+        <ProgramsCausesSection programs={cityPrograms} causes={cityCauses} />
 
         {/* Map of Offerings */}
         {(() => {
