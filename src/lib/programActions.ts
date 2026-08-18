@@ -3,11 +3,12 @@ import { Gift, HandHeart, MessageCircle, UserCheck } from "lucide-react";
 export type ProgramActionKey = "volunteer" | "consult" | "donate" | "gift";
 
 /**
- * The four ways a visitor can engage with a program. `submits` marks the two
- * actions that write a real row (volunteer_applications, which supports
- * program_id server-side). Donate and gift have no payment path yet, so their
- * pages say so instead of faking a confirmation.
+ * The four ways a visitor can engage with a program. All four write a real
+ * volunteer_applications row (program_id is supported server-side) so the
+ * organisation can follow up. Donate and gift take no in-app payment — they
+ * collect a pledge/offer the organisation contacts the supporter about.
  */
+
 export const programActions = [
   {
     key: "volunteer" as ProgramActionKey,
