@@ -9,11 +9,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import NotFoundView from "@/components/NotFound";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
+import { programActions as actionOptions } from "@/lib/programActions";
 
 import { useI18n } from "@/lib/i18n";
 
 const formatDate = (value: string | null, lang: "en" | "ar") =>
   value ? new Intl.DateTimeFormat(lang === "ar" ? "ar-EG" : "en-EG", { dateStyle: "medium" }).format(new Date(`${value}T12:00:00`)) : null;
+
 
 const ProgramDetail = () => {
   const { id } = useParams();
