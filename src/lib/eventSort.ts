@@ -87,3 +87,17 @@ export const eventCategoryKey = (category?: string | null) => {
   const c = (category || "").toLowerCase();
   return KNOWN_CATEGORIES.includes(c) ? `event.category.${c}` : "section.events";
 };
+
+/**
+ * Display text for a category: a translated label when it is one of the known
+ * categories, otherwise the exact wording the organizer typed via
+ * "Other (specify)". Never invents a label.
+ */
+export const eventCategoryText = (
+  category: string | null | undefined,
+  t: (key: string) => string,
+) => {
+  const raw = (category || "").trim();
+  if (!raw) return "";
+  return KNOWN_CATEGORIES.includes(raw.toLowerCase()) ? t(`event.category.${raw.toLowerCase()}`) : raw;
+};

@@ -20,7 +20,7 @@ import { useI18n } from "@/lib/i18n";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { useCities, useRegions } from "@/hooks/useListings";
 import { supabase } from "@/integrations/supabase/client";
-import { EventRow, isPastEvent, eventCategoryKey, sortEventsUpcomingFirst } from "@/lib/eventSort";
+import { EventRow, isPastEvent, eventCategoryKey, eventCategoryText, sortEventsUpcomingFirst } from "@/lib/eventSort";
 import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
@@ -151,7 +151,7 @@ const EventDetail = () => {
   ];
 
   const details = [
-    { icon: Tag, label: t("event.category"), value: t(eventCategoryKey(event.category)) },
+    { icon: Tag, label: t("event.category"), value: eventCategoryText(event.category, t) },
     { icon: Timer, label: t("event.duration"), value: multiDay ? `${durationDays} ${t("event.days")}` : t("event.oneDay") },
     ...(event.capacity ? [{ icon: Users, label: t("event.capacity"), value: `${event.capacity} ${t("event.people")}` }] : []),
     { icon: Wallet, label: t("event.admission"), value: priceLabel },
@@ -190,7 +190,7 @@ const EventDetail = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
         <div className="absolute top-3 start-3 flex flex-wrap gap-2">
           <span className="bg-primary/90 text-primary-foreground text-[11px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
-            <Tag className="w-3 h-3" /> {t(eventCategoryKey(event.category))}
+            <Tag className="w-3 h-3" /> {eventCategoryText(event.category, t)}
           </span>
           <span
             className={`text-[11px] font-medium px-2.5 py-1 rounded-full ${
