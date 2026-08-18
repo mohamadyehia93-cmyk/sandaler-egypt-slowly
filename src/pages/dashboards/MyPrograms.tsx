@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Plus, Trash2, HeartHandshake, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import PreviewButton from "@/components/dashboard/PreviewButton";
+import { useDashboardIdentity } from "@/hooks/useDashboardIdentity";
+
 
 const MyPrograms = () => {
   const { lang } = useI18n();
