@@ -5,7 +5,7 @@
  */
 
 /** experiences_theme_check / trips_theme_check */
-export type ExperienceTheme = "nature" | "history" | "food" | "adventure" | "culture" | "community";
+export type ExperienceTheme = "nature" | "history" | "food" | "adventure" | "culture" | "community" | "other";
 
 export const EXPERIENCE_THEME_VALUES: ExperienceTheme[] = [
   "nature",
@@ -14,6 +14,7 @@ export const EXPERIENCE_THEME_VALUES: ExperienceTheme[] = [
   "adventure",
   "culture",
   "community",
+  "other",
 ];
 
 /** Both the EN and the AR label of a category map to the same stored theme. */
@@ -102,7 +103,18 @@ export const EXPERIENCE_THEMES: {
   { key: "adventure", label: { en: "Adventure", ar: "مغامرة" }, emoji: "🏄" },
   { key: "culture", label: { en: "Art & Culture", ar: "فن وثقافة" }, emoji: "🎨" },
   { key: "community", label: { en: "Community", ar: "مجتمع" }, emoji: "🤝" },
+  { key: "other", label: { en: "Other", ar: "أخرى" }, emoji: "✨" },
 ];
+
+/**
+ * Category label -> stored theme, falling back to "other" for any free text the
+ * owner typed via the "Other (specify)" option. Returns null only for blanks.
+ */
+export const themeOrOther = (label: string): ExperienceTheme | null => {
+  const raw = (label || "").trim();
+  if (!raw) return null;
+  return themeForCategory(raw) || "other";
+};
 
 /** accommodations_accommodation_type_check — the ONLY accepted stay types. */
 export type AccommodationType = "homestay" | "eco-lodge" | "guesthouse" | "camp" | "hotel";
