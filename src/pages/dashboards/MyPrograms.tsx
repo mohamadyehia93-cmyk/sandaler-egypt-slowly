@@ -41,6 +41,16 @@ const MyPrograms = () => {
     },
   });
 
+  // Public surface for a program: the organization page when one exists,
+  // otherwise the owner's public provider profile.
+  const { providerId } = useDashboardIdentity();
+  const previewPath = org?.slug || org?.id
+    ? `/organization/${org.slug || org.id}`
+    : providerId
+      ? `/provider/${providerId}`
+      : null;
+
+
   const handleDelete = async (id: string) => {
     if (!window.confirm(lang === "ar" ? "حذف هذا البرنامج؟" : "Delete this program?")) return;
     const { error } = await supabase.from("programs").delete().eq("id", id);
