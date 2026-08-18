@@ -12,13 +12,12 @@ import { bylineNames } from "@/lib/postByline";
 import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents, useTrips, useProducts, useAccommodations, useTransport, usePrograms } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
-import CausesSection from "@/components/CausesSection";
 import RegionMap from "@/components/RegionMap";
 import BottomNav from "@/components/BottomNav";
 import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
-import ProgramsSection from "@/components/ProgramsSection";
+import ProgramsCausesSection from "@/components/ProgramsCausesSection";
 
 type PostItem = {
   id: string;
@@ -425,7 +424,8 @@ const RegionDetail = () => {
         {/* Events */}
         <EventsSection events={regionEvents} />
 
-        <ProgramsSection programs={regionPrograms} />
+        {/* Programs & Causes — one merged feed with per-item labels */}
+        <ProgramsCausesSection programs={regionPrograms} causes={regionCauses} />
 
         {/* Experiences */}
         {regionExperiences.length > 0 && (
@@ -583,8 +583,6 @@ const RegionDetail = () => {
         )}
 
 
-        {/* Causes */}
-        <CausesSection regionId={regionId || ""} cityFilter={selectedCity} />
       </div>
 
       <BottomNav />

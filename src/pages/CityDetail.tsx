@@ -9,13 +9,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents, useCauses, usePrograms } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
-import CausesSection from "@/components/CausesSection";
 import CityOfferingsMap, { OfferingPin } from "@/components/CityOfferingsMap";
 import BottomNav from "@/components/BottomNav";
 import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
-import ProgramsSection from "@/components/ProgramsSection";
+import ProgramsCausesSection from "@/components/ProgramsCausesSection";
 
 type PostItem = {
   id: string;
