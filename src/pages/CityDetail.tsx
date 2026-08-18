@@ -6,7 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents, useCauses } from "@/hooks/useListings";
+import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents, useCauses, usePrograms } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
 import CausesSection from "@/components/CausesSection";
@@ -15,6 +15,7 @@ import BottomNav from "@/components/BottomNav";
 import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
+import ProgramsSection from "@/components/ProgramsSection";
 
 type PostItem = {
   id: string;
@@ -144,7 +145,8 @@ const CityDetail = () => {
   const { data: dbPosts = [], isLoading: l8 } = usePosts();
   const { data: dbEvents = [] } = useEvents();
   const { data: dbCauses = [] } = useCauses();
-  const isLoading = l1 || l2 || l3 || l4 || l5 || l6 || l7 || l8;
+  const { data: dbPrograms = [], isLoading: l9 } = usePrograms();
+  const isLoading = l1 || l2 || l3 || l4 || l5 || l6 || l7 || l8 || l9;
 
   // City copy comes from the cities table only. There is no sample fallback: an
   // unknown city id must 404 rather than borrow another city's description.
@@ -235,6 +237,7 @@ const CityDetail = () => {
   ]);
 
   const cityCauses = (dbCauses as any[]).filter((c) => c.city_id === cityId);
+  const cityPrograms = (dbPrograms as any[]).filter((p) => p.city_id === cityId);
   const cityPosts = dedupe([
     ...(dbPosts as any[]).filter((p) => p.city_id === cityId).map((p) => ({
       id: p.slug || p.id, slug: p.slug,
@@ -539,6 +542,9 @@ const CityDetail = () => {
             </div>
           </SectionHeader>
         )}
+
+        {/* Causes */}
+        <ProgramsSection programs={cityPrograms} />
 
         {/* Causes */}
         {cityCauses.length > 0 && (
