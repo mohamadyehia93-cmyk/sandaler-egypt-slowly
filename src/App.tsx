@@ -27,6 +27,7 @@ const ExperienceDetail = lazy(() => import("./pages/ExperienceDetail.tsx"));
 const TripDetail = lazy(() => import("./pages/TripDetail.tsx"));
 const AudioTourDetail = lazy(() => import("./pages/AudioTourDetail.tsx"));
 const CauseDetail = lazy(() => import("./pages/CauseDetail.tsx"));
+const ProgramDetail = lazy(() => import("./pages/ProgramDetail.tsx"));
 const OrganizationDetail = lazy(() => import("./pages/OrganizationDetail.tsx"));
 const Wishlists = lazy(() => import("./pages/Wishlists.tsx"));
 const Search = lazy(() => import("./pages/Search.tsx"));
@@ -161,6 +162,7 @@ const App = () => {
             <Route path="/collections" element={<AllCollections />} />
             <Route path="/collection/:id" element={<CollectionDetail />} />
             <Route path="/cause/:id" element={<CauseDetail />} />
+            <Route path="/program/:id" element={<ProgramDetail />} />
             <Route path="/organization/:id" element={<OrganizationDetail />} />
             <Route path="/cause/:id/gift" element={<CauseSupportGift />} />
             <Route path="/cause/:id/donate" element={<CauseSupportDonate />} />

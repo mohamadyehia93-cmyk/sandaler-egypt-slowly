@@ -129,6 +129,20 @@ export const useCauses = () =>
     },
   });
 
+export const usePrograms = () =>
+  useQuery({
+    queryKey: ["programs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("programs")
+        .select("*")
+        .eq("status", "published")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
 export const useWhosWho = () =>
   useQuery({
     queryKey: ["whos_who"],
