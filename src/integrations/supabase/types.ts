@@ -2117,6 +2117,7 @@ export type Database = {
       }
       programs: {
         Row: {
+          city_id: string | null
           created_at: string
           description_ar: string | null
           description_en: string | null
@@ -2125,11 +2126,14 @@ export type Database = {
           goals: Json
           id: string
           image: string | null
+          latitude: number | null
           location_ar: string | null
           location_en: string | null
+          longitude: number | null
           organization_id: string | null
           owner_id: string
           program_type: string | null
+          region_id: string | null
           slug: string | null
           start_date: string | null
           status: string
@@ -2137,9 +2141,11 @@ export type Database = {
           title_en: string
           translation_meta: Json
           updated_at: string
+          video_url: string | null
           volunteers_needed: number | null
         }
         Insert: {
+          city_id?: string | null
           created_at?: string
           description_ar?: string | null
           description_en?: string | null
@@ -2148,11 +2154,14 @@ export type Database = {
           goals?: Json
           id?: string
           image?: string | null
+          latitude?: number | null
           location_ar?: string | null
           location_en?: string | null
+          longitude?: number | null
           organization_id?: string | null
           owner_id: string
           program_type?: string | null
+          region_id?: string | null
           slug?: string | null
           start_date?: string | null
           status?: string
@@ -2160,9 +2169,11 @@ export type Database = {
           title_en: string
           translation_meta?: Json
           updated_at?: string
+          video_url?: string | null
           volunteers_needed?: number | null
         }
         Update: {
+          city_id?: string | null
           created_at?: string
           description_ar?: string | null
           description_en?: string | null
@@ -2171,11 +2182,14 @@ export type Database = {
           goals?: Json
           id?: string
           image?: string | null
+          latitude?: number | null
           location_ar?: string | null
           location_en?: string | null
+          longitude?: number | null
           organization_id?: string | null
           owner_id?: string
           program_type?: string | null
+          region_id?: string | null
           slug?: string | null
           start_date?: string | null
           status?: string
@@ -2183,9 +2197,25 @@ export type Database = {
           title_en?: string
           translation_meta?: Json
           updated_at?: string
+          video_url?: string | null
           volunteers_needed?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "programs_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "programs_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       provider_statuses: {
         Row: {
