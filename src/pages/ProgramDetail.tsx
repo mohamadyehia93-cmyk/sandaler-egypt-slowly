@@ -23,10 +23,26 @@ const ProgramDetail = () => {
     enabled: !!id,
   });
 
+  const ownerId = (data as any)?.owner_id ?? null;
+  const { data: org } = useQuery({
+    queryKey: ["program-owner-org", ownerId],
+    enabled: !!ownerId,
+    queryFn: async () => {
+      const { data: rows } = await supabase
+        .from("organizations")
+        .select("id, slug, name_en, name_ar, logo")
+        .eq("owner_id", ownerId)
+        .eq("status", "published")
+        .limit(1);
+      return (rows?.[0] as any) ?? null;
+    },
+  });
+
   if (isLoading) return <div className="min-h-screen bg-background p-4 space-y-4"><Skeleton className="h-64 w-full" /><Skeleton className="h-28 w-full" /></div>;
   if (!data) return <NotFoundView context="program" />;
 
   const program = data as any;
+
   const title = lang === "ar" ? (program.title_ar || program.title_en) : program.title_en;
   const description = lang === "ar" ? (program.description_ar || program.description_en) : program.description_en;
   const location = lang === "ar" ? (program.location_ar || program.location_en) : program.location_en;
