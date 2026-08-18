@@ -1,58 +1,26 @@
-import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ProgramCauseCard from "@/components/ProgramCauseCard";
 import { useI18n } from "@/lib/i18n";
-import { useCauses } from "@/hooks/useListings";
+import { useCauses, usePrograms } from "@/hooks/useListings";
+import { mergeProgramsCauses } from "@/lib/programsCauses";
 import SectionHeader from "./SectionHeader";
 import { Skeleton } from "./ui/skeleton";
 
+/** Home row: programs and causes in one feed, each card labelled. */
 const HomeCausesSection = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
-  const { data: causes, isLoading } = useCauses();
+  const { data: causes = [], isLoading } = useCauses();
+  const { data: programs = [], isLoading: loadingPrograms } = usePrograms();
+
+  const items = mergeProgramsCauses(programs as any[], causes as any[], lang).slice(0, 3);
 
   return (
     <SectionHeader titleKey="section.causes" onSeeAll={() => navigate("/causes")}>
       <div className="grid grid-cols-3 gap-3 px-4">
-        {isLoading
-          ? Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-[200px] rounded-lg" />
-            ))
-          : (causes ?? []).slice(0, 3).map((cause: any) => {
-              return (
-                <div
-                  key={cause.id}
-                  onClick={() => navigate(`/cause/${cause.slug || cause.id}`)}
-                  className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer"
-                >
-                  <div className="relative h-28">
-                    <img
-                      src={cause.image || "/placeholder.svg"}
-                      alt={lang === "ar" ? (cause.title_ar || cause.title_en) : cause.title_en}
-                      className="w-full h-full object-cover"
-                    />
-                    {(lang === "ar" ? (cause.category_ar || cause.category_en) : cause.category_en) && (
-                      <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
-                        {lang === "ar" ? (cause.category_ar || cause.category_en) : cause.category_en}
-                      </span>
-                    )}
-                    <button className="absolute top-2 right-2 p-1 rounded-full bg-background/80 backdrop-blur-sm" onClick={(e) => e.stopPropagation()}>
-                      <Heart className="w-3.5 h-3.5 text-foreground" />
-                    </button>
-                  </div>
-                  <div className="p-2.5">
-                    <h3 className="text-xs font-semibold text-foreground line-clamp-2 mb-1">
-                      {lang === "ar" ? (cause.title_ar || cause.title_en) : cause.title_en}
-                    </h3>
-                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground mb-1.5">
-                      <span>{cause.org_logo}</span>
-                      <span className="font-medium truncate">
-                        {lang === "ar" ? (cause.org_name_ar || cause.org_name_en) : cause.org_name_en}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+        {isLoading || loadingPrograms
+          ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-[200px] rounded-lg" />)
+          : items.map((item) => <ProgramCauseCard key={`${item.kind}-${item.id}`} item={item} />)}
       </div>
     </SectionHeader>
   );
