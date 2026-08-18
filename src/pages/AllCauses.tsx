@@ -1,11 +1,11 @@
-import { ArrowLeft, Heart, Search, MapPin } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
+import ProgramCauseCard from "@/components/ProgramCauseCard";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useI18n } from "@/lib/i18n";
 import { useCauses, usePrograms, useRegions } from "@/hooks/useListings";
-import CityBadge from "@/components/CityBadge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useState, useMemo } from "react";
-import ProgramsSection from "@/components/ProgramsSection";
+import { mergeProgramsCauses, type FeedKind, type ProgramCauseItem } from "@/lib/programsCauses";
 
 type ThemeKey = "heritage" | "community" | "environment" | "education";
 
@@ -18,11 +18,12 @@ const THEME_META: Record<ThemeKey, { en: string; ar: string; emoji: string }> = 
 
 const THEME_ORDER: ThemeKey[] = ["heritage", "community", "environment", "education"];
 
-const classifyCause = (c: any): ThemeKey => {
-  const cat = (c.category_en ?? "").toLowerCase();
-  if (cat.includes("heritage") || cat.includes("culture")) return "heritage";
-  if (cat.includes("environment") || cat.includes("sustain")) return "environment";
-  if (cat.includes("education")) return "education";
+/** Themes are derived from whatever category/type text the row carries — nothing invented. */
+const classify = (item: ProgramCauseItem): ThemeKey => {
+  const text = `${item.category ?? ""} ${item.title}`.toLowerCase();
+  if (text.includes("heritage") || text.includes("culture")) return "heritage";
+  if (text.includes("environment") || text.includes("sustain") || text.includes("climate")) return "environment";
+  if (text.includes("education") || text.includes("school") || text.includes("learn") || text.includes("teen")) return "education";
   return "community";
 };
 
@@ -30,50 +31,70 @@ const AllCauses = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  const [kindFilter, setKindFilter] = useState<FeedKind | "all">("all");
   const [search, setSearch] = useState("");
   const { data: causes = [], isLoading } = useCauses();
+  const { data: programs = [], isLoading: loadingPrograms } = usePrograms();
   const { data: regions = [] } = useRegions();
-  const { data: programs = [] } = usePrograms();
+
+  const all = useMemo(
+    () => mergeProgramsCauses(programs as any[], causes as any[], lang),
+    [programs, causes, lang]
+  );
 
   const filtered = useMemo(
     () =>
-      (causes as any[]).filter((c) => {
-        if (activeRegion && c.region_id !== activeRegion) return false;
+      all.filter((item) => {
+        if (kindFilter !== "all" && item.kind !== kindFilter) return false;
+        if (activeRegion && item.regionId !== activeRegion) return false;
         if (!search.trim()) return true;
-        const q = search.toLowerCase();
-        return (c.title_en ?? "").toLowerCase().includes(q) || (c.title_ar ?? "").includes(q);
+        return item.title.toLowerCase().includes(search.toLowerCase());
       }),
-    [search, activeRegion, causes]
+    [all, kindFilter, activeRegion, search]
   );
 
   const grouped = useMemo(() => {
-    const g: Record<ThemeKey, any[]> = { heritage: [], community: [], environment: [], education: [] };
-    filtered.forEach((c) => g[classifyCause(c)].push(c));
+    const g: Record<ThemeKey, ProgramCauseItem[]> = { heritage: [], community: [], environment: [], education: [] };
+    filtered.forEach((item) => g[classify(item)].push(item));
     return g;
   }, [filtered]);
 
   const regionCounts = useMemo(() => {
     const c: Record<string, number> = {};
-    (causes as any[]).forEach((x) => {
-      if (x.region_id) c[x.region_id] = (c[x.region_id] || 0) + 1;
+    all.forEach((x) => {
+      if (x.regionId) c[x.regionId] = (c[x.regionId] || 0) + 1;
     });
     return c;
-  }, [causes]);
+  }, [all]);
+
+  const kindTabs: { key: FeedKind | "all"; label: string }[] = [
+    { key: "all", label: lang === "ar" ? "الكل" : "All" },
+    { key: "program", label: lang === "ar" ? "برامج" : "Programs" },
+    { key: "cause", label: lang === "ar" ? "قضايا" : "Causes" },
+  ];
+
+  const loading = isLoading || loadingPrograms;
 
   return (
     <div className="min-h-screen bg-surface pb-8">
       <header className="sticky top-0 z-40 bg-background border-b border-border">
         <div className="flex items-center gap-3 px-4 py-3">
           <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary">
-            <ArrowLeft className="w-5 h-5 text-foreground" />
+            <ArrowLeft className="w-5 h-5 text-foreground rtl:rotate-180" />
           </button>
           <h1 className="text-lg font-bold text-foreground">
-            {lang === "ar" ? "القضايا" : "Causes"}
+            {lang === "ar" ? "البرامج والقضايا" : "Programs & Causes"}
           </h1>
           <span className="text-xs text-muted-foreground ms-auto">
-            {filtered.length} {lang === "ar" ? "قضية" : "causes"}
+            {filtered.length} {lang === "ar" ? "عنصر" : "items"}
           </span>
         </div>
+
+        <p className="px-4 pb-2 text-[11px] leading-relaxed text-muted-foreground">
+          {lang === "ar"
+            ? "البرامج مبادرات محددة المدة تديرها منظمة أو مقدّم خدمة ويمكنك الانضمام إليها. القضايا مواضيع أوسع تعرّفك بالقضية والجهات العاملة عليها."
+            : "Programs are time-bound initiatives run by an organisation you can join. Causes are broader entries introducing an issue and who works on it."}
+        </p>
 
         <div className="px-4 pb-3">
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border">
@@ -81,30 +102,37 @@ const AllCauses = () => {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={lang === "ar" ? "ابحث في القضايا..." : "Search causes..."}
+              placeholder={lang === "ar" ? "ابحث في البرامج والقضايا..." : "Search programs & causes..."}
               className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
           </div>
         </div>
 
-        <div className="px-4 pb-3 flex">
+        <div className="flex items-center gap-2 px-4 pb-3">
+          {kindTabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setKindFilter(tab.key)}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                kindFilter === tab.key
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card text-foreground border border-border"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+
           <select
             value={activeRegion ?? ""}
             onChange={(e) => setActiveRegion(e.target.value || null)}
-            className="w-auto px-4 py-2 rounded-full bg-primary text-primary-foreground border border-primary text-xs font-semibold outline-none cursor-pointer appearance-none bg-no-repeat bg-[right_0.75rem_center] pe-8"
-            style={{
-              backgroundImage:
-                "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\")",
-            }}
+            className="ms-auto rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground outline-none"
           >
-            <option value="" className="bg-card text-foreground">
-              {lang === "ar" ? "كل المناطق" : "All Regions"}
-            </option>
+            <option value="">{lang === "ar" ? "كل المناطق" : "All Regions"}</option>
             {(regions as any[]).map((r) => {
-              const count = regionCounts[r.id] || 0;
-              if (count === 0) return null;
+              if (!regionCounts[r.id]) return null;
               return (
-                <option key={r.id} value={r.id} className="bg-card text-foreground">
+                <option key={r.id} value={r.id}>
                   {r.emoji} {lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}
                 </option>
               );
@@ -114,12 +142,7 @@ const AllCauses = () => {
       </header>
 
       <div className="pt-4">
-        <div className="mb-8">
-          <ProgramsSection
-            programs={(programs as any[]).filter((program) => !activeRegion || program.region_id === activeRegion)}
-          />
-        </div>
-        {isLoading ? (
+        {loading ? (
           <div className="px-4 space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="h-32 w-full rounded-lg" />
@@ -128,90 +151,33 @@ const AllCauses = () => {
         ) : (
           THEME_ORDER.map((themeKey) => {
             const items = grouped[themeKey];
-            if (!items || items.length === 0) return null;
+            if (items.length === 0) return null;
             const meta = THEME_META[themeKey];
-
             return (
               <section key={themeKey} className="mb-8">
-                <div className="flex items-end justify-between px-4 mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{meta.emoji}</span>
-                    <h2 className="text-base font-bold text-foreground">
-                      {lang === "ar" ? meta.ar : meta.en}
-                    </h2>
-                    <span className="text-xs text-muted-foreground">({items.length})</span>
-                  </div>
+                <div className="flex items-center gap-2 px-4 mb-3">
+                  <span className="text-xl">{meta.emoji}</span>
+                  <h2 className="text-base font-bold text-foreground">{lang === "ar" ? meta.ar : meta.en}</h2>
+                  <span className="text-xs text-muted-foreground">({items.length})</span>
                 </div>
-
                 <div className="flex gap-3 px-4 overflow-x-auto hide-scrollbar">
-                  {items.map((cause: any) => {
-                    const title = lang === "ar" ? (cause.title_ar || cause.title_en) : cause.title_en;
-                    const category = lang === "ar" ? (cause.category_ar || cause.category_en) : cause.category_en;
-                    const orgName = lang === "ar" ? (cause.org_name_ar || cause.org_name_en) : cause.org_name_en;
-                    return (
-                      <div
-                        key={cause.id}
-                        onClick={() => navigate(`/cause/${cause.slug || cause.id}`)}
-                        className="min-w-[240px] shrink-0 rounded-lg overflow-hidden shadow-card bg-card cursor-pointer active:scale-[0.98] transition-transform"
-                      >
-                        <div className="relative h-32">
-                          <img src={cause.image} alt={title} className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                          {category && (
-                            <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
-                              {category}
-                            </span>
-                          )}
-                          <button
-                            className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Heart className="w-3.5 h-3.5 text-foreground" />
-                          </button>
-                        </div>
-                        <div className="p-3">
-                          <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">
-                            {title}
-                          </h3>
-                          {cause.city_id && <CityBadge cityId={cause.city_id} />}
-                          {orgName && (
-                            <div className="flex items-center gap-1 text-[10px] text-muted-foreground mt-1 mb-2">
-                              {cause.org_logo && <span>{cause.org_logo}</span>}
-                              <span className="font-medium truncate">{orgName}</span>
-                            </div>
-                          )}
-                          {(() => {
-                            const r = (regions as any[]).find((x) => x.id === cause.region_id);
-                            if (!r) return null;
-                            return (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(`/region/${cause.region_id}`);
-                                }}
-                                className="w-full flex items-center justify-center gap-1 px-2 py-1.5 rounded-md bg-secondary text-secondary-foreground text-[10px] font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
-                              >
-                                <MapPin className="w-3 h-3" />
-                                {r.emoji} {lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}
-                              </button>
-                            );
-                          })()}
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {items.map((item) => (
+                    <ProgramCauseCard
+                      key={`${item.kind}-${item.id}`}
+                      item={item}
+                      className="min-w-[240px] max-w-[240px] shrink-0"
+                    />
+                  ))}
                 </div>
               </section>
             );
           })
         )}
 
-        {!isLoading && filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <div className="text-center py-12">
             <Search className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">
-              {lang === "ar" ? "لا توجد نتائج" : "No causes found"}
-            </p>
+            <p className="text-sm text-muted-foreground">{lang === "ar" ? "لا توجد نتائج" : "No results found"}</p>
           </div>
         )}
       </div>
