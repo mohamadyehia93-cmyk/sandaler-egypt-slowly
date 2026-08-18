@@ -89,7 +89,7 @@ const translations: Record<string, Record<Lang, string>> = {
   "section.partners": { en: "Our Partners", ar: "شركاؤنا" },
   "section.certifications": { en: "Verification & Certificates", ar: "التوثيق والشهادات" },
   "common.audioTour": { en: "Audio Tour", ar: "جولة صوتية" },
-  "section.causes": { en: "Local Causes", ar: "قضايا محلية" },
+  "section.causes": { en: "Programs & Causes", ar: "البرامج والقضايا" },
   "city.about": { en: "About", ar: "عن المدينة" },
   "city.highlights": { en: "Highlights", ar: "أبرز المعالم" },
   "city.knownFor": { en: "Known For", ar: "تشتهر بـ" },
