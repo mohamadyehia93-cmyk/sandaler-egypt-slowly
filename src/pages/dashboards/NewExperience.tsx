@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyProviderId } from "@/lib/providerRecord";
 import { generateSlotDrafts } from "@/lib/experienceSlots";
-import { themeForCategory, readableDbError } from "@/lib/listingTaxonomy";
+import { themeForCategory, themeOrOther, readableDbError } from "@/lib/listingTaxonomy";
 
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
@@ -70,7 +70,7 @@ const NewExperience = () => {
           title_ar: data.title_ar ?? "",
           description_en: data.description_en ?? "",
           description_ar: data.description_ar ?? "",
-          category: data.theme ?? "",
+          category: (data.theme === "other" ? data.theme_other : data.theme) ?? "",
           price: data.price != null ? String(data.price) : "",
           duration: mins ? String(mins / 60) : "",
           durationUnit: "hours",
@@ -110,7 +110,7 @@ const NewExperience = () => {
       case 1: return form.description_en.trim().length > 0;
       // Validate at the category step, not at publish time: only a category that
       // maps to a stored theme the database accepts may advance.
-      case 2: return !!themeForCategory(form.category);
+      case 2: return !!themeOrOther(form.category);
       case 4: return form.price.trim().length > 0 && Number(form.price) >= 0;
       default: return true;
     }
@@ -124,16 +124,10 @@ const NewExperience = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    const theme = themeForCategory(form.category);
+    const theme = themeOrOther(form.category);
     if (!form.title_en.trim() || !form.title_ar.trim() || !theme || !form.price.trim()) {
       toast.error(
-        !theme && form.category
-          ? lang === "ar"
-            ? "الفئة المختارة غير مدعومة. يرجى اختيار فئة من القائمة."
-            : "That category isn't supported. Please pick one from the list."
-          : lang === "ar"
-          ? "يرجى ملء الحقول المطلوبة"
-          : "Please fill in required fields"
+        lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields"
       );
       return;
     }
@@ -175,6 +169,7 @@ const NewExperience = () => {
         description_en: form.description_en.trim(),
         description_ar: form.description_ar.trim() || null,
         theme,
+        theme_other: theme === "other" ? form.category.trim() : null,
         price: parseInt(form.price) || 0,
         duration_minutes: durationMinutes || null,
         capacity_min: parseInt(form.groupSizeMin) || 1,
