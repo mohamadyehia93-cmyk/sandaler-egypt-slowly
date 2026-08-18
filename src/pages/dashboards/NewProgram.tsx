@@ -3,12 +3,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { slugify, uploadImages } from "@/lib/dashboardForms";
+import { slugify, uploadImages, uploadVideo } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import VideoPicker from "@/components/dashboard/VideoPicker";
+import CityPicker from "@/components/dashboard/CityPicker";
+import LocationPicker from "@/components/dashboard/LocationPicker";
+import { getCityCoords } from "@/lib/cityCoords";
 import BilingualField from "@/components/dashboard/BilingualField";
 import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
-import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Calendar, Users, Heart } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Calendar, Users, Heart, Video } from "lucide-react";
 import { toast } from "sonner";
 
 const programTypes = [
@@ -28,6 +32,9 @@ const NewProgram = () => {
   const [submitting, setSubmitting] = useState(false);
   const [photos, setPhotos] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [video, setVideo] = useState<File | null>(null);
+  const [existingVideo, setExistingVideo] = useState<string | null>(null);
+  const [locTab, setLocTab] = useState<"city" | "map">("city");
 
   const [authorLang, setAuthorLang] = useState<Lang>(lang === "ar" ? "ar" : "en");
   const [meta, setMeta] = useState<TranslationMeta>({});
@@ -38,6 +45,10 @@ const NewProgram = () => {
     descriptionEn: "",
     descriptionAr: "",
     type: "",
+    cityId: "",
+    regionId: "",
+    latitude: "",
+    longitude: "",
     locationEn: "",
     locationAr: "",
     startDate: "",
@@ -62,6 +73,10 @@ const NewProgram = () => {
         descriptionEn: data.description_en || "",
         descriptionAr: data.description_ar || "",
         type: data.program_type || "",
+        cityId: (data as any).city_id || "",
+        regionId: (data as any).region_id || "",
+        latitude: (data as any).latitude != null ? String((data as any).latitude) : "",
+        longitude: (data as any).longitude != null ? String((data as any).longitude) : "",
         locationEn: data.location_en || "",
         locationAr: data.location_ar || "",
         startDate: data.start_date || "",
@@ -72,6 +87,7 @@ const NewProgram = () => {
       });
       setMeta(((data as any).translation_meta as TranslationMeta) || {});
       setExistingImages(data.image ? [data.image] : []);
+      setExistingVideo((data as any).video_url || null);
     })();
   }, [isEdit, id, lang]);
 
@@ -99,6 +115,7 @@ const NewProgram = () => {
     try {
       const uploaded = await uploadImages(photos, user.id);
       const images = [...existingImages, ...uploaded];
+      const videoUrl = video ? await uploadVideo(video, user.id) : existingVideo;
       const goals = form.goals.map((g) => g.trim()).filter(Boolean);
 
       const payload = {
@@ -108,6 +125,10 @@ const NewProgram = () => {
         description_en: form.descriptionEn.trim(),
         description_ar: form.descriptionAr.trim() || null,
         program_type: form.type,
+        city_id: form.cityId || null,
+        region_id: form.regionId || null,
+        latitude: form.latitude ? Number(form.latitude) : null,
+        longitude: form.longitude ? Number(form.longitude) : null,
         location_en: form.locationEn.trim() || null,
         location_ar: form.locationAr.trim() || null,
         translation_meta: meta as any,
@@ -117,6 +138,7 @@ const NewProgram = () => {
         donation_target: parseInt(form.donationTarget) || null,
         goals,
         image: images[0] || null,
+        video_url: videoUrl || null,
         status: "published",
       };
 
@@ -195,18 +217,80 @@ const NewProgram = () => {
           </div>
         </div>
 
-        <BilingualField
-          fieldEn="location_en" fieldAr="location_ar"
-          labelEn="Location" labelAr="الموقع"
-          icon={<MapPin className="w-3.5 h-3.5 text-role-organization" />}
-          valueEn={form.locationEn} valueAr={form.locationAr}
-          onChange={({ en, ar }) => setForm((p) => ({ ...p, locationEn: en, locationAr: ar }))}
-          meta={meta} onMetaChange={setMeta}
-          authorLang={authorLang}
-          context="city and governorate name in Egypt"
-          placeholderEn="e.g. Tanta, Gharbia" placeholderAr="مثال: طنطا، الغربية"
-          inputClass={inputClass} labelClass={labelClass}
-        />
+        <div>
+          <label className={labelClass}>
+            <MapPin className="w-3.5 h-3.5 text-role-organization" />
+            {lang === "ar" ? "الموقع" : "Location"}
+          </label>
+          <div className="flex gap-2 mb-3">
+            {([
+              { key: "city", en: "City", ar: "المدينة" },
+              { key: "map", en: "Exact address", ar: "العنوان الدقيق" },
+            ] as const).map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setLocTab(t.key)}
+                className={`flex-1 px-3 py-2 rounded-xl text-xs font-semibold border transition-colors ${
+                  locTab === t.key
+                    ? "bg-role-organization text-white border-role-organization"
+                    : "bg-card text-foreground border-border"
+                }`}
+              >
+                {lang === "ar" ? t.ar : t.en}
+              </button>
+            ))}
+          </div>
+
+          {locTab === "city" ? (
+            <CityPicker
+              cityId={form.cityId}
+              onChange={(cityId, regionId) => setForm((p) => ({ ...p, cityId, regionId }))}
+              iconClass="w-3.5 h-3.5 text-role-organization"
+              inputClass={inputClass}
+              labelClass={labelClass}
+              hintEn="Choosing a city makes your program appear on that city's and region's pages."
+              hintAr="اختيار المدينة يجعل برنامجك يظهر في صفحات المدينة والمنطقة."
+            />
+          ) : (
+            <div className="space-y-3">
+              <LocationPicker
+                lat={form.latitude}
+                lng={form.longitude}
+                fallbackCenter={getCityCoords(form.cityId)}
+                onChange={(lat, lng) =>
+                  setForm((p) => ({ ...p, latitude: String(lat), longitude: String(lng) }))
+                }
+              />
+              <BilingualField
+                fieldEn="location_en" fieldAr="location_ar"
+                labelEn="Address / landmark" labelAr="العنوان / علامة مميزة"
+                icon={<MapPin className="w-3.5 h-3.5 text-role-organization" />}
+                valueEn={form.locationEn} valueAr={form.locationAr}
+                onChange={({ en, ar }) => setForm((p) => ({ ...p, locationEn: en, locationAr: ar }))}
+                meta={meta} onMetaChange={setMeta}
+                authorLang={authorLang}
+                context="street address or landmark in Egypt"
+                placeholderEn="e.g. Youth Centre, El Geish St." placeholderAr="مثال: مركز الشباب، شارع الجيش"
+                inputClass={inputClass} labelClass={labelClass}
+              />
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className={labelClass}>
+            <Video className="w-3.5 h-3.5 text-role-organization" />
+            {lang === "ar" ? "فيديو ترويجي (اختياري)" : "Promo Video (optional)"}
+          </label>
+          <VideoPicker
+            file={video}
+            onChange={setVideo}
+            existingUrl={existingVideo}
+            onRemoveExisting={() => setExistingVideo(null)}
+            uploading={submitting}
+          />
+        </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
