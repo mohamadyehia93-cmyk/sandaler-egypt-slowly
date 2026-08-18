@@ -7,7 +7,9 @@ import ShareButton from "@/components/ShareButton";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import NotFoundView from "@/components/NotFound";
+import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
+
 import { useI18n } from "@/lib/i18n";
 
 const formatDate = (value: string | null, lang: "en" | "ar") =>
