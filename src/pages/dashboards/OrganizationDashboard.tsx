@@ -127,10 +127,19 @@ const OrganizationDashboard = () => {
           <button onClick={() => navigate("/dashboard/organization/new-program")} className="w-full bg-role-organization text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2">
             <Plus className="w-4 h-4" /> {lang === "ar" ? "إضافة برنامج" : "Add Program"}
           </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={() => navigate("/dashboard/new-event")} className="border-2 border-role-organization text-role-organization rounded-xl py-3 font-semibold text-xs flex items-center justify-center gap-1.5">
+              <Plus className="w-4 h-4" /> {lang === "ar" ? "فعالية جديدة" : "New Event"}
+            </button>
+            <button onClick={() => navigate("/dashboard/events")} className="border-2 border-role-organization text-role-organization rounded-xl py-3 font-semibold text-xs flex items-center justify-center gap-1.5">
+              <Calendar className="w-4 h-4" /> {lang === "ar" ? "فعالياتي" : "My Events"}
+            </button>
+          </div>
           <button onClick={() => navigate("/calendar")} className="w-full border-2 border-role-organization text-role-organization rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2">
             <Calendar className="w-4 h-4" /> {lang === "ar" ? "تقويم الفعاليات" : "Events Calendar"}
           </button>
         </div>
+
       </div>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-role-organization flex justify-around py-2 z-50">

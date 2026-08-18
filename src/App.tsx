@@ -264,6 +264,10 @@ const App = () => {
             <Route path="/dashboard/trip-organizer/new-event" element={<NewEvent />} />
             <Route path="/dashboard/trip-organizer/my-events" element={<MyEvents />} />
             <Route path="/dashboard/trip-organizer/events" element={<EventsDashboard />} />
+            {/* Role-neutral aliases: any provider role may organise events */}
+            <Route path="/dashboard/events" element={<EventsDashboard />} />
+            <Route path="/dashboard/new-event" element={<NewEvent />} />
+
             <Route path="/dashboard/trip-organizer" element={<TripOrganizerDashboard />} />
 
             <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />

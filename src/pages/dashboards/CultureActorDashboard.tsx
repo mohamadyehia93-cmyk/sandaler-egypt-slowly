@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, FileText, Bookmark, Headphones, Users, Plus, Sparkles, ChevronRight, Bell, Briefcase, BookOpen, Mic } from "lucide-react";
+import { ArrowLeft, FileText, Bookmark, Headphones, Users, Plus, Sparkles, ChevronRight, Bell, Briefcase, BookOpen, Mic, Calendar, CalendarPlus } from "lucide-react";
 import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
@@ -282,6 +282,15 @@ const CultureActorDashboard = () => {
             <FileText className="w-4 h-4" /> {lang === "ar" ? "إدارة محتواي" : "Manage My Content"}
             <ChevronRight className="w-4 h-4" />
           </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={() => navigate("/dashboard/new-event")} className="border-2 border-role-culture-actor text-role-culture-actor rounded-xl py-3 font-semibold text-xs flex items-center justify-center gap-1.5">
+              <CalendarPlus className="w-4 h-4" /> {lang === "ar" ? "فعالية جديدة" : "New Event"}
+            </button>
+            <button onClick={() => navigate("/dashboard/events")} className="border-2 border-role-culture-actor text-role-culture-actor rounded-xl py-3 font-semibold text-xs flex items-center justify-center gap-1.5">
+              <Calendar className="w-4 h-4" /> {lang === "ar" ? "فعالياتي" : "My Events"}
+            </button>
+          </div>
+
         </div>
       </div>
 
