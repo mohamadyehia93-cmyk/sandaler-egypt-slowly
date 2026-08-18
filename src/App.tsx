@@ -165,6 +165,8 @@ const App = () => {
             <Route path="/collection/:id" element={<CollectionDetail />} />
             <Route path="/cause/:id" element={<CauseDetail />} />
             <Route path="/program/:id" element={<ProgramDetail />} />
+            <Route path="/program/:id/:action" element={<ProgramSupport />} />
+
             <Route path="/organization/:id" element={<OrganizationDetail />} />
             <Route path="/cause/:id/gift" element={<CauseSupportGift />} />
             <Route path="/cause/:id/donate" element={<CauseSupportDonate />} />
