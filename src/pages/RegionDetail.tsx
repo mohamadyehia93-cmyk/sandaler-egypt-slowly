@@ -9,7 +9,7 @@ import { bylineNames } from "@/lib/postByline";
 // Sample experiences/posts used to be merged into the DB results here, so a region
 // page mixed fabricated listings (with their own invented ratings and prices) in
 // with real ones. Only real rows are rendered now.
-import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents, useTrips, useProducts, useAccommodations, useTransport } from "@/hooks/useListings";
+import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents, useTrips, useProducts, useAccommodations, useTransport, usePrograms } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
 import EventsSection from "@/components/EventsSection";
 import CausesSection from "@/components/CausesSection";
@@ -18,6 +18,7 @@ import BottomNav from "@/components/BottomNav";
 import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
+import ProgramsSection from "@/components/ProgramsSection";
 
 type PostItem = {
   id: string;
@@ -165,6 +166,7 @@ const RegionDetail = () => {
   const { data: dbProducts = [] } = useProducts();
   const { data: dbStays = [] } = useAccommodations();
   const { data: dbTransport = [] } = useTransport();
+  const { data: dbPrograms = [] } = usePrograms();
   // City copy comes from the cities table, not the sample cityData map, so a
   // selected city can never show another city's overview.
   const { data: selectedCityRow } = useQuery({
@@ -255,6 +257,9 @@ const RegionDetail = () => {
   const regionEvents = (dbEvents as any[])
     .filter((e) => e.region_id === regionId)
     .filter((e) => selectedCity === "all" || e.city_id === selectedCity);
+  const regionPrograms = (dbPrograms as any[])
+    .filter((p) => p.region_id === regionId)
+    .filter((p) => selectedCity === "all" || p.city_id === selectedCity);
   const regionPosts = dedupe([
     ...(dbPosts as any[]).filter((p) => p.region_id === regionId).map((p) => ({
       id: p.slug || p.id, slug: p.slug,
@@ -419,6 +424,8 @@ const RegionDetail = () => {
 
         {/* Events */}
         <EventsSection events={regionEvents} />
+
+        <ProgramsSection programs={regionPrograms} />
 
         {/* Experiences */}
         {regionExperiences.length > 0 && (

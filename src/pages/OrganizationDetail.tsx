@@ -301,7 +301,7 @@ const OrganizationDetail = () => {
           </h2>
           <div className="space-y-2">
             {programs.map((p) => (
-              <div key={p.id} className="flex items-center gap-3 bg-card rounded-xl border border-border p-3">
+              <button key={p.id} type="button" onClick={() => navigate(`/program/${p.slug || p.id}`)} className="w-full flex items-center gap-3 bg-card rounded-xl border border-border p-3 text-start hover:border-primary transition-colors">
                 <img src={p.image || "/placeholder.svg"} alt="" className="w-14 h-14 rounded-lg object-cover shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-foreground line-clamp-1">
@@ -311,7 +311,7 @@ const OrganizationDetail = () => {
                     {lang === "ar" ? (p.description_ar || p.description_en) : p.description_en}
                   </p>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>

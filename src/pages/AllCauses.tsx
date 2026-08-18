@@ -1,10 +1,11 @@
 import { ArrowLeft, Heart, Search, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
-import { useCauses, useRegions } from "@/hooks/useListings";
+import { useCauses, usePrograms, useRegions } from "@/hooks/useListings";
 import CityBadge from "@/components/CityBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useMemo } from "react";
+import ProgramsSection from "@/components/ProgramsSection";
 
 type ThemeKey = "heritage" | "community" | "environment" | "education";
 
@@ -32,6 +33,7 @@ const AllCauses = () => {
   const [search, setSearch] = useState("");
   const { data: causes = [], isLoading } = useCauses();
   const { data: regions = [] } = useRegions();
+  const { data: programs = [] } = usePrograms();
 
   const filtered = useMemo(
     () =>
@@ -112,6 +114,11 @@ const AllCauses = () => {
       </header>
 
       <div className="pt-4">
+        <div className="mb-8">
+          <ProgramsSection
+            programs={(programs as any[]).filter((program) => !activeRegion || program.region_id === activeRegion)}
+          />
+        </div>
         {isLoading ? (
           <div className="px-4 space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (

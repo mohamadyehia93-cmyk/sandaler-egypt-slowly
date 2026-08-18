@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Plus, Trash2, HeartHandshake, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import PreviewButton from "@/components/dashboard/PreviewButton";
-import { useDashboardIdentity } from "@/hooks/useDashboardIdentity";
 
 
 const MyPrograms = () => {
@@ -28,30 +27,6 @@ const MyPrograms = () => {
       return data;
     },
   });
-
-  const { data: org } = useQuery({
-    queryKey: ["my-org-slug", user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("organizations")
-        .select("id, slug")
-        .eq("owner_id", user!.id)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // Public surface for a program: the organization page when one exists,
-  // otherwise the owner's public provider profile.
-  const { providerId } = useDashboardIdentity();
-  const previewPath = org?.slug || org?.id
-    ? `/organization/${org.slug || org.id}`
-    : providerId
-      ? `/provider/${providerId}`
-      : null;
-
 
   const handleDelete = async (id: string) => {
     if (!window.confirm(lang === "ar" ? "حذف هذا البرنامج؟" : "Delete this program?")) return;
@@ -90,12 +65,10 @@ const MyPrograms = () => {
                 <p className="text-[11px] text-muted-foreground line-clamp-1">{e.program_type}{e.start_date ? ` · ${e.start_date}` : ""}</p>
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
-              {previewPath && (
-                <PreviewButton
-                  path={previewPath}
-                  className="bg-role-organization/10 text-role-organization"
-                />
-              )}
+              <PreviewButton
+                path={`/program/${e.id}`}
+                className="bg-role-organization/10 text-role-organization"
+              />
 
               <button onClick={() => navigate(`/dashboard/organization/edit-program/${e.id}`)} className="p-2 rounded-lg bg-role-organization/10 text-role-organization">
                 <Pencil className="w-4 h-4" />

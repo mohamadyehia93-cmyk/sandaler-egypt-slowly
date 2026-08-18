@@ -21,6 +21,7 @@ export type NotFoundContext =
   | "culture-actor"
   | "event"
   | "collection"
+  | "program"
   | "generic";
 
 
@@ -43,6 +44,7 @@ const COPY: Record<NotFoundContext, { en: string; ar: string }> = {
   "culture-actor": { en: "Culture actor not found", ar: "الفاعل الثقافي غير موجود" },
   event: { en: "Event not found", ar: "الفعالية غير موجودة" },
   collection: { en: "Collection not found", ar: "المجموعة غير موجودة" },
+  program: { en: "Program not found", ar: "البرنامج غير موجود" },
   generic: { en: "Page not found", ar: "الصفحة غير موجودة" },
 };
 
