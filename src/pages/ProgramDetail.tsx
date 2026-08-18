@@ -120,43 +120,68 @@ const ProgramDetail = () => {
         {location && <div className="flex items-start gap-2 rounded-lg border border-border bg-card p-3"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span className="text-sm text-foreground">{location}</span></div>}
 
         {/* The organisation behind the program — only rendered when a real published row exists. */}
-        {org && (
+        {owner && (
           <section>
             <h2 className="mb-3 text-base font-bold text-primary-dark">{lang === "ar" ? "المنظمة" : "The Organization"}</h2>
             <button
-              onClick={() => navigate(`/organization/${org.slug || org.id}`)}
+              onClick={() => navigate(owner.href)}
               className="flex w-full items-center gap-3 rounded-xl border border-border bg-card p-4 text-start transition-colors hover:border-primary"
             >
               <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-primary/15 text-2xl">
-                {org.logo && org.logo.startsWith("http") ? <img src={org.logo} alt="" className="h-full w-full object-cover" /> : (org.logo || <Building2 className="h-5 w-5 text-primary" />)}
+                {owner.logo && owner.logo.startsWith("http")
+                  ? <img src={owner.logo} alt="" className="h-full w-full object-cover" />
+                  : (owner.logo || <Building2 className="h-5 w-5 text-primary" />)}
               </div>
-              <span className="flex-1 text-sm font-semibold text-foreground">{lang === "ar" ? (org.name_ar || org.name_en) : org.name_en}</span>
+              <span className="flex-1 text-sm font-semibold text-foreground">{lang === "ar" ? (owner.name_ar || owner.name_en) : owner.name_en}</span>
               <span className="text-[10px] font-semibold text-primary">{lang === "ar" ? "عرض الملف" : "View profile"} →</span>
             </button>
+
+            {(lang === "ar" ? (owner.about_ar || owner.about_en) : owner.about_en) && (
+              <>
+                <h3 className="mb-2 mt-5 text-sm font-bold text-foreground">{lang === "ar" ? "عن المنظمة" : "About the organization"}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {lang === "ar" ? (owner.about_ar || owner.about_en) : owner.about_en}
+                </p>
+              </>
+            )}
           </section>
         )}
 
-        {/* How to take part — only actions this program can actually honour. */}
+        {/* Take action — four routes; each page states plainly what it can and cannot do. */}
         <section>
           <h2 className="mb-3 text-base font-bold text-primary-dark">{lang === "ar" ? "كيف تشارك" : "How to Take Part"}</h2>
-          {program.owner_id ? (
-            <>
-              <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
-                {lang === "ar"
-                  ? "التطوع والمشاركة في هذا البرنامج يتم تنسيقهما مباشرة مع المنظمة عبر الرسائل داخل التطبيق."
-                  : "Volunteering and taking part in this program are arranged directly with the organisation through in-app messages."}
-              </p>
-              <MessageOwnerButton ownerId={program.owner_id} kind="auto" label={lang === "ar" ? "مراسلة المنظمة" : "Message organization"} />
-            </>
-          ) : (
-            <p className="text-xs leading-relaxed text-muted-foreground">
+          <div className="grid grid-cols-2 gap-3">
+            {actionOptions.map((opt) => (
+              <button
+                key={opt.key}
+                disabled={!program.owner_id}
+                onClick={() => navigate(`/program/${id}/${opt.key}`)}
+                className={`flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-4 shadow-card transition-colors ${
+                  program.owner_id ? "hover:border-primary" : "cursor-not-allowed opacity-50"
+                }`}
+              >
+                <div className={`flex h-10 w-10 items-center justify-center rounded-full ${opt.color}`}>
+                  <opt.icon className="h-5 w-5" />
+                </div>
+                <span className="text-sm font-semibold text-foreground">{opt.label[lang]}</span>
+                <span className="text-center text-[10px] leading-tight text-muted-foreground">{opt.desc[lang]}</span>
+              </button>
+            ))}
+          </div>
+          {!program.owner_id && (
+            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
               {lang === "ar"
                 ? "لا توجد جهة يمكنها استقبال طلبات المشاركة في هذا البرنامج حالياً، وهو معروض للتعريف فقط."
                 : "No organisation can currently receive requests for this program, so it is listed for information only."}
             </p>
           )}
         </section>
+
+        {program.owner_id && (
+          <MessageOwnerButton ownerId={program.owner_id} kind="auto" label={lang === "ar" ? "مراسلة المنظمة" : "Message organization"} />
+        )}
       </div>
+
 
     </main>
   );
