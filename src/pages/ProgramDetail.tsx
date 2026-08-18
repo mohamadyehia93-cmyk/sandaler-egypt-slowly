@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, CalendarDays, MapPin, Target, Users, Video } from "lucide-react";
+import { ArrowLeft, Building2, CalendarDays, MapPin, Target, Users, Video } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import LocationChips from "@/components/LocationChips";
 import MessageOwnerButton from "@/components/MessageOwnerButton";
