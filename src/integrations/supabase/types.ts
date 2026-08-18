@@ -1105,6 +1105,7 @@ export type Database = {
           slug: string | null
           status: string | null
           theme: string | null
+          theme_other: string | null
           title_ar: string | null
           title_en: string
           translation_meta: Json
@@ -1139,6 +1140,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           theme?: string | null
+          theme_other?: string | null
           title_ar?: string | null
           title_en: string
           translation_meta?: Json
@@ -1173,6 +1175,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           theme?: string | null
+          theme_other?: string | null
           title_ar?: string | null
           title_en?: string
           translation_meta?: Json
@@ -2800,6 +2803,7 @@ export type Database = {
           slug: string | null
           status: string | null
           theme: string | null
+          theme_other: string | null
           title_ar: string | null
           title_en: string
           translation_meta: Json
@@ -2840,6 +2844,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           theme?: string | null
+          theme_other?: string | null
           title_ar?: string | null
           title_en: string
           translation_meta?: Json
@@ -2880,6 +2885,7 @@ export type Database = {
           slug?: string | null
           status?: string | null
           theme?: string | null
+          theme_other?: string | null
           title_ar?: string | null
           title_en?: string
           translation_meta?: Json
