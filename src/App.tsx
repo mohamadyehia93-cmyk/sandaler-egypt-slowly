@@ -28,6 +28,8 @@ const TripDetail = lazy(() => import("./pages/TripDetail.tsx"));
 const AudioTourDetail = lazy(() => import("./pages/AudioTourDetail.tsx"));
 const CauseDetail = lazy(() => import("./pages/CauseDetail.tsx"));
 const ProgramDetail = lazy(() => import("./pages/ProgramDetail.tsx"));
+const ProgramSupport = lazy(() => import("./pages/ProgramSupport.tsx"));
+
 const OrganizationDetail = lazy(() => import("./pages/OrganizationDetail.tsx"));
 const Wishlists = lazy(() => import("./pages/Wishlists.tsx"));
 const Search = lazy(() => import("./pages/Search.tsx"));
