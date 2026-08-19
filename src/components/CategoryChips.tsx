@@ -74,10 +74,7 @@ const CategoryChips = ({
         ))}
         <button
           type="button"
-          onClick={() => {
-            setOtherOpen(true);
-            if (isKnown) onChange("");
-          }}
+          onClick={openOther}
           className={`${base} ${otherOpen ? selectedClass : idle}`}
         >
           {ar ? "أخرى (حدّد)" : "Other (specify)"}
