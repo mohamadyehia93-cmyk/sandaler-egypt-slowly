@@ -85,8 +85,11 @@ const CategoryChips = ({
         <input
           autoFocus
           type="text"
-          value={isKnown ? "" : value}
-          onChange={(e) => onChange(e.target.value)}
+          value={otherText}
+          onChange={(e) => {
+            setOtherText(e.target.value);
+            onChange(e.target.value);
+          }}
           maxLength={60}
           dir={ar ? "rtl" : "ltr"}
           placeholder={ar ? "اكتب الفئة…" : "Type the category…"}
