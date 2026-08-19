@@ -53,6 +53,12 @@ const CategoryChips = ({
     onChange(v);
   };
 
+  const openOther = () => {
+    setOtherOpen(true);
+    // Restore whatever was typed before (may be empty); never write a sentinel.
+    onChange(otherText);
+  };
+
   return (
     <div>
       <div className={variant === "block" ? "grid grid-cols-1 gap-2 mt-3" : "flex flex-wrap gap-2"}>
