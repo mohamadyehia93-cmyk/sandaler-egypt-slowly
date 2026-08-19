@@ -17,6 +17,8 @@ const allowedProviderRoutes = [
   "/admin",
   "/flag-issue",
   "/booking",
+  // Read-only public events calendar — linked from provider dashboards.
+  "/calendar",
   "/.lovable/oauth/consent",
 ];
 

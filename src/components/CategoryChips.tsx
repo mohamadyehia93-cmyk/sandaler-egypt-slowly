@@ -35,6 +35,12 @@ const CategoryChips = ({
   const ar = lang === "ar";
   const isKnown = options.some((o) => o.value === value);
   const [otherOpen, setOtherOpen] = useState(!!value && !isKnown);
+  /**
+   * The "Other" input owns its own text. It must NOT derive from `isKnown`,
+   * otherwise typing a string that happens to equal a known option value would
+   * wipe the field mid-typing.
+   */
+  const [otherText, setOtherText] = useState(isKnown ? "" : value || "");
 
   const base =
     variant === "block"
