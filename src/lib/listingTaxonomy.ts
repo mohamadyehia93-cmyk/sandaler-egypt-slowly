@@ -107,6 +107,29 @@ export const EXPERIENCE_THEMES: {
 ];
 
 /**
+ * ============================================================================
+ * DELIBERATE, DOCUMENTED SPLIT — do not "unify" this without a migration.
+ * ============================================================================
+ * Custom ("Other (specify)") categories are stored in TWO different shapes:
+ *
+ *   A) events.category, products.category, posts.category
+ *      -> the typed text is written DIRECTLY into the category column.
+ *         These columns are free text (no CHECK constraint), so the exact
+ *         wording round-trips and renders as typed.
+ *
+ *   B) experiences.theme / trips.theme
+ *      -> theme = 'other' (an allowed CHECK value) and the typed text goes to
+ *         theme_other. Required because experiences_theme_check /
+ *         trips_theme_check reject any value outside the closed enum, and
+ *         those themes drive filtering, region/city grouping and iconography.
+ *
+ * Chosen resolution: keep the split, document it here. Unifying would mean
+ * either dropping the CHECK constraint on theme (losing the guarantee that
+ * filters/icon maps see only known keys) or migrating three free-text columns
+ * plus every read site for no user-visible gain. Any new constrained taxonomy
+ * column MUST follow shape (B); any new free-text one follows (A).
+ * ============================================================================
+ *
  * Category label -> stored theme, falling back to "other" for any free text the
  * owner typed via the "Other (specify)" option. Returns null only for blanks.
  */
