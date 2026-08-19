@@ -35,6 +35,12 @@ const CategoryChips = ({
   const ar = lang === "ar";
   const isKnown = options.some((o) => o.value === value);
   const [otherOpen, setOtherOpen] = useState(!!value && !isKnown);
+  /**
+   * The "Other" input owns its own text. It must NOT derive from `isKnown`,
+   * otherwise typing a string that happens to equal a known option value would
+   * wipe the field mid-typing.
+   */
+  const [otherText, setOtherText] = useState(isKnown ? "" : value || "");
 
   const base =
     variant === "block"
@@ -45,6 +51,12 @@ const CategoryChips = ({
   const pick = (v: string) => {
     setOtherOpen(false);
     onChange(v);
+  };
+
+  const openOther = () => {
+    setOtherOpen(true);
+    // Restore whatever was typed before (may be empty); never write a sentinel.
+    onChange(otherText);
   };
 
   return (
@@ -62,10 +74,7 @@ const CategoryChips = ({
         ))}
         <button
           type="button"
-          onClick={() => {
-            setOtherOpen(true);
-            if (isKnown) onChange("");
-          }}
+          onClick={openOther}
           className={`${base} ${otherOpen ? selectedClass : idle}`}
         >
           {ar ? "أخرى (حدّد)" : "Other (specify)"}
@@ -76,8 +85,11 @@ const CategoryChips = ({
         <input
           autoFocus
           type="text"
-          value={isKnown ? "" : value}
-          onChange={(e) => onChange(e.target.value)}
+          value={otherText}
+          onChange={(e) => {
+            setOtherText(e.target.value);
+            onChange(e.target.value);
+          }}
           maxLength={60}
           dir={ar ? "rtl" : "ltr"}
           placeholder={ar ? "اكتب الفئة…" : "Type the category…"}
