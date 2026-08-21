@@ -27,10 +27,13 @@ type Person = {
   interests_en: string[] | null; interests_ar: string[] | null;
   favorite_places_en: string[] | null; favorite_places_ar: string[] | null;
   meeting_times_en: string | null; meeting_times_ar: string | null;
+  availability: unknown;
+  latitude: number | null; longitude: number | null;
   languages_en: string[] | null; languages_ar: string[] | null;
   years_active: number | null;
   status: string | null;
 };
+
 type Experience = {
   id: string; slug: string | null;
   title_en: string; title_ar: string;
