@@ -294,11 +294,17 @@ for (const t of targets) {
       new Set([...tokens(topicTerms), ...tokens(title)]),
     );
 
-    const queries = [
-      city ? `${city.en} ${topicTerms}`.trim() : "",
-      `${topicTerms} Egypt`.trim(),
-      city ? `${city.en} Egypt ${tokens(title).slice(0, 2).join(" ")}`.trim() : "",
-    ].filter(Boolean);
+    // Commons search ANDs all terms — keep every query to <=3 words or it returns nothing.
+    const topicWords = tokens(topicTerms);
+    const queries = Array.from(
+      new Set(
+        [
+          city && topicWords[0] ? `${city.en} ${topicWords[0]}` : "",
+          topicWords.slice(0, 2).length ? `${topicWords.slice(0, 2).join(" ")} Egypt` : "",
+          city ? `${city.en} Egypt` : "",
+        ].filter(Boolean),
+      ),
+    );
 
     const used = new Set<string>();
     let chosen: Candidate[] = [];
