@@ -1,5 +1,5 @@
 import { ArrowLeft, Bookmark, Mic, Film, Camera, MessageSquare, ChefHat, ClipboardList, Map, FileText, Search, SlidersHorizontal, X as XIcon, Check } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
 import { usePosts, useRegions } from "@/hooks/useListings";
@@ -32,8 +32,11 @@ const sections: ContentSection[] = [
 const AllPosts = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
-  const [activeRegion, setActiveRegion] = useState<string | null>(null);
-  const [activeTheme, setActiveTheme] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  // Arriving from a region/city page must preserve that context instead of
+  // dropping the visitor into the unfiltered global list.
+  const [activeRegion, setActiveRegion] = useState<string | null>(searchParams.get("region"));
+  const [activeTheme, setActiveTheme] = useState<string | null>(searchParams.get("category"));
   const [search, setSearch] = useState("");
   const { data: dbPosts = [], isLoading } = usePosts();
   const { data: regions = [] } = useRegions();

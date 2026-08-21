@@ -35,10 +35,12 @@ const RegionPostsSection = ({
   posts,
   lang,
   navigate,
+  regionId,
 }: {
   posts: PostItem[];
   lang: "en" | "ar";
   navigate: ReturnType<typeof useNavigate>;
+  regionId?: string;
 }) => {
   const [activeCategory, setActiveCategory] = useState("all");
 
@@ -66,7 +68,17 @@ const RegionPostsSection = ({
           {lang === "ar" ? "مقالات ومنشورات" : "Posts & Articles"}
         </h3>
         <button
-          onClick={() => navigate("/posts")}
+          onClick={() => {
+            const params = new URLSearchParams();
+            if (regionId) params.set("region", regionId);
+            if (activeCategory !== "all") {
+              const label = categories.find((c) => c.key === activeCategory);
+              const en = posts.find((p) => p.category.en.toLowerCase() === activeCategory)?.category.en;
+              if (en || label) params.set("category", en || label!.label);
+            }
+            const qs = params.toString();
+            navigate(qs ? `/posts?${qs}` : "/posts");
+          }}
           className="ms-auto text-xs font-semibold text-primary hover:underline"
         >
           {lang === "ar" ? "عرض الكل ←" : "See all →"}
@@ -398,7 +410,7 @@ const RegionDetail = () => {
 
       <div className="space-y-6 pt-1">
         {/* Categorized Posts/Articles */}
-        {regionPosts.length > 0 && <RegionPostsSection posts={regionPosts} lang={lang} navigate={navigate} />}
+        {regionPosts.length > 0 && <RegionPostsSection posts={regionPosts} lang={lang} navigate={navigate} regionId={regionId} />}
 
         {/* Who's Who */}
         {regionPeople.length > 0 && (
