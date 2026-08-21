@@ -213,15 +213,47 @@ const PersonDetail = () => {
           </div>
         )}
 
-        {meetingTimes && (
+        {(slots.length > 0 || meetingTimes) && (
           <div className="bg-card rounded-xl p-4 shadow-card border border-border">
             <div className="flex items-center gap-2 mb-3">
               <Clock className="w-4 h-4 text-primary" />
               <h3 className="text-sm font-semibold text-foreground">{lang === "ar" ? "أوقات اللقاء" : "Best Times to Meet"}</h3>
             </div>
-            <p className="text-sm text-muted-foreground">{meetingTimes}</p>
+            {slots.length > 0 ? (
+              <ul className="space-y-1.5">
+                {slots.map((s, i) => (
+                  <li key={i} className="text-sm text-muted-foreground">
+                    {formatSlot(s, lang === "ar")}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">{meetingTimes}</p>
+            )}
           </div>
         )}
+
+        {coords && (
+          <div className="bg-card rounded-xl p-4 shadow-card border border-border">
+            <div className="flex items-center gap-2 mb-3">
+              <MapPin className="w-4 h-4 text-primary" />
+              <h3 className="text-sm font-semibold text-foreground">{lang === "ar" ? "مكان اللقاء" : "Where to Meet"}</h3>
+            </div>
+            {(cityName || regionName) && (
+              <p className="text-sm text-muted-foreground mb-3">{cityName || regionName}</p>
+            )}
+            <a
+              href={directionsToUrl(coords, "driving")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary"
+            >
+              <Navigation className="w-4 h-4" />
+              {lang === "ar" ? "الاتجاهات على خرائط جوجل" : "Directions on Google Maps"}
+            </a>
+          </div>
+        )}
+
 
         {languages.length > 0 && (
           <div className="bg-card rounded-xl p-4 shadow-card border border-border">
