@@ -1,5 +1,5 @@
 import { ArrowLeft, Bookmark, Mic, Film, Camera, MessageSquare, ChefHat, ClipboardList, Map, FileText, Search, SlidersHorizontal, X as XIcon, Check } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
 import { usePosts, useRegions } from "@/hooks/useListings";
