@@ -280,10 +280,20 @@ const EditProfile = () => {
     });
     setSatLogo((row?.logo as string) || (row?.image as string) || null);
     setFocusAreas(asStringArray(row?.focus_areas_en));
+    setFocusAreasAr(asStringArray(row?.focus_areas_ar));
     setInterests(asStringArray(row?.interests_en));
+    setInterestsAr(asStringArray(row?.interests_ar));
     setExpertise(asStringArray(row?.expertise_en));
+    setExpertiseAr(asStringArray(row?.expertise_ar));
     setSatSocial(asSocial(row?.social_links));
+    setSatCityId(str("city_id"));
+    setSatRegionId(str("region_id"));
+    setSatLat(row?.latitude == null ? "" : String(row.latitude));
+    setSatLng(row?.longitude == null ? "" : String(row.longitude));
+    setAvailability(parseAvailability(row?.availability));
+    setSatSlug(str("slug"));
   };
+
 
   const load = async () => {
     // Signed out: stop loading so the sign-in prompt renders instead of the spinner.
