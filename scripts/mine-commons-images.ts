@@ -281,7 +281,7 @@ for (const t of targets) {
   stats[t.table] = { subject: 0, fallback: 0, none: 0 };
   const cols = ["id", t.titleCol, t.cityCol || "null", ...t.topicCols.map((c) => `coalesce(${c}::text,'')`)];
   const rows = sql(
-    `select ${cols.join(", ")} from ${t.table} where image like '%unsplash%' order by id`,
+    `select ${cols.join(", ")} from ${t.table} where image like '%unsplash%' order by id limit 4`,
   );
   console.log(`${t.table}: ${rows.length} rows to re-image`);
   for (const r of rows) {
