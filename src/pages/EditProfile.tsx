@@ -408,6 +408,14 @@ const EditProfile = () => {
     const nameEn = f.nameEn.trim();
     const nameAr = f.nameAr.trim() || nameEn; // satellite tables require name_ar
 
+    // Fold any uncommitted chip drafts in so typed text is never lost on save.
+    const focusEnFinal = withDraft(focusAreas, focusDraft);
+    const focusArFinal = withDraft(focusAreasAr, focusDraftAr);
+    const interestsEnFinal = withDraft(interests, interestDraft);
+    const interestsArFinal = withDraft(interestsAr, interestDraftAr);
+    const expertiseEnFinal = withDraft(expertise, expertiseDraft);
+    const expertiseArFinal = withDraft(expertiseAr, expertiseDraftAr);
+
     let values: LooseRow = {};
     if (r === "organization") {
       values = {
@@ -417,7 +425,8 @@ const EditProfile = () => {
         mission_en: sat.missionEn.trim() || null,
         mission_ar: sat.missionAr.trim() || null,
         website: sat.orgWebsite.trim() || null,
-        focus_areas_en: focusAreas,
+        focus_areas_en: focusEnFinal,
+        focus_areas_ar: focusArFinal,
         location_en: f.cityEn || null,
         location_ar: f.cityAr || null,
       };
@@ -428,9 +437,17 @@ const EditProfile = () => {
         image: logo || providerAvatar || null,
         role_en: sat.roleEn.trim() || null,
         role_ar: sat.roleAr.trim() || null,
-        meeting_times_en: sat.meetingTimesEn.trim() || null,
-        meeting_times_ar: sat.meetingTimesAr.trim() || null,
-        interests_en: interests,
+        // Structured hours are the source of truth; the legacy free-text
+        // columns are cleared so the public page can't show two answers.
+        availability: availability.filter((s) => s.to > s.from),
+        meeting_times_en: null,
+        meeting_times_ar: null,
+        interests_en: interestsEnFinal,
+        interests_ar: interestsArFinal,
+        city_id: satCityId || null,
+        region_id: satRegionId || null,
+        latitude: satLat ? Number(satLat) : null,
+        longitude: satLng ? Number(satLng) : null,
         bio_en: f.bioEn.trim() || null,
         bio_ar: f.bioAr.trim() || null,
       };
@@ -439,7 +456,8 @@ const EditProfile = () => {
         name_en: nameEn,
         name_ar: nameAr,
         image: logo || providerAvatar || null,
-        expertise_en: expertise,
+        expertise_en: expertiseEnFinal,
+        expertise_ar: expertiseArFinal,
         quote_en: sat.quoteEn.trim() || null,
         quote_ar: sat.quoteAr.trim() || null,
         social_links: satSocial,
@@ -447,6 +465,9 @@ const EditProfile = () => {
         bio_ar: f.bioAr.trim() || null,
       };
     }
+
+    // Human-readable URL: generated once, then never changed (links stay stable).
+    if (!satSlug && nameEn) values.slug = slugify(nameEn, user.id.slice(0, 6));
 
     const table = SATELLITE_TABLE[r];
     const owner = OWNER_COL[r];
@@ -461,6 +482,7 @@ const EditProfile = () => {
     });
     return error?.message ?? null;
   };
+
 
   const saveProvider = async (nextStatus?: string) => {
 
