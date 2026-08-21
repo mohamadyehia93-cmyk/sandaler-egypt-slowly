@@ -6,10 +6,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useRegions, useCities } from "@/hooks/useListings";
-import { uploadImages } from "@/lib/dashboardForms";
+import { uploadImages, slugify } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import CityPicker from "@/components/dashboard/CityPicker";
+import LocationPicker from "@/components/dashboard/LocationPicker";
+import AvailabilityEditor from "@/components/dashboard/AvailabilityEditor";
+import { parseAvailability, type AvailabilitySlot } from "@/lib/availability";
+import { getCityCoords } from "@/lib/cityCoords";
 import { PROVIDER_PUBLIC_COLUMNS, type ProviderContact } from "@/lib/providerColumns";
 import { Button } from "@/components/ui/button";
+
 
 /**
  * Single edit screen for both audiences:
