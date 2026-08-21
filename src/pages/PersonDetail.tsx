@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Clock, Globe, Award, Heart, Sparkles, MessageCircle } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Globe, Award, Heart, Sparkles, MessageCircle, Navigation } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
+import { parseAvailability, formatSlot } from "@/lib/availability";
+import { directionsToUrl } from "@/lib/mapsLinks";
 import BottomNav from "@/components/BottomNav";
 import FollowButton from "@/components/FollowButton";
 import NotFoundView from "@/components/NotFound";
 import ExpertCollections from "@/components/ExpertCollections";
 import { Skeleton } from "@/components/ui/skeleton";
+
 
 type Region = { id: string; name_en: string; name_ar: string; emoji: string | null; color: string | null };
 type Person = {
