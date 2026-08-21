@@ -908,7 +908,7 @@ const EditProfile = () => {
                   <input className={inputClass} placeholder="https://" dir="ltr" value={sat.orgWebsite} onChange={(e) => setS("orgWebsite", e.target.value)} />
                 </div>
                 <ChipEditor
-                  label={ar ? "مجالات التركيز" : "Focus areas"}
+                  label={ar ? "مجالات التركيز (إنجليزي)" : "Focus areas (English)"}
                   placeholder={ar ? "أضف مجالاً" : "Add a focus area"}
                   items={focusAreas}
                   setItems={setFocusAreas}
@@ -916,6 +916,16 @@ const EditProfile = () => {
                   setDraft={setFocusDraft}
                   ar={ar}
                 />
+                <ChipEditor
+                  label={ar ? "مجالات التركيز (عربي)" : "Focus areas (Arabic)"}
+                  placeholder={ar ? "أضف مجالاً" : "Add a focus area in Arabic"}
+                  items={focusAreasAr}
+                  setItems={setFocusAreasAr}
+                  draft={focusDraftAr}
+                  setDraft={setFocusDraftAr}
+                  ar={ar}
+                />
+
               </div>
             )}
 
