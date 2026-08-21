@@ -11,6 +11,7 @@ import FollowButton from "@/components/FollowButton";
 import NotFoundView from "@/components/NotFound";
 import ExpertCollections from "@/components/ExpertCollections";
 import { Skeleton } from "@/components/ui/skeleton";
+import Avatar from "@/components/AvatarFallback";
 
 
 type Region = { id: string; name_en: string; name_ar: string; emoji: string | null; color: string | null };
@@ -135,10 +136,10 @@ const PersonDetail = () => {
       <div className="relative">
         <div className="h-40 w-full" style={{ background: `linear-gradient(135deg, ${accent}60, ${accent}20)` }} />
         <div className="px-4 -mt-16 relative z-10">
-          <img
-            src={person.image || "/placeholder.svg"}
-            alt={name}
-            className="w-28 h-28 rounded-2xl object-cover border-4 border-background shadow-elevated"
+          <Avatar
+            src={person.image}
+            name={name}
+            className="w-28 h-28 rounded-2xl border-4 border-background shadow-elevated"
           />
         </div>
       </div>
