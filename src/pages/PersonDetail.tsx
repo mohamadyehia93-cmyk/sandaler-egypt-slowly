@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Clock, Globe, Award, Heart, Sparkles, MessageCircle } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Globe, Award, Heart, Sparkles, MessageCircle, Navigation } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
+import { parseAvailability, formatSlot } from "@/lib/availability";
+import { directionsToUrl } from "@/lib/mapsLinks";
 import BottomNav from "@/components/BottomNav";
 import FollowButton from "@/components/FollowButton";
 import NotFoundView from "@/components/NotFound";
 import ExpertCollections from "@/components/ExpertCollections";
 import { Skeleton } from "@/components/ui/skeleton";
+
 
 type Region = { id: string; name_en: string; name_ar: string; emoji: string | null; color: string | null };
 type Person = {
@@ -24,10 +27,13 @@ type Person = {
   interests_en: string[] | null; interests_ar: string[] | null;
   favorite_places_en: string[] | null; favorite_places_ar: string[] | null;
   meeting_times_en: string | null; meeting_times_ar: string | null;
+  availability: unknown;
+  latitude: number | null; longitude: number | null;
   languages_en: string[] | null; languages_ar: string[] | null;
   years_active: number | null;
   status: string | null;
 };
+
 type Experience = {
   id: string; slug: string | null;
   title_en: string; title_ar: string;
@@ -94,12 +100,21 @@ const PersonDetail = () => {
   const name = lang === "ar" ? (person.name_ar || person.name_en) : person.name_en;
   const role = lang === "ar" ? (person.role_ar || person.role_en) : person.role_en;
   const bio = lang === "ar" ? (person.bio_ar || person.bio_en) : person.bio_en;
-  const interests = (lang === "ar" ? (person.interests_ar || person.interests_en) : person.interests_en) ?? [];
-  const places = (lang === "ar" ? (person.favorite_places_ar || person.favorite_places_en) : person.favorite_places_en) ?? [];
+  // An empty Arabic array must fall back to English (an [] is truthy).
+  const pickList = (arList: string[] | null, enList: string[] | null) =>
+    (lang === "ar" ? (arList?.length ? arList : enList) : enList) ?? [];
+  const interests = pickList(person.interests_ar, person.interests_en);
+  const places = pickList(person.favorite_places_ar, person.favorite_places_en);
+  const slots = parseAvailability(person.availability);
   const meetingTimes = lang === "ar" ? (person.meeting_times_ar || person.meeting_times_en) : person.meeting_times_en;
-  const languages = (lang === "ar" ? (person.languages_ar || person.languages_en) : person.languages_en) ?? [];
+  const languages = pickList(person.languages_ar, person.languages_en);
   const regionName = region ? (lang === "ar" ? (region.name_ar || region.name_en) : region.name_en) : null;
   const accent = region?.color || "hsl(var(--primary))";
+  const coords =
+    person.latitude != null && person.longitude != null
+      ? { lat: Number(person.latitude), lng: Number(person.longitude) }
+      : null;
+
 
   return (
     <div className="min-h-screen bg-surface pb-20">
@@ -198,15 +213,47 @@ const PersonDetail = () => {
           </div>
         )}
 
-        {meetingTimes && (
+        {(slots.length > 0 || meetingTimes) && (
           <div className="bg-card rounded-xl p-4 shadow-card border border-border">
             <div className="flex items-center gap-2 mb-3">
               <Clock className="w-4 h-4 text-primary" />
               <h3 className="text-sm font-semibold text-foreground">{lang === "ar" ? "أوقات اللقاء" : "Best Times to Meet"}</h3>
             </div>
-            <p className="text-sm text-muted-foreground">{meetingTimes}</p>
+            {slots.length > 0 ? (
+              <ul className="space-y-1.5">
+                {slots.map((s, i) => (
+                  <li key={i} className="text-sm text-muted-foreground">
+                    {formatSlot(s, lang === "ar")}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">{meetingTimes}</p>
+            )}
           </div>
         )}
+
+        {coords && (
+          <div className="bg-card rounded-xl p-4 shadow-card border border-border">
+            <div className="flex items-center gap-2 mb-3">
+              <MapPin className="w-4 h-4 text-primary" />
+              <h3 className="text-sm font-semibold text-foreground">{lang === "ar" ? "مكان اللقاء" : "Where to Meet"}</h3>
+            </div>
+            {(cityName || regionName) && (
+              <p className="text-sm text-muted-foreground mb-3">{cityName || regionName}</p>
+            )}
+            <a
+              href={directionsToUrl(coords, "driving")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary"
+            >
+              <Navigation className="w-4 h-4" />
+              {lang === "ar" ? "الاتجاهات على خرائط جوجل" : "Directions on Google Maps"}
+            </a>
+          </div>
+        )}
+
 
         {languages.length > 0 && (
           <div className="bg-card rounded-xl p-4 shadow-card border border-border">

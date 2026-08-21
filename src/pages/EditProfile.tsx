@@ -6,10 +6,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useRegions, useCities } from "@/hooks/useListings";
-import { uploadImages } from "@/lib/dashboardForms";
+import { uploadImages, slugify } from "@/lib/dashboardForms";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
+import CityPicker from "@/components/dashboard/CityPicker";
+import LocationPicker from "@/components/dashboard/LocationPicker";
+import AvailabilityEditor from "@/components/dashboard/AvailabilityEditor";
+import { parseAvailability, type AvailabilitySlot } from "@/lib/availability";
+import { getCityCoords } from "@/lib/cityCoords";
 import { PROVIDER_PUBLIC_COLUMNS, type ProviderContact } from "@/lib/providerColumns";
 import { Button } from "@/components/ui/button";
+
 
 /**
  * Single edit screen for both audiences:
@@ -205,13 +211,36 @@ const EditProfile = () => {
   const [satLogoFiles, setSatLogoFiles] = useState<File[]>([]);
   const [focusAreas, setFocusAreas] = useState<string[]>([]);
   const [focusDraft, setFocusDraft] = useState("");
+  const [focusAreasAr, setFocusAreasAr] = useState<string[]>([]);
+  const [focusDraftAr, setFocusDraftAr] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
   const [interestDraft, setInterestDraft] = useState("");
+  const [interestsAr, setInterestsAr] = useState<string[]>([]);
+  const [interestDraftAr, setInterestDraftAr] = useState("");
   const [expertise, setExpertise] = useState<string[]>([]);
   const [expertiseDraft, setExpertiseDraft] = useState("");
+  const [expertiseAr, setExpertiseAr] = useState<string[]>([]);
+  const [expertiseDraftAr, setExpertiseDraftAr] = useState("");
   const [satSocial, setSatSocial] = useState<Social>({});
+  /** Satellite location: real city/region taxonomy + an exact map pin. */
+  const [satCityId, setSatCityId] = useState("");
+  const [satRegionId, setSatRegionId] = useState("");
+  const [satLat, setSatLat] = useState("");
+  const [satLng, setSatLng] = useState("");
+  const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
+  const [satSlug, setSatSlug] = useState<string>("");
 
   const setS = (k: keyof typeof sat, v: string) => setSat((p) => ({ ...p, [k]: v }));
+
+  /**
+   * Chip editors keep uncommitted text in a draft input. Saving must not throw
+   * that text away, so drafts are folded into the list at save time.
+   */
+  const withDraft = (items: string[], draft: string) => {
+    const v = draft.trim();
+    return !v || items.includes(v) ? items : [...items, v];
+  };
+
 
 
   // visitor form
@@ -251,10 +280,20 @@ const EditProfile = () => {
     });
     setSatLogo((row?.logo as string) || (row?.image as string) || null);
     setFocusAreas(asStringArray(row?.focus_areas_en));
+    setFocusAreasAr(asStringArray(row?.focus_areas_ar));
     setInterests(asStringArray(row?.interests_en));
+    setInterestsAr(asStringArray(row?.interests_ar));
     setExpertise(asStringArray(row?.expertise_en));
+    setExpertiseAr(asStringArray(row?.expertise_ar));
     setSatSocial(asSocial(row?.social_links));
+    setSatCityId(str("city_id"));
+    setSatRegionId(str("region_id"));
+    setSatLat(row?.latitude == null ? "" : String(row.latitude));
+    setSatLng(row?.longitude == null ? "" : String(row.longitude));
+    setAvailability(parseAvailability(row?.availability));
+    setSatSlug(str("slug"));
   };
+
 
   const load = async () => {
     // Signed out: stop loading so the sign-in prompt renders instead of the spinner.
@@ -369,6 +408,14 @@ const EditProfile = () => {
     const nameEn = f.nameEn.trim();
     const nameAr = f.nameAr.trim() || nameEn; // satellite tables require name_ar
 
+    // Fold any uncommitted chip drafts in so typed text is never lost on save.
+    const focusEnFinal = withDraft(focusAreas, focusDraft);
+    const focusArFinal = withDraft(focusAreasAr, focusDraftAr);
+    const interestsEnFinal = withDraft(interests, interestDraft);
+    const interestsArFinal = withDraft(interestsAr, interestDraftAr);
+    const expertiseEnFinal = withDraft(expertise, expertiseDraft);
+    const expertiseArFinal = withDraft(expertiseAr, expertiseDraftAr);
+
     let values: LooseRow = {};
     if (r === "organization") {
       values = {
@@ -378,7 +425,8 @@ const EditProfile = () => {
         mission_en: sat.missionEn.trim() || null,
         mission_ar: sat.missionAr.trim() || null,
         website: sat.orgWebsite.trim() || null,
-        focus_areas_en: focusAreas,
+        focus_areas_en: focusEnFinal,
+        focus_areas_ar: focusArFinal,
         location_en: f.cityEn || null,
         location_ar: f.cityAr || null,
       };
@@ -389,9 +437,17 @@ const EditProfile = () => {
         image: logo || providerAvatar || null,
         role_en: sat.roleEn.trim() || null,
         role_ar: sat.roleAr.trim() || null,
-        meeting_times_en: sat.meetingTimesEn.trim() || null,
-        meeting_times_ar: sat.meetingTimesAr.trim() || null,
-        interests_en: interests,
+        // Structured hours are the source of truth; the legacy free-text
+        // columns are cleared so the public page can't show two answers.
+        availability: availability.filter((s) => s.to > s.from),
+        meeting_times_en: null,
+        meeting_times_ar: null,
+        interests_en: interestsEnFinal,
+        interests_ar: interestsArFinal,
+        city_id: satCityId || null,
+        region_id: satRegionId || null,
+        latitude: satLat ? Number(satLat) : null,
+        longitude: satLng ? Number(satLng) : null,
         bio_en: f.bioEn.trim() || null,
         bio_ar: f.bioAr.trim() || null,
       };
@@ -400,7 +456,8 @@ const EditProfile = () => {
         name_en: nameEn,
         name_ar: nameAr,
         image: logo || providerAvatar || null,
-        expertise_en: expertise,
+        expertise_en: expertiseEnFinal,
+        expertise_ar: expertiseArFinal,
         quote_en: sat.quoteEn.trim() || null,
         quote_ar: sat.quoteAr.trim() || null,
         social_links: satSocial,
@@ -408,6 +465,9 @@ const EditProfile = () => {
         bio_ar: f.bioAr.trim() || null,
       };
     }
+
+    // Human-readable URL: generated once, then never changed (links stay stable).
+    if (!satSlug && nameEn) values.slug = slugify(nameEn, user.id.slice(0, 6));
 
     const table = SATELLITE_TABLE[r];
     const owner = OWNER_COL[r];
@@ -422,6 +482,7 @@ const EditProfile = () => {
     });
     return error?.message ?? null;
   };
+
 
   const saveProvider = async (nextStatus?: string) => {
 
@@ -847,7 +908,7 @@ const EditProfile = () => {
                   <input className={inputClass} placeholder="https://" dir="ltr" value={sat.orgWebsite} onChange={(e) => setS("orgWebsite", e.target.value)} />
                 </div>
                 <ChipEditor
-                  label={ar ? "مجالات التركيز" : "Focus areas"}
+                  label={ar ? "مجالات التركيز (إنجليزي)" : "Focus areas (English)"}
                   placeholder={ar ? "أضف مجالاً" : "Add a focus area"}
                   items={focusAreas}
                   setItems={setFocusAreas}
@@ -855,6 +916,16 @@ const EditProfile = () => {
                   setDraft={setFocusDraft}
                   ar={ar}
                 />
+                <ChipEditor
+                  label={ar ? "مجالات التركيز (عربي)" : "Focus areas (Arabic)"}
+                  placeholder={ar ? "أضف مجالاً" : "Add a focus area in Arabic"}
+                  items={focusAreasAr}
+                  setItems={setFocusAreasAr}
+                  draft={focusDraftAr}
+                  setDraft={setFocusDraftAr}
+                  ar={ar}
+                />
+
               </div>
             )}
 
@@ -882,16 +953,39 @@ const EditProfile = () => {
                   <label className={labelClass}>{ar ? "الدور / المسمى (عربي)" : "Role / title (Arabic)"}</label>
                   <input className={inputClass} value={sat.roleAr} onChange={(e) => setS("roleAr", e.target.value)} maxLength={120} dir="rtl" />
                 </div>
-                <div>
-                  <label className={labelClass}>{ar ? "أوقات اللقاء (إنجليزي)" : "Meeting times (English)"}</label>
-                  <input className={inputClass} placeholder={ar ? "مثال: أيام الجمعة صباحاً" : "e.g. Friday mornings"} value={sat.meetingTimesEn} onChange={(e) => setS("meetingTimesEn", e.target.value)} />
-                </div>
-                <div>
-                  <label className={labelClass}>{ar ? "أوقات اللقاء (عربي)" : "Meeting times (Arabic)"}</label>
-                  <input className={inputClass} value={sat.meetingTimesAr} onChange={(e) => setS("meetingTimesAr", e.target.value)} dir="rtl" />
+                <AvailabilityEditor slots={availability} onChange={setAvailability} />
+                <div className="space-y-3">
+                  <CityPicker
+                    cityId={satCityId}
+                    onChange={(city, region) => {
+                      setSatCityId(city);
+                      setSatRegionId(region);
+                    }}
+                    labelEn="City"
+                    labelAr="المدينة"
+                    hintEn="Your city puts you on that city's and region's pages."
+                    hintAr="مدينتك تجعلك تظهر في صفحات المدينة والمنطقة."
+                    inputClass={inputClass}
+                    labelClass={labelClass}
+                  />
+                  <div>
+                    <label className={labelClass}>
+                      <MapPin className="w-3.5 h-3.5 text-primary" />
+                      {ar ? "الموقع على الخريطة (اختياري)" : "Exact spot on the map (optional)"}
+                    </label>
+                    <LocationPicker
+                      lat={satLat}
+                      lng={satLng}
+                      fallbackCenter={getCityCoords(satCityId)}
+                      onChange={(la, ln) => {
+                        setSatLat(String(la));
+                        setSatLng(String(ln));
+                      }}
+                    />
+                  </div>
                 </div>
                 <ChipEditor
-                  label={ar ? "الاهتمامات" : "Interests"}
+                  label={ar ? "الاهتمامات (إنجليزي)" : "Interests (English)"}
                   placeholder={ar ? "أضف اهتماماً" : "Add an interest"}
                   items={interests}
                   setItems={setInterests}
@@ -899,8 +993,18 @@ const EditProfile = () => {
                   setDraft={setInterestDraft}
                   ar={ar}
                 />
+                <ChipEditor
+                  label={ar ? "الاهتمامات (عربي)" : "Interests (Arabic)"}
+                  placeholder={ar ? "أضف اهتماماً" : "Add an interest in Arabic"}
+                  items={interestsAr}
+                  setItems={setInterestsAr}
+                  draft={interestDraftAr}
+                  setDraft={setInterestDraftAr}
+                  ar={ar}
+                />
               </div>
             )}
+
 
             {satRole === "culture-actor" && (
               <div className={cardClass}>
@@ -919,7 +1023,7 @@ const EditProfile = () => {
                   />
                 </div>
                 <ChipEditor
-                  label={ar ? "مجالات الخبرة" : "Expertise"}
+                  label={ar ? "مجالات الخبرة (إنجليزي)" : "Expertise (English)"}
                   placeholder={ar ? "أضف مجال خبرة" : "Add an expertise"}
                   items={expertise}
                   setItems={setExpertise}
@@ -927,6 +1031,16 @@ const EditProfile = () => {
                   setDraft={setExpertiseDraft}
                   ar={ar}
                 />
+                <ChipEditor
+                  label={ar ? "مجالات الخبرة (عربي)" : "Expertise (Arabic)"}
+                  placeholder={ar ? "أضف مجال خبرة" : "Add an expertise in Arabic"}
+                  items={expertiseAr}
+                  setItems={setExpertiseAr}
+                  draft={expertiseDraftAr}
+                  setDraft={setExpertiseDraftAr}
+                  ar={ar}
+                />
+
                 <div>
                   <label className={labelClass}>{ar ? "اقتباس (إنجليزي)" : "Quote (English)"}</label>
                   <textarea className={`${inputClass} min-h-[70px] resize-none`} value={sat.quoteEn} onChange={(e) => setS("quoteEn", e.target.value)} maxLength={300} />
