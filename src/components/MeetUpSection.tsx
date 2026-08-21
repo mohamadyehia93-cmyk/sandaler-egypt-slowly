@@ -4,6 +4,7 @@ import { useWhosWho } from "@/hooks/useListings";
 import SectionHeader from "./SectionHeader";
 import { Skeleton } from "./ui/skeleton";
 import MessageUserButton from "./MessageUserButton";
+import Avatar from "./AvatarFallback";
 
 
 const MeetUpSection = () => {
@@ -24,13 +25,11 @@ const MeetUpSection = () => {
                 onClick={() => navigate(`/person/${person.slug || person.id}`)}
                 className="rounded-lg shadow-card bg-card p-3 flex flex-col items-center gap-2 cursor-pointer"
               >
-                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/30">
-                  <img
-                    src={person.image || "/placeholder.svg"}
-                    alt={lang === "ar" ? (person.name_ar || person.name_en) : person.name_en}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                <Avatar
+                  src={person.image}
+                  name={lang === "ar" ? (person.name_ar || person.name_en) : person.name_en}
+                  className="w-16 h-16 rounded-full border-2 border-primary/30"
+                />
                 <h3 className="text-xs font-semibold text-foreground text-center line-clamp-1">
                   {lang === "ar" ? (person.name_ar || person.name_en) : person.name_en}
                 </h3>
