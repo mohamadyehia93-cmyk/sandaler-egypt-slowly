@@ -100,12 +100,21 @@ const PersonDetail = () => {
   const name = lang === "ar" ? (person.name_ar || person.name_en) : person.name_en;
   const role = lang === "ar" ? (person.role_ar || person.role_en) : person.role_en;
   const bio = lang === "ar" ? (person.bio_ar || person.bio_en) : person.bio_en;
-  const interests = (lang === "ar" ? (person.interests_ar || person.interests_en) : person.interests_en) ?? [];
-  const places = (lang === "ar" ? (person.favorite_places_ar || person.favorite_places_en) : person.favorite_places_en) ?? [];
+  // An empty Arabic array must fall back to English (an [] is truthy).
+  const pickList = (arList: string[] | null, enList: string[] | null) =>
+    (lang === "ar" ? (arList?.length ? arList : enList) : enList) ?? [];
+  const interests = pickList(person.interests_ar, person.interests_en);
+  const places = pickList(person.favorite_places_ar, person.favorite_places_en);
+  const slots = parseAvailability(person.availability);
   const meetingTimes = lang === "ar" ? (person.meeting_times_ar || person.meeting_times_en) : person.meeting_times_en;
-  const languages = (lang === "ar" ? (person.languages_ar || person.languages_en) : person.languages_en) ?? [];
+  const languages = pickList(person.languages_ar, person.languages_en);
   const regionName = region ? (lang === "ar" ? (region.name_ar || region.name_en) : region.name_en) : null;
   const accent = region?.color || "hsl(var(--primary))";
+  const coords =
+    person.latitude != null && person.longitude != null
+      ? { lat: Number(person.latitude), lng: Number(person.longitude) }
+      : null;
+
 
   return (
     <div className="min-h-screen bg-surface pb-20">
