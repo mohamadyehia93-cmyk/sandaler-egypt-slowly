@@ -35,10 +35,12 @@ const RegionPostsSection = ({
   posts,
   lang,
   navigate,
+  regionId,
 }: {
   posts: PostItem[];
   lang: "en" | "ar";
   navigate: ReturnType<typeof useNavigate>;
+  regionId?: string;
 }) => {
   const [activeCategory, setActiveCategory] = useState("all");
 
