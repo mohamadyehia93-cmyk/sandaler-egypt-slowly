@@ -1023,7 +1023,7 @@ const EditProfile = () => {
                   />
                 </div>
                 <ChipEditor
-                  label={ar ? "مجالات الخبرة" : "Expertise"}
+                  label={ar ? "مجالات الخبرة (إنجليزي)" : "Expertise (English)"}
                   placeholder={ar ? "أضف مجال خبرة" : "Add an expertise"}
                   items={expertise}
                   setItems={setExpertise}
@@ -1031,6 +1031,16 @@ const EditProfile = () => {
                   setDraft={setExpertiseDraft}
                   ar={ar}
                 />
+                <ChipEditor
+                  label={ar ? "مجالات الخبرة (عربي)" : "Expertise (Arabic)"}
+                  placeholder={ar ? "أضف مجال خبرة" : "Add an expertise in Arabic"}
+                  items={expertiseAr}
+                  setItems={setExpertiseAr}
+                  draft={expertiseDraftAr}
+                  setDraft={setExpertiseDraftAr}
+                  ar={ar}
+                />
+
                 <div>
                   <label className={labelClass}>{ar ? "اقتباس (إنجليزي)" : "Quote (English)"}</label>
                   <textarea className={`${inputClass} min-h-[70px] resize-none`} value={sat.quoteEn} onChange={(e) => setS("quoteEn", e.target.value)} maxLength={300} />
