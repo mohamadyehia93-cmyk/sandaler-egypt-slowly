@@ -410,7 +410,7 @@ const RegionDetail = () => {
 
       <div className="space-y-6 pt-1">
         {/* Categorized Posts/Articles */}
-        {regionPosts.length > 0 && <RegionPostsSection posts={regionPosts} lang={lang} navigate={navigate} />}
+        {regionPosts.length > 0 && <RegionPostsSection posts={regionPosts} lang={lang} navigate={navigate} regionId={regionId} />}
 
         {/* Who's Who */}
         {regionPeople.length > 0 && (
