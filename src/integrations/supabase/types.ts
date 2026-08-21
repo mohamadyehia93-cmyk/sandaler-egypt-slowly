@@ -2992,6 +2992,7 @@ export type Database = {
       }
       whos_who: {
         Row: {
+          availability: Json
           bio_ar: string | null
           bio_en: string | null
           city_id: string | null
@@ -3021,6 +3022,7 @@ export type Database = {
           years_active: number | null
         }
         Insert: {
+          availability?: Json
           bio_ar?: string | null
           bio_en?: string | null
           city_id?: string | null
@@ -3050,6 +3052,7 @@ export type Database = {
           years_active?: number | null
         }
         Update: {
+          availability?: Json
           bio_ar?: string | null
           bio_en?: string | null
           city_id?: string | null
