@@ -211,13 +211,36 @@ const EditProfile = () => {
   const [satLogoFiles, setSatLogoFiles] = useState<File[]>([]);
   const [focusAreas, setFocusAreas] = useState<string[]>([]);
   const [focusDraft, setFocusDraft] = useState("");
+  const [focusAreasAr, setFocusAreasAr] = useState<string[]>([]);
+  const [focusDraftAr, setFocusDraftAr] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
   const [interestDraft, setInterestDraft] = useState("");
+  const [interestsAr, setInterestsAr] = useState<string[]>([]);
+  const [interestDraftAr, setInterestDraftAr] = useState("");
   const [expertise, setExpertise] = useState<string[]>([]);
   const [expertiseDraft, setExpertiseDraft] = useState("");
+  const [expertiseAr, setExpertiseAr] = useState<string[]>([]);
+  const [expertiseDraftAr, setExpertiseDraftAr] = useState("");
   const [satSocial, setSatSocial] = useState<Social>({});
+  /** Satellite location: real city/region taxonomy + an exact map pin. */
+  const [satCityId, setSatCityId] = useState("");
+  const [satRegionId, setSatRegionId] = useState("");
+  const [satLat, setSatLat] = useState("");
+  const [satLng, setSatLng] = useState("");
+  const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
+  const [satSlug, setSatSlug] = useState<string>("");
 
   const setS = (k: keyof typeof sat, v: string) => setSat((p) => ({ ...p, [k]: v }));
+
+  /**
+   * Chip editors keep uncommitted text in a draft input. Saving must not throw
+   * that text away, so drafts are folded into the list at save time.
+   */
+  const withDraft = (items: string[], draft: string) => {
+    const v = draft.trim();
+    return !v || items.includes(v) ? items : [...items, v];
+  };
+
 
 
   // visitor form
