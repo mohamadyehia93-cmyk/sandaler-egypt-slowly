@@ -943,16 +943,39 @@ const EditProfile = () => {
                   <label className={labelClass}>{ar ? "الدور / المسمى (عربي)" : "Role / title (Arabic)"}</label>
                   <input className={inputClass} value={sat.roleAr} onChange={(e) => setS("roleAr", e.target.value)} maxLength={120} dir="rtl" />
                 </div>
-                <div>
-                  <label className={labelClass}>{ar ? "أوقات اللقاء (إنجليزي)" : "Meeting times (English)"}</label>
-                  <input className={inputClass} placeholder={ar ? "مثال: أيام الجمعة صباحاً" : "e.g. Friday mornings"} value={sat.meetingTimesEn} onChange={(e) => setS("meetingTimesEn", e.target.value)} />
-                </div>
-                <div>
-                  <label className={labelClass}>{ar ? "أوقات اللقاء (عربي)" : "Meeting times (Arabic)"}</label>
-                  <input className={inputClass} value={sat.meetingTimesAr} onChange={(e) => setS("meetingTimesAr", e.target.value)} dir="rtl" />
+                <AvailabilityEditor slots={availability} onChange={setAvailability} />
+                <div className="space-y-3">
+                  <CityPicker
+                    cityId={satCityId}
+                    onChange={(city, region) => {
+                      setSatCityId(city);
+                      setSatRegionId(region);
+                    }}
+                    labelEn="City"
+                    labelAr="المدينة"
+                    hintEn="Your city puts you on that city's and region's pages."
+                    hintAr="مدينتك تجعلك تظهر في صفحات المدينة والمنطقة."
+                    inputClass={inputClass}
+                    labelClass={labelClass}
+                  />
+                  <div>
+                    <label className={labelClass}>
+                      <MapPin className="w-3.5 h-3.5 text-primary" />
+                      {ar ? "الموقع على الخريطة (اختياري)" : "Exact spot on the map (optional)"}
+                    </label>
+                    <LocationPicker
+                      lat={satLat}
+                      lng={satLng}
+                      fallbackCenter={getCityCoords(satCityId)}
+                      onChange={(la, ln) => {
+                        setSatLat(String(la));
+                        setSatLng(String(ln));
+                      }}
+                    />
+                  </div>
                 </div>
                 <ChipEditor
-                  label={ar ? "الاهتمامات" : "Interests"}
+                  label={ar ? "الاهتمامات (إنجليزي)" : "Interests (English)"}
                   placeholder={ar ? "أضف اهتماماً" : "Add an interest"}
                   items={interests}
                   setItems={setInterests}
@@ -960,8 +983,18 @@ const EditProfile = () => {
                   setDraft={setInterestDraft}
                   ar={ar}
                 />
+                <ChipEditor
+                  label={ar ? "الاهتمامات (عربي)" : "Interests (Arabic)"}
+                  placeholder={ar ? "أضف اهتماماً" : "Add an interest in Arabic"}
+                  items={interestsAr}
+                  setItems={setInterestsAr}
+                  draft={interestDraftAr}
+                  setDraft={setInterestDraftAr}
+                  ar={ar}
+                />
               </div>
             )}
+
 
             {satRole === "culture-actor" && (
               <div className={cardClass}>
