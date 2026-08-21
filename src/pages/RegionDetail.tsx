@@ -68,7 +68,17 @@ const RegionPostsSection = ({
           {lang === "ar" ? "مقالات ومنشورات" : "Posts & Articles"}
         </h3>
         <button
-          onClick={() => navigate("/posts")}
+          onClick={() => {
+            const params = new URLSearchParams();
+            if (regionId) params.set("region", regionId);
+            if (activeCategory !== "all") {
+              const label = categories.find((c) => c.key === activeCategory);
+              const en = posts.find((p) => p.category.en.toLowerCase() === activeCategory)?.category.en;
+              if (en || label) params.set("category", en || label!.label);
+            }
+            const qs = params.toString();
+            navigate(qs ? `/posts?${qs}` : "/posts");
+          }}
           className="ms-auto text-xs font-semibold text-primary hover:underline"
         >
           {lang === "ar" ? "عرض الكل ←" : "See all →"}
