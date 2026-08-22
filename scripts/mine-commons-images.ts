@@ -18,6 +18,12 @@ mkdirSync(CACHE_DIR, { recursive: true });
 const LICENCE_OK =
   /^(cc0|cc[- ]by|public domain|pd|attribution)/i;
 
+// Subjects that must never illustrate travel content, plus foreign look-alike places
+// ("Egypt, Pennsylvania", "IndoSuez, Madrid") and historical prints/scans.
+const BAD_SUBJECT =
+  /(bombing|attack|cholera|epidemic|plague|funeral|war|battle|riot|protest|crash|wreck|disaster|cemetery|grave|tomb of the unknown|manuscript|lithograph|engraving|btv1b|carte |map of|postcard|stamp|banknote|coin|drawing|painting|poster|pennsylvania|\bpa\b|madrid|spain|espa|france|paris|turkey|turc|greece|israel|iraq|sudan|libya|jordan|syria|india|indonesia|brazil|mexico|18[0-9]{2}|19[0-4][0-9])/i;
+
+
 const sql = (q: string) => {
   const out = execFileSync("psql", ["-At", "-F", "\u0001", "-c", q], {
     encoding: "utf8",
@@ -83,7 +89,7 @@ async function details(titles: string[]): Promise<Candidate[]> {
       action: "query",
       titles: chunk.join("|"),
       prop: "imageinfo|categories",
-      iiprop: "url|extmetadata",
+      iiprop: "url|mime|extmetadata",
       iiurlwidth: "1000",
       cllimit: "60",
       clshow: "!hidden",
@@ -101,10 +107,23 @@ async function details(titles: string[]): Promise<Candidate[]> {
         String(c.title).replace(/^Category:/, ""),
       );
       const fileTitle = String(p.title).replace(/^File:/, "");
+      const desc = stripHtml(meta.ImageDescription?.value);
+      const blob = `${fileTitle} ${categories.join(" ")} ${desc}`;
+      // Maps, diagrams, flags, coats of arms and logos are never good content photos.
+      if (/(map|maps|خريطة|diagram|chart|flag|coat of arms|logo|seal|plan of|blank|locator)/i.test(blob))
+        continue;
+      if (BAD_SUBJECT.test(blob)) continue;
+      // Reject historical prints and scans: keep photographs from 1990 onwards.
+      const year = Number(
+        (stripHtml(meta.DateTimeOriginal?.value) || "").match(/(1[89]\d{2}|20\d{2})/)?.[1],
+      );
+      if (year && year < 1990) continue;
+
       out.push({
         title: p.title,
-        url: ii.thumburl || ii.url,
+        url: String(ii.thumburl || ii.url).split("?")[0],
         fileTitle,
+
         artist: stripHtml(meta.Artist?.value) || null,
         license,
         licenseUrl: meta.LicenseUrl?.value || null,
@@ -212,7 +231,7 @@ for (const [id, en, ar, gov] of sql(
 
 const creditRows = new Map<string, Candidate>();
 const creditUsage = new Map<string, string>();
-const updates: string[] = [];
+const perTable: Record<string, { id: string; urls: string[]; hasImages: boolean }[]> = {};
 
 function esc(s: string) {
   return s.replace(/'/g, "''");
@@ -233,10 +252,14 @@ function pick(
         (c.haystack.includes(city.en.toLowerCase()) ||
           (!!city.gov && c.haystack.includes(city.gov.toLowerCase())));
       const subjHits = subjectTokens.filter((t) => c.haystack.includes(t)).length;
+      const egyptian = /egypt|مصر|nile|sinai|cairo|nubia/.test(c.haystack);
       if (cityHit) score += 3;
       score += subjHits * 2;
-      if (c.haystack.includes("egypt")) score += 1;
-      return { c, score, ok: cityHit || subjHits > 0 };
+      if (egyptian) score += 1;
+      // Every accepted photo must be anchored in Egypt: either the row's own city,
+      // or a subject match on an Egypt-tagged file.
+      return { c, score, ok: (cityHit && egyptian) || (subjHits > 0 && egyptian) };
+
     })
     .filter((s) => s.ok)
     .sort((a, b) => b.score - a.score);
@@ -335,34 +358,91 @@ for (const t of targets) {
       if (!creditRows.has(c.url)) creditRows.set(c.url, { ...c, fileTitle: c.fileTitle });
       creditUsage.set(c.url, (creditUsage.get(c.url) || usedFor));
     }
-    const gallery = t.hasImages
-      ? `, images = array[${chosen.map((c) => `'${esc(c.url)}'`).join(",")}]::text[]`
-      : "";
-    updates.push(
-      `update public.${t.table} set image = '${esc(chosen[0].url)}'${gallery} where id = '${id}';`,
-    );
+    (perTable[t.table] ||= []).push({ id, urls: chosen.map((c) => c.url), hasImages: t.hasImages });
   }
 }
 
 // ---------------------------------------------------------------- write SQL
+// Payload compaction: Commons thumbnail URLs repeat the file name twice, so store
+// `t:<h>/<hh>/<name>` and rebuild the full thumb URL in SQL. `o:<path>` = literal path.
+const PFX = "https://upload.wikimedia.org/wikipedia/commons/";
+const short = (u: string) => {
+  const p = u.startsWith(PFX) ? u.slice(PFX.length) : u;
+  const m = p.match(/^thumb\/(.)\/(..)\/([^/]+)\/1280px-([^/]+)$/);
+  return m && m[3] === m[4] ? `t:${m[1]}/${m[2]}/${m[3]}` : `o:${p}`;
+};
+// Expands one short code back into an absolute Commons URL.
+const EXPAND = (x: string) =>
+  `(case when left(${x},2)='t:' then '${PFX}thumb/'||substr(${x},3)||'/1280px-'||split_part(substr(${x},3),'/',3) ` +
+  `else '${PFX}'||substr(${x},3) end)`;
+
 const ts = new Date().toISOString().replace(/[-:T]/g, "").slice(0, 14);
 const parts: string[] = [
   "-- Relevant, freely licensed Wikimedia Commons photography for seeded content rows.",
   "-- Generated by scripts/mine-commons-images.ts",
   "",
 ];
-parts.push(...updates, "");
-for (const [url, c] of creditRows) {
+
+for (const [table, rows] of Object.entries(perTable)) {
+  const hasImages = rows[0].hasImages;
+  for (let i = 0; i < rows.length; i += 40) {
+    const values = rows
+      .slice(i, i + 40)
+      .map((r) => `('${r.id}','${esc(r.urls.map(short).join("|"))}')`)
+      .join(",");
+    const gallery = hasImages
+      ? `, images = (select array_agg(${EXPAND("x")}) from unnest(string_to_array(v.u,'|')) x)`
+      : "";
+    parts.push(
+      `update public.${table} t set image = ${EXPAND("split_part(v.u,'|',1)")}${gallery} ` +
+        `from (values ${values}) v(id,u) where t.id = v.id::uuid;`,
+    );
+  }
+}
+parts.push("");
+
+
+const credits = Array.from(creditRows.entries());
+for (let i = 0; i < credits.length; i += 40) {
+  const values = credits
+    .slice(i, i + 40)
+    .map(([url, c]) =>
+      `('${esc(short(url))}','${esc(c.fileTitle)}',${c.artist ? `'${esc(c.artist)}'` : "null"},` +
+      `${c.license ? `'${esc(c.license)}'` : "null"},${c.licenseUrl ? `'${esc(c.licenseUrl)}'` : "null"},` +
+      `'${esc(creditUsage.get(url) || "content photography")}')`,
+    )
+    .join(",");
   parts.push(
     `insert into public.image_credits (image_url, file_title, artist, license, license_url, source_url, used_for) ` +
-      `select '${esc(url)}', '${esc(c.fileTitle)}', ${c.artist ? `'${esc(c.artist)}'` : "null"}, ` +
-      `${c.license ? `'${esc(c.license)}'` : "null"}, ${c.licenseUrl ? `'${esc(c.licenseUrl)}'` : "null"}, ` +
-      `${c.sourceUrl ? `'${esc(c.sourceUrl)}'` : "null"}, '${esc(creditUsage.get(url) || "content photography")}' ` +
-      `where not exists (select 1 from public.image_credits ic where ic.image_url = '${esc(url)}');`,
+      `select ${EXPAND("v.u")}, v.ft, v.ar, v.li, v.lu, 'https://commons.wikimedia.org/wiki/File:'||replace(v.ft,' ','_'), v.uf ` +
+      `from (values ${values}) v(u,ft,ar,li,lu,uf) ` +
+      `where not exists (select 1 from public.image_credits ic where ic.image_url = ${EXPAND("v.u")});`,
   );
 }
 
 const outFile = `supabase/migrations/${ts}_commons_content_images.sql`;
 writeFileSync(outFile, parts.join("\n") + "\n");
 console.log(JSON.stringify(stats, null, 2));
-console.log(`\nWrote ${updates.length} updates, ${creditRows.size} credits -> ${outFile}`);
+console.log(`\nWrote ${Object.values(perTable).reduce((a, b) => a + b.length, 0)} rows, ${creditRows.size} credits -> ${outFile}`);
+
+// Also emit a JSON payload used by the one-off apply function (scripts/apply-images.ts).
+writeFileSync(
+  "/tmp/commons-images.json",
+  JSON.stringify({
+    tables: Object.fromEntries(
+      Object.entries(perTable).map(([t, rows]) => [
+        t,
+        rows.map((r) => ({ id: r.id, image: r.urls[0], images: r.hasImages ? r.urls : null })),
+      ]),
+    ),
+    credits: Array.from(creditRows.entries()).map(([url, c]) => ({
+      image_url: url,
+      file_title: c.fileTitle,
+      artist: c.artist,
+      license: c.license,
+      license_url: c.licenseUrl,
+      source_url: c.sourceUrl,
+      used_for: creditUsage.get(url) || "content photography",
+    })),
+  }),
+);
