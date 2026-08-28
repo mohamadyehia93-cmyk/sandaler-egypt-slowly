@@ -10,6 +10,7 @@ import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
 import OwnerReservationRequests from "@/components/OwnerReservationRequests";
+import ProviderDraftBanner from "@/components/dashboard/ProviderDraftBanner";
 
 const TripOrganizerDashboard = () => {
   const { lang } = useI18n();
@@ -88,6 +89,10 @@ const TripOrganizerDashboard = () => {
           </div>
         </div>
       </header>
+
+      <div className="px-4 pt-4">
+        <ProviderDraftBanner />
+      </div>
 
       <div className="px-4 py-4 space-y-4">
         <DailyStatusCard accentBg="bg-role-trip-organizer" accentText="text-role-trip-organizer" />

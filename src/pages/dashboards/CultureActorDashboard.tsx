@@ -9,6 +9,7 @@ import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderBut
 import DailyStatusCard from "@/components/DailyStatusCard";
 import ActorCommissionsList from "@/components/ActorCommissionsList";
 import SessionRequestsList from "@/components/SessionRequestsList";
+import ProviderDraftBanner from "@/components/dashboard/ProviderDraftBanner";
 
 // Static editorial copy curated by the Sandal team — NOT personalised and not
 // backed by any table. Do not present these as generated suggestions.
@@ -200,6 +201,10 @@ const CultureActorDashboard = () => {
           </div>
         </div>
       </header>
+
+      <div className="px-4 pt-4">
+        <ProviderDraftBanner />
+      </div>
 
       <div className="px-4 py-4 space-y-4">
         <DailyStatusCard accentBg="bg-role-culture-actor" accentText="text-role-culture-actor" />

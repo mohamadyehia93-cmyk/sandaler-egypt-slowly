@@ -7,6 +7,13 @@ import { useRegions, useCities } from "@/hooks/useListings";
 import { useAuth } from "@/hooks/useAuth";
 import { becomeProvider, providerErrorMessage } from "@/lib/becomeProvider";
 import { uploadImages } from "@/lib/dashboardForms";
+import {
+  saveOnboardingDraft,
+  loadOnboardingDraft,
+  clearOnboardingDraft,
+  fileToCompactDataUrl,
+  dataUrlToFile,
+} from "@/lib/onboardingDraft";
 import { supabase } from "@/integrations/supabase/client";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import { toast } from "sonner";
@@ -228,6 +235,9 @@ const SplashPage = () => {
   const [avatarFiles, setAvatarFiles] = useState<File[]>([]);
   const [selectedRoleAnswers, setSelectedRoleAnswers] = useState<Record<number, string[]>>({});
   const [roleQuestionIdx, setRoleQuestionIdx] = useState(0);
+  /** True when we restored a draft saved before the sign-up redirect. */
+  const [restoredDraft, setRestoredDraft] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const goTo = (next: OnboardingStep, dir = 1) => {
     setDirection(dir);
@@ -350,6 +360,18 @@ const SplashPage = () => {
       return "failed";
     }
 
+    // The role works, but the public directory row failed — say so instead of
+    // pretending everything succeeded.
+    if (result.satelliteError) {
+      toast.error(
+        lang === "ar"
+          ? "تم إنشاء حسابك لكن تعذّر إنشاء ملفك العام. حدّثه من تعديل الملف الشخصي."
+          : "Your account was created but your public directory profile failed. Update it from Edit Profile."
+      );
+    }
+
+    // The draft has served its purpose.
+    clearOnboardingDraft();
     return "ok";
   };
 
@@ -364,19 +386,34 @@ const SplashPage = () => {
     navigate(roleDashboardPaths[nextRole] || "/");
   };
 
-  // If the user returns to onboarding already authenticated with a pending
-  // provider selection (made before signing in), finish creating the profile.
+  /**
+   * Restore an onboarding draft saved before the sign-up redirect. We REHYDRATE
+   * the form and drop the person back on the profile step to confirm — we never
+   * auto-create a provider behind their back, which is how the old code shipped
+   * providers named after an email prefix with no bio, city or photo.
+   */
   useEffect(() => {
-    const pending = sessionStorage.getItem("sandal-pending-role") as LocalRole | null;
-    if (!pending || !user) return;
-    (async () => {
-      const status = await completeProvider(pending);
-      sessionStorage.removeItem("sandal-pending-role");
-      if (status === "ok") {
-        await persistPersonalization();
-        navigate(roleDashboardPaths[pending] || "/");
-      }
-    })();
+    if (restoredDraft) return;
+    const draft = loadOnboardingDraft(user?.id ?? null);
+    if (!draft) return;
+
+    setSelectedRole(draft.role);
+    setSelectedRegion(draft.region);
+    setSelectedCities(draft.cities || []);
+    setSelectedInterests(draft.interests || []);
+    setSelectedStyle(draft.travelStyle);
+    setSelectedBudget(draft.budget);
+    setName(draft.name || "");
+    setNameAr(draft.nameAr || "");
+    setBio(draft.bio || "");
+    setSelectedRoleAnswers(draft.roleAnswers || {});
+    if (draft.avatarDataUrl) {
+      const file = dataUrlToFile(draft.avatarDataUrl);
+      if (file) setAvatarFiles([file]);
+    }
+    setRestoredDraft(true);
+    setStep("profile");
+    sessionStorage.removeItem("sandal-pending-role");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
@@ -392,14 +429,40 @@ const SplashPage = () => {
     }
 
     // Provider role requires authentication so we can write the providers row.
+    // Everything typed so far is persisted first so nothing is lost in the
+    // round-trip through sign-up.
     if (!user) {
+      setSubmitting(true);
+      const avatarDataUrl = avatarFiles[0] ? await fileToCompactDataUrl(avatarFiles[0]) : null;
+      saveOnboardingDraft({
+        forUserId: null,
+        role: selectedRole || mappedRole,
+        lang: lang === "ar" ? "ar" : "en",
+        name,
+        nameAr,
+        bio,
+        region: selectedRegion,
+        cities: selectedCities,
+        interests: selectedInterests,
+        travelStyle: selectedStyle,
+        budget: selectedBudget,
+        roleAnswers: selectedRoleAnswers,
+        avatarDataUrl,
+      });
       sessionStorage.setItem("sandal-pending-role", mappedRole);
-      toast.message(lang === "ar" ? "سجّل الدخول لإكمال التسجيل كمزوّد" : "Sign in to finish registering as a provider");
+      setSubmitting(false);
+      toast.message(
+        lang === "ar"
+          ? "أنشئ حسابك لإكمال التسجيل — بياناتك محفوظة"
+          : "Create your account to finish — your details are saved"
+      );
       navigate(`/signup?next=${encodeURIComponent("/welcome")}`);
       return;
     }
 
+    setSubmitting(true);
     const status = await completeProvider(mappedRole as LocalRole);
+    setSubmitting(false);
     if (status !== "ok") return;
 
     await persistPersonalization();
@@ -1112,6 +1175,17 @@ const SplashPage = () => {
             </header>
 
             <div className="flex-1 overflow-y-auto px-4 py-6 space-y-5">
+              {restoredDraft && (
+                <div className="rounded-xl border border-primary/30 bg-primary/5 p-3 flex items-start gap-2">
+                  <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <p className="text-xs text-foreground leading-relaxed">
+                    {lang === "ar"
+                      ? "استعدنا ما أدخلته قبل إنشاء الحساب. راجع بياناتك ثم أكمل."
+                      : "We restored what you entered before signing up. Check it and continue."}
+                  </p>
+                </div>
+              )}
+
               {/* Avatar */}
               <div className="max-w-xs mx-auto w-full">
                 <PhotoPicker
@@ -1122,32 +1196,61 @@ const SplashPage = () => {
                 />
               </div>
 
-              {/* Name (EN) */}
-              <div>
-                <label className="text-sm font-semibold text-foreground block mb-1.5">
-                  {lang === "ar" ? "الاسم (بالإنجليزية)" : "Name (English)"}
-                </label>
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder={lang === "ar" ? "أدخل اسمك" : "Enter your name"}
-                  className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                />
-              </div>
-
-              {/* Name (AR) — optional */}
-              <div>
-                <label className="text-sm font-semibold text-foreground block mb-1.5">
-                  {lang === "ar" ? "الاسم بالعربية (اختياري)" : "Arabic name (optional)"}
-                </label>
-                <input
-                  value={nameAr}
-                  onChange={(e) => setNameAr(e.target.value)}
-                  dir="rtl"
-                  placeholder={lang === "ar" ? "أدخل اسمك بالعربية" : "اسمك بالعربية"}
-                  className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                />
-              </div>
+              {/* Name — the field in the user's own language is the primary one. */}
+              {lang === "ar" ? (
+                <>
+                  <div>
+                    <label className="text-sm font-semibold text-foreground block mb-1.5">
+                      الاسم بالعربية
+                    </label>
+                    <input
+                      value={nameAr}
+                      onChange={(e) => setNameAr(e.target.value)}
+                      dir="rtl"
+                      placeholder="أدخل اسمك"
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-foreground block mb-1.5">
+                      الاسم بالإنجليزية (اختياري)
+                    </label>
+                    <input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      dir="ltr"
+                      placeholder="Your name in English"
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <label className="text-sm font-semibold text-foreground block mb-1.5">
+                      Name
+                    </label>
+                    <input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter your name"
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-foreground block mb-1.5">
+                      Arabic name (optional)
+                    </label>
+                    <input
+                      value={nameAr}
+                      onChange={(e) => setNameAr(e.target.value)}
+                      dir="rtl"
+                      placeholder="اسمك بالعربية"
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    />
+                  </div>
+                </>
+              )}
 
               {/* Short bio — optional */}
               <div>
@@ -1256,13 +1359,18 @@ const SplashPage = () => {
             <div className="px-4 py-4 border-t border-border bg-background space-y-2">
               <button
                 onClick={handleFinish}
-                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
+                disabled={submitting}
+                className="w-full min-h-[48px] py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-60"
               >
-                {lang === "ar" ? "ابدأ الاستكشاف" : "Start Exploring"}
+                {submitting
+                  ? lang === "ar" ? "جارٍ الحفظ…" : "Saving…"
+                  : selectedRole && selectedRole !== "visitor"
+                  ? lang === "ar" ? "إنشاء ملفي" : "Create my profile"
+                  : lang === "ar" ? "ابدأ الاستكشاف" : "Start Exploring"}
               </button>
               <button
-                onClick={handleFinish}
-                className="w-full py-2.5 text-sm text-muted-foreground font-medium"
+                onClick={handleGuestMode}
+                className="w-full min-h-[44px] py-2.5 text-sm text-muted-foreground font-medium"
               >
                 {lang === "ar" ? "تخطي الآن" : "Skip for now"}
               </button>
