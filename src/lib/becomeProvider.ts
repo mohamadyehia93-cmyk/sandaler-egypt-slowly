@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { markHuman, markMachine, translateText, type TranslationMeta } from "@/lib/translation";
 import type { LocalRole } from "@/hooks/useUserRole";
 
 const slugify = (input: string) =>
@@ -34,8 +35,13 @@ export type ProviderDetails = {
  * Three roles have their own richer "satellite" profile table. Onboarding
  * seeds a row there so those directories are never empty for a new provider,
  * and — for organizations — so causes/programs have a real owner.
- * Keyed on the owner column (partial unique index) so re-running onboarding
- * updates instead of duplicating. Failures never block provider creation.
+ *
+ * WHY select-then-insert/update instead of upsert: the uniqueness on these
+ * tables is a PARTIAL unique index (`WHERE user_id IS NOT NULL`), which
+ * Postgres cannot use as an ON CONFLICT inference target, so every upsert
+ * silently failed — organizations ended up with zero owned rows. Explicit
+ * select-then-write needs no schema change, works whatever shape the index
+ * has, and returns a real error we can show the user.
  */
 async function upsertSatellite(
   role: LocalRole,
@@ -43,7 +49,7 @@ async function upsertSatellite(
   nameEn: string,
   slug: string,
   details?: ProviderDetails
-): Promise<void> {
+): Promise<string | null> {
   // Arabic name is optional on the satellite tables now — NULL means "no Arabic
   // name" and display falls back to English. Never mirror English into Arabic.
   const nameAr = details?.nameAr?.trim() || null;
@@ -51,66 +57,100 @@ async function upsertSatellite(
   const bioEn = details?.bioEn?.trim() || null;
   const avatar = details?.avatar || null;
 
-  try {
-    if (role === "organization") {
-      await supabase.from("organizations").upsert(
-        {
-          owner_id: userId,
-          name_en: nameEn,
-          name_ar: nameAr,
-          slug: `org-${slug}`,
-          logo: avatar,
-          description_en: bioEn,
-          city_id: details?.cityId || null,
-          region_id: details?.regionId || null,
-          location_en: details?.cityEn || null,
-          location_ar: details?.cityAr || null,
-          focus_areas_en: labels.length ? labels : null,
-          status: "published",
-        } as never,
-        { onConflict: "owner_id" }
-      );
-    } else if (role === "whos-who") {
-      await supabase.from("whos_who").upsert(
-        {
-          user_id: userId,
-          name_en: nameEn,
-          name_ar: nameAr,
-          slug: `ww-${slug}`,
-          role_en: labels[0] || null,
-          bio_en: bioEn,
-          image: avatar,
-          city_id: details?.cityId || null,
-          region_id: details?.regionId || null,
-          interests_en: labels.length ? labels : null,
-          languages_en: details?.languages
-            ? details.languages.split(",").map((l) => l.trim()).filter(Boolean)
-            : null,
-          status: "published",
-        } as never,
-        { onConflict: "user_id" }
-      );
-    } else if (role === "culture-actor") {
-      await supabase.from("culture_actors").upsert(
-        {
-          user_id: userId,
-          name_en: nameEn,
-          name_ar: nameAr,
-          slug: `ca-${slug}`,
-          title_en: labels[0] || null,
-          bio_en: bioEn,
-          image: avatar,
-          region_id: details?.regionId || null,
-          expertise_en: labels.length ? labels : null,
-          status: "published",
-        } as never,
-        { onConflict: "user_id" }
-      );
-    }
-  } catch {
-    // soft-fail: the provider row is what matters for the role to work
+  let table: "organizations" | "whos_who" | "culture_actors";
+  let ownerCol: "owner_id" | "user_id";
+  let payload: Record<string, unknown>;
+
+  if (role === "organization") {
+    table = "organizations";
+    ownerCol = "owner_id";
+    payload = {
+      owner_id: userId,
+      name_en: nameEn,
+      name_ar: nameAr,
+      slug: `org-${slug}`,
+      logo: avatar,
+      description_en: bioEn,
+      city_id: details?.cityId || null,
+      region_id: details?.regionId || null,
+      location_en: details?.cityEn || null,
+      location_ar: details?.cityAr || null,
+      focus_areas_en: labels.length ? labels : null,
+      status: "published",
+    };
+  } else if (role === "whos-who") {
+    table = "whos_who";
+    ownerCol = "user_id";
+    payload = {
+      user_id: userId,
+      name_en: nameEn,
+      name_ar: nameAr,
+      slug: `ww-${slug}`,
+      role_en: labels[0] || null,
+      bio_en: bioEn,
+      image: avatar,
+      city_id: details?.cityId || null,
+      region_id: details?.regionId || null,
+      interests_en: labels.length ? labels : null,
+      languages_en: details?.languages
+        ? details.languages.split(",").map((l) => l.trim()).filter(Boolean)
+        : null,
+      status: "published",
+    };
+  } else if (role === "culture-actor") {
+    table = "culture_actors";
+    ownerCol = "user_id";
+    payload = {
+      user_id: userId,
+      name_en: nameEn,
+      name_ar: nameAr,
+      slug: `ca-${slug}`,
+      title_en: labels[0] || null,
+      bio_en: bioEn,
+      image: avatar,
+      region_id: details?.regionId || null,
+      expertise_en: labels.length ? labels : null,
+      status: "published",
+    };
+  } else {
+    return null;
   }
+
+  // Never overwrite an existing value with NULL — re-running onboarding must
+  // not wipe a bio or photo the provider already wrote.
+  const insertPayload = { ...payload };
+  const updatePayload: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(payload)) {
+    if (v !== null && v !== undefined) updatePayload[k] = v;
+  }
+
+  // The three satellite tables have different generated row types, so the
+  // shared write path is expressed through this minimal structural view.
+  type DbError = { message: string } | null;
+  type LooseTable = {
+    select: (cols: string) => {
+      eq: (col: string, val: string) => { maybeSingle: () => Promise<{ data: { id: string } | null; error: DbError }> };
+    };
+    update: (values: Record<string, unknown>) => { eq: (col: string, val: string) => Promise<{ error: DbError }> };
+    insert: (values: Record<string, unknown>) => Promise<{ error: DbError }>;
+  };
+  const db = supabase.from(table) as unknown as LooseTable;
+
+  const { data: existing, error: selectError } = await db.select("id").eq(ownerCol, userId).maybeSingle();
+
+  if (selectError) return selectError.message;
+
+  if (existing?.id) {
+    // A previously unpublished satellite (role switch) comes back to life.
+    updatePayload.status = "published";
+    const { error } = await db.update(updatePayload).eq("id", existing.id);
+    return error?.message ?? null;
+  }
+
+  const { error } = await db.insert(insertPayload);
+  return error?.message ?? null;
 }
+
 
 
 /**
@@ -141,7 +181,7 @@ async function unpublishSatellite(oldRole: LocalRole, userId: string): Promise<v
 
 
 export type BecomeProviderResult =
-  | { status: "ok"; error: null }
+  | { status: "ok"; error: null; satelliteError?: string | null }
   | { status: "error"; error: string }
   | { status: "role-exists"; currentRole: LocalRole; error: null };
 
@@ -186,7 +226,7 @@ export async function becomeProvider(
 
   const { data: existing, error: existingError } = await supabase
     .from("providers")
-    .select("role")
+    .select("role, translation_meta")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -206,8 +246,25 @@ export async function becomeProvider(
     .eq("user_id", user.id)
     .maybeSingle();
 
+  const typedEn = details?.nameEn?.trim() || "";
+  const typedAr = details?.nameAr?.trim() || "";
+
+  // ARABIC-FIRST NAMING. An Arabic-first provider types their name in Arabic
+  // and may leave English empty, but providers.name_en is NOT NULL. So when
+  // only Arabic exists we machine-translate it to English; if that fails we
+  // store the Arabic string itself so the constraint is satisfied. Either way
+  // translation_meta marks name_en as machine so it is never mistaken for
+  // authored English. Nothing is ever mirrored the other way (EN -> AR).
+  let englishName = typedEn;
+  let nameEnIsMachine = false;
+  if (!englishName && typedAr) {
+    const res = await translateText({ text: typedAr, from: "ar", to: "en", context: "person or business name" });
+    englishName = res.ok ? res.translation : typedAr;
+    nameEnIsMachine = true;
+  }
+
   const displayName =
-    details?.nameEn?.trim() ||
+    englishName ||
     profile?.display_name ||
     (user.user_metadata?.full_name as string | undefined) ||
     (user.user_metadata?.name as string | undefined) ||
@@ -235,9 +292,16 @@ export async function becomeProvider(
     status,
   };
 
+  const baseMeta = (existing?.translation_meta as TranslationMeta | null) || {};
+  if (nameEnIsMachine) {
+    payload.translation_meta = markMachine(baseMeta, "name_en", "ar");
+  } else if (typedEn) {
+    payload.translation_meta = markHuman(baseMeta, "name_en");
+  }
+
   // Never mirror the English name into name_ar — a NULL means "no Arabic name"
   // and the UI falls back to name_en for display.
-  if (details?.nameAr?.trim()) payload.name_ar = details.nameAr.trim();
+  if (typedAr) payload.name_ar = typedAr;
   if (bioEn) payload.bio_en = bioEn;
   if (details?.bioAr?.trim()) payload.bio_ar = details.bioAr.trim();
   if (details?.taglineEn?.trim()) payload.tagline_en = details.taglineEn.trim();
@@ -256,14 +320,20 @@ export async function becomeProvider(
 
   if (error) return { status: "error", error: error.message };
 
-  await upsertSatellite(role, user.id, displayName, slug, details);
+  // The satellite row is what makes an organization / Who's Who / culture actor
+  // appear in its directory. A failure here used to be swallowed twice; it is
+  // now returned so the caller can tell the user.
+  const satelliteError = await upsertSatellite(role, user.id, displayName, slug, details);
+  if (satelliteError) {
+    console.error("[becomeProvider] satellite profile failed", { role, satelliteError });
+  }
 
   // A confirmed switch must not leave the previous role's profile public.
   if (currentRole && currentRole !== role) {
     await unpublishSatellite(currentRole, user.id);
   }
 
-  return { status: "ok", error: null };
+  return { status: "ok", error: null, satelliteError };
 
 }
 

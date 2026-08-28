@@ -11,6 +11,7 @@ import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderBut
 import DailyStatusCard from "@/components/DailyStatusCard";
 import SellerOrdersList from "@/components/SellerOrdersList";
 import OwnerReservationRequests from "@/components/OwnerReservationRequests";
+import ProviderDraftBanner from "@/components/dashboard/ProviderDraftBanner";
 
 const LOW_STOCK_THRESHOLD = 3;
 
@@ -94,6 +95,10 @@ const ProductSellerDashboard = () => {
           </div>
         </div>
       </header>
+
+      <div className="px-4 pt-4">
+        <ProviderDraftBanner />
+      </div>
 
       <div className="px-4 py-4 space-y-4">
         <DailyStatusCard accentBg="bg-role-product-seller" accentText="text-role-product-seller" />

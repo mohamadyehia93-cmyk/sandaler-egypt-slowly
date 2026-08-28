@@ -10,6 +10,7 @@ import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderBut
 import DailyStatusCard from "@/components/DailyStatusCard";
 import OrgApplicationsList from "@/components/OrgApplicationsList";
 import CausePledgesList from "@/components/CausePledgesList";
+import ProviderDraftBanner from "@/components/dashboard/ProviderDraftBanner";
 
 const OrganizationDashboard = () => {
   const { lang } = useI18n();
@@ -98,6 +99,10 @@ const OrganizationDashboard = () => {
           </div>
         </div>
       </header>
+
+      <div className="px-4 pt-4">
+        <ProviderDraftBanner />
+      </div>
 
       <div className="px-4 py-4 space-y-4">
         <DailyStatusCard accentBg="bg-role-organization" accentText="text-role-organization" />

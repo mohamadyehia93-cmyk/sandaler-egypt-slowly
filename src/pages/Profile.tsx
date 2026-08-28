@@ -13,6 +13,7 @@ import { useIsAmbassador } from "@/hooks/useIsAmbassador";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import ProviderDraftBanner from "@/components/dashboard/ProviderDraftBanner";
 
 type SavedItinerary = {
   id: string;
@@ -131,6 +132,8 @@ const Profile = () => {
       </header>
 
       <div className="px-4 py-6">
+        <ProviderDraftBanner className="mb-4" />
+
         {/* Profile Card */}
         <div className="bg-card rounded-xl shadow-card p-5 flex flex-col items-center mb-6">
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-3">

@@ -27,7 +27,7 @@ const Signup = () => {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -35,13 +35,25 @@ const Signup = () => {
         emailRedirectTo: window.location.origin + (next || ""),
       },
     });
-    setLoading(false);
     if (error) {
+      setLoading(false);
       toast.error(error.message);
-    } else {
-      toast.success(t("auth.account_created_check_email"));
-      navigate(next ? `/login?next=${encodeURIComponent(next)}` : "/login");
+      return;
     }
+
+    // Email confirmations are auto-confirmed on this project, so there is no
+    // email to check and no reason to make the person type their password a
+    // second time. Sign them straight in and continue to `next`.
+    if (!data.session) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) {
+        setLoading(false);
+        navigate(next ? `/login?next=${encodeURIComponent(next)}` : "/login");
+        return;
+      }
+    }
+    setLoading(false);
+    navigate(next || "/profile", { replace: true });
   };
 
   return (

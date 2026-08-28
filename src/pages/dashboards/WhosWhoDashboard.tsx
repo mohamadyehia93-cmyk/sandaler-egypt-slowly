@@ -9,6 +9,7 @@ import { VisitorModeHeaderToggle } from "@/components/VisitorModeToggle";
 import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderButton";
 import DailyStatusCard from "@/components/DailyStatusCard";
 import SessionRequestsList from "@/components/SessionRequestsList";
+import ProviderDraftBanner from "@/components/dashboard/ProviderDraftBanner";
 
 const WhosWhoDashboard = () => {
   const { lang } = useI18n();
@@ -98,6 +99,10 @@ const WhosWhoDashboard = () => {
           </div>
         </div>
       </header>
+
+      <div className="px-4 pt-4">
+        <ProviderDraftBanner />
+      </div>
 
       <div className="px-4 py-4 space-y-4">
         <DailyStatusCard accentBg="bg-role-whos-who" accentText="text-role-whos-who" />

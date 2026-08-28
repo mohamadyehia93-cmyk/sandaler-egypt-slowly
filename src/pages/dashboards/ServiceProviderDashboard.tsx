@@ -13,6 +13,7 @@ import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderBut
 import DailyStatusCard from "@/components/DailyStatusCard";
 import OwnerReservationRequests from "@/components/OwnerReservationRequests";
 import MessageUserButton from "@/components/MessageUserButton";
+import ProviderDraftBanner from "@/components/dashboard/ProviderDraftBanner";
 
 
 type ProviderBooking = {
@@ -162,6 +163,10 @@ const ServiceProviderDashboard = () => {
           </div>
         </div>
       </header>
+
+      <div className="px-4 pt-4">
+        <ProviderDraftBanner />
+      </div>
 
       <div className="px-4 py-4 space-y-4">
         <DailyStatusCard accentBg="bg-role-service-provider" accentText="text-role-service-provider" />
