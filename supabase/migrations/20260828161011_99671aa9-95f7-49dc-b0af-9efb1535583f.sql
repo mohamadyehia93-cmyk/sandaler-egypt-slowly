@@ -1,0 +1,1 @@
+GRANT SELECT (translation_meta) ON public.providers TO anon, authenticated;
