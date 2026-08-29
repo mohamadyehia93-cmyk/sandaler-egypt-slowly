@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { markHuman, markMachine, translateText, type TranslationMeta } from "@/lib/translation";
 import type { LocalRole } from "@/hooks/useUserRole";
+import { normalizeWhatsapp } from "@/lib/whatsapp";
 
 const slugify = (input: string) =>
   input
@@ -27,6 +28,8 @@ export type ProviderDetails = {
   avatar?: string | null;
   specialties?: string[] | null;
   languages?: string | null;
+  /** WhatsApp number — the contact locals actually answer on. */
+  whatsapp?: string | null;
   /** Human-readable labels for the role quiz answers, used to seed satellites. */
   answerLabels?: string[] | null;
 };
@@ -313,12 +316,28 @@ export async function becomeProvider(
   if (avatar) payload.avatar = avatar;
   if (details?.specialties?.length) payload.specialties = details.specialties;
   if (details?.languages) payload.languages = details.languages;
+  // WhatsApp (like contact_email / contact_phone) is a PRIVATE column: SELECT on
+  // it is revoked for anon/authenticated so it can only be read through the
+  // guarded `get_provider_contact` RPC. An upsert would compile to
+  // `SET whatsapp = excluded.whatsapp`, which READS the column and therefore
+  // fails with "permission denied for table providers". So the number is written
+  // in a separate plain UPDATE on the caller's own row, which needs no SELECT.
+  const whatsapp = details?.whatsapp?.trim() ? normalizeWhatsapp(details.whatsapp) : null;
 
   const { error } = await supabase
     .from("providers")
     .upsert(payload as never, { onConflict: "user_id" });
 
   if (error) return { status: "error", error: error.message };
+
+  if (whatsapp) {
+    const { error: waError } = await supabase
+      .from("providers")
+      .update({ whatsapp })
+      .eq("user_id", user.id);
+    if (waError) console.error("[becomeProvider] whatsapp not saved", waError.message);
+  }
+
 
   // The satellite row is what makes an organization / Who's Who / culture actor
   // appear in its directory. A failure here used to be swallowed twice; it is

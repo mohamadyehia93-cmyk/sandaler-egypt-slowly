@@ -6,6 +6,7 @@ import { ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
 import Avatar from "@/components/AvatarFallback";
+import ProviderContactCard from "@/components/ProviderContactCard";
 
 
 interface ProviderBioCardProps {
@@ -113,6 +114,9 @@ const ProviderBioCard = ({ providerId, roleLabel }: ProviderBioCardProps) => {
           )}
         </div>
       </div>
+      {/* WhatsApp / contact — gated by get_provider_contact, so this renders
+          the "unlocks after a confirmed booking" note to everyone else. */}
+      <ProviderContactCard providerId={provider.id} compact />
       <button
         onClick={() => navigate(`/provider/${provider.id}`)}
         className="w-full mt-3 text-xs font-semibold text-primary bg-primary/10 hover:bg-primary/15 rounded-lg py-2 transition-colors flex items-center justify-center gap-1"
@@ -120,6 +124,7 @@ const ProviderBioCard = ({ providerId, roleLabel }: ProviderBioCardProps) => {
         {lang === "ar" ? "عرض الملف الشخصي" : "View Full Profile"}
         <ChevronRight className="w-3.5 h-3.5" />
       </button>
+
     </div>
   );
 };

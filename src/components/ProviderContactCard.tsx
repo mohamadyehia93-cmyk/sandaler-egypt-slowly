@@ -2,17 +2,25 @@ import { useEffect, useState } from "react";
 import { Mail, Phone, MessageCircle, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
+import { waLink } from "@/lib/whatsapp";
 import type { ProviderContact } from "@/lib/providerColumns";
 
 /**
- * Private contact details for a provider.
+ * Private contact details for a provider, with WhatsApp as the primary action.
  *
- * The columns are not readable through the `providers` table any more; the
- * guarded `get_provider_contact` RPC returns them only to the provider itself
- * or to a signed-in user with a confirmed transaction. Anyone else sees a short
- * note explaining that contact details unlock after a confirmed booking.
+ * The columns are not readable through the `providers` table; the guarded
+ * `get_provider_contact` RPC returns them only to the provider itself or to a
+ * signed-in user with a confirmed transaction. That gate is deliberate and
+ * unchanged — before a confirmed booking the in-app Message button is the
+ * channel, and this card explains why the number is not shown yet.
  */
-const ProviderContactCard = ({ providerId }: { providerId?: string }) => {
+const ProviderContactCard = ({
+  providerId,
+  compact = false,
+}: {
+  providerId?: string;
+  compact?: boolean;
+}) => {
   const { lang } = useI18n();
   const ar = lang === "ar";
   const [contact, setContact] = useState<ProviderContact | null>(null);
@@ -41,27 +49,31 @@ const ProviderContactCard = ({ providerId }: { providerId?: string }) => {
 
   if (!providerId || loading) return null;
 
-  const items = [
+  const whatsapp = contact?.whatsapp?.trim() || null;
+  const rest = [
     { icon: Mail, value: contact?.contact_email, href: (v: string) => `mailto:${v}` },
     { icon: Phone, value: contact?.contact_phone, href: (v: string) => `tel:${v}` },
-    { icon: MessageCircle, value: contact?.whatsapp, href: (v: string) => `https://wa.me/${v.replace(/[^\d]/g, "")}` },
   ].filter((i) => !!i.value);
 
-  return (
-    <div className="mx-4 mt-4 rounded-xl bg-card shadow-card p-4" dir={ar ? "rtl" : "ltr"}>
-      <h2 className="text-sm font-semibold text-foreground mb-2">
-        {ar ? "بيانات التواصل" : "Contact details"}
-      </h2>
-      {items.length === 0 ? (
-        <p className="text-xs text-muted-foreground flex items-start gap-2">
-          <Lock className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-          {ar
-            ? "تظهر بيانات التواصل بعد تأكيد حجز أو طلب مع هذا المضيف."
-            : "Contact details unlock after a confirmed booking or order with this host."}
-        </p>
-      ) : (
-        <ul className="space-y-2">
-          {items.map(({ icon: Icon, value, href }) => (
+  // Compact mode sits inside another card (listing pages), so it draws no box.
+  if (compact && !whatsapp && rest.length === 0) return null;
+
+  const body = (
+    <>
+      {whatsapp && (
+        <a
+          href={waLink(whatsapp)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full min-h-[44px] rounded-xl bg-success text-success-foreground font-bold text-sm px-4"
+        >
+          <MessageCircle className="w-4 h-4 shrink-0" />
+          {ar ? "تواصل على واتساب" : "Chat on WhatsApp"}
+        </a>
+      )}
+      {rest.length > 0 && (
+        <ul className="space-y-2 mt-2">
+          {rest.map(({ icon: Icon, value, href }) => (
             <li key={value as string}>
               <a
                 href={href(value as string)}
@@ -75,6 +87,25 @@ const ProviderContactCard = ({ providerId }: { providerId?: string }) => {
           ))}
         </ul>
       )}
+      {!whatsapp && rest.length === 0 && (
+        <p className="text-xs text-muted-foreground flex items-start gap-2">
+          <Lock className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+          {ar
+            ? "رقم واتساب وبيانات التواصل تظهر بعد تأكيد حجز أو طلب. لحد ساعتها استخدم المراسلة داخل التطبيق."
+            : "WhatsApp and contact details unlock after a confirmed booking or order. Until then, use the in-app message."}
+        </p>
+      )}
+    </>
+  );
+
+  if (compact) return <div className="mt-3">{body}</div>;
+
+  return (
+    <div className="mx-4 mt-4 rounded-xl bg-card shadow-card p-4" dir={ar ? "rtl" : "ltr"}>
+      <h2 className="text-sm font-semibold text-foreground mb-2">
+        {ar ? "بيانات التواصل" : "Contact details"}
+      </h2>
+      {body}
     </div>
   );
 };
