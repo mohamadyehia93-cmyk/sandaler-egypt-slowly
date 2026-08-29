@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { markHuman, markMachine, translateText, type TranslationMeta } from "@/lib/translation";
 import type { LocalRole } from "@/hooks/useUserRole";
+import { normalizeWhatsapp } from "@/lib/whatsapp";
 
 const slugify = (input: string) =>
   input
@@ -321,7 +322,7 @@ export async function becomeProvider(
   // `SET whatsapp = excluded.whatsapp`, which READS the column and therefore
   // fails with "permission denied for table providers". So the number is written
   // in a separate plain UPDATE on the caller's own row, which needs no SELECT.
-  const whatsapp = details?.whatsapp?.trim() || null;
+  const whatsapp = details?.whatsapp?.trim() ? normalizeWhatsapp(details.whatsapp) : null;
 
   const { error } = await supabase
     .from("providers")
