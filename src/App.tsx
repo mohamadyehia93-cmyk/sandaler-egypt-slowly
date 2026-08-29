@@ -18,6 +18,7 @@ import OAuthConsent from "./pages/OAuthConsent.tsx";
 // Eager — first paint critical
 import Index from "./pages/Index.tsx";
 import Splash from "./pages/Splash.tsx";
+import ClaimProfile from "./pages/ClaimProfile.tsx";
 import Login from "./pages/Login.tsx";
 import Signup from "./pages/Signup.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -151,6 +152,7 @@ const App = () => {
               <Suspense fallback={<RouteFallback />}>
               <Routes>
             <Route path="/welcome" element={<Splash />} />
+            <Route path="/claim/:token" element={<ClaimProfile />} />
             <Route path="/" element={<Index />} />
             <Route path="/calendar" element={<EventCalendar />} />
             <Route path="/event/:id" element={<EventDetail />} />

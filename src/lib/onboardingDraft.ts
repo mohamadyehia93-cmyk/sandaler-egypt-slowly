@@ -17,14 +17,18 @@
  * mobile data exactly once, after sign-in.
  */
 
-const KEY = "sandal-onboarding-draft-v1";
+const KEY = "sandal-onboarding-draft-v2";
 
 export type OnboardingDraft = {
-  v: 1;
+  v: 2;
   savedAt: string;
   /** The auth user the draft was created for, or null if created signed out. */
   forUserId: string | null;
   role: string;
+  /** Plain-language provider intent (see providerIntents.ts), if one was chosen. */
+  intent: string | null;
+  /** WhatsApp number typed on the profile step, if any. */
+  whatsapp: string;
   lang: "en" | "ar";
   name: string;
   nameAr: string;
@@ -87,14 +91,14 @@ export function dataUrlToFile(dataUrl: string, name = "avatar.jpg"): File | null
 
 export function saveOnboardingDraft(draft: Omit<OnboardingDraft, "v" | "savedAt">): void {
   try {
-    const payload: OnboardingDraft = { ...draft, v: 1, savedAt: new Date().toISOString() };
+    const payload: OnboardingDraft = { ...draft, v: 2, savedAt: new Date().toISOString() };
     localStorage.setItem(KEY, JSON.stringify(payload));
   } catch {
     // Quota exceeded (usually the avatar): keep the text, drop the photo.
     try {
       localStorage.setItem(
         KEY,
-        JSON.stringify({ ...draft, avatarDataUrl: null, v: 1, savedAt: new Date().toISOString() })
+        JSON.stringify({ ...draft, avatarDataUrl: null, v: 2, savedAt: new Date().toISOString() })
       );
     } catch {
       // localStorage unavailable (private mode): nothing more we can do.
@@ -111,7 +115,7 @@ export function loadOnboardingDraft(currentUserId: string | null): OnboardingDra
     const raw = localStorage.getItem(KEY);
     if (!raw) return null;
     const draft = JSON.parse(raw) as OnboardingDraft;
-    if (draft?.v !== 1 || !draft.role) {
+    if (draft?.v !== 2 || !draft.role) {
       clearOnboardingDraft();
       return null;
     }

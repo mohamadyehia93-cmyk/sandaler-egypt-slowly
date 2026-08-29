@@ -15,6 +15,13 @@ import {
   dataUrlToFile,
 } from "@/lib/onboardingDraft";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  PROVIDER_INTENTS,
+  getProviderIntent,
+  rememberProviderIntent,
+  type ProviderIntentKey,
+} from "@/lib/providerIntents";
+import { isPlausibleWhatsapp } from "@/lib/whatsapp";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import { toast } from "sonner";
 import {
@@ -78,6 +85,36 @@ const roleQuestions: Record<string, RoleQuestion[]> = {
         { key: "nature-exp", icon: Leaf, label: { en: "Nature & Outdoor", ar: "طبيعة ونشاطات خارجية" } },
         { key: "cultural-events", icon: Music, label: { en: "Cultural Events", ar: "فعاليات ثقافية" } },
         { key: "wellness", icon: Heart, label: { en: "Wellness & Healing", ar: "صحة واستشفاء" } },
+      ],
+      multi: true,
+    },
+  ],
+  "intent-host": [
+    {
+      title: { en: "What do you host?", ar: "بتستقبل ضيوف فين؟" },
+      subtitle: { en: "Pick what fits your place", ar: "اختار اللي يوصف مكانك" },
+      options: [
+        { key: "room-in-home", icon: Home, label: { en: "A room in my home", ar: "غرفة في بيتي" } },
+        { key: "whole-house", icon: Home, label: { en: "A whole house or flat", ar: "بيت أو شقة كاملة" } },
+        { key: "guesthouse", icon: Building2, label: { en: "A guesthouse", ar: "بيت ضيافة" } },
+        { key: "ecolodge", icon: Leaf, label: { en: "An eco-lodge", ar: "لودج بيئي" } },
+        { key: "camp", icon: Tent, label: { en: "A camp", ar: "كامب" } },
+        { key: "farm-stay", icon: Wheat, label: { en: "A farm stay", ar: "إقامة في مزرعة" } },
+      ],
+      multi: true,
+    },
+  ],
+  "intent-drive": [
+    {
+      title: { en: "How do you drive people?", ar: "بتوصّل الناس إزاي؟" },
+      subtitle: { en: "Pick what you offer", ar: "اختار اللي بتقدمه" },
+      options: [
+        { key: "car-with-driver", icon: Car, label: { en: "My car with me driving", ar: "عربيتي وأنا اللي بسوق" } },
+        { key: "airport-transfer", icon: Bus, label: { en: "Station & airport transfers", ar: "توصيل من المحطة والمطار" } },
+        { key: "day-hire", icon: Clock, label: { en: "Hire for the day", ar: "إيجار باليوم" } },
+        { key: "intercity", icon: Map, label: { en: "Between towns", ar: "بين المدن" } },
+        { key: "microbus", icon: Bus, label: { en: "Microbus / group", ar: "ميكروباص / مجموعات" } },
+        { key: "boat", icon: Ship, label: { en: "Boat or felucca", ar: "قارب أو فلوكة" } },
       ],
       multi: true,
     },
@@ -232,6 +269,9 @@ const SplashPage = () => {
   const [name, setName] = useState("");
   const [nameAr, setNameAr] = useState("");
   const [bio, setBio] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  /** Plain-language statement the person picked (see providerIntents.ts). */
+  const [selectedIntent, setSelectedIntent] = useState<ProviderIntentKey | null>(null);
   const [avatarFiles, setAvatarFiles] = useState<File[]>([]);
   const [selectedRoleAnswers, setSelectedRoleAnswers] = useState<Record<number, string[]>>({});
   const [roleQuestionIdx, setRoleQuestionIdx] = useState(0);
@@ -279,9 +319,12 @@ const SplashPage = () => {
     Object.values(selectedRoleAnswers).flat().filter(Boolean);
 
   /** Readable labels for the same answers — used to seed satellite profiles. */
+  /** Which question set to ask: the intent's own set when there is one. */
+  const questionsKey = getProviderIntent(selectedIntent)?.questions || selectedRole || "";
+
   const roleAnswerLabels = () => {
-    if (!selectedRole) return [];
-    const questions = roleQuestions[selectedRole] || [];
+    if (!questionsKey) return [];
+    const questions = roleQuestions[questionsKey] || [];
     const keys = new Set(roleAnswerKeys());
     return questions
       .flatMap((q) => q.options)
@@ -342,6 +385,7 @@ const SplashPage = () => {
             specialties: roleAnswerKeys(),
             answerLabels: roleAnswerLabels(),
             languages: narratedLanguages(),
+            whatsapp: whatsapp.trim() || null,
           }
         : undefined,
       { force }
@@ -383,7 +427,8 @@ const SplashPage = () => {
     const status = await completeProvider(nextRole, true, true);
     if (status !== "ok") return;
     await persistPersonalization();
-    navigate(roleDashboardPaths[nextRole] || "/");
+    const landing = getProviderIntent(selectedIntent)?.landing;
+    navigate(landing || roleDashboardPaths[nextRole] || "/");
   };
 
   /**
@@ -406,6 +451,8 @@ const SplashPage = () => {
     setName(draft.name || "");
     setNameAr(draft.nameAr || "");
     setBio(draft.bio || "");
+    setWhatsapp(draft.whatsapp || "");
+    setSelectedIntent((draft.intent as ProviderIntentKey | null) ?? null);
     setSelectedRoleAnswers(draft.roleAnswers || {});
     if (draft.avatarDataUrl) {
       const file = dataUrlToFile(draft.avatarDataUrl);
@@ -437,10 +484,12 @@ const SplashPage = () => {
       saveOnboardingDraft({
         forUserId: null,
         role: selectedRole || mappedRole,
+        intent: selectedIntent,
         lang: lang === "ar" ? "ar" : "en",
         name,
         nameAr,
         bio,
+        whatsapp,
         region: selectedRegion,
         cities: selectedCities,
         interests: selectedInterests,
@@ -466,7 +515,8 @@ const SplashPage = () => {
     if (status !== "ok") return;
 
     await persistPersonalization();
-    navigate(roleDashboardPaths[mappedRole] || "/");
+    const landing = getProviderIntent(selectedIntent)?.landing;
+    navigate(landing || roleDashboardPaths[mappedRole] || "/");
   };
 
   const handleGuestMode = () => {
@@ -652,49 +702,54 @@ const SplashPage = () => {
               </button>
               <div>
                 <h1 className="text-lg font-bold text-foreground">
-                  {lang === "ar" ? "اختر دورك" : "Choose Your Role"}
+                  {lang === "ar" ? "إنت بتعمل إيه؟" : "What do you do?"}
                 </h1>
                 <p className="text-xs text-muted-foreground">
-                  {lang === "ar" ? "كيف تريد المساهمة؟" : "How do you want to contribute?"}
+                  {lang === "ar" ? "اختار الجملة اللي تشبهك" : "Pick the line that sounds like you"}
                 </p>
               </div>
             </header>
 
             <div className="flex-1 overflow-y-auto px-4 py-4">
               <div className="grid grid-cols-1 gap-2.5">
-                {localRoles.map(({ key, icon: Icon, label, desc }) => (
-                  <button
-                    key={key}
-                    onClick={() => {
-                      setSelectedRole(key);
-                      setRoleQuestionIdx(0);
-                      setSelectedRoleAnswers({});
-                      if (roleQuestions[key]) {
-                        goTo("roleDetails");
-                      } else {
-                        goTo("city");
-                      }
-                    }}
-                    className="flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-start border-border bg-card hover:border-primary/30"
-                  >
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-secondary text-secondary-foreground">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground">{label[lang]}</p>
-                      <p className="text-xs text-muted-foreground">{desc[lang]}</p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 ms-auto" />
-                  </button>
-                ))}
+                {PROVIDER_INTENTS.map((intent) => {
+                  const Icon = intent.icon;
+                  return (
+                    <button
+                      key={intent.key}
+                      onClick={() => {
+                        setSelectedIntent(intent.key);
+                        rememberProviderIntent(intent.key);
+                        setSelectedRole(intent.role);
+                        setRoleQuestionIdx(0);
+                        setSelectedRoleAnswers({});
+                        if (roleQuestions[intent.questions]) {
+                          goTo("roleDetails");
+                        } else {
+                          goTo("city");
+                        }
+                      }}
+                      className="flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-start border-border bg-card hover:border-primary/30 min-h-[64px]"
+                    >
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-secondary text-secondary-foreground">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground">{intent.statement[lang]}</p>
+                        <p className="text-xs text-muted-foreground leading-relaxed">{intent.sub[lang]}</p>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0 ms-auto" />
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </motion.div>
         )}
 
         {/* STEP 3c: Role-specific Questions */}
-        {step === "roleDetails" && selectedRole && roleQuestions[selectedRole] && (() => {
-          const questions = roleQuestions[selectedRole];
+        {step === "roleDetails" && questionsKey && roleQuestions[questionsKey] && (() => {
+          const questions = roleQuestions[questionsKey];
           const currentQ = questions[roleQuestionIdx];
           if (!currentQ) return null;
           const currentAnswers = selectedRoleAnswers[roleQuestionIdx] || [];
@@ -1266,6 +1321,35 @@ const SplashPage = () => {
                 />
               </div>
 
+              {/* WhatsApp — optional, but the number locals are actually reached on. */}
+              {selectedRole && selectedRole !== "visitor" && (
+                <div className="rounded-xl border border-primary/30 bg-primary/5 p-3">
+                  <label className="text-sm font-semibold text-foreground block mb-1">
+                    {lang === "ar" ? "رقم واتساب (اختياري)" : "WhatsApp number (optional)"}
+                  </label>
+                  <p className="text-xs text-muted-foreground mb-2 leading-relaxed">
+                    {lang === "ar"
+                      ? "الزوار بيتواصلوا على واتساب بعد تأكيد الحجز أو الأوردر. سيبه فاضي لو مش عايز."
+                      : "Visitors reach you on WhatsApp once a booking or order is confirmed. Leave it empty if you prefer."}
+                  </p>
+                  <input
+                    value={whatsapp}
+                    onChange={(e) => setWhatsapp(e.target.value)}
+                    dir="ltr"
+                    inputMode="tel"
+                    placeholder={lang === "ar" ? "رقم الواتساب" : "WhatsApp number"}
+                    className="w-full px-4 py-3 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  />
+                  {whatsapp.trim() !== "" && !isPlausibleWhatsapp(whatsapp) && (
+                    <p className="text-xs text-destructive mt-1.5">
+                      {lang === "ar"
+                        ? "الرقم قصير أوي — راجعه."
+                        : "That does not look like a phone number — check it."}
+                    </p>
+                  )}
+                </div>
+              )}
+
               {/* Summary badges */}
               <div className="space-y-2">
                 {/* Role */}
@@ -1281,7 +1365,8 @@ const SplashPage = () => {
                   <div>
                     <p className="text-xs text-muted-foreground">{lang === "ar" ? "دورك" : "Your role"}</p>
                     <p className="text-sm font-semibold text-foreground">
-                      {allRoles.find(r => r.key === selectedRole)?.label[lang]}
+                      {getProviderIntent(selectedIntent)?.statement[lang]
+                        || allRoles.find(r => r.key === selectedRole)?.label[lang]}
                     </p>
                   </div>
                 </div>
