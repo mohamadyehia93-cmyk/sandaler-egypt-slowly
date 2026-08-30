@@ -119,21 +119,8 @@ const roleQuestions: Record<string, RoleQuestion[]> = {
       multi: true,
     },
   ],
-  "whos-who": [
-    {
-      title: { en: "What is your field?", ar: "ما مجالك؟" },
-      subtitle: { en: "Select your area of expertise", ar: "اختر مجال خبرتك" },
-      options: [
-        { key: "artisan", icon: Palette, label: { en: "Artisan & Craftsperson", ar: "حرفي وصانع" } },
-        { key: "historian", icon: Landmark, label: { en: "Historian & Researcher", ar: "مؤرخ وباحث" } },
-        { key: "chef", icon: UtensilsCrossed, label: { en: "Chef & Food Expert", ar: "طاهٍ وخبير طعام" } },
-        { key: "musician", icon: Music, label: { en: "Musician & Performer", ar: "موسيقي ومؤدي" } },
-        { key: "elder", icon: Star, label: { en: "Community Elder", ar: "شيخ المجتمع" } },
-        { key: "guide", icon: Compass, label: { en: "Local Guide", ar: "مرشد محلي" } },
-      ],
-      multi: false,
-    },
-  ],
+  // No "whos-who" question set: the role is invitation-only and never selected here.
+
   "trip-organizer": [
     {
       title: { en: "What trips do you organize?", ar: "ما نوع الرحلات؟" },
@@ -197,10 +184,15 @@ const topRoles = [
   { key: "local", icon: Home, label: { en: "Local", ar: "محلي" }, desc: { en: "I live here and want to contribute", ar: "أعيش هنا وأريد المساهمة" } },
 ];
 
+/**
+ * Label lookup for the completion screen only — the role step itself renders
+ * PROVIDER_INTENTS. `whos-who` is deliberately NOT here: it is invitation-only
+ * and created by Sandal through /admin, never self-serve.
+ */
 const localRoles = [
   { key: "culture-actor", icon: Pen, label: { en: "Culture Actor", ar: "فاعل ثقافي" }, desc: { en: "Write, narrate audio tours, curate collections", ar: "اكتب، وسجّل جولات صوتية، ونسّق مجموعات" } },
   { key: "service-provider", icon: Briefcase, label: { en: "Service Provider", ar: "مقدم خدمة" }, desc: { en: "List experiences & activities", ar: "اعرض تجارب وأنشطة" } },
-  { key: "whos-who", icon: Star, label: { en: "Who's Who", ar: "شخصية بارزة" }, desc: { en: "Be recognized as a local figure", ar: "كن شخصية محلية معروفة" } },
+
   { key: "trip-organizer", icon: Map, label: { en: "Trip Organizer", ar: "منظم رحلات" }, desc: { en: "Create & lead group trips", ar: "أنشئ وقُد رحلات جماعية" } },
   { key: "product-seller", icon: ShoppingBag, label: { en: "Product Seller", ar: "بائع منتجات" }, desc: { en: "Sell local crafts & goods", ar: "بِع حرفاً ومنتجات محلية" } },
   { key: "organization", icon: Building2, label: { en: "Organization", ar: "منظمة" }, desc: { en: "Recruit volunteers & donors", ar: "اجذب متطوعين ومتبرعين" } },
@@ -245,7 +237,7 @@ const onboardingToUserRole: Record<string, UserRole> = {
   "visitor": "visitor",
   "culture-actor": "culture-actor",
   "service-provider": "service-provider",
-  "whos-who": "whos-who",
+  // whos-who is intentionally absent: it is an invitation-only, admin-created role.
   "trip-organizer": "trip-organizer",
   "product-seller": "product-seller",
   "organization": "organization",
@@ -287,7 +279,7 @@ const SplashPage = () => {
   const roleDashboardPaths: Record<string, string> = {
     "culture-actor": "/dashboard/culture-actor",
     "service-provider": "/dashboard/service-provider",
-    "whos-who": "/dashboard/whos-who",
+    // whos-who is admin-created only (see useUserRole.tsx) — never reached here.
     "organization": "/dashboard/organization",
     "product-seller": "/dashboard/product-seller",
     "trip-organizer": "/dashboard/trip-organizer",

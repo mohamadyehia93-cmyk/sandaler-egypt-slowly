@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Copy, Link2, Loader2, Plus, RefreshCw, UserCheck, UserPlus } from "lucide-react";
+import { Copy, Link2, Loader2, Plus, RefreshCw, Star, UserCheck, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
@@ -58,6 +58,25 @@ const slugify = (input: string) =>
     .replace(/-+/g, "-")
     .slice(0, 48) || "provider";
 
+/**
+ * Role options the admin can pick from. These are the seven public
+ * plain-language statements PLUS `whos-who`, which is invitation-only: it is
+ * absent from public onboarding on purpose and can only be created here.
+ */
+const ADMIN_ROLE_OPTIONS: { key: string; role: string; statement: { en: string; ar: string } }[] = [
+  ...PROVIDER_INTENTS.map((i) => ({ key: i.key as string, role: i.role as string, statement: i.statement })),
+  {
+    key: "whos-who-invite",
+    role: "whos-who",
+    statement: {
+      en: "Who's Who — someone Sandal is recognising (invitation only)",
+      ar: "من يكون من — شخصية تكرّمها سندال (بدعوة فقط)",
+    },
+  },
+];
+
+type OwnerlessEntry = { id: string; name_en: string; name_ar: string | null; city_id: string | null };
+
 const AdminAssistedProviders = () => {
   const { lang } = useI18n();
   const ar = lang === "ar";
@@ -67,7 +86,7 @@ const AdminAssistedProviders = () => {
 
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [intentKey, setIntentKey] = useState(PROVIDER_INTENTS[0].key as string);
+  const [intentKey, setIntentKey] = useState(ADMIN_ROLE_OPTIONS[0].key);
   const [nameAr, setNameAr] = useState("");
   const [nameEn, setNameEn] = useState("");
   const [bio, setBio] = useState("");
@@ -76,6 +95,10 @@ const AdminAssistedProviders = () => {
   const [specialties, setSpecialties] = useState("");
   const [photo, setPhoto] = useState<File[]>([]);
   const [links, setLinks] = useState<Record<string, string>>({});
+  const [adoptOpen, setAdoptOpen] = useState(false);
+  const [adoptSearch, setAdoptSearch] = useState("");
+  const [adopting, setAdopting] = useState<string | null>(null);
+
 
   const { data: rows = [], isLoading } = useQuery({
     queryKey: ["admin-assisted-providers"],
@@ -102,6 +125,34 @@ const AdminAssistedProviders = () => {
     },
   });
 
+  // Seeded Who's Who directory entries with no owner. Sandal already lists
+  // these people; adopting one creates the matching provider row and issues a
+  // claim link so the real person can take ownership.
+  const { data: ownerless = [] } = useQuery({
+    queryKey: ["admin-ownerless-whos-who"],
+    enabled: adoptOpen,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("whos_who")
+        .select("id, name_en, name_ar, city_id")
+        .is("user_id", null)
+        .order("name_en")
+        .limit(500);
+      if (error) throw error;
+      return (data ?? []) as unknown as OwnerlessEntry[];
+    },
+  });
+
+  const adoptResults = useMemo(() => {
+    const q = adoptSearch.trim().toLowerCase();
+    const list = q
+      ? ownerless.filter(
+          (e) => e.name_en.toLowerCase().includes(q) || (e.name_ar || "").includes(adoptSearch.trim()),
+        )
+      : ownerless;
+    return list.slice(0, 20);
+  }, [ownerless, adoptSearch]);
+
   // Only profiles that were created without an owner are relevant here, plus the
   // ones that have since been claimed through a link.
   const managed = useMemo(() => {
@@ -122,9 +173,31 @@ const AdminAssistedProviders = () => {
     setPhoto([]);
   };
 
+  const adopt = async (entry: OwnerlessEntry) => {
+    setAdopting(entry.id);
+    const { data, error } = await supabase.rpc("admin_adopt_whos_who", { _whos_who_id: entry.id });
+    setAdopting(null);
+    if (error || !data) {
+      toast.error(error?.message || (ar ? "تعذّر إنشاء الرابط" : "Could not create the link"));
+      return;
+    }
+    const result = data as unknown as { provider_id: string; token: string };
+    const url = absoluteUrl(`/claim/${result.token}`);
+    setLinks((prev) => ({ ...prev, [result.provider_id]: url }));
+    await queryClient.invalidateQueries({ queryKey: ["admin-assisted-providers"] });
+    await queryClient.invalidateQueries({ queryKey: ["admin-claim-tokens"] });
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success(ar ? "تم نسخ رابط الاستحواذ" : "Claim link copied");
+    } catch {
+      toast.success(ar ? "تم إنشاء الرابط" : "Link created");
+    }
+  };
+
   const create = async () => {
-    const intent = PROVIDER_INTENTS.find((i) => i.key === intentKey)!;
+    const intent = ADMIN_ROLE_OPTIONS.find((i) => i.key === intentKey)!;
     const displayEn = nameEn.trim() || nameAr.trim();
+
     if (!displayEn) {
       toast.error(ar ? "الاسم مطلوب" : "A name is required");
       return;
@@ -222,16 +295,26 @@ const AdminAssistedProviders = () => {
     };
 
     const sat = satellitePayloads[intent.role];
+    let satelliteId: string | null = null;
     if (sat) {
-      const { error: satError } = await (supabase.from(sat.table as never) as never as {
-        insert: (v: Record<string, unknown>) => Promise<{ error: { message: string } | null }>;
-      }).insert(sat.payload);
-      if (satError) {
+      const { data: satRow, error: satError } = await (supabase.from(sat.table as never) as never as {
+        insert: (v: Record<string, unknown>) => {
+          select: (c: string) => {
+            maybeSingle: () => Promise<{ data: { id: string } | null; error: { message: string } | null }>;
+          };
+        };
+      })
+        .insert(sat.payload)
+        .select("id")
+        .maybeSingle();
+      if (satError || !satRow) {
         toast.error(
           ar
-            ? `أُنشئ الملف لكن تعذّر إنشاء صفحة الدليل: ${satError.message}`
-            : `Profile created, but the directory page failed: ${satError.message}`,
+            ? `أُنشئ الملف لكن تعذّر إنشاء صفحة الدليل: ${satError?.message ?? ""}`
+            : `Profile created, but the directory page failed: ${satError?.message ?? ""}`,
         );
+      } else {
+        satelliteId = satRow.id;
       }
     }
 
@@ -240,12 +323,16 @@ const AdminAssistedProviders = () => {
     setOpen(false);
     toast.success(ar ? "تم إنشاء ملف غير مُطالَب به" : "Unclaimed profile created");
     await queryClient.invalidateQueries({ queryKey: ["admin-assisted-providers"] });
-    await generateLink(inserted.id);
+    await generateLink(inserted.id, sat && satelliteId ? { table: sat.table, id: satelliteId } : null);
   };
 
-  const generateLink = async (providerId: string) => {
+  const generateLink = async (
+    providerId: string,
+    satellite?: { table: string; id: string } | null,
+  ) => {
     const { data, error } = await supabase.rpc("admin_create_provider_claim", {
       _provider_id: providerId,
+      ...(satellite ? { _satellite_table: satellite.table, _satellite_id: satellite.id } : {}),
     });
     if (error || !data) {
       toast.error(error?.message || (ar ? "تعذّر إنشاء الرابط" : "Could not create the link"));
@@ -261,6 +348,7 @@ const AdminAssistedProviders = () => {
       toast.success(ar ? "تم إنشاء الرابط" : "Link created");
     }
   };
+
 
   const copy = async (url: string) => {
     try {
@@ -286,7 +374,50 @@ const AdminAssistedProviders = () => {
           <Plus className="w-4 h-4" />
           {open ? (ar ? "إخفاء النموذج" : "Hide form") : ar ? "إنشاء ملف مزوّد" : "Create a provider profile"}
         </Button>
+        <button
+          onClick={() => setAdoptOpen((v) => !v)}
+          className="mt-2 w-full min-h-[44px] rounded-xl border border-border text-xs font-semibold text-foreground flex items-center justify-center gap-2"
+        >
+          <Star className="w-3.5 h-3.5" />
+          {adoptOpen
+            ? ar ? "إخفاء الدليل" : "Hide directory"
+            : ar ? "دعوة شخصية من دليل «من يكون من»" : "Invite an existing Who's Who entry"}
+        </button>
       </div>
+
+      {adoptOpen && (
+        <div className="rounded-xl border border-border bg-background p-4 space-y-3">
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {ar
+              ? "مدخلات الدليل بدون مالك. اختر شخصًا لإنشاء ملف مزوّد مطابق ورابط استحواذ ترسله له."
+              : "Directory entries with no owner. Pick a person to create the matching provider profile and a claim link to send them."}
+          </p>
+          <input
+            value={adoptSearch}
+            onChange={(e) => setAdoptSearch(e.target.value)}
+            placeholder={ar ? "ابحث بالاسم" : "Search by name"}
+            className="w-full min-h-[44px] px-3 rounded-xl border border-border bg-card text-sm"
+          />
+          {adoptResults.map((e) => (
+            <div key={e.id} className="flex items-center gap-2 border-t border-border pt-2">
+              <p className="text-sm text-foreground truncate min-w-0">
+                {ar ? e.name_ar || e.name_en : e.name_en}
+              </p>
+              <button
+                onClick={() => adopt(e)}
+                disabled={adopting === e.id}
+                className="ms-auto shrink-0 min-h-[44px] px-3 rounded-xl border border-border text-xs font-semibold flex items-center gap-2"
+              >
+                {adopting === e.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Link2 className="w-3.5 h-3.5" />}
+                {ar ? "رابط استحواذ" : "Claim link"}
+              </button>
+            </div>
+          ))}
+          {adoptResults.length === 0 && (
+            <p className="text-xs text-muted-foreground">{ar ? "لا نتائج" : "No matches"}</p>
+          )}
+        </div>
+      )}
 
       {open && (
         <div className="rounded-xl border border-border bg-background p-4 space-y-3">
@@ -299,13 +430,14 @@ const AdminAssistedProviders = () => {
               onChange={(e) => setIntentKey(e.target.value)}
               className="w-full min-h-[44px] px-3 rounded-xl border border-border bg-card text-sm"
             >
-              {PROVIDER_INTENTS.map((i) => (
+              {ADMIN_ROLE_OPTIONS.map((i) => (
                 <option key={i.key} value={i.key}>
                   {i.statement[lang]}
                 </option>
               ))}
             </select>
           </div>
+
 
           <PhotoPicker files={photo} onChange={setPhoto} max={1} hint={ar ? "صورة" : "Photo"} />
 
@@ -383,7 +515,7 @@ const AdminAssistedProviders = () => {
                   {ar ? r.name_ar || r.name_en : r.name_en}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {PROVIDER_INTENTS.find((i) => i.role === r.role)?.statement[lang] || r.role}
+                  {ADMIN_ROLE_OPTIONS.find((i) => i.role === r.role)?.statement[lang] || r.role}
                   {r.city_en ? ` · ${r.city_en}` : ""}
                 </p>
               </div>

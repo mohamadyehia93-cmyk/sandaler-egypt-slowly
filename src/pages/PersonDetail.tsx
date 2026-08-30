@@ -278,7 +278,13 @@ const PersonDetail = () => {
             <MessageCircle className="w-4 h-4 text-primary" />
             <h3 className="text-sm font-semibold text-foreground">{lang === "ar" ? "تواصل" : "Contact"}</h3>
           </div>
+          <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+            {lang === "ar"
+              ? "شخص اختارته سندال وأدرجته في الدليل — الإدراج تكريم وليس تسجيلًا. لو ده ملفك، تواصل مع سندال لاستلامه."
+              : "Someone Sandal has recognised and listed — being listed is a recognition, not a signup. If this is you, contact Sandal to claim your profile."}
+          </p>
           <div className="flex gap-2">
+
             <FollowButton targetType="person" targetId={person.id} variant="outline" className="flex-1" />
             {person.user_id ? (
               <button
