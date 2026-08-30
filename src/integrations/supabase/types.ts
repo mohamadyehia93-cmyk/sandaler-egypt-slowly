@@ -2230,6 +2230,8 @@ export type Database = {
           id: string
           provider_id: string
           revoked_at: string | null
+          satellite_id: string | null
+          satellite_table: string | null
           token_hash: string
           updated_at: string
         }
@@ -2242,6 +2244,8 @@ export type Database = {
           id?: string
           provider_id: string
           revoked_at?: string | null
+          satellite_id?: string | null
+          satellite_table?: string | null
           token_hash: string
           updated_at?: string
         }
@@ -2254,6 +2258,8 @@ export type Database = {
           id?: string
           provider_id?: string
           revoked_at?: string | null
+          satellite_id?: string | null
+          satellite_table?: string | null
           token_hash?: string
           updated_at?: string
         }
@@ -3159,10 +3165,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      admin_create_provider_claim: {
-        Args: { _provider_id: string }
-        Returns: string
-      }
+      admin_adopt_whos_who: { Args: { _whos_who_id: string }; Returns: Json }
+      admin_create_provider_claim:
+        | { Args: { _provider_id: string }; Returns: string }
+        | {
+            Args: {
+              _provider_id: string
+              _satellite_id?: string
+              _satellite_table?: string
+            }
+            Returns: string
+          }
       admin_exists: { Args: never; Returns: boolean }
       claim_first_admin: { Args: never; Returns: boolean }
       claim_provider_profile: { Args: { _token: string }; Returns: Json }

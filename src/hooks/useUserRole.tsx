@@ -9,7 +9,14 @@ import { useAuth } from "@/hooks/useAuth";
  * role. Legacy strings are simply not recognised any more: a provider row that
  * still held one would resolve to "visitor" rather than break — the accounts
  * themselves were migrated.
+ *
+ * `whos-who` is INVITATION-ONLY and deliberately absent from public onboarding
+ * (Splash.tsx renders PROVIDER_INTENTS, which has no whos-who statement).
+ * Sandal curates the directory: an admin creates or adopts the profile in
+ * /admin → Assisted signup and hands the person a claim link. Being listed is a
+ * recognition, not a signup — do NOT add it back to the onboarding role cards.
  */
+
 export type LocalRole =
   | "culture-actor"
   | "service-provider"
