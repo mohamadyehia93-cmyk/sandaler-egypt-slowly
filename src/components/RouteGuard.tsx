@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useUserRole } from "@/hooks/useUserRole";
+import DashboardGate from "@/components/DashboardGate";
 
 /** Routes that providers can always access regardless of mode */
 const allowedProviderRoutes = [
