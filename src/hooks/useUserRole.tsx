@@ -142,7 +142,7 @@ export const UserRoleProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <UserRoleContext.Provider
-      value={{ role, isProvider, isVisitorMode, setRole, toggleVisitorMode, enterVisitorMode, exitVisitorMode, dashboardPath }}
+      value={{ role, isProvider, isVisitorMode, roleLoading, setRole, toggleVisitorMode, enterVisitorMode, exitVisitorMode, dashboardPath }}
     >
       {children}
     </UserRoleContext.Provider>
