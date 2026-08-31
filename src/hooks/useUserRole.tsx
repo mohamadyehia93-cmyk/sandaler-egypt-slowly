@@ -31,6 +31,8 @@ interface UserRoleContextType {
   role: UserRole;
   isProvider: boolean;
   isVisitorMode: boolean;
+  /** true until the server-side role lookup for the current user resolves */
+  roleLoading: boolean;
   setRole: (role: UserRole) => void;
   toggleVisitorMode: () => void;
   enterVisitorMode: () => void;
@@ -65,6 +67,7 @@ const VALID_LOCAL_ROLES = Object.keys(roleDashboardPaths) as LocalRole[];
 export const UserRoleProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const [role, setRoleState] = useState<UserRole>("visitor");
+  const [roleLoading, setRoleLoading] = useState(true);
   const [visitorMode, setVisitorMode] = useState(
     () => localStorage.getItem("sandal-visitor-mode") === "true"
   );
@@ -77,8 +80,11 @@ export const UserRoleProvider = ({ children }: { children: ReactNode }) => {
 
     if (!user) {
       setRoleState("visitor");
+      setRoleLoading(false);
       return;
     }
+
+    setRoleLoading(true);
 
     (async () => {
       const { data, error } = await supabase
@@ -95,6 +101,8 @@ export const UserRoleProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setRoleState("visitor");
       }
+      // Always resolves, success or failure — never leaves a gate spinning.
+      setRoleLoading(false);
     })();
 
     return () => {
@@ -134,7 +142,7 @@ export const UserRoleProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <UserRoleContext.Provider
-      value={{ role, isProvider, isVisitorMode, setRole, toggleVisitorMode, enterVisitorMode, exitVisitorMode, dashboardPath }}
+      value={{ role, isProvider, isVisitorMode, roleLoading, setRole, toggleVisitorMode, enterVisitorMode, exitVisitorMode, dashboardPath }}
     >
       {children}
     </UserRoleContext.Provider>

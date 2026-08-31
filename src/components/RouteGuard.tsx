@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useUserRole } from "@/hooks/useUserRole";
+import DashboardGate from "@/components/DashboardGate";
 
 /** Routes that providers can always access regardless of mode */
 const allowedProviderRoutes = [
@@ -13,6 +14,8 @@ const allowedProviderRoutes = [
   "/edit-profile",
   
   "/welcome",
+  // Invitation claim links must open for anyone, including existing providers.
+  "/claim",
   "/dashboard",
   "/admin",
   "/flag-issue",
@@ -51,7 +54,8 @@ const RouteGuard = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isProvider, isVisitorMode, dashboardPath, location.pathname, location.search, navigate]);
 
-  return <>{children}</>;
+  // Every /dashboard/* route is gated here, once, rather than per page.
+  return <DashboardGate>{children}</DashboardGate>;
 };
 
 export default RouteGuard;
