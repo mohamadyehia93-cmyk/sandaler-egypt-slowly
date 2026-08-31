@@ -51,7 +51,8 @@ const RouteGuard = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isProvider, isVisitorMode, dashboardPath, location.pathname, location.search, navigate]);
 
-  return <>{children}</>;
+  // Every /dashboard/* route is gated here, once, rather than per page.
+  return <DashboardGate>{children}</DashboardGate>;
 };
 
 export default RouteGuard;
