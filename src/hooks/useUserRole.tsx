@@ -31,6 +31,8 @@ interface UserRoleContextType {
   role: UserRole;
   isProvider: boolean;
   isVisitorMode: boolean;
+  /** true until the server-side role lookup for the current user resolves */
+  roleLoading: boolean;
   setRole: (role: UserRole) => void;
   toggleVisitorMode: () => void;
   enterVisitorMode: () => void;
