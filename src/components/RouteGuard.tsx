@@ -14,6 +14,8 @@ const allowedProviderRoutes = [
   "/edit-profile",
   
   "/welcome",
+  // Invitation claim links must open for anyone, including existing providers.
+  "/claim",
   "/dashboard",
   "/admin",
   "/flag-issue",
