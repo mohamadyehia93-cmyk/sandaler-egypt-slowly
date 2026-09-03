@@ -80,7 +80,7 @@ const StepPricing = ({ form, set, updateForm }: Props) => {
       <div>
         <label className={labelClass}>
           <ListChecks className="w-3.5 h-3.5 text-muted-foreground" />
-          {lang === "ar" ? "غير مشمول" : "What's Not Included"}
+          {lang === "ar" ? "غير مشمول *" : "What's Not Included *"}
         </label>
         <div className="space-y-2">
           {form.excludes.map((item, i) => (
