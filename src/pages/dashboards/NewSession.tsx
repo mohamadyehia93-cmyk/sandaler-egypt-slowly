@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify } from "@/lib/dashboardForms";
 import { ArrowLeft, FileText, MapPin, Clock, Users, Calendar, Tag } from "lucide-react";
+import BilingualField from "@/components/dashboard/BilingualField";
 import CityPicker from "@/components/dashboard/CityPicker";
 import LocationPicker from "@/components/dashboard/LocationPicker";
 import { getCityCoords } from "@/lib/cityCoords";
