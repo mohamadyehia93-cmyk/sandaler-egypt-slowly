@@ -24,7 +24,7 @@ const StepTitle = ({ form, set }: Props) => {
     <div key="ar">
       <label className={labelClass}>
         <FileText className="w-3.5 h-3.5 text-role-service-provider" />
-        {ar ? "العنوان بالعربية *" : `Title (Arabic)${ar ? " *" : " (optional)"}`}
+        {ar ? "العنوان بالعربية *" : "Title (Arabic) (optional)"}
       </label>
       <input
         className={inputClass}
