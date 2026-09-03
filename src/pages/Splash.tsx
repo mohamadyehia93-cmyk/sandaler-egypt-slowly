@@ -296,12 +296,21 @@ const SplashPage = () => {
   };
 
   const persistPersonalization = async () => {
+    // Visitors now pick regions; everything downstream still reads city ids, so
+    // a region expands to its member cities on save (no schema change).
+    const cityIds = selectedCities.length
+      ? selectedCities
+      : (dbCities || [])
+          .filter((c: any) => selectedRegions.includes(c.region_id))
+          .map((c: any) => c.id);
+
     // localStorage stays for anonymous/offline use; the DB is the source of
     // truth once the visitor is signed in.
     if (selectedInterests.length > 0) localStorage.setItem("sandal-interests", JSON.stringify(selectedInterests));
     if (selectedStyle) localStorage.setItem("sandal-travel-style", selectedStyle);
     if (selectedBudget) localStorage.setItem("sandal-budget", selectedBudget);
-    if (selectedCities.length > 0) localStorage.setItem("sandal-cities", JSON.stringify(selectedCities));
+    if (cityIds.length > 0) localStorage.setItem("sandal-cities", JSON.stringify(cityIds));
+    if (selectedRegions.length > 0) localStorage.setItem("sandal-regions", JSON.stringify(selectedRegions));
     localStorage.setItem("sandal-onboarded", "true");
 
     if (!user) return;
@@ -311,10 +320,11 @@ const SplashPage = () => {
         interests: selectedInterests.length ? selectedInterests : null,
         travel_style: selectedStyle,
         budget: selectedBudget,
-        cities: selectedCities.length ? selectedCities : null,
+        cities: cityIds.length ? cityIds : null,
       })
       .eq("user_id", user.id);
   };
+
 
   /** Flatten the role-specific quiz answers into a specialties list. */
   const roleAnswerKeys = () =>
