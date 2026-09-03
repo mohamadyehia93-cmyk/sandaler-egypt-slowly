@@ -26,3 +26,13 @@ Each itinerary step gets an optional description line under it — in the experi
 - Shape stored per experience step: `{ "step": string, "description": string }`.
 - Files: `src/components/experience-wizard/types.ts` (step shape + default), `src/components/experience-wizard/StepLocation.tsx` (description input, add/remove), `src/pages/dashboards/NewExperience.tsx` (load on edit, include in save payload with the same `otherLang` preservation pattern used by `NewTrip.tsx`), `src/pages/ExperienceDetail.tsx` (render section, hidden when empty), `src/pages/dashboards/NewTrip.tsx` (per-day description bound to the day `description` field, short line bound to `title`).
 - Verification: typecheck + vite build, then a headless Arabic pass at 390px creating an experience with descriptions and confirming they render on the public page in both languages.
+
+## One language mandatory, not both
+
+Currently the experience wizard demands both an English and an Arabic title (both marked `*`), so an Arabic-first host cannot proceed without writing English.
+
+- Only the field in the author's current interface language is required; the other language becomes clearly optional.
+- Labels reflect it: `*` only on the required language, "(optional)" on the other.
+- Validation on the step and on publish checks the author-language field only; description fields follow the same rule.
+- Applies to the experience wizard title and description steps, and any other creation form that hard-requires both languages (the shared bilingual field already treats the second language as optional, so most forms are unaffected — I will sweep the New* forms and align any that require both).
+- Nothing is invented for the empty language: it saves as empty and public pages already fall back to the language that exists.
