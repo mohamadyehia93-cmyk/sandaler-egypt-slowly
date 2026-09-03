@@ -18,6 +18,7 @@ import OAuthConsent from "./pages/OAuthConsent.tsx";
 // Eager — first paint critical
 import Index from "./pages/Index.tsx";
 import Splash from "./pages/Splash.tsx";
+import SwitchRole from "./pages/SwitchRole.tsx";
 import ClaimProfile from "./pages/ClaimProfile.tsx";
 import Login from "./pages/Login.tsx";
 import Signup from "./pages/Signup.tsx";
