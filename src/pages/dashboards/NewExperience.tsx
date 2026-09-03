@@ -66,6 +66,17 @@ const NewExperience = () => {
           return;
         }
         const mins = data.duration_minutes ?? 0;
+        const asArr = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
+        const rawEn = asArr((data as any).itinerary_en);
+        const rawAr = asArr((data as any).itinerary_ar);
+        setOtherItinerary({ en: rawEn, ar: rawAr });
+        // Show the authoring language's stored steps, falling back to the other
+        // language so the host never sees an empty list while data exists.
+        const rawItin = ar ? (rawAr.length ? rawAr : rawEn) : rawEn.length ? rawEn : rawAr;
+        const loadedItinerary = rawItin.map((i) => {
+          const it = (i || {}) as { step?: string; description?: string };
+          return { step: String(it.step ?? ""), description: String(it.description ?? "") };
+        });
         setForm({
           ...defaultFormData,
           title_en: data.title_en ?? "",
