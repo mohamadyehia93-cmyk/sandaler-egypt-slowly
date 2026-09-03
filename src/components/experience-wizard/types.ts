@@ -31,7 +31,7 @@ export interface ExperienceFormData {
   meetingPointName: string;
   meetingPointLat: string;
   meetingPointLng: string;
-  itinerary: { step: string }[];
+  itinerary: { step: string; description?: string }[];
 
 }
 
@@ -68,7 +68,7 @@ export const defaultFormData: ExperienceFormData = {
   meetingPointName: "",
   meetingPointLat: "",
   meetingPointLng: "",
-  itinerary: [{ step: "" }],
+  itinerary: [{ step: "", description: "" }],
 
 };
 

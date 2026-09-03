@@ -100,7 +100,9 @@ const NewEvent = () => {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
       return;
     }
-    if (!form.title_en.trim() || !form.title_ar.trim() || !form.start_date) {
+    // ONE LANGUAGE IS MANDATORY: whichever language the app is currently set to.
+    const requiredTitle = (lang === "ar" ? form.title_ar : form.title_en).trim();
+    if (!requiredTitle || !form.start_date) {
       toast.error(lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields");
       return;
     }
@@ -125,7 +127,7 @@ const NewEvent = () => {
 
       const payload = {
         organizer_id: providerId,
-        title_en: form.title_en.trim(),
+        title_en: form.title_en.trim() || form.title_ar.trim(),
         title_ar: form.title_ar.trim() || null,
         description_en: form.description_en.trim() || null,
         description_ar: form.description_ar.trim() || null,
@@ -164,7 +166,7 @@ const NewEvent = () => {
       } else {
         const { error } = await supabase
           .from("events")
-          .insert({ ...payload, slug: `${slugify(form.title_en)}-${Math.random().toString(36).slice(2, 7)}` });
+          .insert({ ...payload, slug: `${slugify(form.title_en || form.title_ar)}-${Math.random().toString(36).slice(2, 7)}` });
         if (error) throw error;
         toast.success(
           nextStatus === "pending"
@@ -217,11 +219,11 @@ const NewEvent = () => {
 
         <div className="grid grid-cols-1 gap-3">
           <div>
-            <label className={labelClass}><FileText className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "العنوان (إنجليزي) *" : "Title (English) *"}</label>
+            <label className={labelClass}><FileText className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "العنوان (إنجليزي) (اختياري)" : "Title (English) *"}</label>
             <input className={inputClass} value={form.title_en} onChange={(e) => set("title_en", e.target.value)} maxLength={120} />
           </div>
           <div>
-            <label className={labelClass}><FileText className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "العنوان (عربي) *" : "Title (Arabic) *"}</label>
+            <label className={labelClass}><FileText className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "العنوان (عربي) *" : "Title (Arabic) (optional)"}</label>
             <input className={inputClass} dir="rtl" value={form.title_ar} onChange={(e) => set("title_ar", e.target.value)} maxLength={120} />
           </div>
         </div>

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { fetchMyProviderId } from "@/lib/providerRecord";
 import { generateSlotDrafts } from "@/lib/experienceSlots";
 import { themeForCategory, themeOrOther, readableDbError } from "@/lib/listingTaxonomy";
@@ -36,6 +37,8 @@ const NewExperience = () => {
   const [loadState, setLoadState] = useState<"idle" | "loading" | "ok" | "signed-out" | "denied" | "missing">(
     isEdit ? "loading" : "ok"
   );
+  /** The itinerary stored in the language the host is NOT authoring in — kept untouched on save. */
+  const [otherItinerary, setOtherItinerary] = useState<{ en: unknown; ar: unknown }>({ en: [], ar: [] });
 
   // ── Edit mode: load the existing listing and prefill every persisted field ──
   useEffect(() => {
@@ -64,6 +67,17 @@ const NewExperience = () => {
           return;
         }
         const mins = data.duration_minutes ?? 0;
+        const asArr = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
+        const rawEn = asArr(data.itinerary_en);
+        const rawAr = asArr(data.itinerary_ar);
+        setOtherItinerary({ en: rawEn, ar: rawAr });
+        // Show the authoring language's stored steps, falling back to the other
+        // language so the host never sees an empty list while data exists.
+        const rawItin = ar ? (rawAr.length ? rawAr : rawEn) : rawEn.length ? rawEn : rawAr;
+        const loadedItinerary = rawItin.map((i) => {
+          const it = (i || {}) as { step?: string; description?: string };
+          return { step: String(it.step ?? ""), description: String(it.description ?? "") };
+        });
         setForm({
           ...defaultFormData,
           title_en: data.title_en ?? "",
@@ -84,7 +98,7 @@ const NewExperience = () => {
           meetingPointName: data.meeting_point_name ?? "",
           meetingPointLat: data.meeting_point_lat != null ? String(data.meeting_point_lat) : "",
           meetingPointLng: data.meeting_point_lng != null ? String(data.meeting_point_lng) : "",
-
+          itinerary: loadedItinerary.length ? loadedItinerary : [{ step: "", description: "" }],
         });
         setLoadState("ok");
       } catch {
@@ -94,6 +108,8 @@ const NewExperience = () => {
     return () => {
       cancelled = true;
     };
+  // ar intentionally excluded: re-running on a language toggle would overwrite edits.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, editId, user, authLoading]);
 
   const set = useCallback((key: string, value: string) => {
@@ -104,14 +120,23 @@ const NewExperience = () => {
     setForm((p) => ({ ...p, ...updates }));
   }, []);
 
+  // ONE LANGUAGE IS MANDATORY: whichever language the app is set to.
+  const titleRequired = (ar ? form.title_ar : form.title_en).trim();
+  const descriptionRequired = (ar ? form.description_ar : form.description_en).trim();
+  const includesFilled = form.includes.some((i) => i.trim());
+  const excludesFilled = form.excludes.some((i) => i.trim());
+
   const canProceed = (): boolean => {
     switch (step) {
-      case 0: return form.title_en.trim().length > 0 && form.title_ar.trim().length > 0;
-      case 1: return form.description_en.trim().length > 0;
+      case 0: return titleRequired.length > 0;
+      case 1: return descriptionRequired.length > 0;
       // Validate at the category step, not at publish time: only a category that
       // maps to a stored theme the database accepts may advance.
       case 2: return !!themeOrOther(form.category);
-      case 4: return form.price.trim().length > 0 && Number(form.price) >= 0;
+      case 4:
+        return (
+          form.price.trim().length > 0 && Number(form.price) >= 0 && includesFilled && excludesFilled
+        );
       default: return true;
     }
   };
@@ -125,7 +150,7 @@ const NewExperience = () => {
       return;
     }
     const theme = themeOrOther(form.category);
-    if (!form.title_en.trim() || !form.title_ar.trim() || !theme || !form.price.trim()) {
+    if (!titleRequired || !descriptionRequired || !theme || !form.price.trim() || !includesFilled || !excludesFilled) {
       toast.error(
         lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields"
       );
@@ -163,11 +188,21 @@ const NewExperience = () => {
         ? Math.round(parseFloat(form.duration || "0") * 60)
         : Math.round(parseFloat(form.duration || "0") * 24 * 60);
 
+      // Steps with nothing typed at all are dropped; only the authoring
+      // language is written, the other keeps whatever the row already stored.
+      const itinerary = form.itinerary
+        .map((i) => ({ step: i.step.trim(), description: (i.description ?? "").trim() }))
+        .filter((i) => i.step || i.description);
+
+      // title_en is NOT NULL: when the host only wrote Arabic, store that text
+      // rather than an empty string so the listing is never nameless.
       const payload = {
-        title_en: form.title_en.trim(),
+        title_en: form.title_en.trim() || form.title_ar.trim(),
         title_ar: form.title_ar.trim() || null,
-        description_en: form.description_en.trim(),
+        description_en: form.description_en.trim() || form.description_ar.trim(),
         description_ar: form.description_ar.trim() || null,
+        itinerary_en: (ar ? otherItinerary.en : itinerary) as Json,
+        itinerary_ar: (ar ? itinerary : otherItinerary.ar) as Json,
         theme,
         theme_other: theme === "other" ? form.category.trim() : null,
         price: parseInt(form.price) || 0,
