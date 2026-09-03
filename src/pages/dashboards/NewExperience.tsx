@@ -185,11 +185,21 @@ const NewExperience = () => {
         ? Math.round(parseFloat(form.duration || "0") * 60)
         : Math.round(parseFloat(form.duration || "0") * 24 * 60);
 
+      // Steps with nothing typed at all are dropped; only the authoring
+      // language is written, the other keeps whatever the row already stored.
+      const itinerary = form.itinerary
+        .map((i) => ({ step: i.step.trim(), description: (i.description ?? "").trim() }))
+        .filter((i) => i.step || i.description);
+
+      // title_en is NOT NULL: when the host only wrote Arabic, store that text
+      // rather than an empty string so the listing is never nameless.
       const payload = {
-        title_en: form.title_en.trim(),
+        title_en: form.title_en.trim() || form.title_ar.trim(),
         title_ar: form.title_ar.trim() || null,
-        description_en: form.description_en.trim(),
+        description_en: form.description_en.trim() || form.description_ar.trim(),
         description_ar: form.description_ar.trim() || null,
+        itinerary_en: (ar ? otherItinerary.en : itinerary) as any,
+        itinerary_ar: (ar ? itinerary : otherItinerary.ar) as any,
         theme,
         theme_other: theme === "other" ? form.category.trim() : null,
         price: parseInt(form.price) || 0,
