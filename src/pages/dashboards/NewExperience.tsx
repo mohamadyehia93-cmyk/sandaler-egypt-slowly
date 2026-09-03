@@ -147,7 +147,7 @@ const NewExperience = () => {
       return;
     }
     const theme = themeOrOther(form.category);
-    if (!form.title_en.trim() || !form.title_ar.trim() || !theme || !form.price.trim()) {
+    if (!titleRequired || !descriptionRequired || !theme || !form.price.trim() || !includesFilled || !excludesFilled) {
       toast.error(
         lang === "ar" ? "يرجى ملء الحقول المطلوبة" : "Please fill in required fields"
       );
