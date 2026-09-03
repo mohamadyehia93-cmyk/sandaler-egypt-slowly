@@ -19,9 +19,9 @@ const StepLocation = ({ form, set, updateForm }: Props) => {
   const ar = lang === "ar";
 
 
-  const updateStep = (idx: number, value: string) => {
+  const updateStep = (idx: number, key: "step" | "description", value: string) => {
     const arr = [...form.itinerary];
-    arr[idx] = { step: value };
+    arr[idx] = { ...arr[idx], [key]: value };
     updateForm({ itinerary: arr });
   };
 
