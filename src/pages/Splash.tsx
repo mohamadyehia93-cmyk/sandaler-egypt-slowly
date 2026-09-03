@@ -875,33 +875,26 @@ const SplashPage = () => {
           >
             <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
               <button onClick={() => {
-                if (selectedRole === "visitor") {
-                  goTo("role", -1);
+                const questions = roleQuestions[selectedRole!];
+                if (questions && questions.length > 0) {
+                  setRoleQuestionIdx(questions.length - 1);
+                  goTo("roleDetails", -1);
                 } else {
-                  const questions = roleQuestions[selectedRole!];
-                  if (questions && questions.length > 0) {
-                    setRoleQuestionIdx(questions.length - 1);
-                    goTo("roleDetails", -1);
-                  } else {
-                    goTo("localRole", -1);
-                  }
+                  goTo("localRole", -1);
                 }
               }} className="p-1.5 rounded-full hover:bg-secondary">
                 <ArrowLeft className="w-5 h-5 text-foreground" />
               </button>
               <div>
                 <h1 className="text-lg font-bold text-foreground">
-                  {selectedRole === "visitor"
-                    ? (lang === "ar" ? "أي مدن تريد استكشافها؟" : "Cities to Explore")
-                    : (lang === "ar" ? "أين تعمل؟" : "Where Are You Based?")}
+                  {lang === "ar" ? "أين تعمل؟" : "Where Are You Based?"}
                 </h1>
                 <p className="text-xs text-muted-foreground">
-                  {selectedRole === "visitor"
-                    ? (lang === "ar" ? "اختر المدن التي تهمك" : "Pick cities you'd like to visit")
-                    : (lang === "ar" ? "اختر المدن التي تقدم خدماتك فيها" : "Select cities where you operate")}
+                  {lang === "ar" ? "اختر المدن التي تقدم خدماتك فيها" : "Select cities where you operate"}
                 </p>
               </div>
             </header>
+
 
             {/* Region filter chips */}
             <div className="px-4 pt-4 pb-2 flex gap-2 overflow-x-auto no-scrollbar">
