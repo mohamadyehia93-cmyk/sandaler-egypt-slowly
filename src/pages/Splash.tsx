@@ -948,7 +948,7 @@ const SplashPage = () => {
 
             <div className="px-4 py-4 border-t border-border bg-background space-y-2">
               <button
-                onClick={() => goTo(selectedRole === "visitor" ? "interests" : "profile")}
+                onClick={() => goTo("profile")}
                 className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
               >
                 {selectedCities.length > 0
@@ -957,7 +957,7 @@ const SplashPage = () => {
                 }
               </button>
               <button
-                onClick={() => goTo(selectedRole === "visitor" ? "interests" : "profile")}
+                onClick={() => goTo("profile")}
                 className="w-full py-2 text-xs text-muted-foreground font-medium"
               >
                 {lang === "ar" ? "تخطي" : "Skip"}
@@ -1123,7 +1123,7 @@ const SplashPage = () => {
             className="min-h-screen bg-background flex flex-col"
           >
             <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
-              <button onClick={() => goTo(selectedRole === "visitor" ? "budget" : "city", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+              <button onClick={() => goTo("city", -1)} className="p-1.5 rounded-full hover:bg-secondary">
                 <ArrowLeft className="w-5 h-5 text-foreground" />
               </button>
               <div>
