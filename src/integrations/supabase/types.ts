@@ -1098,6 +1098,8 @@ export type Database = {
           id: string
           image: string | null
           images: string[] | null
+          itinerary_ar: Json | null
+          itinerary_en: Json | null
           meeting_point_lat: number | null
           meeting_point_lng: number | null
           meeting_point_name: string | null
@@ -1133,6 +1135,8 @@ export type Database = {
           id?: string
           image?: string | null
           images?: string[] | null
+          itinerary_ar?: Json | null
+          itinerary_en?: Json | null
           meeting_point_lat?: number | null
           meeting_point_lng?: number | null
           meeting_point_name?: string | null
@@ -1168,6 +1172,8 @@ export type Database = {
           id?: string
           image?: string | null
           images?: string[] | null
+          itinerary_ar?: Json | null
+          itinerary_en?: Json | null
           meeting_point_lat?: number | null
           meeting_point_lng?: number | null
           meeting_point_name?: string | null
