@@ -550,6 +550,12 @@ const SplashPage = () => {
     );
   };
 
+  const toggleRegion = (regionId: string) => {
+    setSelectedRegions(prev =>
+      prev.includes(regionId) ? prev.filter(r => r !== regionId) : [...prev, regionId]
+    );
+  };
+
   // Build city list from database
   const regionsList = dbRegions || [];
   const citiesList = dbCities || [];
@@ -557,9 +563,6 @@ const SplashPage = () => {
     ? citiesList.filter(c => c.region_id === selectedRegion)
     : citiesList;
 
-  // Progress indicator for visitor quiz
-  const visitorSteps = ["interests", "travelStyle", "budget"] as const;
-  const currentVisitorStep = visitorSteps.indexOf(step as any);
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
