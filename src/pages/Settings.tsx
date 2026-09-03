@@ -122,8 +122,12 @@ const Settings = () => {
       items: [
         {
           icon: Repeat,
-          label: { en: "Switch role / Become a provider", ar: "تغيير الدور / كن مقدم خدمة" },
-          action: () => navigate("/welcome"),
+          // An existing provider goes to the one-tap switch; someone with no
+          // role still needs the full onboarding.
+          label: isProvider
+            ? { en: "Switch role", ar: "تغيير الدور" }
+            : { en: "Become a provider", ar: "كن مقدم خدمة" },
+          action: () => navigate(isProvider ? "/switch-role" : "/welcome"),
         },
         {
           icon: LogOut,
