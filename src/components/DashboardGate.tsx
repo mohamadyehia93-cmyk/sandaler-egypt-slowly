@@ -91,19 +91,39 @@ const DashboardGate = ({ children }: { children: React.ReactNode }) => {
               : "This area is for Sandal providers. Your account is a visitor account."}
         </p>
         <div className="space-y-2">
+          {/* An existing provider can resolve this in one tap — no re-onboarding.
+              whos-who is invitation-only and never offered as a switch target. */}
+          {isProvider && required !== "any-provider" && required !== "whos-who" && (
+            <Link
+              to={`/switch-role?to=${required}`}
+              className="block w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
+            >
+              {lang === "ar" ? "غيّر دوري إلى هذا" : "Switch my role to this"}
+            </Link>
+          )}
           {dashboardPath && (
             <Link
               to={dashboardPath}
-              className="block w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
+              className={`block w-full py-3 rounded-xl font-semibold text-sm ${
+                isProvider && required !== "any-provider" && required !== "whos-who"
+                  ? "bg-secondary text-secondary-foreground"
+                  : "bg-primary text-primary-foreground"
+              }`}
             >
               {lang === "ar" ? "اذهب إلى لوحتي" : "Go to my dashboard"}
             </Link>
           )}
           <Link
-            to="/welcome"
+            to={isProvider ? "/switch-role" : "/welcome"}
             className="block w-full py-3 rounded-xl bg-secondary text-secondary-foreground font-semibold text-sm"
           >
-            {lang === "ar" ? "سجّل كمقدم خدمة" : "Become a provider"}
+            {isProvider
+              ? lang === "ar"
+                ? "اختر دورًا آخر"
+                : "Choose another role"
+              : lang === "ar"
+                ? "سجّل كمقدم خدمة"
+                : "Become a provider"}
           </Link>
           <Link to="/" className="block w-full py-3 text-sm text-muted-foreground">
             {lang === "ar" ? "العودة للرئيسية" : "Back to home"}
