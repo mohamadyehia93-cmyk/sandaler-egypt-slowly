@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Quote, Feather, BookOpen, Share2, Instagram, Twitter, MessageCircle, Headphones, Clock, Briefcase } from "lucide-react";
 import ShareButton from "@/components/ShareButton";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import ProviderStatusView from "@/components/ProviderStatusView";
@@ -42,6 +43,7 @@ const CultureActorDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang } = useI18n();
+  const { user: authUser } = useAuth();
 
   const [actor, setActor] = useState<Actor | null>(null);
   const [region, setRegion] = useState<Region | null>(null);
@@ -151,6 +153,7 @@ const CultureActorDetail = () => {
 
         <div className="flex gap-2 mt-4">
           <FollowButton targetType="culture_actor" targetId={actor.id} variant="primary" className="flex-1" />
+          {actor.user_id !== authUser?.id && (
           <button
             onClick={() => navigate(`/inbox?personId=${actor.id}&kind=culture_actor`)}
             className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-card border border-border text-foreground hover:bg-secondary transition-colors"
@@ -158,6 +161,7 @@ const CultureActorDetail = () => {
             <MessageCircle className="w-4 h-4 text-primary" />
             {lang === "ar" ? "رسالة" : "Message"}
           </button>
+          )}
         </div>
 
         <button

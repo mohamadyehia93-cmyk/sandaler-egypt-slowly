@@ -67,12 +67,13 @@ export const useConversations = () => {
   const findOrCreateConversation = useCallback(async (
     targetId: string,
     kind: MessagingTargetKind = "auto",
-  ): Promise<{ conversationId: string | null; reason?: "unclaimed" | "unresolved" }> => {
+  ): Promise<{ conversationId: string | null; reason?: "unclaimed" | "unresolved" | "self" }> => {
     if (!user) return { conversationId: null, reason: "unresolved" };
 
     const { userId: otherUserId, unclaimed } = await resolveUserIdForMessaging(targetId, kind);
     if (!otherUserId) return { conversationId: null, reason: unclaimed ? "unclaimed" : "unresolved" };
-    if (otherUserId === user.id) return { conversationId: null, reason: "unresolved" };
+    // Own profile / own listing: messaging yourself is not a failure, just not possible.
+    if (otherUserId === user.id) return { conversationId: null, reason: "self" };
 
     // Check existing
     const { data: existing } = await supabase

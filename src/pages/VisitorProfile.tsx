@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, MessageCircle, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import FollowButton from "@/components/FollowButton";
@@ -17,6 +18,7 @@ import NotFound from "@/components/NotFound";
 const VisitorProfile = () => {
   const { id } = useParams();
   const { lang } = useI18n();
+  const { user: authUser } = useAuth();
   const navigate = useNavigate();
 
   const { data: profile, isLoading } = useQuery({
@@ -79,14 +81,16 @@ const VisitorProfile = () => {
             variant="primary"
             className="flex-1 !py-0 !h-9 !rounded-md"
           />
-          <Button
-            variant="outline"
-            className="h-9 text-sm font-semibold gap-1.5"
-            onClick={() => navigate(`/inbox?personId=${profile.user_id}&kind=user`)}
-          >
-            <MessageCircle className="w-4 h-4" />
-            {lang === "ar" ? "رسالة" : "Message"}
-          </Button>
+          {profile.user_id !== authUser?.id && (
+            <Button
+              variant="outline"
+              className="h-9 text-sm font-semibold gap-1.5"
+              onClick={() => navigate(`/inbox?personId=${profile.user_id}&kind=user`)}
+            >
+              <MessageCircle className="w-4 h-4" />
+              {lang === "ar" ? "رسالة" : "Message"}
+            </Button>
+          )}
         </div>
       </div>
 

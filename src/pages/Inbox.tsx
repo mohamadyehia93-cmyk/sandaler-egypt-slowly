@@ -30,6 +30,10 @@ const Inbox = () => {
           setNotice(lang === "ar"
             ? "لم ينضم هذا المضيف إلى ساندال بعد، لذا لا يمكن إرسال رسالة إليه."
             : "This host hasn't joined Sandal yet, so they can't receive messages.");
+        else if (reason === "self")
+          setNotice(lang === "ar"
+            ? "هذا حسابك أنت — لا يمكنك مراسلة نفسك."
+            : "That's your own account — you can't message yourself.");
         else
           setNotice(lang === "ar"
             ? "لا يمكن بدء محادثة مع هذا الحساب."
