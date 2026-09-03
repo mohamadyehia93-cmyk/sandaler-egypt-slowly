@@ -973,10 +973,10 @@ const SplashPage = () => {
           </motion.div>
         )}
 
-        {/* STEP 5a: Interests (Visitor Quiz 1/3) */}
-        {step === "interests" && (
+        {/* VISITOR STEP: one screen — regions + interests + optional style/budget */}
+        {step === "discover" && (
           <motion.div
-            key="interests"
+            key="discover"
             custom={direction}
             variants={slideVariants}
             initial="enter"
@@ -986,227 +986,136 @@ const SplashPage = () => {
             className="min-h-screen bg-background flex flex-col"
           >
             <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
-              <button onClick={() => goTo("city", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+              <button onClick={() => goTo("role", -1)} className="p-1.5 rounded-full hover:bg-secondary">
                 <ArrowLeft className="w-5 h-5 text-foreground" />
               </button>
               <div className="flex-1">
                 <h1 className="text-lg font-bold text-foreground">
-                  {lang === "ar" ? "ما يهمك" : "What Interests You?"}
+                  {lang === "ar" ? "ما الذي يهمك؟" : "What are you into?"}
                 </h1>
                 <p className="text-xs text-muted-foreground">
-                  {lang === "ar" ? "اختر ٣ أو أكثر لتخصيص تجربتك" : "Pick 3+ to personalize your feed"}
+                  {lang === "ar" ? "كل شيء اختياري — يمكنك تعديله لاحقاً" : "All optional — you can change it later"}
                 </p>
               </div>
-              <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">1/3</span>
             </header>
 
-            {/* Progress bar */}
-            <div className="h-1 bg-secondary">
-              <div className="h-1 bg-primary transition-all" style={{ width: "33%" }} />
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
+              {/* Regions instead of a 30-city grid */}
+              <section>
+                <h2 className="text-sm font-semibold text-foreground mb-2">
+                  {lang === "ar" ? "أي مناطق مصر؟" : "Which parts of Egypt?"}
+                </h2>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {regionsList.map((r: any) => {
+                    const isSelected = selectedRegions.includes(r.id);
+                    return (
+                      <button
+                        key={r.id}
+                        onClick={() => toggleRegion(r.id)}
+                        className={`relative flex items-center gap-2 p-3 rounded-xl border-2 transition-all text-start ${
+                          isSelected ? "border-primary bg-primary/5" : "border-border bg-card"
+                        }`}
+                      >
+                        <MapPin className={`w-4 h-4 shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                        <span className="text-sm font-medium text-foreground truncate">
+                          {lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}
+                        </span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-primary absolute top-2 end-2" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-sm font-semibold text-foreground mb-2">
+                  {lang === "ar" ? "اهتماماتك" : "Your interests"}
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {interests.map(({ key, icon: Icon, label }) => {
+                    const isSelected = selectedInterests.includes(key);
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => toggleInterest(key)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-medium transition-colors ${
+                          isSelected
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-card text-foreground"
+                        }`}
+                      >
+                        <Icon className="w-3.5 h-3.5" />
+                        {label[lang]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-sm font-semibold text-foreground mb-2">
+                  {lang === "ar" ? "أسلوب سفرك" : "Travel style"}
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {travelStyles.map(({ key, icon: Icon, label }) => {
+                    const isSelected = selectedStyle === key;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => setSelectedStyle(isSelected ? null : key)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-medium transition-colors ${
+                          isSelected
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-card text-foreground"
+                        }`}
+                      >
+                        <Icon className="w-3.5 h-3.5" />
+                        {label[lang]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-sm font-semibold text-foreground mb-2">
+                  {lang === "ar" ? "ميزانيتك اليومية" : "Daily budget"}
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {budgetOptions.map(({ key, icon: Icon, label }) => {
+                    const isSelected = selectedBudget === key;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => setSelectedBudget(isSelected ? null : key)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full border text-xs font-medium transition-colors ${
+                          isSelected
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-card text-foreground"
+                        }`}
+                      >
+                        <Icon className="w-3.5 h-3.5" />
+                        {label[lang]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-4 py-4">
-              <div className="grid grid-cols-2 gap-3">
-                {interests.map(({ key, icon: Icon, label }) => {
-                  const isSelected = selectedInterests.includes(key);
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => toggleInterest(key)}
-                      className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-                        isSelected
-                          ? "border-primary bg-primary/5 shadow-card"
-                          : "border-border bg-card hover:border-primary/30"
-                      }`}
-                    >
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        isSelected ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
-                      }`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <span className="text-xs font-semibold text-foreground text-center">{label[lang]}</span>
-                      {isSelected && <Check className="w-4 h-4 text-primary" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="px-4 py-4 border-t border-border bg-background space-y-2">
+            {/* One primary action: straight to the feed, no profile step. */}
+            <div className="px-4 py-4 border-t border-border bg-background">
               <button
-                onClick={() => goTo("travelStyle")}
-                disabled={selectedInterests.length < 3}
-                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed"
+                onClick={handleFinish}
+                disabled={loading}
+                className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-50"
               >
-                {lang === "ar" ? "التالي" : "Continue"} ({selectedInterests.length}/3+)
-              </button>
-              <button
-                onClick={() => goTo("travelStyle")}
-                className="w-full py-2 text-xs text-muted-foreground font-medium"
-              >
-                {lang === "ar" ? "تخطي" : "Skip"}
+                {lang === "ar" ? "ابدأ الاستكشاف" : "Start exploring"}
               </button>
             </div>
           </motion.div>
         )}
 
-        {/* STEP 5b: Travel Style (Visitor Quiz 2/3) */}
-        {step === "travelStyle" && (
-          <motion.div
-            key="travelStyle"
-            custom={direction}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.3 }}
-            className="min-h-screen bg-background flex flex-col"
-          >
-            <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
-              <button onClick={() => goTo("interests", -1)} className="p-1.5 rounded-full hover:bg-secondary">
-                <ArrowLeft className="w-5 h-5 text-foreground" />
-              </button>
-              <div className="flex-1">
-                <h1 className="text-lg font-bold text-foreground">
-                  {lang === "ar" ? "أسلوب سفرك" : "Your Travel Style"}
-                </h1>
-                <p className="text-xs text-muted-foreground">
-                  {lang === "ar" ? "كيف تحب أن تسافر؟" : "How do you like to travel?"}
-                </p>
-              </div>
-              <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">2/3</span>
-            </header>
-
-            <div className="h-1 bg-secondary">
-              <div className="h-1 bg-primary transition-all" style={{ width: "66%" }} />
-            </div>
-
-            <div className="flex-1 overflow-y-auto px-4 py-6">
-              <div className="space-y-3">
-                {travelStyles.map(({ key, icon: Icon, label, desc }) => {
-                  const isSelected = selectedStyle === key;
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => setSelectedStyle(key)}
-                      className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-start ${
-                        isSelected
-                          ? "border-primary bg-primary/5 shadow-card"
-                          : "border-border bg-card hover:border-primary/30"
-                      }`}
-                    >
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
-                        isSelected ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
-                      }`}>
-                        <Icon className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-bold text-foreground">{label[lang]}</p>
-                        <p className="text-xs text-muted-foreground">{desc[lang]}</p>
-                      </div>
-                      {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="px-4 py-4 border-t border-border bg-background space-y-2">
-              <button
-                onClick={() => goTo("budget")}
-                disabled={!selectedStyle}
-                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {lang === "ar" ? "التالي" : "Continue"}
-              </button>
-              <button
-                onClick={() => goTo("budget")}
-                className="w-full py-2 text-xs text-muted-foreground font-medium"
-              >
-                {lang === "ar" ? "تخطي" : "Skip"}
-              </button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* STEP 5c: Budget (Visitor Quiz 3/3) */}
-        {step === "budget" && (
-          <motion.div
-            key="budget"
-            custom={direction}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.3 }}
-            className="min-h-screen bg-background flex flex-col"
-          >
-            <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
-              <button onClick={() => goTo("travelStyle", -1)} className="p-1.5 rounded-full hover:bg-secondary">
-                <ArrowLeft className="w-5 h-5 text-foreground" />
-              </button>
-              <div className="flex-1">
-                <h1 className="text-lg font-bold text-foreground">
-                  {lang === "ar" ? "ميزانيتك" : "Your Budget"}
-                </h1>
-                <p className="text-xs text-muted-foreground">
-                  {lang === "ar" ? "كم تخطط لإنفاقه يومياً؟" : "How much do you plan to spend daily?"}
-                </p>
-              </div>
-              <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">3/3</span>
-            </header>
-
-            <div className="h-1 bg-secondary">
-              <div className="h-1 bg-primary transition-all" style={{ width: "100%" }} />
-            </div>
-
-            <div className="flex-1 overflow-y-auto px-4 py-6">
-              <div className="space-y-3">
-                {budgetOptions.map(({ key, icon: Icon, label, desc }) => {
-                  const isSelected = selectedBudget === key;
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => setSelectedBudget(key)}
-                      className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-start ${
-                        isSelected
-                          ? "border-primary bg-primary/5 shadow-card"
-                          : "border-border bg-card hover:border-primary/30"
-                      }`}
-                    >
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
-                        isSelected ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"
-                      }`}>
-                        <Icon className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-bold text-foreground">{label[lang]}</p>
-                        <p className="text-xs text-muted-foreground">{desc[lang]}</p>
-                      </div>
-                      {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="px-4 py-4 border-t border-border bg-background space-y-2">
-              <button
-                onClick={() => goTo("profile")}
-                disabled={!selectedBudget}
-                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {lang === "ar" ? "التالي" : "Continue"}
-              </button>
-              <button
-                onClick={() => goTo("profile")}
-                className="w-full py-2 text-xs text-muted-foreground font-medium"
-              >
-                {lang === "ar" ? "تخطي" : "Skip"}
-              </button>
-            </div>
-          </motion.div>
-        )}
 
         {/* STEP 6: Profile Setup */}
         {step === "profile" && (
