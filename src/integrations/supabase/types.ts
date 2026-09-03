@@ -912,8 +912,10 @@ export type Database = {
           id: string
           image: string | null
           is_free: boolean
+          latitude: number | null
           location_ar: string | null
           location_en: string | null
+          longitude: number | null
           organizer_id: string | null
           price: number | null
           region_id: string | null
@@ -942,8 +944,10 @@ export type Database = {
           id?: string
           image?: string | null
           is_free?: boolean
+          latitude?: number | null
           location_ar?: string | null
           location_en?: string | null
+          longitude?: number | null
           organizer_id?: string | null
           price?: number | null
           region_id?: string | null
@@ -972,8 +976,10 @@ export type Database = {
           id?: string
           image?: string | null
           is_free?: boolean
+          latitude?: number | null
           location_ar?: string | null
           location_en?: string | null
+          longitude?: number | null
           organizer_id?: string | null
           price?: number | null
           region_id?: string | null
@@ -1375,8 +1381,10 @@ export type Database = {
           description_en: string | null
           id: string
           image: string | null
+          latitude: number | null
           location_ar: string | null
           location_en: string | null
+          longitude: number | null
           meetup_date: string | null
           meetup_time: string | null
           organizer_id: string | null
@@ -1397,8 +1405,10 @@ export type Database = {
           description_en?: string | null
           id?: string
           image?: string | null
+          latitude?: number | null
           location_ar?: string | null
           location_en?: string | null
+          longitude?: number | null
           meetup_date?: string | null
           meetup_time?: string | null
           organizer_id?: string | null
@@ -1419,8 +1429,10 @@ export type Database = {
           description_en?: string | null
           id?: string
           image?: string | null
+          latitude?: number | null
           location_ar?: string | null
           location_en?: string | null
+          longitude?: number | null
           meetup_date?: string | null
           meetup_time?: string | null
           organizer_id?: string | null
