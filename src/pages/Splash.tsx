@@ -32,9 +32,15 @@ import {
   Sparkles, Zap, Clock, DollarSign, Crown, Coins, Star, Globe, Mountain
 } from "lucide-react";
 
+/**
+ * Visitor branch is deliberately short: splash (with language) → role → discover
+ * (regions + interests + style + budget on ONE screen) → the feed. The provider
+ * branch keeps its longer path (localRole → roleDetails → city → profile).
+ */
 type OnboardingStep =
-  | "splash" | "language" | "role" | "localRole" | "roleDetails"
-  | "city" | "interests" | "travelStyle" | "budget" | "profile";
+  | "splash" | "role" | "localRole" | "roleDetails"
+  | "city" | "discover" | "profile";
+
 
 type RoleQuestion = {
   title: { en: string; ar: string };
