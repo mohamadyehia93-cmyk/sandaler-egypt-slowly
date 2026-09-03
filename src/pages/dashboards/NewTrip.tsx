@@ -9,6 +9,9 @@ import { fetchMyProviderId } from "@/lib/providerRecord";
 import { tripTypeForLabel, readableDbError } from "@/lib/listingTaxonomy";
 import PhotoPicker from "@/components/dashboard/PhotoPicker";
 import CityPicker from "@/components/dashboard/CityPicker";
+import CityNameSelect from "@/components/dashboard/CityNameSelect";
+import LocationPicker from "@/components/dashboard/LocationPicker";
+import { getCityCoords } from "@/lib/cityCoords";
 import BilingualField from "@/components/dashboard/BilingualField";
 import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
@@ -64,6 +67,8 @@ const NewTrip = () => {
     regionId: "",
     startLocation: "",
     destinations: [""],
+    lat: "",
+    lng: "",
     itinerary: [{ day: "1", description: "" }],
     includes: [""],
     departureDate: "",
@@ -110,6 +115,8 @@ const NewTrip = () => {
         itinerary: itin.length ? itin.map((i, idx) => ({ day: String(idx + 1), description: String((i as { description?: string })?.description || "") })) : [{ day: "1", description: "" }],
         includes: inc.length ? inc.map((i) => String(i)) : [""],
         departureDate: data.date || "",
+        lat: data.latitude != null ? String(data.latitude) : "",
+        lng: data.longitude != null ? String(data.longitude) : "",
       });
       setMeta(((data as any).translation_meta as TranslationMeta) || {});
       setExistingImages(Array.isArray(data.images) ? (data.images as string[]) : data.image ? [data.image] : []);
@@ -187,6 +194,8 @@ const NewTrip = () => {
         city_id: form.cityId || null,
         region_id: form.regionId || null,
         date: form.departureDate || null,
+        latitude: form.lat ? Number(form.lat) : null,
+        longitude: form.lng ? Number(form.lng) : null,
         // Write ONLY the authoring language; the other language keeps whatever
         // the row already stored (see otherLang guard above).
         route_en: authorLang === "en" ? route || null : otherLang.route_en,
@@ -316,9 +325,23 @@ const NewTrip = () => {
           labelClass={labelClass}
         />
 
+        <CityNameSelect
+          value={form.startLocation}
+          onChange={(cityName) => set("startLocation", cityName)}
+          label={lang === "ar" ? "مدينة الانطلاق" : "Start city"}
+          iconClass="w-3.5 h-3.5 text-role-trip-organizer"
+          className={inputClass}
+          labelClass={labelClass}
+        />
+
         <div>
-          <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-trip-organizer" />{lang === "ar" ? "نقطة الانطلاق" : "Start Location"}</label>
-          <input className={inputClass} placeholder={lang === "ar" ? "مثال: القاهرة" : "e.g. Cairo"} value={form.startLocation} onChange={(e) => set("startLocation", e.target.value)} maxLength={100} />
+          <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-trip-organizer" />{lang === "ar" ? "نقطة اللقاء على الخريطة" : "Departure point on the map"}</label>
+          <LocationPicker
+            lat={form.lat}
+            lng={form.lng}
+            fallbackCenter={getCityCoords(form.cityId)}
+            onChange={(la, lo) => setForm((p) => ({ ...p, lat: la.toFixed(6), lng: lo.toFixed(6) }))}
+          />
         </div>
 
         <div>
@@ -326,7 +349,7 @@ const NewTrip = () => {
           <div className="space-y-2">
             {form.destinations.map((d, i) => (
               <div key={i} className="flex gap-2">
-                <input className={`${inputClass} flex-1`} placeholder={lang === "ar" ? "مدينة أو معلم..." : "City or landmark..."} value={d} onChange={(e) => updateDest(i, e.target.value)} maxLength={80} />
+                <div className="flex-1"><CityNameSelect value={d} onChange={(cityName) => updateDest(i, cityName)} className={inputClass} /></div>
                 {form.destinations.length > 1 && <button onClick={() => removeDest(i)} className="p-2 text-destructive"><Trash2 className="w-4 h-4" /></button>}
               </div>
             ))}

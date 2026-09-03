@@ -11,6 +11,7 @@ import type { Lang, TranslationMeta } from "@/lib/translation";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import CategoryChips from "@/components/CategoryChips";
+import CityPicker from "@/components/dashboard/CityPicker";
 
 const categories = [
   { en: "Heritage & History", ar: "تراث وتاريخ" },
@@ -41,7 +42,8 @@ const NewArticle = () => {
     bodyEn: "",
     bodyAr: "",
     category: "",
-    location: "",
+    cityId: "",
+    regionId: "",
     tags: [""],
   });
 
@@ -60,7 +62,8 @@ const NewArticle = () => {
         bodyEn: data.body_en || "",
         bodyAr: data.body_ar || "",
         category: data.category || "",
-        location: "",
+        cityId: data.city_id || "",
+        regionId: data.region_id || "",
         tags: Array.isArray(data.tags) && data.tags.length ? (data.tags as string[]) : [""],
       });
       setExistingImages(Array.isArray(data.images) ? (data.images as string[]) : data.image ? [data.image] : []);
@@ -109,6 +112,8 @@ const NewArticle = () => {
         excerpt_ar: form.bodyAr.trim() ? form.bodyAr.trim().slice(0, 160) : null,
         translation_meta: meta as any,
         category: form.category,
+        city_id: form.cityId || null,
+        region_id: form.regionId || null,
         tags,
         image: images[0] || null,
         images,
@@ -195,11 +200,18 @@ const NewArticle = () => {
           />
         </div>
 
-        {/* Location */}
-        <div>
-          <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "الموقع" : "Location"}</label>
-          <input className={inputClass} placeholder={lang === "ar" ? "مثال: رشيد، البحيرة" : "e.g. Rosetta, Beheira"} value={form.location} onChange={(e) => set("location", e.target.value)} maxLength={100} />
-        </div>
+        {/* Location — real city taxonomy, never free text */}
+        <CityPicker
+          cityId={form.cityId}
+          onChange={(cityId, regionId) => setForm((p) => ({ ...p, cityId, regionId }))}
+          labelEn="City this article is about"
+          labelAr="المدينة التي يتحدث عنها المقال"
+          hintEn="The article then appears on that city's and its region's pages."
+          hintAr="سيظهر المقال بعدها في صفحة تلك المدينة ومنطقتها."
+          iconClass="w-3.5 h-3.5 text-role-culture-actor"
+          inputClass={inputClass}
+          labelClass={labelClass}
+        />
 
         {/* Tags */}
         <div>
