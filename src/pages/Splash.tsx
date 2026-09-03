@@ -247,7 +247,7 @@ const SplashPage = () => {
   const { t, lang, setLang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { refreshRole } = useUserRole();
+  const { refreshRole, isProvider } = useUserRole();
   const { data: dbRegions } = useRegions();
   const { data: dbCities } = useCities();
 
