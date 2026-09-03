@@ -1100,7 +1100,7 @@ const SplashPage = () => {
             <div className="px-4 py-4 border-t border-border bg-background">
               <button
                 onClick={handleFinish}
-                disabled={loading}
+                disabled={submitting}
                 className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated disabled:opacity-50"
               >
                 {lang === "ar" ? "ابدأ الاستكشاف" : "Start exploring"}
