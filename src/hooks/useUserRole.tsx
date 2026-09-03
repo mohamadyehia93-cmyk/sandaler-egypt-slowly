@@ -33,6 +33,8 @@ interface UserRoleContextType {
   isVisitorMode: boolean;
   /** true until the server-side role lookup for the current user resolves */
   roleLoading: boolean;
+  /** Re-read the verified provider role after onboarding or a role switch. */
+  refreshRole: () => Promise<UserRole>;
   setRole: (role: UserRole) => void;
   toggleVisitorMode: () => void;
   enterVisitorMode: () => void;
@@ -75,40 +77,33 @@ export const UserRoleProvider = ({ children }: { children: ReactNode }) => {
   // Source of truth for the user's role is the server (providers table),
   // verified against the authenticated user id. localStorage is never trusted
   // as an authorization gate — it only holds the visitor-mode UI preference.
-  useEffect(() => {
-    let cancelled = false;
-
+  const refreshRole = useCallback(async (): Promise<UserRole> => {
     if (!user) {
       setRoleState("visitor");
       setRoleLoading(false);
-      return;
+      return "visitor";
     }
 
     setRoleLoading(true);
+    const { data, error } = await supabase
+      .from("providers")
+      .select("role")
+      .eq("user_id", user.id)
+      .maybeSingle();
 
-    (async () => {
-      const { data, error } = await supabase
-        .from("providers")
-        .select("role")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (cancelled) return;
-
-      const dbRole = data?.role as LocalRole | undefined;
-      if (!error && dbRole && VALID_LOCAL_ROLES.includes(dbRole)) {
-        setRoleState(dbRole);
-      } else {
-        setRoleState("visitor");
-      }
-      // Always resolves, success or failure — never leaves a gate spinning.
-      setRoleLoading(false);
-    })();
-
-    return () => {
-      cancelled = true;
-    };
+    const dbRole = data?.role as LocalRole | undefined;
+    const nextRole: UserRole = !error && dbRole && VALID_LOCAL_ROLES.includes(dbRole)
+      ? dbRole
+      : "visitor";
+    setRoleState(nextRole);
+    // Always resolves, success or failure — never leaves a gate spinning.
+    setRoleLoading(false);
+    return nextRole;
   }, [user]);
+
+  useEffect(() => {
+    void refreshRole();
+  }, [refreshRole]);
 
   const isProvider = role !== "visitor";
   const isVisitorMode = isProvider && visitorMode;
@@ -142,7 +137,7 @@ export const UserRoleProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <UserRoleContext.Provider
-      value={{ role, isProvider, isVisitorMode, roleLoading, setRole, toggleVisitorMode, enterVisitorMode, exitVisitorMode, dashboardPath }}
+      value={{ role, isProvider, isVisitorMode, roleLoading, refreshRole, setRole, toggleVisitorMode, enterVisitorMode, exitVisitorMode, dashboardPath }}
     >
       {children}
     </UserRoleContext.Provider>

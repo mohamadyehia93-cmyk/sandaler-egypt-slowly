@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useI18n } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { roleLabels, type UserRole, type LocalRole } from "@/hooks/useUserRole";
+import { roleLabels, useUserRole, type UserRole, type LocalRole } from "@/hooks/useUserRole";
 import { useRegions, useCities } from "@/hooks/useListings";
 import { useAuth } from "@/hooks/useAuth";
 import { becomeProvider, providerErrorMessage } from "@/lib/becomeProvider";
@@ -247,6 +247,7 @@ const SplashPage = () => {
   const { t, lang, setLang } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { refreshRole } = useUserRole();
   const { data: dbRegions } = useRegions();
   const { data: dbCities } = useCities();
 
@@ -419,6 +420,7 @@ const SplashPage = () => {
     const status = await completeProvider(nextRole, true, true);
     if (status !== "ok") return;
     await persistPersonalization();
+    await refreshRole();
     const landing = getProviderIntent(selectedIntent)?.landing;
     navigate(landing || roleDashboardPaths[nextRole] || "/");
   };
@@ -507,6 +509,7 @@ const SplashPage = () => {
     if (status !== "ok") return;
 
     await persistPersonalization();
+    await refreshRole();
     const landing = getProviderIntent(selectedIntent)?.landing;
     navigate(landing || roleDashboardPaths[mappedRole] || "/");
   };
