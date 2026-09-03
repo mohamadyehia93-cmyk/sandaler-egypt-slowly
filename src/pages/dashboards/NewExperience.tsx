@@ -36,6 +36,8 @@ const NewExperience = () => {
   const [loadState, setLoadState] = useState<"idle" | "loading" | "ok" | "signed-out" | "denied" | "missing">(
     isEdit ? "loading" : "ok"
   );
+  /** The itinerary stored in the language the host is NOT authoring in — kept untouched on save. */
+  const [otherItinerary, setOtherItinerary] = useState<{ en: unknown; ar: unknown }>({ en: [], ar: [] });
 
   // ── Edit mode: load the existing listing and prefill every persisted field ──
   useEffect(() => {
