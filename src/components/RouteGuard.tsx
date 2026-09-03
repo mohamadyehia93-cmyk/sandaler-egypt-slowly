@@ -14,6 +14,8 @@ const allowedProviderRoutes = [
   "/edit-profile",
   
   "/welcome",
+  // One-tap role switch for an existing provider.
+  "/switch-role",
   // Invitation claim links must open for anyone, including existing providers.
   "/claim",
   "/dashboard",
