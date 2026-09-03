@@ -9,6 +9,9 @@ import { useCities, useRegions } from "@/hooks/useListings";
 import { ArrowLeft, Upload, FileText, Tag, MapPin, Calendar, Clock, DollarSign, Ticket, Users } from "lucide-react";
 import { toast } from "sonner";
 import CategoryChips from "@/components/CategoryChips";
+import CityPicker from "@/components/dashboard/CityPicker";
+import LocationPicker from "@/components/dashboard/LocationPicker";
+import { getCityCoords } from "@/lib/cityCoords";
 import { eventStatusClasses, eventStatusLabel } from "@/lib/eventSort";
 
 const CATEGORIES = ["festival", "exhibition", "concert", "workshop", "performance", "market"];
@@ -45,6 +48,8 @@ const NewEvent = () => {
     venue_en: "",
     venue_ar: "",
     capacity: "",
+    latitude: "",
+    longitude: "",
     is_free: true,
     price: "",
     ticket_url: "",
@@ -72,6 +77,8 @@ const NewEvent = () => {
           venue_en: data.venue_en || "",
           venue_ar: data.venue_ar || "",
           capacity: data.capacity != null ? String(data.capacity) : "",
+          latitude: (data as any).latitude != null ? String((data as any).latitude) : "",
+          longitude: (data as any).longitude != null ? String((data as any).longitude) : "",
           is_free: data.is_free ?? true,
           price: data.price != null ? String(data.price) : "",
           ticket_url: data.ticket_url || "",
@@ -131,6 +138,8 @@ const NewEvent = () => {
         venue_en: form.venue_en.trim() || null,
         venue_ar: form.venue_ar.trim() || null,
         capacity: form.capacity ? parseInt(form.capacity, 10) || null : null,
+        latitude: form.latitude ? Number(form.latitude) : null,
+        longitude: form.longitude ? Number(form.longitude) : null,
         is_free: form.is_free,
         price: form.is_free ? null : parseFloat(form.price) || null,
         ticket_url: form.ticket_url.trim() || null,
@@ -236,26 +245,15 @@ const NewEvent = () => {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "المنطقة" : "Region"}</label>
-            <select className={inputClass} value={form.region_id} onChange={(e) => { set("region_id", e.target.value); set("city_id", ""); }}>
-              <option value="">{lang === "ar" ? "اختر" : "Select"}</option>
-              {(regions as any[]).map((r) => (
-                <option key={r.id} value={r.id}>{lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "المدينة" : "City"}</label>
-            <select className={inputClass} value={form.city_id} onChange={(e) => set("city_id", e.target.value)}>
-              <option value="">{lang === "ar" ? "اختر" : "Select"}</option>
-              {regionCities.map((c) => (
-                <option key={c.id} value={c.id}>{lang === "ar" ? (c.name_ar || c.name_en) : c.name_en}</option>
-              ))}
-            </select>
-          </div>
-        </div>
+        <CityPicker
+          cityId={form.city_id}
+          onChange={(cityId, regionId) => setForm((p) => ({ ...p, city_id: cityId, region_id: regionId }))}
+          iconClass="w-3.5 h-3.5 text-primary"
+          inputClass={inputClass}
+          labelClass={labelClass}
+          hintEn="The event then appears on that city's and its region's pages."
+          hintAr="ستظهر الفعالية بعدها في صفحة تلك المدينة ومنطقتها."
+        />
 
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -282,6 +280,16 @@ const NewEvent = () => {
             <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "المكان (عربي)" : "Venue (Arabic)"}</label>
             <input className={inputClass} dir="rtl" value={form.venue_ar} onChange={(e) => set("venue_ar", e.target.value)} maxLength={120} />
           </div>
+        </div>
+
+        <div>
+          <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "الموقع على الخريطة" : "Exact spot on the map"}</label>
+          <LocationPicker
+            lat={form.latitude}
+            lng={form.longitude}
+            fallbackCenter={getCityCoords(form.city_id)}
+            onChange={(la, lo) => setForm((p) => ({ ...p, latitude: la.toFixed(6), longitude: lo.toFixed(6) }))}
+          />
         </div>
 
         <div>

@@ -1,3 +1,4 @@
+import CityNameSelect from "@/components/dashboard/CityNameSelect";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, MessageCircle, Plus, HelpCircle, Lightbulb, Camera } from "lucide-react";
@@ -237,13 +238,13 @@ const Community = () => {
           />
           <div className="flex items-center gap-2">
             <div className="flex-1 flex items-center gap-2">
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-secondary">
-                <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-                <Input
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-secondary flex-1">
+                <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                <CityNameSelect
                   value={newLocation}
-                  onChange={(e) => setNewLocation(e.target.value)}
-                  placeholder={lang === "ar" ? "الموقع" : "Location"}
-                  className="h-6 border-none bg-transparent text-xs p-0 focus-visible:ring-0"
+                  onChange={(cityName) => setNewLocation(cityName)}
+                  className="h-6 w-full border-none bg-transparent text-xs p-0 focus:outline-none"
+                  placeholder={lang === "ar" ? "المدينة" : "City"}
                 />
               </div>
             </div>
