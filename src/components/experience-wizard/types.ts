@@ -68,7 +68,7 @@ export const defaultFormData: ExperienceFormData = {
   meetingPointName: "",
   meetingPointLat: "",
   meetingPointLng: "",
-  itinerary: [{ step: "" }],
+  itinerary: [{ step: "", description: "" }],
 
 };
 
