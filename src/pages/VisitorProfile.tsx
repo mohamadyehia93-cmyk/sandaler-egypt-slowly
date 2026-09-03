@@ -79,14 +79,16 @@ const VisitorProfile = () => {
             variant="primary"
             className="flex-1 !py-0 !h-9 !rounded-md"
           />
-          <Button
-            variant="outline"
-            className="h-9 text-sm font-semibold gap-1.5"
-            onClick={() => navigate(`/inbox?personId=${profile.user_id}&kind=user`)}
-          >
-            <MessageCircle className="w-4 h-4" />
-            {lang === "ar" ? "رسالة" : "Message"}
-          </Button>
+          {profile.user_id !== authUser?.id && (
+            <Button
+              variant="outline"
+              className="h-9 text-sm font-semibold gap-1.5"
+              onClick={() => navigate(`/inbox?personId=${profile.user_id}&kind=user`)}
+            >
+              <MessageCircle className="w-4 h-4" />
+              {lang === "ar" ? "رسالة" : "Message"}
+            </Button>
+          )}
         </div>
       </div>
 

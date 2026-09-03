@@ -195,6 +195,7 @@ const ProviderProfile = () => {
           variant="primary"
           className="flex-1"
         />
+        {provider.user_id !== authUser?.id && (
         <button
           onClick={() => navigate(`/inbox?personId=${provider.id}&kind=provider`)}
           className="flex-1 py-2.5 rounded-xl border-2 border-border text-foreground font-semibold text-sm flex items-center justify-center gap-1.5 bg-card"
@@ -202,6 +203,7 @@ const ProviderProfile = () => {
           <MessageSquare className="w-4 h-4" />
           {lang === "ar" ? "رسالة" : "Message"}
         </button>
+        )}
       </div>
 
       <ProviderContactCard providerId={provider.id} />
