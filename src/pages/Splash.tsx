@@ -706,6 +706,23 @@ const SplashPage = () => {
             </header>
 
             <div className="flex-1 overflow-y-auto px-4 py-4">
+              {/* Already a provider: offer the one-tap switch instead of retyping
+                  a full onboarding. The long flow stays available below. */}
+              {isProvider && (
+                <button
+                  onClick={() => navigate("/switch-role")}
+                  className="w-full mb-3 p-3 rounded-xl bg-primary/5 border border-primary/30 text-start"
+                >
+                  <p className="text-sm font-semibold text-foreground">
+                    {lang === "ar" ? "عندك حساب مقدم خدمة بالفعل" : "You already have a provider account"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {lang === "ar"
+                      ? "غيّر دورك في خطوة واحدة بدون إعادة إدخال بياناتك"
+                      : "Switch your role in one step — no need to re-enter your details"}
+                  </p>
+                </button>
+              )}
               <div className="grid grid-cols-1 gap-2.5">
                 {PROVIDER_INTENTS.map((intent) => {
                   const Icon = intent.icon;
