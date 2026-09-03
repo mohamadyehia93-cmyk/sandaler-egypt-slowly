@@ -261,7 +261,10 @@ const SplashPage = () => {
   const [direction, setDirection] = useState(1);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  /** Visitor branch: regions chosen instead of a 30-city grid. */
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
+
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
   const [selectedBudget, setSelectedBudget] = useState<string | null>(null);
