@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Globe, Bell, Moon, Shield, LogOut, ChevronRight, Eye, Repeat } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Settings = () => {
   const navigate = useNavigate();
   const { lang, setLang } = useI18n();
+  const { isProvider } = useUserRole();
   const [userId, setUserId] = useState<string | null>(null);
   const [emailNotifications, setEmailNotifications] = useState<boolean | null>(null);
   const [saving, setSaving] = useState(false);
