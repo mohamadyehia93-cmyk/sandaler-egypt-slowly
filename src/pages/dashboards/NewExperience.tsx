@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { fetchMyProviderId } from "@/lib/providerRecord";
 import { generateSlotDrafts } from "@/lib/experienceSlots";
 import { themeForCategory, themeOrOther, readableDbError } from "@/lib/listingTaxonomy";
@@ -67,8 +68,8 @@ const NewExperience = () => {
         }
         const mins = data.duration_minutes ?? 0;
         const asArr = (v: unknown): unknown[] => (Array.isArray(v) ? v : []);
-        const rawEn = asArr((data as any).itinerary_en);
-        const rawAr = asArr((data as any).itinerary_ar);
+        const rawEn = asArr(data.itinerary_en);
+        const rawAr = asArr(data.itinerary_ar);
         setOtherItinerary({ en: rawEn, ar: rawAr });
         // Show the authoring language's stored steps, falling back to the other
         // language so the host never sees an empty list while data exists.
@@ -107,6 +108,8 @@ const NewExperience = () => {
     return () => {
       cancelled = true;
     };
+  // ar intentionally excluded: re-running on a language toggle would overwrite edits.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, editId, user, authLoading]);
 
   const set = useCallback((key: string, value: string) => {
@@ -198,8 +201,8 @@ const NewExperience = () => {
         title_ar: form.title_ar.trim() || null,
         description_en: form.description_en.trim() || form.description_ar.trim(),
         description_ar: form.description_ar.trim() || null,
-        itinerary_en: (ar ? otherItinerary.en : itinerary) as any,
-        itinerary_ar: (ar ? itinerary : otherItinerary.ar) as any,
+        itinerary_en: (ar ? otherItinerary.en : itinerary) as Json,
+        itinerary_ar: (ar ? itinerary : otherItinerary.ar) as Json,
         theme,
         theme_other: theme === "other" ? form.category.trim() : null,
         price: parseInt(form.price) || 0,
