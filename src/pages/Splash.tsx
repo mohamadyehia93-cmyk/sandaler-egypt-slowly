@@ -584,26 +584,30 @@ const SplashPage = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
             </div>
+            {/* Language IS the first tap: one screen fewer, and the rest of the
+                flow is already in the right language. */}
             <div className="relative z-10 flex flex-col items-center justify-end flex-1 pb-12 px-6">
               <div className="text-5xl mb-3">🌊</div>
               <h1 className="text-4xl font-extrabold text-primary-foreground mb-1 tracking-tight">Sandal</h1>
               <p className="text-lg text-primary-foreground/80 mb-1 font-medium">Discover Egypt. Slowly.</p>
               <p className="text-base text-primary-foreground/60 mb-8 font-cairo">اكتشف مصر. ببطء.</p>
-              <button
-                onClick={() => goTo("language")}
-                className="w-full max-w-xs py-3.5 rounded-xl bg-primary text-primary-foreground font-bold text-base shadow-elevated mb-3"
-              >
-                {t("splash.getStarted")}
-              </button>
-              <button
-                onClick={() => goTo("language")}
-                className="w-full max-w-xs py-3 rounded-xl bg-primary-foreground/10 backdrop-blur text-primary-foreground font-medium text-base border border-primary-foreground/20"
-              >
-                {t("splash.login")}
-              </button>
+              <div className="flex gap-3 w-full max-w-xs mb-3">
+                <button
+                  onClick={() => { setLang("ar"); goTo("role"); }}
+                  className="flex-1 py-4 rounded-xl bg-primary text-primary-foreground font-bold text-base shadow-elevated font-cairo"
+                >
+                  🇪🇬 العربية
+                </button>
+                <button
+                  onClick={() => { setLang("en"); goTo("role"); }}
+                  className="flex-1 py-4 rounded-xl bg-primary-foreground/15 backdrop-blur text-primary-foreground font-bold text-base border border-primary-foreground/25"
+                >
+                  🇬🇧 English
+                </button>
+              </div>
               <button
                 onClick={handleGuestMode}
-                className="mt-3 text-sm text-primary-foreground/80 underline underline-offset-4"
+                className="mt-2 min-h-[44px] px-4 text-sm text-primary-foreground/80 underline underline-offset-4"
               >
                 {lang === "ar" ? "المتابعة كضيف" : "Continue as guest"}
               </button>
@@ -611,41 +615,7 @@ const SplashPage = () => {
           </motion.div>
         )}
 
-        {/* STEP 2: Language Selection */}
-        {step === "language" && (
-          <motion.div
-            key="language"
-            custom={direction}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.3 }}
-            className="min-h-screen flex flex-col items-center justify-center bg-background px-6"
-          >
-            <div className="text-4xl mb-2">🌊</div>
-            <h1 className="text-2xl font-bold text-primary-dark mb-8">{t("splash.chooseLanguage")}</h1>
-            <div className="flex gap-4 w-full max-w-xs mb-8">
-              <button
-                onClick={() => { setLang("en"); goTo("role"); }}
-                className="flex-1 py-6 rounded-xl shadow-card bg-card border-2 border-primary/20 hover:border-primary transition-colors text-center"
-              >
-                <span className="text-2xl block mb-1">🇬🇧</span>
-                <span className="text-lg font-semibold text-foreground">English</span>
-              </button>
-              <button
-                onClick={() => { setLang("ar"); goTo("role"); }}
-                className="flex-1 py-6 rounded-xl shadow-card bg-card border-2 border-primary/20 hover:border-primary transition-colors text-center"
-              >
-                <span className="text-2xl block mb-1">🇪🇬</span>
-                <span className="text-lg font-semibold text-foreground font-cairo">العربية</span>
-              </button>
-            </div>
-            <button onClick={handleGuestMode} className="text-sm text-muted-foreground underline">
-              {lang === "ar" ? "تصفح كزائر" : "Browse as guest"}
-            </button>
-          </motion.div>
-        )}
+
 
         {/* STEP 3: Visitor vs Local */}
         {step === "role" && (
