@@ -6,6 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { slugify } from "@/lib/dashboardForms";
 import { ArrowLeft, FileText, MapPin, Clock, Users, Calendar, Tag } from "lucide-react";
 import BilingualField from "@/components/dashboard/BilingualField";
+import CityPicker from "@/components/dashboard/CityPicker";
+import LocationPicker from "@/components/dashboard/LocationPicker";
+import { getCityCoords } from "@/lib/cityCoords";
+import { useCities } from "@/hooks/useListings";
 import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
 import { toast } from "sonner";
@@ -37,11 +41,15 @@ const NewSession = () => {
     time: "",
     duration: "",
     maxSpots: "",
-    locationEn: "",
-    locationAr: "",
+    cityId: "",
+    regionId: "",
+    latitude: "",
+    longitude: "",
   });
 
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
+  const { data: cities } = useCities();
+  const city = (cities ?? []).find((c: any) => c.id === form.cityId) as any;
 
   const handleSubmit = async () => {
     if (!user) {
@@ -64,8 +72,12 @@ const NewSession = () => {
         description_ar: form.descriptionAr.trim() ? withType(form.descriptionAr) : null,
         meetup_date: form.date || null,
         meetup_time: form.time || null,
-        location_en: form.locationEn.trim() || null,
-        location_ar: form.locationAr.trim() || null,
+        city_id: form.cityId || null,
+        region_id: form.regionId || null,
+        location_en: city?.name_en || null,
+        location_ar: city?.name_ar || city?.name_en || null,
+        latitude: form.latitude ? Number(form.latitude) : null,
+        longitude: form.longitude ? Number(form.longitude) : null,
         capacity: parseInt(form.maxSpots) || 20,
         translation_meta: meta as any,
         slug: slugify(form.titleEn || form.titleAr, user.id.slice(0, 6)),
@@ -155,18 +167,25 @@ const NewSession = () => {
           </div>
         </div>
 
-        <BilingualField
-          fieldEn="location_en" fieldAr="location_ar"
-          labelEn="Location" labelAr="المكان"
-          icon={<MapPin className="w-3.5 h-3.5 text-role-whos-who" />}
-          valueEn={form.locationEn} valueAr={form.locationAr}
-          onChange={({ en, ar }) => setForm((p) => ({ ...p, locationEn: en, locationAr: ar }))}
-          meta={meta} onMetaChange={setMeta}
-          authorLang={authorLang}
-          context="venue and city name in Egypt"
-          placeholderEn="e.g. Bayt Al-Suhaymi, Cairo" placeholderAr="مثال: بيت السحيمي، القاهرة"
-          inputClass={inputClass} labelClass={labelClass}
+        <CityPicker
+          cityId={form.cityId}
+          onChange={(cityId, regionId) => setForm((p) => ({ ...p, cityId, regionId }))}
+          iconClass="w-3.5 h-3.5 text-role-whos-who"
+          inputClass={inputClass}
+          labelClass={labelClass}
+          hintEn="The session then appears on that city's and its region's pages."
+          hintAr="ستظهر الجلسة بعدها في صفحة تلك المدينة ومنطقتها."
         />
+
+        <div>
+          <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-whos-who" />{lang === "ar" ? "مكان اللقاء على الخريطة" : "Meeting spot on the map"}</label>
+          <LocationPicker
+            lat={form.latitude}
+            lng={form.longitude}
+            fallbackCenter={getCityCoords(form.cityId)}
+            onChange={(la, lo) => setForm((p) => ({ ...p, latitude: la.toFixed(6), longitude: lo.toFixed(6) }))}
+          />
+        </div>
 
         <button onClick={handleSubmit} disabled={submitting} className="w-full bg-role-whos-who text-white rounded-xl py-4 font-bold text-sm mt-4 disabled:opacity-60">
           {submitting ? (lang === "ar" ? "جاري النشر..." : "Publishing...") : (lang === "ar" ? "نشر الجلسة" : "Publish Session")}

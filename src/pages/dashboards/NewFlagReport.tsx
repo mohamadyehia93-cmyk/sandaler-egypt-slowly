@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Upload, FileText, MapPin, Tag, AlertTriangle, Image, Loader2, ShieldAlert } from "lucide-react";
 import { useIsAmbassador } from "@/hooks/useIsAmbassador";
 import { toast } from "sonner";
+import CityNameSelect from "@/components/dashboard/CityNameSelect";
 
 const issueTypes = [
   { en: "Quality Concern", ar: "مشكلة جودة" },
@@ -172,7 +173,7 @@ const NewFlagReport = () => {
 
         <div>
           <label className={labelClass}><MapPin className="w-3.5 h-3.5 text-role-ambassador" />{lang === "ar" ? "الموقع" : "Location"}</label>
-          <input className={inputClass} placeholder={lang === "ar" ? "مثال: المنزلة، الدقهلية" : "e.g. Manzala, Dakahlia"} value={form.location} onChange={(e) => set("location", e.target.value)} maxLength={100} />
+          <CityNameSelect value={form.location} onChange={(cityName) => set("location", cityName)} className={inputClass} />
         </div>
 
         <div>
