@@ -650,7 +650,8 @@ const SplashPage = () => {
                   onClick={() => {
                     if (key === "visitor") {
                       setSelectedRole("visitor");
-                      goTo("city");
+                      goTo("discover");
+
                     } else {
                       goTo("localRole");
                     }
