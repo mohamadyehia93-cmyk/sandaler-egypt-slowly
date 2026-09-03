@@ -69,7 +69,7 @@ const NewTrip = () => {
     destinations: [""],
     lat: "",
     lng: "",
-    itinerary: [{ day: "1", description: "" }],
+    itinerary: [{ day: "1", title: "", description: "" }],
     includes: [""],
     departureDate: "",
   });
@@ -112,7 +112,18 @@ const NewTrip = () => {
         regionId: data.region_id || "",
         startLocation: routeParts[0] || "",
         destinations: routeParts.length > 1 ? routeParts.slice(1) : [""],
-        itinerary: itin.length ? itin.map((i, idx) => ({ day: String(idx + 1), description: String((i as { description?: string })?.description || "") })) : [{ day: "1", description: "" }],
+        itinerary: itin.length
+          ? itin.map((i, idx) => {
+              const it = (i || {}) as { title?: string; description?: string };
+              // Legacy rows stored the day's short line in `description`; keep it
+              // visible in the short field and leave the new detail field empty.
+              return {
+                day: String(idx + 1),
+                title: String(it.title || it.description || ""),
+                description: String(it.title ? it.description || "" : ""),
+              };
+            })
+          : [{ day: "1", title: "", description: "" }],
         includes: inc.length ? inc.map((i) => String(i)) : [""],
         departureDate: data.date || "",
         lat: data.latitude != null ? String(data.latitude) : "",
@@ -135,10 +146,10 @@ const NewTrip = () => {
   const addDest = () => setForm((p) => ({ ...p, destinations: [...p.destinations, ""] }));
   const removeDest = (idx: number) => setForm((p) => ({ ...p, destinations: p.destinations.filter((_, i) => i !== idx) }));
 
-  const updateItinerary = (idx: number, value: string) => {
-    setForm((p) => { const arr = [...p.itinerary]; arr[idx] = { ...arr[idx], description: value }; return { ...p, itinerary: arr }; });
+  const updateItinerary = (idx: number, key: "title" | "description", value: string) => {
+    setForm((p) => { const arr = [...p.itinerary]; arr[idx] = { ...arr[idx], [key]: value }; return { ...p, itinerary: arr }; });
   };
-  const addItinerary = () => setForm((p) => ({ ...p, itinerary: [...p.itinerary, { day: String(p.itinerary.length + 1), description: "" }] }));
+  const addItinerary = () => setForm((p) => ({ ...p, itinerary: [...p.itinerary, { day: String(p.itinerary.length + 1), title: "", description: "" }] }));
   const removeItinerary = (idx: number) => setForm((p) => ({ ...p, itinerary: p.itinerary.filter((_, i) => i !== idx) }));
 
   const updateIncludes = (idx: number, value: string) => {
@@ -174,9 +185,9 @@ const NewTrip = () => {
       const route = [form.startLocation.trim(), ...destinations].filter(Boolean).join(" → ");
       const days = parseInt(form.days) || 1;
       const itinerary = form.itinerary
-        .filter((i) => i.description.trim())
+        .filter((i) => i.title.trim() || i.description.trim())
         .slice(0, days)
-        .map((i, idx) => ({ day: idx + 1, description: i.description.trim() }));
+        .map((i, idx) => ({ day: idx + 1, title: i.title.trim(), description: i.description.trim() }));
 
       const inclusions = form.includes.map((i) => i.trim()).filter(Boolean);
 
@@ -363,7 +374,10 @@ const NewTrip = () => {
             {form.itinerary.map((item, i) => (
               <div key={i} className="flex gap-2 items-start">
                 <span className="w-6 h-6 rounded-full bg-role-trip-organizer text-white flex items-center justify-center text-[10px] font-bold mt-2.5 shrink-0">{i + 1}</span>
-                <input className={`${inputClass} flex-1`} placeholder={lang === "ar" ? "وصف اليوم..." : "Day description..."} value={item.description} onChange={(e) => updateItinerary(i, e.target.value)} maxLength={200} />
+                <div className="flex-1 space-y-1.5">
+                  <input className={inputClass} placeholder={lang === "ar" ? "عنوان اليوم..." : "Day title..."} value={item.title} onChange={(e) => updateItinerary(i, "title", e.target.value)} maxLength={200} />
+                  <textarea className={`${inputClass} py-2.5 min-h-[60px] resize-y`} placeholder={lang === "ar" ? "أضف وصفًا — اختياري" : "Add detail — optional"} value={item.description} onChange={(e) => updateItinerary(i, "description", e.target.value)} maxLength={400} />
+                </div>
                 {form.itinerary.length > 1 && <button onClick={() => removeItinerary(i)} className="p-2 text-destructive mt-1"><Trash2 className="w-4 h-4" /></button>}
               </div>
             ))}
