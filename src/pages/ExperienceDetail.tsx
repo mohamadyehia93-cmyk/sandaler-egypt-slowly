@@ -407,6 +407,44 @@ const ExperienceDetail = () => {
           </>
         )}
 
+        {/* ── ITINERARY (only steps the row actually stores) ──────── */}
+        {(() => {
+          type Step = { step?: string; description?: string };
+          const rawEn = (exp as any).itinerary_en;
+          const rawAr = (exp as any).itinerary_ar;
+          const arr = (v: unknown): Step[] => (Array.isArray(v) ? (v as Step[]) : []);
+          const preferred = ar ? (arr(rawAr).length ? rawAr : rawEn) : arr(rawEn).length ? rawEn : rawAr;
+          const stepsList = arr(preferred).filter(
+            (s) => (s?.step || "").trim() || (s?.description || "").trim()
+          );
+          if (stepsList.length === 0) return null;
+          return (
+            <>
+              <Divider />
+              <div>
+                <h2 className="text-sm font-semibold text-foreground mb-2">{ar ? "خطة التجربة" : "Itinerary"}</h2>
+                <ol className="space-y-2.5">
+                  {stepsList.map((s, i) => (
+                    <li key={i} className="flex gap-2.5">
+                      <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        {i + 1}
+                      </span>
+                      <div className="flex-1">
+                        {(s.step || "").trim() && (
+                          <p className="text-xs font-semibold text-foreground leading-[1.5]">{s.step}</p>
+                        )}
+                        {(s.description || "").trim() && (
+                          <p className="text-xs text-muted-foreground leading-[1.6] mt-0.5 whitespace-pre-line">{s.description}</p>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </>
+          );
+        })()}
+
         {/* ── AVAILABILITY (real slots only) ─────────────────────── */}
         <Divider />
         <div>
