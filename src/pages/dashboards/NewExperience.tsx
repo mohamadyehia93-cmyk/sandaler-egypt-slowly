@@ -117,14 +117,23 @@ const NewExperience = () => {
     setForm((p) => ({ ...p, ...updates }));
   }, []);
 
+  // ONE LANGUAGE IS MANDATORY: whichever language the app is set to.
+  const titleRequired = (ar ? form.title_ar : form.title_en).trim();
+  const descriptionRequired = (ar ? form.description_ar : form.description_en).trim();
+  const includesFilled = form.includes.some((i) => i.trim());
+  const excludesFilled = form.excludes.some((i) => i.trim());
+
   const canProceed = (): boolean => {
     switch (step) {
-      case 0: return form.title_en.trim().length > 0 && form.title_ar.trim().length > 0;
-      case 1: return form.description_en.trim().length > 0;
+      case 0: return titleRequired.length > 0;
+      case 1: return descriptionRequired.length > 0;
       // Validate at the category step, not at publish time: only a category that
       // maps to a stored theme the database accepts may advance.
       case 2: return !!themeOrOther(form.category);
-      case 4: return form.price.trim().length > 0 && Number(form.price) >= 0;
+      case 4:
+        return (
+          form.price.trim().length > 0 && Number(form.price) >= 0 && includesFilled && excludesFilled
+        );
       default: return true;
     }
   };
