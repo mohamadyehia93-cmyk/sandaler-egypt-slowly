@@ -102,17 +102,26 @@ const StepLocation = ({ form, set, updateForm }: Props) => {
       {/* Itinerary */}
       <div>
         <label className={labelClass}>{ar ? "خطة الرحلة" : "Itinerary Steps"}</label>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {form.itinerary.map((item, i) => (
             <div key={i} className="flex gap-2 items-start">
               <span className="w-6 h-6 rounded-full bg-role-service-provider text-white flex items-center justify-center text-[10px] font-bold mt-2.5 shrink-0">{i + 1}</span>
-              <input className={`${inputClass} flex-1`} placeholder={ar ? "وصف الخطوة..." : "Describe this step..."} value={item.step} onChange={(e) => updateStep(i, e.target.value)} maxLength={200} />
+              <div className="flex-1 space-y-1.5">
+                <input className={inputClass} placeholder={ar ? "اسم الخطوة..." : "Name this step..."} value={item.step} onChange={(e) => updateStep(i, "step", e.target.value)} maxLength={200} />
+                <textarea
+                  className={`${inputClass} py-2.5 min-h-[60px] resize-y`}
+                  placeholder={ar ? "أضف وصفًا — اختياري" : "Add detail — optional"}
+                  value={item.description ?? ""}
+                  onChange={(e) => updateStep(i, "description", e.target.value)}
+                  maxLength={400}
+                />
+              </div>
               {form.itinerary.length > 1 && (
                 <button onClick={() => updateForm({ itinerary: form.itinerary.filter((_, j) => j !== i) })} className="p-2 text-destructive mt-1"><Trash2 className="w-4 h-4" /></button>
               )}
             </div>
           ))}
-          <button onClick={() => updateForm({ itinerary: [...form.itinerary, { step: "" }] })} className="flex items-center gap-1 text-xs font-medium text-role-service-provider ms-8">
+          <button onClick={() => updateForm({ itinerary: [...form.itinerary, { step: "", description: "" }] })} className="flex items-center gap-1 text-xs font-medium text-role-service-provider ms-8">
             <Plus className="w-3.5 h-3.5" /> {ar ? "إضافة خطوة" : "Add step"}
           </button>
         </div>
