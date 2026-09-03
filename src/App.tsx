@@ -153,7 +153,9 @@ const App = () => {
               <Suspense fallback={<RouteFallback />}>
               <Routes>
             <Route path="/welcome" element={<Splash />} />
+            <Route path="/switch-role" element={<SwitchRole />} />
             <Route path="/claim/:token" element={<ClaimProfile />} />
+
             <Route path="/" element={<Index />} />
             <Route path="/calendar" element={<EventCalendar />} />
             <Route path="/event/:id" element={<EventDetail />} />
