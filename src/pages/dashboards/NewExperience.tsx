@@ -97,7 +97,7 @@ const NewExperience = () => {
           meetingPointName: data.meeting_point_name ?? "",
           meetingPointLat: data.meeting_point_lat != null ? String(data.meeting_point_lat) : "",
           meetingPointLng: data.meeting_point_lng != null ? String(data.meeting_point_lng) : "",
-
+          itinerary: loadedItinerary.length ? loadedItinerary : [{ step: "", description: "" }],
         });
         setLoadState("ok");
       } catch {
