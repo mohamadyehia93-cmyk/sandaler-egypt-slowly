@@ -59,7 +59,7 @@ const StepPricing = ({ form, set, updateForm }: Props) => {
       <div>
         <label className={labelClass}>
           <ListChecks className="w-3.5 h-3.5 text-role-service-provider" />
-          {lang === "ar" ? "ما يشمله السعر" : "What's Included"}
+          {lang === "ar" ? "ما يشمله السعر *" : "What's Included *"}
         </label>
         <div className="space-y-2">
           {form.includes.map((item, i) => (
