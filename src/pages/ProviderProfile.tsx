@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ShareButton from "@/components/ShareButton";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
@@ -89,6 +90,7 @@ const ProviderProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang } = useI18n();
+  const { user: authUser } = useAuth();
   const [following, setFollowing] = useState(false);
 
   const { data: provider, isLoading } = useQuery({

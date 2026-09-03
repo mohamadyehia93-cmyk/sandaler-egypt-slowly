@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar, MessageCircle, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import BottomNav from "@/components/BottomNav";
 import FollowButton from "@/components/FollowButton";
@@ -17,6 +18,7 @@ import NotFound from "@/components/NotFound";
 const VisitorProfile = () => {
   const { id } = useParams();
   const { lang } = useI18n();
+  const { user: authUser } = useAuth();
   const navigate = useNavigate();
 
   const { data: profile, isLoading } = useQuery({

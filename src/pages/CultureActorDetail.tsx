@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Quote, Feather, BookOpen, Share2, Instagram, Twitter, MessageCircle, Headphones, Clock, Briefcase } from "lucide-react";
 import ShareButton from "@/components/ShareButton";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import ProviderStatusView from "@/components/ProviderStatusView";
@@ -42,6 +43,7 @@ const CultureActorDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang } = useI18n();
+  const { user: authUser } = useAuth();
 
   const [actor, setActor] = useState<Actor | null>(null);
   const [region, setRegion] = useState<Region | null>(null);
