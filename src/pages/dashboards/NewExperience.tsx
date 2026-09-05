@@ -7,6 +7,8 @@ import type { Json } from "@/integrations/supabase/types";
 import { fetchMyProviderId } from "@/lib/providerRecord";
 import { generateSlotDrafts } from "@/lib/experienceSlots";
 import { themeForCategory, themeOrOther, readableDbError } from "@/lib/listingTaxonomy";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import DraftResumePrompt from "@/components/dashboard/DraftResumePrompt";
 
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
@@ -23,6 +25,9 @@ import StepAvailability from "@/components/experience-wizard/StepAvailability";
 import StepPolicies from "@/components/experience-wizard/StepPolicies";
 import StepLocation from "@/components/experience-wizard/StepLocation";
 import StepReview from "@/components/experience-wizard/StepReview";
+
+const DRAFT_KEY = "new-experience";
+
 
 const NewExperience = () => {
   const { lang } = useI18n();
