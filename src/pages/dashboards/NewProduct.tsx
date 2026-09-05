@@ -268,7 +268,7 @@ const NewProduct = () => {
         <DraftResumePrompt onResume={handleResumeDraft} onStartOver={startOver} accentClass="bg-role-product-seller" />
       )}
 
-      <div className="px-4 py-5 space-y-5">
+      <div className="px-4 py-5 space-y-5" onBlur={flush}>
         <AuthorLangToggle value={authorLang} onChange={setAuthorLang} />
 
         <div>

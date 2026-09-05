@@ -225,7 +225,7 @@ const NewEvent = () => {
         <DraftResumePrompt onResume={handleResumeDraft} onStartOver={startOver} accentClass="bg-primary" />
       )}
 
-      <div className="px-4 py-5 space-y-5">
+      <div className="px-4 py-5 space-y-5" onBlur={flush}>
         <div>
           <label className={labelClass}><Upload className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "صورة الفعالية" : "Event Photo"}</label>
           <label className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center gap-2 bg-card cursor-pointer">
