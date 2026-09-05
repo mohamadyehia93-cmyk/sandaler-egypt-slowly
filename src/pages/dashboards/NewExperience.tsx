@@ -302,7 +302,7 @@ const NewExperience = () => {
       case 0: return <StepTitle form={form} set={set} />;
       case 1: return <StepDescription form={form} set={set} />;
       case 2: return <StepCategory form={form} set={set} />;
-      case 3: return <StepPhotos form={form} updateForm={updateForm} />;
+      case 3: return <StepPhotos form={form} updateForm={updateForm} userId={user?.id ?? null} />;
       case 4: return <StepPricing form={form} set={set} updateForm={updateForm} />;
       case 5: return <StepDuration form={form} set={set} />;
       case 6: return <StepAvailability form={form} set={set} updateForm={updateForm} />;
