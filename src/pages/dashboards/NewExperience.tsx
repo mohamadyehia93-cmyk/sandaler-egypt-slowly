@@ -376,7 +376,8 @@ const NewExperience = () => {
 
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 inset-x-0 bg-card border-t border-border px-4 py-3 flex gap-3 z-30">
+      <div className={`fixed bottom-0 inset-x-0 bg-card border-t border-border px-4 py-3 flex gap-3 z-30 ${pendingDraft ? "hidden" : ""}`}>
+
         {step > 0 && (
           <button onClick={prev} className="flex-1 flex items-center justify-center gap-1 py-3 rounded-xl border border-border text-sm font-medium text-foreground">
             <ChevronLeft className="w-4 h-4" />
