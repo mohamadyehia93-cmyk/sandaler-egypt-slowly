@@ -18,6 +18,8 @@ import type { Lang, TranslationMeta } from "@/lib/translation";
 import type { Json } from "@/integrations/supabase/types";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Clock, Users, DollarSign, Calendar, ListChecks } from "lucide-react";
 import { toast } from "sonner";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import DraftResumePrompt from "@/components/dashboard/DraftResumePrompt";
 
 const tripTypes = [
   { en: "One Day", ar: "يوم واحد" },
@@ -158,6 +160,25 @@ const NewTrip = () => {
   const addIncludes = () => setForm((p) => ({ ...p, includes: [...p.includes, ""] }));
   const removeIncludes = (idx: number) => setForm((p) => ({ ...p, includes: p.includes.filter((_, i) => i !== idx) }));
 
+  /**
+   * Resumable draft. Text fields are auto-saved per user so an interruption
+   * (call, reload, lost connection) no longer empties the form. Photos still
+   * upload at save time here, so newly picked files are not part of the draft.
+   */
+  const [pristineForm] = useState(() => JSON.stringify(form));
+  const draftDirty = JSON.stringify(form) !== pristineForm;
+  const { pendingDraft, resume, startOver, flush, clear: clearDraft } = useFormDraft<typeof form>({
+    formKey: "new-trip",
+    userId: user?.id ?? null,
+    data: form,
+    enabled: !(isEdit),
+    isDirty: draftDirty,
+  });
+  const handleResumeDraft = () => {
+    const restored = resume();
+    if (restored) setForm((p) => ({ ...p, ...restored.data }));
+  };
+
   const handleSubmit = async () => {
     if (!user) {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
@@ -233,6 +254,7 @@ const NewTrip = () => {
       queryClient.invalidateQueries({ queryKey: ["my-trips"] });
       queryClient.invalidateQueries({ queryKey: ["trips"] });
       if (id) queryClient.invalidateQueries({ queryKey: ["trip", id] });
+      clearDraft();
       navigate("/dashboard/trip-organizer/my-trips");
 
     } catch (err: any) {
@@ -255,6 +277,10 @@ const NewTrip = () => {
         <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل الرحلة" : "Edit Trip") : (lang === "ar" ? "إنشاء رحلة" : "Create Trip")}</h1>
       </header>
+
+      {pendingDraft && (
+        <DraftResumePrompt onResume={handleResumeDraft} onStartOver={startOver} accentClass="bg-role-trip-organizer" />
+      )}
 
       <div className="px-4 py-5 space-y-5">
         <AuthorLangToggle value={authorLang} onChange={setAuthorLang} />
