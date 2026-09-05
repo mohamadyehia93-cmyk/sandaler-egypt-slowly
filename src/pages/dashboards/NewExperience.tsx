@@ -284,7 +284,9 @@ const NewExperience = () => {
       }
 
       toast.success(ar ? "تم نشر التجربة بنجاح!" : "Experience published successfully!");
+      clear();
       navigate("/dashboard/service-provider/my-listings");
+
     } catch (err: any) {
       toast.error(
         readableDbError(err?.message || "", ar) ||
