@@ -357,11 +357,23 @@ const NewExperience = () => {
         </h1>
       </header>
 
-      <WizardProgress currentStep={step} />
+      {pendingDraft ? (
+        <DraftResumePrompt
+          onResume={handleResume}
+          onStartOver={startOver}
+          accentClass="bg-role-service-provider"
+        />
+      ) : (
+        <>
+          <WizardProgress currentStep={step} />
 
-      <div className="px-4 py-4">
-        {renderStep()}
-      </div>
+          {/* onBlur: save as soon as a field is left, not only on step change. */}
+          <div className="px-4 py-4" onBlur={flush}>
+            {renderStep()}
+          </div>
+        </>
+      )}
+
 
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 inset-x-0 bg-card border-t border-border px-4 py-3 flex gap-3 z-30">
