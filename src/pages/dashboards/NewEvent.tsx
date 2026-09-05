@@ -108,7 +108,7 @@ const NewEvent = () => {
     formKey: "new-event",
     userId: user?.id ?? null,
     data: form,
-    enabled: !(!!editId),
+    enabled: !editId,
     isDirty: draftDirty,
   });
   const handleResumeDraft = () => {
