@@ -198,19 +198,11 @@ const NewExperience = () => {
         return;
       }
 
-      let imageUrl: string | null = null;
-      const imageUrls: string[] = [];
+      // Photos were already uploaded in the photo step (see StepPhotos) so a
+      // mid-wizard interruption cannot cost the provider their images.
+      const imageUrls: string[] = form.photoPreviewUrls.filter((u) => /^https?:\/\//.test(u));
+      const imageUrl: string | null = imageUrls[0] ?? null;
 
-      // Upload photos
-      for (const photo of form.photos) {
-        const ext = photo.name.split(".").pop();
-        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error: uploadError } = await supabase.storage.from("listing-images").upload(path, photo);
-        if (uploadError) throw uploadError;
-        const { data: urlData } = supabase.storage.from("listing-images").getPublicUrl(path);
-        imageUrls.push(urlData.publicUrl);
-      }
-      if (imageUrls.length > 0) imageUrl = imageUrls[0];
 
       const durationMinutes = form.durationUnit === "hours"
         ? Math.round(parseFloat(form.duration || "0") * 60)
