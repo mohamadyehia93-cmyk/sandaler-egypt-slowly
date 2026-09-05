@@ -7,6 +7,8 @@ import type { Json } from "@/integrations/supabase/types";
 import { fetchMyProviderId } from "@/lib/providerRecord";
 import { generateSlotDrafts } from "@/lib/experienceSlots";
 import { themeForCategory, themeOrOther, readableDbError } from "@/lib/listingTaxonomy";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import DraftResumePrompt from "@/components/dashboard/DraftResumePrompt";
 
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
@@ -23,6 +25,9 @@ import StepAvailability from "@/components/experience-wizard/StepAvailability";
 import StepPolicies from "@/components/experience-wizard/StepPolicies";
 import StepLocation from "@/components/experience-wizard/StepLocation";
 import StepReview from "@/components/experience-wizard/StepReview";
+
+const DRAFT_KEY = "new-experience";
+
 
 const NewExperience = () => {
   const { lang } = useI18n();
@@ -120,6 +125,28 @@ const NewExperience = () => {
     setForm((p) => ({ ...p, ...updates }));
   }, []);
 
+  // ── Resumable draft (create mode only; in edit mode the row is the truth) ──
+  const dirty =
+    step > 0 ||
+    !!(form.title_en || form.title_ar || form.description_en || form.description_ar ||
+      form.category || form.price || form.photoPreviewUrls.length);
+  const { pendingDraft, resume, startOver, flush, clear } = useFormDraft<ExperienceFormData>({
+    formKey: DRAFT_KEY,
+    userId: user?.id ?? null,
+    data: form,
+    step,
+    enabled: !isEdit && !authLoading,
+    isDirty: dirty,
+  });
+
+  const handleResume = () => {
+    const restored = resume();
+    if (restored) {
+      setForm({ ...defaultFormData, ...restored.data, photos: [] });
+      setStep(Math.min(restored.step, steps.length - 1));
+    }
+  };
+
   // ONE LANGUAGE IS MANDATORY: whichever language the app is set to.
   const titleRequired = (ar ? form.title_ar : form.title_en).trim();
   const descriptionRequired = (ar ? form.description_ar : form.description_en).trim();
@@ -141,8 +168,9 @@ const NewExperience = () => {
     }
   };
 
-  const next = () => { if (step < steps.length - 1 && canProceed()) setStep(step + 1); };
-  const prev = () => { if (step > 0) setStep(step - 1); };
+  const next = () => { if (step < steps.length - 1 && canProceed()) { setStep(step + 1); flush(); } };
+  const prev = () => { if (step > 0) { setStep(step - 1); flush(); } };
+
 
   const handleSubmit = async () => {
     if (!user) {
@@ -170,19 +198,11 @@ const NewExperience = () => {
         return;
       }
 
-      let imageUrl: string | null = null;
-      const imageUrls: string[] = [];
+      // Photos were already uploaded in the photo step (see StepPhotos) so a
+      // mid-wizard interruption cannot cost the provider their images.
+      const imageUrls: string[] = form.photoPreviewUrls.filter((u) => /^https?:\/\//.test(u));
+      const imageUrl: string | null = imageUrls[0] ?? null;
 
-      // Upload photos
-      for (const photo of form.photos) {
-        const ext = photo.name.split(".").pop();
-        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { error: uploadError } = await supabase.storage.from("listing-images").upload(path, photo);
-        if (uploadError) throw uploadError;
-        const { data: urlData } = supabase.storage.from("listing-images").getPublicUrl(path);
-        imageUrls.push(urlData.publicUrl);
-      }
-      if (imageUrls.length > 0) imageUrl = imageUrls[0];
 
       const durationMinutes = form.durationUnit === "hours"
         ? Math.round(parseFloat(form.duration || "0") * 60)
@@ -264,7 +284,9 @@ const NewExperience = () => {
       }
 
       toast.success(ar ? "تم نشر التجربة بنجاح!" : "Experience published successfully!");
+      clear();
       navigate("/dashboard/service-provider/my-listings");
+
     } catch (err: any) {
       toast.error(
         readableDbError(err?.message || "", ar) ||
@@ -280,7 +302,7 @@ const NewExperience = () => {
       case 0: return <StepTitle form={form} set={set} />;
       case 1: return <StepDescription form={form} set={set} />;
       case 2: return <StepCategory form={form} set={set} />;
-      case 3: return <StepPhotos form={form} updateForm={updateForm} />;
+      case 3: return <StepPhotos form={form} updateForm={updateForm} userId={user?.id ?? null} />;
       case 4: return <StepPricing form={form} set={set} updateForm={updateForm} />;
       case 5: return <StepDuration form={form} set={set} />;
       case 6: return <StepAvailability form={form} set={set} updateForm={updateForm} />;
@@ -335,14 +357,27 @@ const NewExperience = () => {
         </h1>
       </header>
 
-      <WizardProgress currentStep={step} />
+      {pendingDraft ? (
+        <DraftResumePrompt
+          onResume={handleResume}
+          onStartOver={startOver}
+          accentClass="bg-role-service-provider"
+        />
+      ) : (
+        <>
+          <WizardProgress currentStep={step} />
 
-      <div className="px-4 py-4">
-        {renderStep()}
-      </div>
+          {/* onBlur: save as soon as a field is left, not only on step change. */}
+          <div className="px-4 py-4" onBlur={flush}>
+            {renderStep()}
+          </div>
+        </>
+      )}
+
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 inset-x-0 bg-card border-t border-border px-4 py-3 flex gap-3 z-30">
+      <div className={`fixed bottom-0 inset-x-0 bg-card border-t border-border px-4 py-3 flex gap-3 z-30 ${pendingDraft ? "hidden" : ""}`}>
+
         {step > 0 && (
           <button onClick={prev} className="flex-1 flex items-center justify-center gap-1 py-3 rounded-xl border border-border text-sm font-medium text-foreground">
             <ChevronLeft className="w-4 h-4" />

@@ -21,6 +21,8 @@ import {
   DollarSign, MapPin, ScrollText, CalendarClock,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import DraftResumePrompt from "@/components/dashboard/DraftResumePrompt";
 
 /**
  * Create / edit a transport listing. Ownership convention:
@@ -136,6 +138,25 @@ const NewTransport = ({ editorial = false }: { editorial?: boolean }) => {
 
   const set = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
   const cityCenter = form.cityId ? cityCoords[form.cityId] : undefined;
+
+  /**
+   * Resumable draft. Text fields are auto-saved per user so an interruption
+   * (call, reload, lost connection) no longer empties the form. Photos still
+   * upload at save time here, so newly picked files are not part of the draft.
+   */
+  const [pristineForm] = useState(() => JSON.stringify(form));
+  const draftDirty = JSON.stringify(form) !== pristineForm;
+  const { pendingDraft, resume, startOver, flush, clear: clearDraft } = useFormDraft<typeof form>({
+    formKey: "new-transport",
+    userId: user?.id ?? null,
+    data: form,
+    enabled: !(isEdit),
+    isDirty: draftDirty,
+  });
+  const handleResumeDraft = () => {
+    const restored = resume();
+    if (restored) setForm((p) => ({ ...p, ...restored.data }));
+  };
 
   const handleSubmit = async () => {
     if (!user) {
@@ -253,7 +274,11 @@ const NewTransport = ({ editorial = false }: { editorial?: boolean }) => {
         </h1>
       </header>
 
-      <div className="px-4 py-5 space-y-5">
+      {pendingDraft && (
+        <DraftResumePrompt onResume={handleResumeDraft} onStartOver={startOver} accentClass="bg-role-service-provider" />
+      )}
+
+      <div className="px-4 py-5 space-y-5" onBlur={flush}>
         <AuthorLangToggle value={authorLang} onChange={setAuthorLang} />
 
         <div>

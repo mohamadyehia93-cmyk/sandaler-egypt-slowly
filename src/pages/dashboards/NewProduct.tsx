@@ -13,6 +13,8 @@ import type { Lang, TranslationMeta } from "@/lib/translation";
 import type { Json } from "@/integrations/supabase/types";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, DollarSign, Package, Ruler, Truck, Clock, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import DraftResumePrompt from "@/components/dashboard/DraftResumePrompt";
 import CategoryChips from "@/components/CategoryChips";
 
 import { PRODUCT_CATEGORIES as categories } from "@/lib/productTaxonomy";
@@ -137,6 +139,25 @@ const NewProduct = () => {
   const setDeliveryRow = (i: number, patch: Partial<DeliveryRow>) =>
     setDelivery((p) => p.map((d, idx) => (idx === i ? { ...d, ...patch } : d)));
 
+  /**
+   * Resumable draft. Text fields are auto-saved per user so an interruption
+   * (call, reload, lost connection) no longer empties the form. Photos still
+   * upload at save time here, so newly picked files are not part of the draft.
+   */
+  const [pristineForm] = useState(() => JSON.stringify(form));
+  const draftDirty = JSON.stringify(form) !== pristineForm;
+  const { pendingDraft, resume, startOver, flush, clear: clearDraft } = useFormDraft<typeof form>({
+    formKey: "new-product",
+    userId: user?.id ?? null,
+    data: form,
+    enabled: !(isEdit),
+    isDirty: draftDirty,
+  });
+  const handleResumeDraft = () => {
+    const restored = resume();
+    if (restored) setForm((p) => ({ ...p, ...restored.data }));
+  };
+
   const handleSubmit = async () => {
     if (!user) {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
@@ -223,6 +244,7 @@ const NewProduct = () => {
         if (error) throw error;
         toast.success(lang === "ar" ? "تمت إضافة المنتج بنجاح!" : "Product published successfully!");
       }
+      clearDraft();
       navigate("/dashboard/product-seller/my-products");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to save product");
@@ -242,7 +264,11 @@ const NewProduct = () => {
         <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل المنتج" : "Edit Product") : (lang === "ar" ? "إضافة منتج" : "Add Product")}</h1>
       </header>
 
-      <div className="px-4 py-5 space-y-5">
+      {pendingDraft && (
+        <DraftResumePrompt onResume={handleResumeDraft} onStartOver={startOver} accentClass="bg-role-product-seller" />
+      )}
+
+      <div className="px-4 py-5 space-y-5" onBlur={flush}>
         <AuthorLangToggle value={authorLang} onChange={setAuthorLang} />
 
         <div>

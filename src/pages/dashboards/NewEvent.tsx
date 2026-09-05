@@ -8,6 +8,8 @@ import { fetchMyProviderId } from "@/lib/providerRecord";
 import { useCities, useRegions } from "@/hooks/useListings";
 import { ArrowLeft, Upload, FileText, Tag, MapPin, Calendar, Clock, DollarSign, Ticket, Users } from "lucide-react";
 import { toast } from "sonner";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import DraftResumePrompt from "@/components/dashboard/DraftResumePrompt";
 import CategoryChips from "@/components/CategoryChips";
 import CityPicker from "@/components/dashboard/CityPicker";
 import LocationPicker from "@/components/dashboard/LocationPicker";
@@ -95,6 +97,25 @@ const NewEvent = () => {
     [cities, form.region_id]
   );
 
+  /**
+   * Resumable draft. Text fields are auto-saved per user so an interruption
+   * (call, reload, lost connection) no longer empties the form. Photos still
+   * upload at save time here, so newly picked files are not part of the draft.
+   */
+  const [pristineForm] = useState(() => JSON.stringify(form));
+  const draftDirty = JSON.stringify(form) !== pristineForm;
+  const { pendingDraft, resume, startOver, flush, clear: clearDraft } = useFormDraft<typeof form>({
+    formKey: "new-event",
+    userId: user?.id ?? null,
+    data: form,
+    enabled: !editId,
+    isDirty: draftDirty,
+  });
+  const handleResumeDraft = () => {
+    const restored = resume();
+    if (restored) setForm((p) => ({ ...p, ...restored.data }));
+  };
+
   const handleSubmit = async (nextStatus: "draft" | "pending") => {
     if (!user) {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
@@ -176,6 +197,7 @@ const NewEvent = () => {
       }
       queryClient.invalidateQueries({ queryKey: ["my-events"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      clearDraft();
       navigate("/dashboard/trip-organizer/events");
     } catch (err: any) {
       toast.error(err.message || "Failed to save event");
@@ -199,7 +221,11 @@ const NewEvent = () => {
         </h1>
       </header>
 
-      <div className="px-4 py-5 space-y-5">
+      {pendingDraft && (
+        <DraftResumePrompt onResume={handleResumeDraft} onStartOver={startOver} accentClass="bg-primary" />
+      )}
+
+      <div className="px-4 py-5 space-y-5" onBlur={flush}>
         <div>
           <label className={labelClass}><Upload className="w-3.5 h-3.5 text-primary" />{lang === "ar" ? "صورة الفعالية" : "Event Photo"}</label>
           <label className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center gap-2 bg-card cursor-pointer">
