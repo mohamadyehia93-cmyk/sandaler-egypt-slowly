@@ -125,6 +125,28 @@ const NewExperience = () => {
     setForm((p) => ({ ...p, ...updates }));
   }, []);
 
+  // ── Resumable draft (create mode only; in edit mode the row is the truth) ──
+  const dirty =
+    step > 0 ||
+    !!(form.title_en || form.title_ar || form.description_en || form.description_ar ||
+      form.category || form.price || form.photoPreviewUrls.length);
+  const { pendingDraft, resume, startOver, flush, clear } = useFormDraft<ExperienceFormData>({
+    formKey: DRAFT_KEY,
+    userId: user?.id ?? null,
+    data: form,
+    step,
+    enabled: !isEdit && !authLoading,
+    isDirty: dirty,
+  });
+
+  const handleResume = () => {
+    const restored = resume();
+    if (restored) {
+      setForm({ ...defaultFormData, ...restored.data, photos: [] });
+      setStep(Math.min(restored.step, steps.length - 1));
+    }
+  };
+
   // ONE LANGUAGE IS MANDATORY: whichever language the app is set to.
   const titleRequired = (ar ? form.title_ar : form.title_en).trim();
   const descriptionRequired = (ar ? form.description_ar : form.description_en).trim();
@@ -146,8 +168,9 @@ const NewExperience = () => {
     }
   };
 
-  const next = () => { if (step < steps.length - 1 && canProceed()) setStep(step + 1); };
-  const prev = () => { if (step > 0) setStep(step - 1); };
+  const next = () => { if (step < steps.length - 1 && canProceed()) { setStep(step + 1); flush(); } };
+  const prev = () => { if (step > 0) { setStep(step - 1); flush(); } };
+
 
   const handleSubmit = async () => {
     if (!user) {
