@@ -281,12 +281,13 @@ const AllPosts = () => {
                         <div className="relative h-32">
                           <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                          <button
-                            className="absolute top-2 right-2 p-1.5 rounded-full bg-background/30 backdrop-blur-sm"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Bookmark className="w-3.5 h-3.5 text-white" />
-                          </button>
+                          <WishlistButton
+                            itemType="post"
+                            itemId={p.uuid}
+                            variant="bookmark"
+                            className="absolute top-2 right-2 p-1.5 rounded-full bg-background/60 backdrop-blur-sm"
+                          />
+
                           {ct && CtIcon && (
                             <span className={`absolute top-2 left-2 inline-flex items-center gap-0.5 ${ct.color} text-white text-[10px] font-semibold px-1.5 py-0.5 rounded`}>
                               <CtIcon className="w-3 h-3" />
