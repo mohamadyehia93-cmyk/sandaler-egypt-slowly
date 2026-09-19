@@ -27,7 +27,7 @@ const PriceBadge = ({ price, suffix, variant = "inline", className = "" }: Price
     return (
       <span
         className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm ${
-          isFree ? "bg-success/90 text-primary-foreground" : "bg-background/90 text-primary-dark"
+          isFree ? "bg-success/90 text-success-foreground" : "bg-background/90 text-primary-dark"
         } ${className}`}
       >
         {label}

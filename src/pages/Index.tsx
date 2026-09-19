@@ -21,9 +21,13 @@ import ProductGrid from "@/components/ProductGrid";
 import MeetUpSection from "@/components/MeetUpSection";
 import CollectionsSection from "@/components/CollectionsSection";
 import Partners from "@/components/Partners";
+import { HOME_PURPOSE_LINE } from "@/content/siteCopy";
+import { useI18n } from "@/lib/i18n";
 
 const Index = () => {
   const { t } = useTranslation();
+  const { lang } = useI18n();
+
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "explore");
   const [scrolled, setScrolled] = useState(false);
@@ -97,16 +101,40 @@ const Index = () => {
         {activeTab === "explore" && <HeroCarousel />}
         {activeTab !== "explore" && <div className="h-16" />}
 
+        {/* Purpose line — EDITABLE, see src/content/siteCopy.ts */}
+        {activeTab === "explore" && (
+          <p className="px-4 -mt-4 mb-2 text-[13px] font-semibold leading-relaxed text-foreground">
+            {lang === "ar" ? HOME_PURPOSE_LINE.ar : HOME_PURPOSE_LINE.en}{" "}
+            <button
+              onClick={() => navigate("/about")}
+              className="text-primary underline underline-offset-4 font-bold"
+            >
+              {lang === "ar" ? "من نحن" : "About Sandal"}
+            </button>
+          </p>
+        )}
+
         <TopTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
         <div className="pt-2">
           {activeTab === "explore" && (
             <>
+              {/* PRIMARY: what's happening now */}
+              <EventsSection events={dbEvents as any[]} />
+              <AudioTourCards />
+
+              {/* SECONDARY: everything else, clearly demoted */}
+              <div className="mt-6 mb-5 px-4 flex items-center gap-3">
+                <span className="h-px flex-1 bg-border" />
+                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  {lang === "ar" ? "المزيد للاستكشاف" : "More to explore"}
+                </span>
+                <span className="h-px flex-1 bg-border" />
+              </div>
+
               <RegionScroll />
               <LatestPosts />
-              <AudioTourCards />
               <CollectionsSection />
-              <EventsSection events={dbEvents as any[]} />
               <HomeCausesSection />
 
               {/* Why Sandal? — collapsed footer */}
@@ -127,7 +155,13 @@ const Index = () => {
                 )}
                 {/* Footer links — image credits must stay reachable from the home page
                     because CC BY-SA hero images appear here. */}
-                <div className="mt-4 flex items-center justify-center">
+                <div className="mt-4 flex items-center justify-center gap-4">
+                  <button
+                    onClick={() => navigate("/about")}
+                    className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors underline underline-offset-4"
+                  >
+                    {lang === "ar" ? "من نحن" : "About Sandal"}
+                  </button>
                   <button
                     onClick={() => navigate("/credits")}
                     className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors underline underline-offset-4"
@@ -139,6 +173,7 @@ const Index = () => {
 
             </>
           )}
+
           {activeTab === "experiences" && <ExperienceCards />}
           {activeTab === "trips" && <TripCards />}
         </div>
