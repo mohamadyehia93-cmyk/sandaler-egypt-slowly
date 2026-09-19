@@ -36,7 +36,8 @@ const AudioTourCards = () => {
                 {a.duration_minutes} {t("common.min")} · {a.stops_count} {t("common.stops")}
               </div>
               {/* Free vs paid, visible before tapping in */}
-              <PriceBadge price={a.price} variant="overlay" className="absolute top-2 right-2" />
+              <PriceBadge price={a.price} variant="overlay" className="absolute bottom-2 right-2" />
+
               <div className="absolute bottom-3 left-3 right-3">
                 <h3 className="text-sm font-bold text-primary-foreground line-clamp-2">
                   {lang === "ar" ? (a.title_ar || a.title_en) : a.title_en}
