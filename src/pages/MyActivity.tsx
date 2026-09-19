@@ -105,7 +105,7 @@ const MyActivity = () => {
                 </h2>
                 <div className="space-y-2">
                   {data!.reviews.map((r) => {
-                    const exp = r.experiences as { title_en?: string; title_ar?: string; slug?: string } | null;
+                    const exp = r.experience;
                     const title = (ar ? exp?.title_ar || exp?.title_en : exp?.title_en) || "";
                     return (
                       <button
