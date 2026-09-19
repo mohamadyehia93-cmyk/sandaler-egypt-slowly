@@ -14,6 +14,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import ProviderDraftBanner from "@/components/dashboard/ProviderDraftBanner";
+import ProfileCompleteness from "@/components/ProfileCompleteness";
+import { useVisitorStats } from "@/hooks/useVisitorStats";
 
 type SavedItinerary = {
   id: string;
@@ -33,6 +35,7 @@ const Profile = () => {
   const { isAmbassador } = useIsAmbassador();
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null } | null>(null);
   const [itineraries, setItineraries] = useState<SavedItinerary[]>([]);
+  const { data: visitorStats } = useVisitorStats();
 
   useEffect(() => {
     if (!user) return;
@@ -99,21 +102,36 @@ const Profile = () => {
   const displayName = profile?.display_name || googleName || user.email || t("profile.traveler");
   const avatarUrl = profile?.avatar_url || googleAvatar;
 
-  const stats = [
-    { value: String(itineraries.length), label: t("profile.plans") },
-    { value: "0", label: t("profile.reviews") },
-  ];
+  // Every tile is a real count of the signed-in user's own rows. A number we
+  // cannot query is not shown at all — nothing here is hardcoded.
+  const stats = visitorStats
+    ? [
+        { value: String(visitorStats.itineraries), label: t("profile.plans"), path: null },
+        { value: String(visitorStats.reviews), label: t("profile.reviews"), path: "/profile/activity" },
+        { value: String(visitorStats.wishlist), label: lang === "ar" ? "محفوظة" : "Saved", path: "/wishlists" },
+        { value: String(visitorStats.followers), label: lang === "ar" ? "متابعون" : "Followers", path: null },
+        { value: String(visitorStats.following), label: lang === "ar" ? "أتابع" : "Following", path: "/profile/following" },
+      ]
+    : [];
 
   const menuItems = [
     // Ambassador is a capability, so its entry point lives here rather than in a dashboard.
     ...(isAmbassador ? [{ label: lang === "ar" ? "إبلاغ عن مشكلة" : "Flag an issue", path: "/flag-issue" }] : []),
     ...(isAdmin ? [{ label: lang === "ar" ? "لوحة الإدارة" : "Admin panel", path: "/admin" }] : []),
+    { label: lang === "ar" ? "نشاطك" : "Your activity", path: "/profile/activity" },
+    { label: lang === "ar" ? "حجوزاتي" : "My Bookings", path: "/bookings" },
     { label: lang === "ar" ? "تذاكري" : "My Tickets", path: "/tickets" },
     { label: lang === "ar" ? "طلباتي" : "My Orders", path: "/orders" },
     { label: lang === "ar" ? "طلبات التطوع" : "My Applications", path: "/applications" },
     { label: lang === "ar" ? "طلبات الجلسات" : "My Session Requests", path: "/session-requests" },
+    { label: lang === "ar" ? "الجلسات" : "Sessions", path: "/sessions" },
+    { label: lang === "ar" ? "دعمي" : "My Pledges", path: "/pledges" },
+    { label: lang === "ar" ? "أعمال مطلوبة" : "My Commissions", path: "/commissions" },
+    { label: lang === "ar" ? "يوميات المضيفين" : "Host Updates", path: "/statuses" },
+    { label: lang === "ar" ? "المفضلة" : "Wishlists", path: "/wishlists" },
+    { label: lang === "ar" ? "أتابع" : "Following", path: "/profile/following" },
     { label: t("profile.impact_dashboard"), path: "/profile/impact" },
-    { label: t("profile.badges_quests"), path: "/profile/badges" },
+    { label: lang === "ar" ? "شاراتك" : "Your badges", path: "/profile/badges" },
     { label: t("profile.settings"), path: "/profile/settings" },
     { label: t("profile.help_support"), path: "/profile/help" },
   ];
@@ -133,6 +151,7 @@ const Profile = () => {
 
       <div className="px-4 py-6">
         <ProviderDraftBanner className="mb-4" />
+        <ProfileCompleteness className="mb-4" />
 
         {/* Profile Card */}
         <div className="bg-card rounded-xl shadow-card p-5 flex flex-col items-center mb-6">
@@ -217,15 +236,22 @@ const Profile = () => {
           </div>
         )}
 
-        {/* Stats */}
-        <div className="flex bg-card rounded-xl shadow-card mb-6">
-          {stats.map((s, i) => (
-            <div key={i} className={`flex-1 py-4 text-center ${i < stats.length - 1 ? "border-r border-border" : ""}`}>
-              <span className="text-xl font-bold text-primary-dark block">{s.value}</span>
-              <span className="text-xs text-muted-foreground">{s.label}</span>
-            </div>
-          ))}
-        </div>
+        {/* Stats — every tile is a live count; the row is hidden until they load */}
+        {stats.length > 0 && (
+          <div className="flex bg-card rounded-xl shadow-card mb-6 overflow-hidden">
+            {stats.map((s, i) => (
+              <button
+                key={i}
+                disabled={!s.path}
+                onClick={() => s.path && navigate(s.path)}
+                className={`flex-1 py-4 text-center ${i < stats.length - 1 ? "border-r border-border" : ""} ${s.path ? "active:bg-secondary/50" : "cursor-default"}`}
+              >
+                <span className="text-lg font-bold text-primary-dark block">{s.value}</span>
+                <span className="text-[11px] text-muted-foreground">{s.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Menu */}
         <div className="bg-card rounded-xl shadow-card overflow-hidden">
