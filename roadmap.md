@@ -9,3 +9,4 @@
 - [x] Rebuild Badges & Quests from real activity counts; drop fabricated quests
 - [x] Profile completeness nudge (photo, bio, city/interests) linking to /edit-profile
 - [x] Visitors can edit interests / cities / travel style / budget after sign-up
+- [x] Visitor dashboard: one view of bookings, orders, requests, tickets, sessions, pledges, applications, commissions
