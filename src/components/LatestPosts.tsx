@@ -1,12 +1,11 @@
-import { Bookmark, Mic, Film, Camera, MessageSquare, ChefHat, ClipboardList, Map } from "lucide-react";
+import { Mic, Film, Camera, MessageSquare, ChefHat, ClipboardList, Map } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { usePosts } from "@/hooks/useListings";
 import SectionHeader from "./SectionHeader";
-import CityBadge from "./CityBadge";
-import WishlistButton from "./WishlistButton";
+import CardCarousel from "./CardCarousel";
+import ContentCard from "./ContentCard";
 import { Skeleton } from "./ui/skeleton";
-
 
 const contentTypeConfig: Record<string, { icon: React.ElementType; label: { en: string; ar: string }; color: string }> = {
   podcast: { icon: Mic, label: { en: "Podcast", ar: "بودكاست" }, color: "bg-purple-500" },
@@ -20,95 +19,32 @@ const contentTypeConfig: Record<string, { icon: React.ElementType; label: { en: 
 
 export { contentTypeConfig };
 
-// Display order + bilingual labels for the 4 themes used in the DB
-const THEME_ORDER = ["Culture", "History", "Food", "Nature"] as const;
-const THEME_LABEL: Record<string, { en: string; ar: string }> = {
-  Culture: { en: "Culture", ar: "ثقافة" },
-  History: { en: "History", ar: "تاريخ" },
-  Food: { en: "Food", ar: "طعام" },
-  Nature: { en: "Nature", ar: "طبيعة" },
-};
-
-const PostCard = ({ p, lang, navigate }: any) => {
-  const ct = p.content_type ? contentTypeConfig[p.content_type] : null;
-  const CtIcon = ct?.icon;
-  const title = lang === "ar" ? (p.title_ar || p.title_en) : p.title_en;
-  return (
-    <div
-      className="rounded-lg overflow-hidden shadow-card bg-card relative cursor-pointer"
-      onClick={() => navigate(`/post/${p.slug || p.id}`)}
-    >
-      <div className="relative h-40">
-        <img src={p.image || "/placeholder.svg"} alt={title} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 gradient-overlay" />
-        <WishlistButton
-          itemType="post"
-          itemId={p.id}
-          variant="bookmark"
-          className="absolute top-2 right-2 p-1.5 rounded-full bg-background/60 backdrop-blur-sm"
-        />
-
-        {ct && CtIcon && (
-          <span
-            className={`absolute top-2 left-2 inline-flex items-center gap-1 ${ct.color} text-white text-[9px] font-semibold px-1.5 py-0.5 rounded`}
-          >
-            <CtIcon className="w-3 h-3" />
-            {ct.label[lang]}
-          </span>
-        )}
-        <div className="absolute bottom-2.5 left-2.5 right-2.5">
-          {p.city_id && <CityBadge cityId={p.city_id} variant="overlay" />}
-          <h3 className="text-xs font-bold text-primary-foreground line-clamp-2 leading-tight">
-            {title}
-          </h3>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const LatestPosts = () => {
   const { lang } = useI18n();
   const navigate = useNavigate();
   const { data: posts, isLoading } = usePosts();
 
-  if (isLoading) {
-    return (
-      <SectionHeader titleKey="section.latestPosts" onSeeAll={() => navigate("/posts")}>
-        <div className="grid grid-cols-3 gap-3 px-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-40 rounded-lg" />
-          ))}
-        </div>
-      </SectionHeader>
-    );
-  }
-
-  // Group posts by theme/category
-  const grouped: Record<string, any[]> = {};
-  (posts ?? []).forEach((p: any) => {
-    const key = p.category && THEME_LABEL[p.category] ? p.category : "Other";
-    (grouped[key] ||= []).push(p);
-  });
-
-  const themes = THEME_ORDER.filter((k) => grouped[k]?.length);
-
   return (
-    <SectionHeader titleKey="section.latestPosts" onSeeAll={() => navigate("/posts")}>
-      <div className="space-y-5">
-        {themes.map((theme) => (
-          <div key={theme}>
-            <h3 className="px-4 mb-2 text-[13px] font-bold text-foreground">
-              {THEME_LABEL[theme][lang]}
-            </h3>
-            <div className="grid grid-cols-3 gap-3 px-4">
-              {grouped[theme].slice(0, 3).map((p: any) => (
-                <PostCard key={p.id} p={p} lang={lang} navigate={navigate} />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+    <SectionHeader id="stories" titleKey="section.latestPosts" onSeeAll={() => navigate("/posts")}>
+      {isLoading ? (
+        <div className="px-4">
+          <Skeleton className="aspect-[3/2] w-full rounded-xl" />
+        </div>
+      ) : (
+        <CardCarousel>
+          {(posts ?? []).slice(0, 6).map((p) => (
+            <ContentCard
+              key={p.id}
+              type="story"
+              title={(lang === "ar" ? p.title_ar || p.title_en : p.title_en) || ""}
+              image={p.image}
+              href={`/post/${p.slug || p.id}`}
+              showPrice={false}
+              wishlist={{ itemType: "post", itemId: p.id, variant: "bookmark" }}
+            />
+          ))}
+        </CardCarousel>
+      )}
     </SectionHeader>
   );
 };

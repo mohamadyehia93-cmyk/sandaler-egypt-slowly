@@ -1,59 +1,36 @@
-import WishlistButton from "@/components/WishlistButton";
-import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAccommodations } from "@/hooks/useListings";
 import SectionHeader from "./SectionHeader";
-import CityBadge from "./CityBadge";
-import PriceBadge from "./PriceBadge";
+import CardCarousel from "./CardCarousel";
+import ContentCard from "./ContentCard";
 import { Skeleton } from "./ui/skeleton";
 
 const AccommodationCards = () => {
-  const { lang, t } = useI18n();
-  const navigate = useNavigate();
+  const { lang } = useI18n();
   const { data: accommodation, isLoading } = useAccommodations();
 
   return (
-    <SectionHeader titleKey="section.placesToStay">
-      <div className="grid grid-cols-3 gap-3 px-4">
-        {isLoading ? (
-          Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-[220px] rounded-lg" />
-          ))
-        ) : (accommodation ?? []).slice(0, 3).map((a) => (
-          <div key={a.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${a.slug || a.id}`)}>
-            <div className="relative h-32">
-              <img src={a.image || "/placeholder.svg"} alt={lang === "ar" ? (a.name_ar || a.name_en) : a.name_en} className="w-full h-full object-cover" />
-              <WishlistButton itemType="accommodation" itemId={a.id} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm" />
-              {a.accommodation_type && (
-                <span className="absolute bottom-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
-                  {a.accommodation_type}
-                </span>
-              )}
-            </div>
-            <div className="p-3">
-              <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-0.5">
-                {lang === "ar" ? (a.name_ar || a.name_en) : a.name_en}
-              </h3>
-              {a.listing_kind !== "hosted" && (
-                <span className="inline-block mb-1 text-[9px] font-medium text-muted-foreground border border-border rounded-full px-1.5 py-0.5">
-                  {lang === "ar" ? "معلومات صندل" : "Sandal info"}
-                </span>
-              )}
-              {a.host_name_en && (
-                <div className="flex items-center gap-1.5 mb-1">
-                  {a.host_image && <img src={a.host_image} alt="" className="w-4 h-4 rounded-full object-cover" />}
-                  <span className="text-[10px] text-primary font-medium truncate">
-                    {lang === "ar" ? (a.host_name_ar || a.host_name_en) : a.host_name_en}
-                  </span>
-                </div>
-              )}
-              {a.city_id && <div className="mb-2"><CityBadge cityId={a.city_id} /></div>}
-              <PriceBadge price={a.price_per_night} suffix={t("common.perNight")} />
-
-            </div>
-          </div>
-        ))}
-      </div>
+    <SectionHeader id="stays" titleKey="section.placesToStay">
+      {isLoading ? (
+        <div className="px-4">
+          <Skeleton className="aspect-[3/2] w-full rounded-xl" />
+        </div>
+      ) : (
+        <CardCarousel>
+          {(accommodation ?? []).slice(0, 6).map((a) => (
+            <ContentCard
+              key={a.id}
+              type="stay"
+              title={(lang === "ar" ? a.name_ar || a.name_en : a.name_en) || ""}
+              image={a.image}
+              href={`/stay/${a.slug || a.id}`}
+              price={a.price_per_night}
+              note={a.price_per_night ? (lang === "ar" ? "لكل ليلة" : "per night") : undefined}
+              wishlist={{ itemType: "accommodation", itemId: a.id }}
+            />
+          ))}
+        </CardCarousel>
+      )}
     </SectionHeader>
   );
 };

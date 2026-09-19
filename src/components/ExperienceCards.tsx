@@ -1,18 +1,12 @@
-import WishlistButton from "@/components/WishlistButton";
-import { useState, useMemo } from "react";
-import { Heart } from "lucide-react";
+import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
-import { EXPERIENCE_THEMES } from "@/lib/listingTaxonomy";
 import { useExperiences, useRegions } from "@/hooks/useListings";
-import CityBadge from "./CityBadge";
-import PriceBadge from "./PriceBadge";
-
-import { useNavigate } from "react-router-dom";
+import CardCarousel from "./CardCarousel";
+import ContentCard from "./ContentCard";
 import { Skeleton } from "./ui/skeleton";
 
 const ExperienceCards = () => {
   const { lang, t } = useI18n();
-  const navigate = useNavigate();
   const { data: experiences, isLoading } = useExperiences();
   const { data: dbRegions } = useRegions();
   const [activeRegion, setActiveRegion] = useState("all");
@@ -23,102 +17,49 @@ const ExperienceCards = () => {
     (e) => activeRegion === "all" || e.region_id === activeRegion
   );
 
-  // Group by theme, preserving the EXPERIENCE_THEMES order
-  const grouped = useMemo(() => {
-    return EXPERIENCE_THEMES
-      .map((th) => ({
-        theme: th,
-        items: filtered.filter((e) => e.theme === th.key),
-      }))
-      .filter((g) => g.items.length > 0);
-  }, [filtered]);
-
   return (
-    <section className="pb-6">
-      {/* Header */}
-      <div className="px-4 mb-3 flex items-center justify-between">
-        <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+    <section id="experiences" className="mb-12 scroll-mt-28">
+      <div className="px-4 mb-4 flex items-center justify-between gap-3">
+        <h2 className={`text-[11px] font-semibold text-muted-foreground ${lang === "ar" ? "" : "uppercase tracking-[0.12em]"}`}>
           {t("section.experiences")}
         </h2>
         <select
           value={activeRegion}
           onChange={(e) => setActiveRegion(e.target.value)}
-          className="px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold border-0 outline-none cursor-pointer"
+          aria-label={lang === "ar" ? "تصفية حسب المنطقة" : "Filter by region"}
+          className="px-3 py-1.5 rounded-full bg-secondary text-foreground text-xs font-semibold border border-border outline-none cursor-pointer"
         >
           <option value="all">{lang === "ar" ? "كل المناطق" : "All Regions"}</option>
           {regionsList.map((r) => (
             <option key={r.id} value={r.id}>
-              {lang === "ar" ? (r.name_ar || r.name_en) : r.name_en}
+              {lang === "ar" ? r.name_ar || r.name_en : r.name_en}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Grouped vertical feed */}
       {isLoading ? (
-        <div className="px-4 space-y-3">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-28 w-full rounded-lg" />
-          ))}
+        <div className="px-4">
+          <Skeleton className="aspect-[3/2] w-full rounded-xl" />
         </div>
-      ) : grouped.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <p className="px-4 text-sm text-muted-foreground text-center py-8">
           {lang === "ar" ? "لا توجد تجارب" : "No experiences found"}
         </p>
       ) : (
-        <div className="space-y-6">
-          {grouped.map(({ theme, items }) => (
-            <div key={theme.key}>
-              <div className="px-4 mb-2 flex items-center gap-2">
-                <span className="text-lg">{theme.emoji}</span>
-                <h3 className="text-base font-bold text-foreground">{theme.label[lang]}</h3>
-                <span className="text-xs text-muted-foreground">({items.length})</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3 px-4">
-                {items.slice(0, 3).map((e) => (
-                  <button
-                    key={e.id}
-                    onClick={() => navigate(`/experience/${e.slug || e.id}`)}
-                    className="rounded-lg overflow-hidden shadow-card bg-card text-start"
-                  >
-                    <div className="relative h-32">
-                      <img
-                        src={e.image || "/placeholder.svg"}
-                        alt={lang === "ar" ? (e.title_ar || e.title_en) : e.title_en}
-                        className="w-full h-full object-cover"
-                      />
-                      <WishlistButton itemType="experience" itemId={e.id} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm" />
-                    </div>
-                    <div className="p-3">
-                      <h4 className="text-sm font-semibold text-foreground line-clamp-2 mb-1">
-                        {lang === "ar" ? (e.title_ar || e.title_en) : e.title_en}
-                      </h4>
-                      {e.host_name_en && (
-                        <div className="flex items-center gap-1.5 mb-1.5">
-                          {e.host_image && (
-                            <img src={e.host_image} alt="" className="w-4 h-4 rounded-full object-cover" />
-                          )}
-                          <span className="text-[10px] text-primary font-medium truncate">
-                            {lang === "ar" ? (e.host_name_ar || e.host_name_en) : e.host_name_en}
-                          </span>
-                        </div>
-                      )}
-                      {e.city_id && <div className="mb-2"><CityBadge cityId={e.city_id} /></div>}
-                      <div className="flex items-center justify-between">
-                        <PriceBadge price={e.price} />
-                        {e.rating ? (
-                          <span className="text-xs text-muted-foreground">⭐ {e.rating}</span>
-                        ) : null}
-                      </div>
-
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
+        <CardCarousel>
+          {filtered.slice(0, 8).map((e) => (
+            <ContentCard
+              key={e.id}
+              type="experience"
+              title={(lang === "ar" ? e.title_ar || e.title_en : e.title_en) || ""}
+              image={e.image}
+              href={`/experience/${e.slug || e.id}`}
+              price={e.price}
+              wishlist={{ itemType: "experience", itemId: e.id }}
+            />
           ))}
-        </div>
+        </CardCarousel>
       )}
     </section>
   );
