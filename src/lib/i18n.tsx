@@ -1,4 +1,6 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import i18n from "@/i18n/config";
+
 
 type Lang = "en" | "ar";
 
@@ -110,21 +112,38 @@ const I18nContext = createContext<I18nContextType>({
   dir: "ltr",
 });
 
+/**
+ * Single source of truth for the UI language: i18next.
+ * This context used to keep its own useState, so toggling the language only
+ * changed react-i18next strings while every `useI18n()` component stayed put.
+ */
+const normalize = (value?: string | null): Lang =>
+  (value ?? "").toLowerCase().startsWith("ar") ? "ar" : "en";
+
 export const I18nProvider = ({ children }: { children: ReactNode }) => {
-  const [lang, setLang] = useState<Lang>(() => {
-    const saved = localStorage.getItem("sandal-lang");
-    return (saved === "ar" || saved === "en") ? saved : "en";
-  });
+  const [lang, setLangState] = useState<Lang>(() => normalize(i18n.language));
+
+  useEffect(() => {
+    const onChange = (next: string) => setLangState(normalize(next));
+    i18n.on("languageChanged", onChange);
+    setLangState(normalize(i18n.language));
+    return () => {
+      i18n.off("languageChanged", onChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   const changeLang = (l: Lang) => {
-    setLang(l);
-    localStorage.setItem("sandal-lang", l);
-    document.documentElement.dir = l === "ar" ? "rtl" : "ltr";
-    document.documentElement.lang = l;
+    i18n.changeLanguage(l);
   };
 
   const t = (key: string) => translations[key]?.[lang] ?? key;
   const dir = lang === "ar" ? "rtl" : "ltr";
+
 
   return (
     <I18nContext.Provider value={{ lang, setLang: changeLang, t, dir }}>
