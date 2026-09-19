@@ -74,6 +74,7 @@ const ContentCard = ({
           <WishlistButton
             itemType={wishlist.itemType}
             itemId={wishlist.itemId}
+            variant={wishlist.variant}
             className="absolute top-2.5 end-2.5 rounded-full bg-background/70 p-2 backdrop-blur-sm"
           />
         )}
@@ -96,9 +97,6 @@ const ContentCard = ({
           )}
         </div>
       </div>
-      {priceSuffix && !(price === 0 || price == null) && (
-        <span className="sr-only">{priceSuffix}</span>
-      )}
     </article>
   );
 };
