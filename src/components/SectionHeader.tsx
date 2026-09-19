@@ -5,17 +5,19 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 type SectionHeaderProps = {
   titleKey: string;
   onSeeAll?: () => void;
+  /** Anchor id, used by the sticky category nav to scroll here. */
+  id?: string;
   children: ReactNode;
 };
 
-const SectionHeader = forwardRef(({ titleKey, onSeeAll, children }: SectionHeaderProps, ref: React.Ref<HTMLElement>) => {
+const SectionHeader = forwardRef(({ titleKey, onSeeAll, id, children }: SectionHeaderProps, ref: React.Ref<HTMLElement>) => {
   const { t, lang } = useI18n();
   const Arrow = lang === "ar" ? ChevronLeft : ChevronRight;
   const isAr = lang === "ar";
 
   return (
-    <section ref={ref} className="mb-8">
-      <div className="flex items-end justify-between px-4 mb-3">
+    <section ref={ref} id={id} className="mb-12 scroll-mt-28">
+      <div className="flex items-end justify-between px-4 mb-4">
         <h2
           className={`text-[11px] font-semibold text-muted-foreground ${
             isAr ? "" : "uppercase tracking-[0.12em]"
