@@ -51,6 +51,8 @@ const ProductDetail = lazy(() => import("./pages/ProductDetail.tsx"));
 const PartnerDetail = lazy(() => import("./pages/PartnerDetail.tsx"));
 const ImpactDashboard = lazy(() => import("./pages/ImpactDashboard.tsx"));
 const BadgesQuests = lazy(() => import("./pages/BadgesQuests.tsx"));
+const Following = lazy(() => import("./pages/Following.tsx"));
+const MyActivity = lazy(() => import("./pages/MyActivity.tsx"));
 const Settings = lazy(() => import("./pages/Settings.tsx"));
 const HelpSupport = lazy(() => import("./pages/HelpSupport.tsx"));
 const CauseSupportGift = lazy(() => import("./pages/CauseSupportGift.tsx"));
@@ -221,6 +223,8 @@ const App = () => {
             <Route path="/edit-profile" element={<EditProfile />} />
             <Route path="/profile/impact" element={<ImpactDashboard />} />
             <Route path="/profile/badges" element={<BadgesQuests />} />
+            <Route path="/profile/following" element={<Following />} />
+            <Route path="/profile/activity" element={<MyActivity />} />
             <Route path="/profile/settings" element={<Settings />} />
             <Route path="/profile/help" element={<HelpSupport />} />
             <Route path="/admin" element={<Admin />} />

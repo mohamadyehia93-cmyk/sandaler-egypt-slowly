@@ -15,6 +15,7 @@ import { parseAvailability, type AvailabilitySlot } from "@/lib/availability";
 import { getCityCoords } from "@/lib/cityCoords";
 import { PROVIDER_PUBLIC_COLUMNS, type ProviderContact } from "@/lib/providerColumns";
 import { Button } from "@/components/ui/button";
+import { VISITOR_INTERESTS, VISITOR_TRAVEL_STYLES, VISITOR_BUDGETS } from "@/lib/visitorPrefs";
 
 
 /**
@@ -248,6 +249,10 @@ const EditProfile = () => {
   const [vBio, setVBio] = useState("");
   const [vAvatar, setVAvatar] = useState<string | null>(null);
   const [vAvatarFiles, setVAvatarFiles] = useState<File[]>([]);
+  const [vInterests, setVInterests] = useState<string[]>([]);
+  const [vCities, setVCities] = useState<string[]>([]);
+  const [vStyle, setVStyle] = useState<string | null>(null);
+  const [vBudget, setVBudget] = useState<string | null>(null);
 
   const set = (k: keyof typeof f, v: string) => setF((p) => ({ ...p, [k]: v }));
 
@@ -302,10 +307,14 @@ const EditProfile = () => {
       return;
     }
     setLoading(true);
-    const [{ data: prov }, { data: prof }] = await Promise.all([
+    // The personalisation columns are not client-readable by design, so they come
+    // back through the caller-scoped get_my_preferences() function.
+    const [{ data: prov }, { data: prof }, { data: prefRows }] = await Promise.all([
       supabase.from("providers").select(PROVIDER_PUBLIC_COLUMNS).eq("user_id", user.id).maybeSingle(),
       supabase.from("profiles").select("display_name, avatar_url, bio").eq("user_id", user.id).maybeSingle(),
+      supabase.rpc("get_my_preferences"),
     ]);
+    const prefs = Array.isArray(prefRows) ? prefRows[0] : prefRows;
 
     if (prov) {
       const p = prov as unknown as ProviderRow;
@@ -352,6 +361,10 @@ const EditProfile = () => {
     setVName(prof?.display_name || "");
     setVBio(prof?.bio || "");
     setVAvatar(prof?.avatar_url || null);
+    setVInterests(asStringArray(prefs?.interests));
+    setVCities(asStringArray(prefs?.cities));
+    setVStyle(prefs?.travel_style ?? null);
+    setVBudget(prefs?.budget ?? null);
     setLoading(false);
   };
 
@@ -580,7 +593,15 @@ const EditProfile = () => {
       }
       const { error } = await supabase
         .from("profiles")
-        .update({ display_name: vName.trim(), bio: vBio.trim() || null, avatar_url: avatar || null })
+        .update({
+          display_name: vName.trim(),
+          bio: vBio.trim() || null,
+          avatar_url: avatar || null,
+          interests: vInterests.length ? vInterests : null,
+          cities: vCities.length ? vCities : null,
+          travel_style: vStyle,
+          budget: vBudget,
+        })
         .eq("user_id", user.id);
       if (error) throw error;
       setVAvatarFiles([]);
@@ -1102,6 +1123,87 @@ const EditProfile = () => {
                 onChange={(e) => setVBio(e.target.value)}
                 maxLength={500}
               />
+            </div>
+
+            {/* Personalisation picked at sign-up, editable here so it never gets stuck */}
+            <div>
+              <label className={labelClass}>{ar ? "اهتماماتك" : "Your interests"}</label>
+              <div className="flex flex-wrap gap-2">
+                {VISITOR_INTERESTS.map((i) => {
+                  const on = vInterests.includes(i.key);
+                  return (
+                    <button
+                      key={i.key}
+                      type="button"
+                      onClick={() =>
+                        setVInterests(on ? vInterests.filter((k) => k !== i.key) : [...vInterests, i.key])
+                      }
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border ${
+                        on ? "bg-primary text-primary-foreground border-primary" : "border-border text-foreground"
+                      }`}
+                    >
+                      {ar ? i.label.ar : i.label.en}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label className={labelClass}>{ar ? "مدنك" : "Your cities"}</label>
+              <div className="flex flex-wrap gap-2 max-h-44 overflow-y-auto">
+                {(cities || []).map((c) => {
+                  const on = vCities.includes(c.id);
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setVCities(on ? vCities.filter((k) => k !== c.id) : [...vCities, c.id])}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border ${
+                        on ? "bg-primary text-primary-foreground border-primary" : "border-border text-foreground"
+                      }`}
+                    >
+                      {ar ? c.name_ar || c.name_en : c.name_en}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label className={labelClass}>{ar ? "أسلوب سفرك" : "Travel style"}</label>
+              <div className="flex flex-wrap gap-2">
+                {VISITOR_TRAVEL_STYLES.map((s) => (
+                  <button
+                    key={s.key}
+                    type="button"
+                    onClick={() => setVStyle(vStyle === s.key ? null : s.key)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border ${
+                      vStyle === s.key ? "bg-primary text-primary-foreground border-primary" : "border-border text-foreground"
+                    }`}
+                  >
+                    {ar ? s.label.ar : s.label.en}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className={labelClass}>{ar ? "ميزانيتك اليومية" : "Daily budget"}</label>
+              <div className="flex flex-wrap gap-2">
+                {VISITOR_BUDGETS.map((b) => (
+                  <button
+                    key={b.key}
+                    type="button"
+                    onClick={() => setVBudget(vBudget === b.key ? null : b.key)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border ${
+                      vBudget === b.key ? "bg-primary text-primary-foreground border-primary" : "border-border text-foreground"
+                    }`}
+                  >
+                    {ar ? b.label.ar : b.label.en}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}

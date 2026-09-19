@@ -3205,6 +3205,16 @@ export type Database = {
         Args: { _target_id: string; _target_type: string }
         Returns: number
       }
+      get_my_preferences: {
+        Args: never
+        Returns: {
+          budget: string
+          cities: string[]
+          interests: string[]
+          preferred_language: string
+          travel_style: string
+        }[]
+      }
       get_provider_contact: {
         Args: { _provider_id: string }
         Returns: {
