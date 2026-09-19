@@ -26,7 +26,7 @@ const MyActivity = () => {
       const [reviews, posts, comments] = await Promise.all([
         supabase
           .from("experience_reviews")
-          .select("id, rating, review_text, created_at, experience_id, experiences(title_en, title_ar, slug)")
+          .select("id, rating, review_text, created_at, experience_id")
           .eq("user_id", uid)
           .order("created_at", { ascending: false }),
         supabase
@@ -40,8 +40,22 @@ const MyActivity = () => {
           .eq("user_id", uid)
           .order("created_at", { ascending: false }),
       ]);
+
+      // experience_reviews has no FK to experiences, so the titles are looked up
+      // in a second query rather than through an embed.
+      const reviewRows = reviews.data ?? [];
+      const ids = [...new Set(reviewRows.map((r) => r.experience_id))];
+      const titles = new Map<string, { title_en: string; title_ar: string | null; slug: string | null }>();
+      if (ids.length) {
+        const { data: exps } = await supabase
+          .from("experiences")
+          .select("id, title_en, title_ar, slug")
+          .in("id", ids);
+        (exps ?? []).forEach((e) => titles.set(e.id, e));
+      }
+
       return {
-        reviews: reviews.data ?? [],
+        reviews: reviewRows.map((r) => ({ ...r, experience: titles.get(r.experience_id) ?? null })),
         posts: posts.data ?? [],
         comments: comments.data ?? [],
       };
