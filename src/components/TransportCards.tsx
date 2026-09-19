@@ -37,7 +37,7 @@ const TransportCards = () => {
               </div>
             )}
             {tr.city_id && <CityBadge cityId={tr.city_id} />}
-            <span className="text-sm font-bold text-primary-dark">{tr.price} {t("common.egp")}</span>
+            <PriceBadge price={tr.price} />
           </div>
         ))}
       </div>

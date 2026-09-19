@@ -43,7 +43,7 @@ const ProductGrid = () => {
                 </div>
               )}
               {p.city_id && <div className="mb-1"><CityBadge cityId={p.city_id} /></div>}
-              <span className="text-sm font-bold text-primary-dark">{p.price} {t("common.egp")}</span>
+              <PriceBadge price={p.price} />
             </div>
           </div>
         ))}

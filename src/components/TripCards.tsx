@@ -228,9 +228,8 @@ const TripCards = () => {
                         </div>
                       )}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-primary-dark">
-                          {tr.price} {t("common.egp")}
-                        </span>
+                        <PriceBadge price={tr.price} />
+
                         <button
                           onClick={(e) => { e.stopPropagation(); navigate(`/booking?type=trip&id=${tr.id}`); }}
                           className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold"

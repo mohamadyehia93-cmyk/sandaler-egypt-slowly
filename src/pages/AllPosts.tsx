@@ -5,6 +5,8 @@ import { bylineNames } from "@/lib/postByline";
 import { usePosts, useRegions } from "@/hooks/useListings";
 import { contentTypeConfig } from "@/components/LatestPosts";
 import CityBadge from "@/components/CityBadge";
+import WishlistButton from "@/components/WishlistButton";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useMemo } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from "@/components/ui/sheet";

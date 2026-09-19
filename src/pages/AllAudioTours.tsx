@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAudioTours, useRegions } from "@/hooks/useListings";
 import CityBadge from "@/components/CityBadge";
+import PriceBadge from "@/components/PriceBadge";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useMemo } from "react";
 
