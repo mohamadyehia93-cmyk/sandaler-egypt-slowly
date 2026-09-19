@@ -6,7 +6,7 @@ import ContentCard from "./ContentCard";
 import { Skeleton } from "./ui/skeleton";
 
 const AccommodationCards = () => {
-  const { lang, t } = useI18n();
+  const { lang } = useI18n();
   const { data: accommodation, isLoading } = useAccommodations();
 
   return (
@@ -25,7 +25,7 @@ const AccommodationCards = () => {
               image={a.image}
               href={`/stay/${a.slug || a.id}`}
               price={a.price_per_night}
-              note={a.price_per_night ? t("common.perNight") : undefined}
+              note={a.price_per_night ? (lang === "ar" ? "لكل ليلة" : "per night") : undefined}
               wishlist={{ itemType: "accommodation", itemId: a.id }}
             />
           ))}
