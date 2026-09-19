@@ -147,12 +147,7 @@ const AllAudioTours = () => {
                         <Headphones className="w-3 h-3" />
                         {a.duration_minutes} {t("common.min")} · {a.stops_count} {t("common.stops")}
                       </div>
-                      <button
-                        className="absolute top-2 right-2 p-1.5 rounded-full bg-primary text-primary-foreground"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Play className="w-3.5 h-3.5" />
-                      </button>
+                      <PriceBadge price={(a as any).price} variant="overlay" className="absolute top-2 right-2" />
                       <div className="absolute bottom-2 left-2 right-2">
                         <h3 className="text-sm font-bold text-primary-foreground line-clamp-2 leading-tight">
                           {lang === "ar" ? (a.title_ar || a.title_en) : a.title_en}
@@ -161,10 +156,8 @@ const AllAudioTours = () => {
                     </div>
                     <div className="p-3 flex items-center justify-between">
                       {a.city_id && <CityBadge cityId={a.city_id} />}
-                      {/* Payments aren't live for tours yet — listening is free. */}
-                      <span className="text-sm font-bold text-primary-dark">
-                        {lang === "ar" ? "مجاني للاستماع" : "Free to listen"}
-                      </span>
+                      <PriceBadge price={(a as any).price} />
+
 
                     </div>
                   </div>

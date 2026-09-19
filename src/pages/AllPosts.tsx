@@ -46,6 +46,8 @@ const AllPosts = () => {
     () =>
       (dbPosts as any[]).map((p) => ({
         id: p.slug || p.id,
+        uuid: p.id,
+
         title: { en: p.title_en, ar: p.title_ar },
         image: p.image,
         regionId: p.region_id,
