@@ -104,11 +104,12 @@ const ExperienceCards = () => {
                       )}
                       {e.city_id && <div className="mb-2"><CityBadge cityId={e.city_id} /></div>}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-primary-dark">
-                          {e.price === 0 ? t("common.free") : `${e.price} ${t("common.egp")}`}
-                        </span>
-                        <span className="text-xs text-muted-foreground">⭐ {e.rating}</span>
+                        <PriceBadge price={e.price} />
+                        {e.rating ? (
+                          <span className="text-xs text-muted-foreground">⭐ {e.rating}</span>
+                        ) : null}
                       </div>
+
                     </div>
                   </button>
                 ))}
