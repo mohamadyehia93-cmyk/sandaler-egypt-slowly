@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { contentTypeLabel, type ContentType } from "@/lib/contentTypes";
+import type { WishlistItemType } from "@/hooks/useWishlist";
 import PriceBadge from "./PriceBadge";
 import WishlistButton from "./WishlistButton";
 
@@ -13,12 +14,10 @@ export type ContentCardProps = {
   href: string;
   /** Price in EGP. 0/null renders the green Free / مجاني badge. */
   price?: number | null;
-  /** Already-translated suffix, e.g. "/night". */
-  priceSuffix?: string;
-  /** Hide the price badge for items that are not purchasable (stories, regions). */
+  /** Hide the price badge for items that are not purchasable (stories, causes). */
   showPrice?: boolean;
   /** Optional save-to-wishlist overlay. */
-  wishlist?: { itemType: string; itemId: string };
+  wishlist?: { itemType: WishlistItemType; itemId?: string | null; variant?: "heart" | "bookmark" };
   /** Small line under the title, e.g. a date. Use sparingly. */
   note?: string;
   className?: string;
