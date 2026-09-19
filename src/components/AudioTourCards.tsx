@@ -19,7 +19,7 @@ const AudioTourCards = () => {
         </div>
       ) : (
         <CardCarousel>
-          {(audioTours ?? []).slice(0, 6).map((a: any) => (
+          {(audioTours ?? []).slice(0, 6).map((a) => (
             <ContentCard
               key={a.id}
               type="audio-tour"

@@ -32,7 +32,7 @@ const LatestPosts = () => {
         </div>
       ) : (
         <CardCarousel>
-          {(posts ?? []).slice(0, 6).map((p: any) => (
+          {(posts ?? []).slice(0, 6).map((p) => (
             <ContentCard
               key={p.id}
               type="story"

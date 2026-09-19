@@ -34,7 +34,6 @@ const ContentCard = ({
   image,
   href,
   price,
-  priceSuffix,
   showPrice = true,
   wishlist,
   note,

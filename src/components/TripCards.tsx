@@ -153,7 +153,7 @@ const TripCards = () => {
         </p>
       ) : (
         <CardCarousel>
-          {filtered.slice(0, 8).map((tr: any) => (
+          {filtered.slice(0, 8).map((tr) => (
             <ContentCard
               key={tr.id}
               type="trip"

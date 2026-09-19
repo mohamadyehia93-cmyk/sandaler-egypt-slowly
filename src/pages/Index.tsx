@@ -129,7 +129,7 @@ const Index = () => {
 
       <div className="max-w-5xl mx-auto pt-8">
         {/* One consistent feed, one card template, one section per content type */}
-        <EventsSection events={dbEvents as any[]} />
+        <EventsSection events={dbEvents} />
         <AudioTourCards />
         <ExperienceCards />
         <TripCards />

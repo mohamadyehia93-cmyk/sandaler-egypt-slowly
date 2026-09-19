@@ -14,7 +14,7 @@ const HomeCausesSection = () => {
   const { data: causes = [], isLoading } = useCauses();
   const { data: programs = [], isLoading: loadingPrograms } = usePrograms();
 
-  const items = mergeProgramsCauses(programs as any[], causes as any[], lang).slice(0, 6);
+  const items = mergeProgramsCauses(programs, causes, lang).slice(0, 6);
 
   return (
     <SectionHeader id="causes" titleKey="section.causes" onSeeAll={() => navigate("/causes")}>
