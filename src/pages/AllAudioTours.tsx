@@ -1,4 +1,4 @@
-import { ArrowLeft, Headphones, Play, Search } from "lucide-react";
+import { ArrowLeft, Headphones, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useAudioTours, useRegions } from "@/hooks/useListings";

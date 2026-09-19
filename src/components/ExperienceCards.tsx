@@ -5,6 +5,8 @@ import { useI18n } from "@/lib/i18n";
 import { EXPERIENCE_THEMES } from "@/lib/listingTaxonomy";
 import { useExperiences, useRegions } from "@/hooks/useListings";
 import CityBadge from "./CityBadge";
+import PriceBadge from "./PriceBadge";
+
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "./ui/skeleton";
 
