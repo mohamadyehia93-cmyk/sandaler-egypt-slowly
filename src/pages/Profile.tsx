@@ -118,6 +118,7 @@ const Profile = () => {
     // Ambassador is a capability, so its entry point lives here rather than in a dashboard.
     ...(isAmbassador ? [{ label: lang === "ar" ? "إبلاغ عن مشكلة" : "Flag an issue", path: "/flag-issue" }] : []),
     ...(isAdmin ? [{ label: lang === "ar" ? "لوحة الإدارة" : "Admin panel", path: "/admin" }] : []),
+    { label: lang === "ar" ? "لوحتي" : "My Dashboard", path: "/profile/dashboard" },
     { label: lang === "ar" ? "نشاطك" : "Your activity", path: "/profile/activity" },
     { label: lang === "ar" ? "حجوزاتي" : "My Bookings", path: "/bookings" },
     { label: lang === "ar" ? "تذاكري" : "My Tickets", path: "/tickets" },
