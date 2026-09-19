@@ -35,8 +35,6 @@ const AudioTourCards = () => {
                 <Headphones className="w-3 h-3" />
                 {a.duration_minutes} {t("common.min")} · {a.stops_count} {t("common.stops")}
               </div>
-              {/* Free vs paid, visible before tapping in */}
-              <PriceBadge price={a.price} variant="overlay" className="absolute bottom-2 right-2" />
 
               <div className="absolute bottom-3 left-3 right-3">
                 <h3 className="text-sm font-bold text-primary-foreground line-clamp-2">
