@@ -149,7 +149,7 @@ const AllAudioTours = () => {
                         <Headphones className="w-3 h-3" />
                         {a.duration_minutes} {t("common.min")} · {a.stops_count} {t("common.stops")}
                       </div>
-                      <PriceBadge price={(a as any).price} variant="overlay" className="absolute top-2 right-2" />
+                      <PriceBadge price={a.price} variant="overlay" className="absolute top-2 right-2" />
                       <div className="absolute bottom-2 left-2 right-2">
                         <h3 className="text-sm font-bold text-primary-foreground line-clamp-2 leading-tight">
                           {lang === "ar" ? (a.title_ar || a.title_en) : a.title_en}
@@ -158,7 +158,7 @@ const AllAudioTours = () => {
                     </div>
                     <div className="p-3 flex items-center justify-between">
                       {a.city_id && <CityBadge cityId={a.city_id} />}
-                      <PriceBadge price={(a as any).price} />
+                      <PriceBadge price={a.price} />
 
 
                     </div>
