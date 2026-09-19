@@ -3,6 +3,7 @@ import { useI18n } from "@/lib/i18n";
 import { useTransport } from "@/hooks/useListings";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
+import PriceBadge from "./PriceBadge";
 import { Skeleton } from "./ui/skeleton";
 
 const TransportCards = () => {
