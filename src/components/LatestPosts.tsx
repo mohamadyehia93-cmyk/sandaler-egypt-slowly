@@ -4,7 +4,9 @@ import { useI18n } from "@/lib/i18n";
 import { usePosts } from "@/hooks/useListings";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
+import WishlistButton from "./WishlistButton";
 import { Skeleton } from "./ui/skeleton";
+
 
 const contentTypeConfig: Record<string, { icon: React.ElementType; label: { en: string; ar: string }; color: string }> = {
   podcast: { icon: Mic, label: { en: "Podcast", ar: "بودكاست" }, color: "bg-purple-500" },
@@ -39,12 +41,13 @@ const PostCard = ({ p, lang, navigate }: any) => {
       <div className="relative h-40">
         <img src={p.image || "/placeholder.svg"} alt={title} className="w-full h-full object-cover" />
         <div className="absolute inset-0 gradient-overlay" />
-        <button
-          className="absolute top-2 right-2 p-1.5 rounded-full bg-background/20 backdrop-blur-sm"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Bookmark className="w-3.5 h-3.5 text-primary-foreground" />
-        </button>
+        <WishlistButton
+          itemType="post"
+          itemId={p.id}
+          variant="bookmark"
+          className="absolute top-2 right-2 p-1.5 rounded-full bg-background/60 backdrop-blur-sm"
+        />
+
         {ct && CtIcon && (
           <span
             className={`absolute top-2 left-2 inline-flex items-center gap-1 ${ct.color} text-white text-[9px] font-semibold px-1.5 py-0.5 rounded`}

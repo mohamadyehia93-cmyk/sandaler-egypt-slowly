@@ -4,6 +4,7 @@ import { useI18n } from "@/lib/i18n";
 import { useAccommodations } from "@/hooks/useListings";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
+import PriceBadge from "./PriceBadge";
 import { Skeleton } from "./ui/skeleton";
 
 const AccommodationCards = () => {
@@ -47,9 +48,8 @@ const AccommodationCards = () => {
                 </div>
               )}
               {a.city_id && <div className="mb-2"><CityBadge cityId={a.city_id} /></div>}
-              <span className="text-sm font-bold text-primary-dark">
-                {a.price_per_night} {t("common.egp")}<span className="text-xs font-normal text-muted-foreground">{t("common.perNight")}</span>
-              </span>
+              <PriceBadge price={a.price_per_night} suffix={t("common.perNight")} />
+
             </div>
           </div>
         ))}

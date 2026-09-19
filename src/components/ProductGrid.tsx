@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { useProducts } from "@/hooks/useListings";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
+import PriceBadge from "./PriceBadge";
 import { Skeleton } from "./ui/skeleton";
 
 const ProductGrid = () => {
@@ -43,7 +44,7 @@ const ProductGrid = () => {
                 </div>
               )}
               {p.city_id && <div className="mb-1"><CityBadge cityId={p.city_id} /></div>}
-              <span className="text-sm font-bold text-primary-dark">{p.price} {t("common.egp")}</span>
+              <PriceBadge price={p.price} />
             </div>
           </div>
         ))}

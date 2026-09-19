@@ -1,10 +1,12 @@
-import { ArrowLeft, Bookmark, Mic, Film, Camera, MessageSquare, ChefHat, ClipboardList, Map, FileText, Search, SlidersHorizontal, X as XIcon, Check } from "lucide-react";
+import { ArrowLeft, Mic, Film, Camera, MessageSquare, ChefHat, ClipboardList, Map, FileText, Search, SlidersHorizontal, X as XIcon, Check } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { bylineNames } from "@/lib/postByline";
 import { usePosts, useRegions } from "@/hooks/useListings";
 import { contentTypeConfig } from "@/components/LatestPosts";
 import CityBadge from "@/components/CityBadge";
+import WishlistButton from "@/components/WishlistButton";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useMemo } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from "@/components/ui/sheet";
@@ -46,6 +48,8 @@ const AllPosts = () => {
     () =>
       (dbPosts as any[]).map((p) => ({
         id: p.slug || p.id,
+        uuid: p.id,
+
         title: { en: p.title_en, ar: p.title_ar },
         image: p.image,
         regionId: p.region_id,
@@ -279,12 +283,13 @@ const AllPosts = () => {
                         <div className="relative h-32">
                           <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                          <button
-                            className="absolute top-2 right-2 p-1.5 rounded-full bg-background/30 backdrop-blur-sm"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Bookmark className="w-3.5 h-3.5 text-white" />
-                          </button>
+                          <WishlistButton
+                            itemType="post"
+                            itemId={p.uuid}
+                            variant="bookmark"
+                            className="absolute top-2 right-2 p-1.5 rounded-full bg-background/60 backdrop-blur-sm"
+                          />
+
                           {ct && CtIcon && (
                             <span className={`absolute top-2 left-2 inline-flex items-center gap-0.5 ${ct.color} text-white text-[10px] font-semibold px-1.5 py-0.5 rounded`}>
                               <CtIcon className="w-3 h-3" />

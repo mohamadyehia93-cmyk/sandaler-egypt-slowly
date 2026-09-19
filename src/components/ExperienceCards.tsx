@@ -5,6 +5,8 @@ import { useI18n } from "@/lib/i18n";
 import { EXPERIENCE_THEMES } from "@/lib/listingTaxonomy";
 import { useExperiences, useRegions } from "@/hooks/useListings";
 import CityBadge from "./CityBadge";
+import PriceBadge from "./PriceBadge";
+
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "./ui/skeleton";
 
@@ -104,11 +106,12 @@ const ExperienceCards = () => {
                       )}
                       {e.city_id && <div className="mb-2"><CityBadge cityId={e.city_id} /></div>}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-primary-dark">
-                          {e.price === 0 ? t("common.free") : `${e.price} ${t("common.egp")}`}
-                        </span>
-                        <span className="text-xs text-muted-foreground">⭐ {e.rating}</span>
+                        <PriceBadge price={e.price} />
+                        {e.rating ? (
+                          <span className="text-xs text-muted-foreground">⭐ {e.rating}</span>
+                        ) : null}
                       </div>
+
                     </div>
                   </button>
                 ))}

@@ -3,6 +3,7 @@ import { useI18n } from "@/lib/i18n";
 import { useTransport } from "@/hooks/useListings";
 import SectionHeader from "./SectionHeader";
 import CityBadge from "./CityBadge";
+import PriceBadge from "./PriceBadge";
 import { Skeleton } from "./ui/skeleton";
 
 const TransportCards = () => {
@@ -37,7 +38,7 @@ const TransportCards = () => {
               </div>
             )}
             {tr.city_id && <CityBadge cityId={tr.city_id} />}
-            <span className="text-sm font-bold text-primary-dark">{tr.price} {t("common.egp")}</span>
+            <PriceBadge price={tr.price} />
           </div>
         ))}
       </div>

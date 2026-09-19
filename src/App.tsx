@@ -120,6 +120,8 @@ const MyCollections = lazy(() => import("./pages/dashboards/MyCollections.tsx"))
 const MySessions = lazy(() => import("./pages/dashboards/MySessions.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
 const Credits = lazy(() => import("./pages/Credits.tsx"));
+const About = lazy(() => import("./pages/About.tsx"));
+
 
 
 const queryClient = new QueryClient({
@@ -230,6 +232,8 @@ const App = () => {
             <Route path="/flag-issue" element={<NewFlagReport />} />
             <Route path="/flag-issue/:id" element={<NewFlagReport />} />
             <Route path="/credits" element={<Credits />} />
+            <Route path="/about" element={<About />} />
+
 
             <Route path="/dashboard/culture-actor/new-article" element={<NewArticle />} />
             <Route path="/dashboard/culture-actor/edit-article/:id" element={<NewArticle />} />

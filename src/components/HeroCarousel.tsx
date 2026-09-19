@@ -33,7 +33,7 @@ const HeroCarousel = () => {
   }, [slides.length]);
 
   if (!slides.length) {
-    return <div className="relative w-full h-[60vh] min-h-[420px] mb-8 bg-muted animate-pulse" />;
+    return <div className="relative w-full h-[42vh] min-h-[300px] mb-5 bg-muted animate-pulse" />;
   }
 
   const slide: any = slides[current % slides.length];
@@ -43,7 +43,7 @@ const HeroCarousel = () => {
 
   return (
     <div
-      className="relative w-full h-[60vh] min-h-[420px] overflow-hidden mb-8 cursor-pointer"
+      className="relative w-full h-[42vh] min-h-[300px] overflow-hidden mb-5 cursor-pointer"
       onClick={() => slide.link && navigate(slide.link)}
     >
       <AnimatePresence mode="wait">

@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { EXPERIENCE_THEMES } from "@/lib/listingTaxonomy";
 import { useTrips, useRegions } from "@/hooks/useListings";
 import CityBadge from "./CityBadge";
+import PriceBadge from "./PriceBadge";
 import { Skeleton } from "./ui/skeleton";
 import {
   DropdownMenu,
@@ -228,9 +229,8 @@ const TripCards = () => {
                         </div>
                       )}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-primary-dark">
-                          {tr.price} {t("common.egp")}
-                        </span>
+                        <PriceBadge price={tr.price} />
+
                         <button
                           onClick={(e) => { e.stopPropagation(); navigate(`/booking?type=trip&id=${tr.id}`); }}
                           className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold"
