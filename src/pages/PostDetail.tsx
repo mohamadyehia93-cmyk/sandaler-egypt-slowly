@@ -157,6 +157,17 @@ const PostDetail = () => {
   });
 
   const paragraphs = (post.body[lang] || "").split("\n\n");
+  // Blocks: "## " lines become headings, consecutive "- " lines become bullet lists.
+  const blocks = paragraphs.map((p) => {
+    const t = p.trim();
+    if (t.startsWith("## ")) return { type: "heading" as const, text: t.slice(3).trim() };
+    const lines = t.split("\n").map((l) => l.trim()).filter(Boolean);
+    if (lines.length > 0 && lines.every((l) => l.startsWith("- "))) {
+      return { type: "list" as const, items: lines.map((l) => l.slice(2).trim()) };
+    }
+    return { type: "text" as const, text: p };
+  });
+
 
   const timeLabel = ct
     ? (ct === contentTypeConfig.podcast || ct === contentTypeConfig.documentary || ct === contentTypeConfig["recipe-video"])
@@ -266,9 +277,20 @@ const PostDetail = () => {
 
       {/* Body */}
       <article className="px-4 pt-5 space-y-4">
-        {paragraphs.map((p, i) => (
-          <p key={i} className="text-sm text-foreground leading-relaxed whitespace-pre-line">{p}</p>
-        ))}
+        {blocks.map((b, i) =>
+          b.type === "heading" ? (
+            <h2 key={i} className="text-base font-bold text-foreground pt-1">{b.text}</h2>
+          ) : b.type === "list" ? (
+            <ul key={i} className="list-disc ps-5 space-y-1.5">
+              {b.items.map((it, j) => (
+                <li key={j} className="text-sm text-foreground leading-relaxed">{it}</li>
+              ))}
+            </ul>
+          ) : (
+            <p key={i} className="text-sm text-foreground leading-relaxed whitespace-pre-line">{b.text}</p>
+          )
+        )}
+
       </article>
 
       {/* Author Bio Section */}
