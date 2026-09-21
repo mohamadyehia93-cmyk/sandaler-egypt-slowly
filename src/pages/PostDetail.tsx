@@ -277,9 +277,20 @@ const PostDetail = () => {
 
       {/* Body */}
       <article className="px-4 pt-5 space-y-4">
-        {paragraphs.map((p, i) => (
-          <p key={i} className="text-sm text-foreground leading-relaxed whitespace-pre-line">{p}</p>
-        ))}
+        {blocks.map((b, i) =>
+          b.type === "heading" ? (
+            <h2 key={i} className="text-base font-bold text-foreground pt-1">{b.text}</h2>
+          ) : b.type === "list" ? (
+            <ul key={i} className="list-disc ps-5 space-y-1.5">
+              {b.items.map((it, j) => (
+                <li key={j} className="text-sm text-foreground leading-relaxed">{it}</li>
+              ))}
+            </ul>
+          ) : (
+            <p key={i} className="text-sm text-foreground leading-relaxed whitespace-pre-line">{b.text}</p>
+          )
+        )}
+
       </article>
 
       {/* Author Bio Section */}
