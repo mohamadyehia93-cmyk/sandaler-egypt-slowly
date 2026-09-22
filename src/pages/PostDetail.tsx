@@ -29,13 +29,13 @@ const PhotoGallery = ({ photos }: { photos: string[] }) => {
         <button
           onClick={() => setCurrent((c) => (c - 1 + total) % total)}
           className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center shadow"
-         aria-label={lang === "ar" ? "السابق" : "Previous"}>
+         aria-label="Previous photo">
           <ChevronLeft className="w-4 h-4 text-foreground" />
         </button>
         <button
           onClick={() => setCurrent((c) => (c + 1) % total)}
           className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center shadow"
-         aria-label={lang === "ar" ? "زيادة" : "Increase"}>
+         aria-label="Next photo">
           <ChevronRight className="w-4 h-4 text-foreground" />
         </button>
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
