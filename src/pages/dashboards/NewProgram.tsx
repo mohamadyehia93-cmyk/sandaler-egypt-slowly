@@ -14,6 +14,8 @@ import AuthorLangToggle from "@/components/dashboard/AuthorLangToggle";
 import type { Lang, TranslationMeta } from "@/lib/translation";
 import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin, Calendar, Users, Heart, Video } from "lucide-react";
 import { toast } from "sonner";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import DraftResumePrompt from "@/components/dashboard/DraftResumePrompt";
 
 const programTypes = [
   { en: "Volunteering", ar: "تطوع" },
@@ -100,6 +102,23 @@ const NewProgram = () => {
   const addGoal = () => setForm((p) => ({ ...p, goals: [...p.goals, ""] }));
   const removeGoal = (idx: number) => setForm((p) => ({ ...p, goals: p.goals.filter((_, i) => i !== idx) }));
 
+  /** Crash recovery: keeps the typed fields for 7 days, per user. Photos and the
+   *  video are Files uploaded at save time, so they are not part of the draft. */
+  const [pristineForm] = useState(() => JSON.stringify(form));
+  const draftDirty = JSON.stringify(form) !== pristineForm;
+  const { pendingDraft, resume, startOver, flush, clear: clearDraft } = useFormDraft<typeof form>({
+    formKey: "new-program",
+    userId: user?.id ?? null,
+    data: form,
+    enabled: !isEdit,
+    isDirty: draftDirty,
+  });
+  const handleResumeDraft = () => {
+    const restored = resume();
+    if (restored) setForm((p) => ({ ...p, ...restored.data }));
+  };
+
+
   const handleSubmit = async () => {
     if (!user) {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
@@ -151,6 +170,7 @@ const NewProgram = () => {
         if (error) throw error;
         toast.success(lang === "ar" ? "تم نشر البرنامج بنجاح!" : "Program published successfully!");
       }
+      clearDraft();
       navigate("/dashboard/organization/my-programs");
     } catch (err: any) {
       toast.error(err.message || "Failed to save program");
@@ -166,11 +186,15 @@ const NewProgram = () => {
   return (
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-role-organization text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
-        <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل البرنامج" : "Edit Program") : (lang === "ar" ? "إضافة برنامج" : "Add Program")}</h1>
       </header>
 
-      <div className="px-4 py-5 space-y-5">
+      {pendingDraft && (
+        <DraftResumePrompt onResume={handleResumeDraft} onStartOver={startOver} accentClass="bg-role-organization" />
+      )}
+
+      <div className="px-4 py-5 space-y-5" onBlur={flush}>
         <AuthorLangToggle value={authorLang} onChange={setAuthorLang} />
 
         <div>

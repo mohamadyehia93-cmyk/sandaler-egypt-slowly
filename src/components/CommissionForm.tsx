@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { COMMISSION_KINDS, feeDisclaimer } from "@/lib/commissions";
+import { useRequestRescue } from "@/hooks/useRequestRescue";
 
 type Props = {
   cultureActorId: string;
@@ -28,6 +29,20 @@ const CommissionForm = ({ cultureActorId, actorName, actorUserId, onDone }: Prop
   const [deadline, setDeadline] = useState("");
   const [saving, setSaving] = useState(false);
 
+  // Keeps the brief if signing in is needed, and returns here afterwards.
+  type Rescue = { kind: string; title: string; brief: string; fee: string; currency: string; deadline: string };
+  const { signInToContinue, clearRescue } = useRequestRescue<Rescue>(
+    `commission:${cultureActorId}`,
+    (d) => {
+      if (d.kind) setKind(d.kind);
+      if (d.title) setTitle(d.title);
+      if (d.brief) setBrief(d.brief);
+      if (d.fee) setFee(d.fee);
+      if (d.currency) setCurrency(d.currency);
+      if (d.deadline) setDeadline(d.deadline);
+    },
+  );
+
   const inputClass =
     "w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40";
 
@@ -43,8 +58,8 @@ const CommissionForm = ({ cultureActorId, actorName, actorUserId, onDone }: Prop
 
   const submit = async () => {
     if (!user) {
-      toast.error(ar ? "يرجى تسجيل الدخول أولاً" : "Please sign in first");
-      navigate("/login");
+      toast.error(ar ? "سجّل الدخول لإرسال الطلب — لن نفقد ما كتبته" : "Sign in to send — we'll keep what you typed");
+      signInToContinue({ kind, title, brief, fee, currency, deadline });
       return;
     }
     if (!title.trim()) {
@@ -67,6 +82,7 @@ const CommissionForm = ({ cultureActorId, actorName, actorUserId, onDone }: Prop
       toast.error(error.message);
       return;
     }
+    clearRescue();
     toast.success(ar ? "تم إرسال طلب التكليف" : "Commission request sent", {
       description: ar
         ? "هذا طلب فقط ولم يتم تحصيل أي مبلغ. سيقوم الفاعل الثقافي بالرد."

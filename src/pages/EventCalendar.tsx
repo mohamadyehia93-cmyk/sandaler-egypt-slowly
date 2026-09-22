@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Clock, Users, Star } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useExperiences, useTrips, useEvents } from "@/hooks/useListings";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type CalendarEvent = {
   id: string;
@@ -34,9 +35,10 @@ const isSameDay = (a: Date, b: Date) =>
 const EventCalendar = () => {
   const navigate = useNavigate();
   const { lang, t } = useI18n();
-  const { data: experiences = [] } = useExperiences();
-  const { data: trips = [] } = useTrips();
-  const { data: cultureEvents = [] } = useEvents();
+  const { data: experiences = [], isLoading: loadingExp } = useExperiences();
+  const { data: trips = [], isLoading: loadingTrips } = useTrips();
+  const { data: cultureEvents = [], isLoading: loadingEvents } = useEvents();
+  const isLoading = loadingExp || loadingTrips || loadingEvents;
 
   const allEvents = useMemo<CalendarEvent[]>(() => {
     const events: CalendarEvent[] = [];
@@ -79,11 +81,18 @@ const EventCalendar = () => {
     return events;
   }, [experiences, trips, cultureEvents]);
 
-  const [currentMonth, setCurrentMonth] = useState(() => {
-    // Start at earliest event month
+  // Derived, not initialised-once: the events arrive after the first render, so a
+  // useState initialiser always saw an empty list and parked the calendar on the
+  // current month even when every event was months away.
+  const [monthOverride, setMonthOverride] = useState<Date | null>(null);
+  const earliestMonth = useMemo(() => {
     const sorted = [...allEvents].sort((a, b) => a.date.getTime() - b.date.getTime());
-    return sorted.length > 0 ? new Date(sorted[0].date.getFullYear(), sorted[0].date.getMonth(), 1) : new Date();
-  });
+    return sorted.length > 0
+      ? new Date(sorted[0].date.getFullYear(), sorted[0].date.getMonth(), 1)
+      : null;
+  }, [allEvents]);
+  const currentMonth = monthOverride ?? earliestMonth ?? new Date();
+  const setCurrentMonth = setMonthOverride;
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const routeFor = (ev: CalendarEvent) =>
@@ -131,7 +140,11 @@ const EventCalendar = () => {
   return (
     <div className="min-h-screen bg-surface pb-20">
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
-        <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary">
+        <button
+          onClick={() => navigate(-1)}
+          aria-label={lang === "ar" ? "رجوع" : "Back"}
+          className="tap-target rounded-full hover:bg-secondary"
+        >
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h1 className="text-lg font-bold text-foreground">
@@ -139,14 +152,27 @@ const EventCalendar = () => {
         </h1>
       </header>
 
+      {isLoading ? (
+        <div className="px-4 pt-4 space-y-4" aria-busy="true" aria-live="polite">
+          <Skeleton className="h-8 w-40 mx-auto" />
+          <div className="grid grid-cols-7 gap-1">
+            {Array.from({ length: 35 }).map((_, i) => (
+              <Skeleton key={i} className="aspect-square rounded-lg" />
+            ))}
+          </div>
+          <Skeleton className="h-5 w-32" />
+          <Skeleton className="h-20 w-full rounded-xl" />
+          <Skeleton className="h-20 w-full rounded-xl" />
+        </div>
+      ) : (
       <div className="px-4 pt-4">
         {/* Month Navigation */}
         <div className="flex items-center justify-between mb-4">
-          <button onClick={prevMonth} className="p-2 rounded-full hover:bg-secondary">
+          <button onClick={prevMonth} aria-label={lang === "ar" ? "الشهر السابق" : "Previous month"} className="tap-target rounded-full hover:bg-secondary">
             <ChevronLeft className="w-5 h-5 text-foreground" />
           </button>
           <h2 className="text-base font-bold text-foreground">{monthName} {year}</h2>
-          <button onClick={nextMonth} className="p-2 rounded-full hover:bg-secondary">
+          <button onClick={nextMonth} aria-label={lang === "ar" ? "الشهر التالي" : "Next month"} className="tap-target rounded-full hover:bg-secondary">
             <ChevronRight className="w-5 h-5 text-foreground" />
           </button>
         </div>
@@ -283,10 +309,18 @@ const EventCalendar = () => {
                     </div>
                   </div>
                 ))}
+              {allEvents.length === 0 && (
+                <p className="py-6 text-center text-sm text-muted-foreground">
+                  {lang === "ar"
+                    ? "لا توجد فعاليات أو رحلات مجدولة حالياً."
+                    : "Nothing is scheduled right now."}
+                </p>
+              )}
             </div>
           </div>
         )}
       </div>
+      )}
     </div>
   );
 };

@@ -11,6 +11,7 @@ import { EventRow, isPastEvent } from "@/lib/eventSort";
 import DetailSkeleton from "@/components/DetailSkeleton";
 import NotFoundView from "@/components/NotFound";
 import SmartImage from "@/components/ui/SmartImage";
+import { useRequestRescue } from "@/hooks/useRequestRescue";
 
 const SERVICE_FEE_RATE = 0.05;
 
@@ -26,6 +27,14 @@ const EventCheckout = () => {
   const [email, setEmail] = useState("");
   const [method, setMethod] = useState<"card" | "wallet" | "cash">("card");
   const [submitting, setSubmitting] = useState(false);
+
+  // Keeps the ticket details if signing in is needed, and returns here afterwards.
+  type Rescue = { quantity: number; name: string; email: string };
+  const { signInToContinue, clearRescue } = useRequestRescue<Rescue>(`event:${id ?? ""}`, (d) => {
+    if (d.quantity) setQuantity(d.quantity);
+    if (d.name) setName(d.name);
+    if (d.email) setEmail(d.email);
+  });
 
   const { data: event, isLoading } = useQuery({
     queryKey: ["event", id],
@@ -91,8 +100,8 @@ const EventCheckout = () => {
 
   const confirm = async () => {
     if (!user) {
-      toast(ar ? "يرجى تسجيل الدخول لشراء التذاكر" : "Please sign in to buy tickets");
-      navigate("/login");
+      toast(ar ? "سجّل الدخول لإتمام الحجز — لن نفقد بياناتك" : "Sign in to finish — we'll keep your details");
+      signInToContinue({ quantity, name, email });
       return;
     }
     if (!name.trim() || !email.trim()) {
@@ -125,13 +134,14 @@ const EventCheckout = () => {
       toast(ar ? "تعذر إتمام الشراء" : "Could not complete the purchase");
       return;
     }
+    clearRescue();
     navigate(`/event-ticket/${data.id}`, { replace: true });
   };
 
   return (
     <div className="min-h-screen bg-surface pb-32">
       <header className="flex items-center gap-2 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
-        <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary">
+        <button onClick={() => navigate(-1)} aria-label={ar ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h1 className="text-base font-bold text-foreground">{ar ? "شراء التذاكر" : "Get tickets"}</h1>

@@ -533,7 +533,7 @@ const ItineraryPlanner = () => {
             className="flex-1 h-10 bg-secondary border-none text-sm"
             disabled={isLoading}
           />
-          <Button type="submit" size="icon" disabled={!input.trim() || isLoading} className="h-10 w-10 rounded-full shrink-0">
+          <Button type="submit" size="icon" aria-label={lang === "ar" ? "إرسال" : "Send"} disabled={!input.trim() || isLoading} className="h-10 w-10 rounded-full shrink-0">
             <Send className="w-4 h-4" />
           </Button>
         </form>

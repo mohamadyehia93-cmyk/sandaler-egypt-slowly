@@ -10,3 +10,10 @@
 - [x] Profile completeness nudge (photo, bio, city/interests) linking to /edit-profile
 - [x] Visitors can edit interests / cities / travel style / budget after sign-up
 - [x] Visitor dashboard: one view of bookings, orders, requests, tickets, sessions, pledges, applications, commissions
+
+## UX quick wins (from the UX/UI audit)
+- [x] Cause detail 404 flash: loading branch before NotFound; loading guard on EventCalendar; sweep the other NotFound pages
+- [x] Booking auth wall: persist + restore booking state across sign-in; earlier sign-in notice
+- [x] City/region pages: shared EmptySection instead of hidden sections
+- [x] Draft saving for NewArticle, NewProgram, NewSession, NewCollection
+- [x] Accessibility: aria-labels on icon-only buttons, focus-visible rings, 44px tap targets, delete dead TopTabs

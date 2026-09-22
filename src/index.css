@@ -110,6 +110,22 @@ html, body {
   [dir="rtl"] .relative > a > img.object-cover {
     object-position: 55% 35%;
   }
+
+  /* ─── Keyboard focus ───
+     Most controls in the app are hand-rolled <button> elements that never had a
+     visible focus state, so keyboard and switch-control users could not see
+     where they were. One base rule covers every button, link and the cards that
+     use role="link", instead of a per-file class. */
+  button:focus-visible,
+  a:focus-visible,
+  [role="link"]:focus-visible,
+  [role="button"]:focus-visible,
+  summary:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--primary));
+  }
 }
 
 @layer utilities {
@@ -168,4 +184,16 @@ html, body {
     @apply w-full h-full object-cover rounded-full;
     object-position: center 30%;
   }
+
+  /* Explicit keyboard focus ring, for the rare control that opts out of the
+     global base rule below (e.g. an element inside an already-ringed parent). */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  /* Keeps a small icon visually small while giving it a 44×44 touch area. */
+  .tap-target {
+    @apply relative min-h-[44px] min-w-[44px] inline-flex items-center justify-center;
+  }
 }
+

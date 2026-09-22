@@ -11,6 +11,7 @@ import { bylineNames } from "@/lib/postByline";
 // with real ones. Only real rows are rendered now.
 import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents, useTrips, useProducts, useAccommodations, useTransport, usePrograms, useCauses } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
+import EmptySection from "@/components/EmptySection";
 import EventsSection from "@/components/EventsSection";
 import RegionMap from "@/components/RegionMap";
 import BottomNav from "@/components/BottomNav";
@@ -206,6 +207,16 @@ const RegionDetail = () => {
     name: lang === "ar" ? regionRow.name_ar || regionRow.name_en || "" : regionRow.name_en || "",
     about: lang === "ar" ? regionRow.about_ar || "" : regionRow.about_en || "",
   };
+
+  /**
+   * Empty sections used to disappear, which made a quiet region look broken.
+   * One honest line naming the region is clearer than a silent gap.
+   */
+  const nothingYet = (en: string, ar: string) => ({
+    messageEn: `No ${en} listed in ${regionRow.name_en || ""} yet.`,
+    messageAr: `لا ${ar} في ${regionRow.name_ar || regionRow.name_en || ""} بعد.`,
+  });
+
 
   const dedupe = <T extends { id: string }>(arr: T[]) => {
     const seen = new Set<string>();
@@ -410,7 +421,18 @@ const RegionDetail = () => {
 
       <div className="space-y-6 pt-1">
         {/* Categorized Posts/Articles */}
-        {regionPosts.length > 0 && <RegionPostsSection posts={regionPosts} lang={lang} navigate={navigate} regionId={regionId} />}
+        {regionPosts.length > 0 ? (
+          <RegionPostsSection posts={regionPosts} lang={lang} navigate={navigate} regionId={regionId} />
+        ) : (
+          <SectionHeader titleKey="section.latestPosts">
+            <EmptySection
+              {...nothingYet("stories", "توجد حكايات")}
+              actionEn="Read stories from everywhere"
+              actionAr="اقرأ حكايات من كل مكان"
+              actionHref="/posts"
+            />
+          </SectionHeader>
+        )}
 
         {/* Who's Who */}
         {regionPeople.length > 0 && (
@@ -444,7 +466,7 @@ const RegionDetail = () => {
         <ProgramsCausesSection programs={regionPrograms} causes={regionCauses} />
 
         {/* Experiences */}
-        {regionExperiences.length > 0 && (
+        {regionExperiences.length > 0 ? (
           <SectionHeader titleKey="section.experiences" onSeeAll={() => navigate("/?tab=experiences")}>
             <div className="grid grid-cols-3 gap-3 px-4">
               {regionExperiences.slice(0, 3).map((e) => (
@@ -468,10 +490,19 @@ const RegionDetail = () => {
               ))}
             </div>
           </SectionHeader>
+        ) : (
+          <SectionHeader titleKey="section.experiences">
+            <EmptySection
+              {...nothingYet("experiences", "توجد تجارب")}
+              actionEn="Browse all experiences"
+              actionAr="تصفّح كل التجارب"
+              actionHref="/?tab=experiences"
+            />
+          </SectionHeader>
         )}
 
         {/* Trips */}
-        {regionTrips.length > 0 && (
+        {regionTrips.length > 0 ? (
           <SectionHeader titleKey="section.trips" onSeeAll={() => navigate("/trips")}>
             <div className="grid grid-cols-3 gap-3 px-4">
               {regionTrips.slice(0, 3).map((tr) => (
@@ -496,10 +527,19 @@ const RegionDetail = () => {
               ))}
             </div>
           </SectionHeader>
+        ) : (
+          <SectionHeader titleKey="section.trips">
+            <EmptySection
+              {...nothingYet("trips", "توجد رحلات")}
+              actionEn="Browse all trips"
+              actionAr="تصفّح كل الرحلات"
+              actionHref="/trips"
+            />
+          </SectionHeader>
         )}
 
         {/* Local Products */}
-        {regionProducts.length > 0 && (
+        {regionProducts.length > 0 ? (
           <SectionHeader titleKey="section.products" onSeeAll={() => navigate("/?tab=products")}>
             <div className="grid grid-cols-3 gap-3 px-4">
               {regionProducts.slice(0, 3).map((p) => (
@@ -521,10 +561,19 @@ const RegionDetail = () => {
               ))}
             </div>
           </SectionHeader>
+        ) : (
+          <SectionHeader titleKey="section.products">
+            <EmptySection
+              {...nothingYet("products", "توجد منتجات")}
+              actionEn="Do you make things here? Join Sandal"
+              actionAr="تصنع منتجات هنا؟ انضم إلى صندل"
+              actionHref="/welcome"
+            />
+          </SectionHeader>
         )}
 
         {/* Places to Stay */}
-        {regionStays.length > 0 && (
+        {regionStays.length > 0 ? (
           <SectionHeader titleKey="section.placesToStay">
             <div className="grid grid-cols-3 gap-3 px-4">
               {regionStays.slice(0, 3).map((s) => (
@@ -544,10 +593,19 @@ const RegionDetail = () => {
               ))}
             </div>
           </SectionHeader>
+        ) : (
+          <SectionHeader titleKey="section.placesToStay">
+            <EmptySection
+              {...nothingYet("stays", "توجد إقامات")}
+              actionEn="Do you host here? Join Sandal"
+              actionAr="تستضيف هنا؟ انضم إلى صندل"
+              actionHref="/welcome"
+            />
+          </SectionHeader>
         )}
 
         {/* Getting Around */}
-        {regionTransport.length > 0 && (
+        {regionTransport.length > 0 ? (
           <SectionHeader titleKey="section.gettingAround">
             <div className="grid grid-cols-3 gap-3 px-4">
               {regionTransport.slice(0, 3).map((tr) => (
@@ -567,11 +625,20 @@ const RegionDetail = () => {
               ))}
             </div>
           </SectionHeader>
+        ) : (
+          <SectionHeader titleKey="section.gettingAround">
+            <EmptySection
+              {...nothingYet("rides", "توجد وسائل تنقّل")}
+              actionEn="Do you drive here? Join Sandal"
+              actionAr="تعمل بالنقل هنا؟ انضم إلى صندل"
+              actionHref="/welcome"
+            />
+          </SectionHeader>
         )}
 
 
         {/* Audio Tours */}
-        {regionAudioTours.length > 0 && (
+        {regionAudioTours.length > 0 ? (
           <SectionHeader titleKey="section.audioTours" onSeeAll={() => navigate("/audio-tours")}>
             <div className="grid grid-cols-3 gap-3 px-4">
               {regionAudioTours.slice(0, 3).map((tour) => (
@@ -595,6 +662,15 @@ const RegionDetail = () => {
                 </div>
               ))}
             </div>
+          </SectionHeader>
+        ) : (
+          <SectionHeader titleKey="section.audioTours">
+            <EmptySection
+              {...nothingYet("audio tours", "توجد جولات صوتية")}
+              actionEn="Browse all audio tours"
+              actionAr="تصفّح كل الجولات الصوتية"
+              actionHref="/audio-tours"
+            />
           </SectionHeader>
         )}
 

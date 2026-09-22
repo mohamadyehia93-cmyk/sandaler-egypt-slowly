@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useRequestRescue } from "@/hooks/useRequestRescue";
 
 type Props = {
   meetupId: string;
@@ -22,10 +23,22 @@ const SessionRequestForm = ({ meetupId, meetupTitle, onDone }: Props) => {
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
 
+  // Keeps the typed request if signing in is needed, and returns here afterwards.
+  type Rescue = { preferredDate: string; message: string; email: string; phone: string };
+  const { signInToContinue, clearRescue } = useRequestRescue<Rescue>(
+    `session:${meetupId}`,
+    (d) => {
+      if (d.preferredDate) setPreferredDate(d.preferredDate);
+      if (d.message) setMessage(d.message);
+      if (d.email) setEmail(d.email);
+      if (d.phone) setPhone(d.phone);
+    },
+  );
+
   const submit = async () => {
     if (!user) {
-      toast.error(ar ? "يرجى تسجيل الدخول أولاً" : "Please sign in first");
-      navigate("/login");
+      toast.error(ar ? "سجّل الدخول لإرسال الطلب — لن نفقد ما كتبته" : "Sign in to send — we'll keep what you typed");
+      signInToContinue({ preferredDate, message, email, phone });
       return;
     }
     setSaving(true);
@@ -42,6 +55,7 @@ const SessionRequestForm = ({ meetupId, meetupTitle, onDone }: Props) => {
       toast.error(error.message);
       return;
     }
+    clearRescue();
     toast.success(ar ? "تم إرسال طلبك" : "Request sent", {
       description: ar ? "تابع حالة الطلب في طلبات الجلسات" : "Track it in My Session Requests",
       action: {

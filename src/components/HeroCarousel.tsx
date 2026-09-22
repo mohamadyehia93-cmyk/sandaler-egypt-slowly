@@ -86,6 +86,7 @@ const HeroCarousel = () => {
         {slides.map((_, i) => (
           <button
             key={i}
+            aria-label={lang === "ar" ? `الشريحة ${i + 1}` : `Slide ${i + 1}`}
             onClick={(e) => {
               e.stopPropagation();
               setCurrent(i);

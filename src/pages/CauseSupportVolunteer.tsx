@@ -114,8 +114,10 @@ const CauseSupportVolunteer = () => {
 
   const handleExpress = (index: number) => {
     if (!user) {
+      // Asked before the form, so nothing typed is at stake — but they must land
+      // back on this cause afterwards instead of on the home page.
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول للتطوع" : "Please sign in to volunteer");
-      navigate("/login");
+      navigate(`/login?return=${encodeURIComponent(window.location.pathname + window.location.search)}`);
       return;
     }
     setSelectedOpp(index);
@@ -188,7 +190,7 @@ const CauseSupportVolunteer = () => {
     <div className="min-h-screen bg-surface pb-28">
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
         {step !== "success" && (
-          <button onClick={handleBack} className="p-1.5 rounded-full hover:bg-secondary">
+          <button onClick={handleBack} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
         )}

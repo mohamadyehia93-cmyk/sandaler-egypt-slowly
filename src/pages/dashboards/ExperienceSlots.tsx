@@ -300,7 +300,7 @@ const ExperienceSlots = () => {
               {editingId ? (ar ? "حفظ" : "Save") : ar ? "إضافة" : "Add"}
             </button>
             {editingId && (
-              <button onClick={resetForm} className="px-4 rounded-xl border border-border text-sm font-medium text-foreground">
+              <button onClick={resetForm} aria-label={ar ? "إلغاء" : "Cancel"} className="px-4 rounded-xl border border-border text-sm font-medium text-foreground">
                 <X className="w-4 h-4" />
               </button>
             )}

@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents, useCauses, usePrograms } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
+import EmptySection from "@/components/EmptySection";
 import EventsSection from "@/components/EventsSection";
 import CityOfferingsMap, { OfferingPin } from "@/components/CityOfferingsMap";
 import BottomNav from "@/components/BottomNav";
@@ -259,6 +260,15 @@ const CityDetail = () => {
   ]);
   const cityEvents = (dbEvents as any[]).filter((e) => e.city_id === cityId);
 
+  /**
+   * A city with nothing listed in a section used to hide the section entirely, so
+   * a quiet city read as a broken page. One honest line naming the city is better:
+   * it says the section exists and is simply empty here.
+   */
+  const nothingYet = (en: string, ar: string) => ({
+    messageEn: `No ${en} listed in ${city.name.en} yet.`,
+    messageAr: `لا ${ar} في ${city.name.ar} بعد.`,
+  });
 
   return (
     <div className="min-h-screen bg-surface pb-20">
@@ -381,7 +391,18 @@ const CityDetail = () => {
         )}
 
         {/* Categorized Posts/Articles */}
-        {cityPosts.length > 0 && <CityPostsSection posts={cityPosts} lang={lang} navigate={navigate} />}
+        {cityPosts.length > 0 ? (
+          <CityPostsSection posts={cityPosts} lang={lang} navigate={navigate} />
+        ) : (
+          <SectionHeader titleKey="section.latestPosts">
+            <EmptySection
+              {...nothingYet("stories", "توجد حكايات")}
+              actionEn="Read stories from everywhere"
+              actionAr="اقرأ حكايات من كل مكان"
+              actionHref="/posts"
+            />
+          </SectionHeader>
+        )}
 
         {/* Who's Who */}
         {cityPeople.length > 0 && (
@@ -412,7 +433,7 @@ const CityDetail = () => {
         <EventsSection events={cityEvents} />
 
         {/* Experiences */}
-        {cityExperiences.length > 0 && (
+        {cityExperiences.length > 0 ? (
           <SectionHeader titleKey="section.experiences" onSeeAll={() => navigate("/?tab=experiences")}>
             <div className="grid grid-cols-3 gap-3 px-4">
               {cityExperiences.slice(0, 3).map((e) => (
@@ -430,10 +451,19 @@ const CityDetail = () => {
               ))}
             </div>
           </SectionHeader>
+        ) : (
+          <SectionHeader titleKey="section.experiences">
+            <EmptySection
+              {...nothingYet("experiences", "توجد تجارب")}
+              actionEn="Browse all experiences"
+              actionAr="تصفّح كل التجارب"
+              actionHref="/?tab=experiences"
+            />
+          </SectionHeader>
         )}
 
         {/* Trips */}
-        {cityTrips.length > 0 && (
+        {cityTrips.length > 0 ? (
           <SectionHeader titleKey="section.trips" onSeeAll={() => navigate("/trips")}>
             <div className="grid grid-cols-3 gap-3 px-4">
               {cityTrips.slice(0, 3).map((trip) => (
@@ -455,9 +485,18 @@ const CityDetail = () => {
               ))}
             </div>
           </SectionHeader>
+        ) : (
+          <SectionHeader titleKey="section.trips">
+            <EmptySection
+              {...nothingYet("trips", "توجد رحلات")}
+              actionEn="Browse all trips"
+              actionAr="تصفّح كل الرحلات"
+              actionHref="/trips"
+            />
+          </SectionHeader>
         )}
 
-        {cityAudioTours.length > 0 && (
+        {cityAudioTours.length > 0 ? (
           <SectionHeader titleKey="section.audioTours" onSeeAll={() => navigate("/audio-tours")}>
             <div className="grid grid-cols-3 gap-3 px-4">
               {cityAudioTours.slice(0, 3).map((tour) => (
@@ -475,10 +514,19 @@ const CityDetail = () => {
               ))}
             </div>
           </SectionHeader>
+        ) : (
+          <SectionHeader titleKey="section.audioTours">
+            <EmptySection
+              {...nothingYet("audio tours", "توجد جولات صوتية")}
+              actionEn="Browse all audio tours"
+              actionAr="تصفّح كل الجولات الصوتية"
+              actionHref="/audio-tours"
+            />
+          </SectionHeader>
         )}
 
         {/* Places to Stay */}
-        {cityAccommodation.length > 0 && (
+        {cityAccommodation.length > 0 ? (
           <SectionHeader titleKey="section.placesToStay">
             <div className="grid grid-cols-3 gap-3 px-4">
               {cityAccommodation.slice(0, 3).map((a) => (
@@ -501,10 +549,19 @@ const CityDetail = () => {
               ))}
             </div>
           </SectionHeader>
+        ) : (
+          <SectionHeader titleKey="section.placesToStay">
+            <EmptySection
+              {...nothingYet("stays", "توجد إقامات")}
+              actionEn="Do you host here? Join Sandal"
+              actionAr="تستضيف هنا؟ انضم إلى صندل"
+              actionHref="/welcome"
+            />
+          </SectionHeader>
         )}
 
         {/* Getting Around */}
-        {cityTransport.length > 0 && (
+        {cityTransport.length > 0 ? (
           <SectionHeader titleKey="section.gettingAround">
             <div className="grid grid-cols-3 gap-3 px-4">
               {cityTransport.slice(0, 3).map((tr) => (
@@ -516,10 +573,19 @@ const CityDetail = () => {
               ))}
             </div>
           </SectionHeader>
+        ) : (
+          <SectionHeader titleKey="section.gettingAround">
+            <EmptySection
+              {...nothingYet("rides", "توجد وسائل تنقّل")}
+              actionEn="Do you drive here? Join Sandal"
+              actionAr="تعمل بالنقل هنا؟ انضم إلى صندل"
+              actionHref="/welcome"
+            />
+          </SectionHeader>
         )}
 
         {/* Local Products */}
-        {cityProducts.length > 0 && (
+        {cityProducts.length > 0 ? (
           <SectionHeader titleKey="section.products">
             <div className="grid grid-cols-3 gap-3 px-4">
               {cityProducts.slice(0, 3).map((p) => (
@@ -539,6 +605,15 @@ const CityDetail = () => {
                 </div>
               ))}
             </div>
+          </SectionHeader>
+        ) : (
+          <SectionHeader titleKey="section.products">
+            <EmptySection
+              {...nothingYet("products", "توجد منتجات")}
+              actionEn="Do you make things here? Join Sandal"
+              actionAr="تصنع منتجات هنا؟ انضم إلى صندل"
+              actionHref="/welcome"
+            />
           </SectionHeader>
         )}
 
