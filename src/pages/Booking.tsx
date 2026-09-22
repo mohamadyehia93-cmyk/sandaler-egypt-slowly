@@ -2,7 +2,8 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Calendar, Users, CreditCard, ShieldCheck, CheckCircle2, Minus, Plus, Clock, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { saveFormDraft, loadFormDraft, clearFormDraft } from "@/lib/formDraft";
 import { useQuery } from "@tanstack/react-query";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -69,6 +70,55 @@ const Booking = () => {
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [requestError, setRequestError] = useState<string | null>(null);
+
+  /**
+   * Sign-in rescue.
+   *
+   * The sign-in wall used to fire on the very last tap, and every field typed in
+   * steps 1-2 (date, guests, name, phone, note) was thrown away — the person came
+   * back to an empty form and usually gave up. So the whole request is written to
+   * localStorage before we send them to sign in, and restored when they return.
+   *
+   * The key is deliberately tied to the listing, not to the account: the draft is
+   * created while nobody is signed in, and has to survive the moment of signing
+   * in. It is device-local, holds nothing private beyond what the person typed,
+   * and is deleted as soon as the request is sent.
+   */
+  const bookingDraftKey = `booking:${type}:${id}`;
+  const bookingDraftUser = "guest";
+  type BookingDraft = {
+    guests: number;
+    selectedDate: string;
+    selectedSlotId: string;
+    contactName: string;
+    contactPhone: string;
+    note: string;
+  };
+  const saveBookingDraft = () =>
+    saveFormDraft<BookingDraft>(
+      bookingDraftKey,
+      bookingDraftUser,
+      { guests, selectedDate, selectedSlotId, contactName, contactPhone, note },
+      1,
+    );
+  const clearBookingDraft = () => clearFormDraft(bookingDraftKey, bookingDraftUser);
+
+  const restoredRef = useRef(false);
+  useEffect(() => {
+    if (restoredRef.current || !id) return;
+    restoredRef.current = true;
+    const draft = loadFormDraft<BookingDraft>(bookingDraftKey, bookingDraftUser);
+    if (!draft) return;
+    const d = draft.data;
+    if (d.guests) setGuests(d.guests);
+    if (d.selectedDate) setSelectedDate(d.selectedDate);
+    if (d.selectedSlotId) setSelectedSlotId(d.selectedSlotId);
+    if (d.contactName) setContactName(d.contactName);
+    if (d.contactPhone) setContactPhone(d.contactPhone);
+    if (d.note) setNote(d.note);
+    // Put them back where they left off: one tap from sending.
+    setStep("payment");
+  }, [id, bookingDraftKey]);
 
 
 
@@ -172,7 +222,11 @@ const Booking = () => {
   return (
     <div className="min-h-screen bg-surface pb-28">
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
-        <button onClick={() => step === "payment" ? setStep("details") : navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary">
+        <button
+          onClick={() => step === "payment" ? setStep("details") : navigate(-1)}
+          aria-label={ar ? "رجوع" : "Back"}
+          className="tap-target rounded-full hover:bg-secondary"
+        >
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h1 className="text-lg font-bold text-foreground">
@@ -219,6 +273,19 @@ const Booking = () => {
             <span className="text-xs text-primary font-bold mt-0.5">{unitPrice} {t("common.egp")}{isStay ? t("common.per_night") : ""}</span>
           </div>
         </div>
+
+        {/* Says up-front that sending needs an account, so the sign-in step is not
+            a surprise at the last tap. Nothing typed is lost either way. */}
+        {!user && step === "details" && (
+          <div className="mb-5 rounded-xl border border-border bg-card p-3 flex gap-2">
+            <Info className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {ar
+                ? "ستحتاج إلى حساب لإرسال الطلب. أكمل بياناتك الآن — سنحفظ ما كتبته ونعيدك إلى هنا بعد تسجيل الدخول."
+                : "You'll need an account to send the request. Fill this in now — we'll keep what you typed and bring you back here after you sign in."}
+            </p>
+          </div>
+        )}
 
         {step === "details" && (
           <>
@@ -466,6 +533,8 @@ const Booking = () => {
           <button
             onClick={async () => {
               if (!user) {
+                // Keep everything they typed, then send them to sign in.
+                saveBookingDraft();
                 navigate(`/login?return=${encodeURIComponent(window.location.pathname + window.location.search)}`);
                 return;
               }
@@ -482,7 +551,10 @@ const Booking = () => {
                   },
                   ar
                 );
-                if (outcome === "requested") setStep("confirmed");
+                if (outcome === "requested") {
+                  clearBookingDraft();
+                  setStep("confirmed");
+                }
                 return;
               }
 
@@ -508,6 +580,7 @@ const Booking = () => {
                 );
                 return;
               }
+              clearBookingDraft();
               setStep("confirmed");
             }}
             disabled={

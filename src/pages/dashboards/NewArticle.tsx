@@ -12,6 +12,8 @@ import { ArrowLeft, Plus, Trash2, FileText, Image, Tag, MapPin } from "lucide-re
 import { toast } from "sonner";
 import CategoryChips from "@/components/CategoryChips";
 import CityPicker from "@/components/dashboard/CityPicker";
+import { useFormDraft } from "@/hooks/useFormDraft";
+import DraftResumePrompt from "@/components/dashboard/DraftResumePrompt";
 
 const categories = [
   { en: "Heritage & History", ar: "تراث وتاريخ" },
@@ -84,6 +86,27 @@ const NewArticle = () => {
   const addTag = () => setForm((p) => ({ ...p, tags: [...p.tags, ""] }));
   const removeTag = (idx: number) => setForm((p) => ({ ...p, tags: p.tags.filter((_, i) => i !== idx) }));
 
+  /**
+   * Crash recovery for the typed text, per user, expiring after 7 days. This is
+   * separate from the "Save as draft" button, which writes a real unpublished
+   * post row: this only rescues work that was never submitted at all. Newly
+   * picked cover photos are Files and are uploaded at save time, so they are
+   * deliberately not part of the draft.
+   */
+  const [pristineForm] = useState(() => JSON.stringify(form));
+  const draftDirty = JSON.stringify(form) !== pristineForm;
+  const { pendingDraft, resume, startOver, flush, clear: clearDraft } = useFormDraft<typeof form>({
+    formKey: "new-article",
+    userId: user?.id ?? null,
+    data: form,
+    enabled: !isEdit,
+    isDirty: draftDirty,
+  });
+  const handleResumeDraft = () => {
+    const restored = resume();
+    if (restored) setForm((p) => ({ ...p, ...restored.data }));
+  };
+
   const handleSubmit = async (status: "draft" | "published") => {
     if (!user) {
       toast.error(lang === "ar" ? "يرجى تسجيل الدخول" : "Please sign in first");
@@ -131,6 +154,7 @@ const NewArticle = () => {
         if (error) throw error;
         toast.success(status === "draft" ? (lang === "ar" ? "تم حفظ المسودة" : "Draft saved") : (lang === "ar" ? "تم نشر المقال بنجاح!" : "Article published successfully!"));
       }
+      clearDraft();
       navigate("/dashboard/culture-actor/my-content");
     } catch (err: any) {
       toast.error(err.message || "Failed to save article");
@@ -146,11 +170,15 @@ const NewArticle = () => {
   return (
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-role-culture-actor text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
-        <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target"><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل المقال" : "Edit Article") : (lang === "ar" ? "مقال جديد" : "New Article")}</h1>
       </header>
 
-      <div className="px-4 py-5 space-y-5">
+      {pendingDraft && (
+        <DraftResumePrompt onResume={handleResumeDraft} onStartOver={startOver} accentClass="bg-role-culture-actor" />
+      )}
+
+      <div className="px-4 py-5 space-y-5" onBlur={flush}>
         {/* Cover Image */}
         <div>
           <label className={labelClass}><Image className="w-3.5 h-3.5 text-role-culture-actor" />{lang === "ar" ? "صورة الغلاف" : "Cover Image"}</label>

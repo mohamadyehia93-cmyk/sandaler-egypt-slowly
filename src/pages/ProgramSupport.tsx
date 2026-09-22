@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { findProgramAction } from "@/lib/programActions";
 import { useI18n } from "@/lib/i18n";
+import { useRequestRescue } from "@/hooks/useRequestRescue";
 
 /**
  * One page for all four program actions. Every action inserts a real
@@ -62,6 +63,19 @@ const ProgramSupport = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+
+  // Keeps the typed request if signing in is needed, and returns here afterwards.
+  type Rescue = { fullName: string; email: string; phone: string; availability: string; message: string; customAmount: string; itemName: string; quantity: string };
+  const { signInToContinue, clearRescue } = useRequestRescue<Rescue>(`program:${id ?? ""}`, (d) => {
+    if (d.fullName) setFullName(d.fullName);
+    if (d.email) setEmail(d.email);
+    if (d.phone) setPhone(d.phone);
+    if (d.availability) setAvailability(d.availability);
+    if (d.message) setMessage(d.message);
+    if (d.customAmount) { setCustomAmount(d.customAmount); setUseCustom(true); }
+    if (d.itemName) setItemName(d.itemName);
+    if (d.quantity) setQuantity(d.quantity);
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ["program", id],
@@ -119,8 +133,8 @@ const ProgramSupport = () => {
 
   const handleSubmit = async () => {
     if (!user) {
-      toast.error(ar ? "يرجى تسجيل الدخول أولاً" : "Please sign in first");
-      navigate("/login");
+      toast.error(ar ? "سجّل الدخول لإرسال الطلب — لن نفقد ما كتبته" : "Sign in to send — we'll keep what you typed");
+      signInToContinue({ fullName, email, phone, availability, message, customAmount, itemName, quantity });
       return;
     }
     if (!validate()) return;
@@ -140,6 +154,7 @@ const ProgramSupport = () => {
       return;
     }
     toast.success(ar ? "تم إرسال طلبك" : "Your request was sent");
+    clearRescue();
     setSent(true);
   };
 

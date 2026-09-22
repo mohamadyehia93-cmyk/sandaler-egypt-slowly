@@ -800,7 +800,7 @@ const SplashPage = () => {
               className="min-h-screen bg-background flex flex-col"
             >
               <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
-                <button onClick={handleBack} className="p-1.5 rounded-full hover:bg-secondary">
+                <button onClick={handleBack} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
                   <ArrowLeft className="w-5 h-5 text-foreground" />
                 </button>
                 <div className="flex-1">

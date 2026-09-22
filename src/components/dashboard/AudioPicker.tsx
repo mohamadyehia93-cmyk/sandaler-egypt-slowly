@@ -86,7 +86,7 @@ const AudioPicker = ({
               {(file.size / 1024 / 1024).toFixed(1)} MB
             </span>
             {!uploading && (
-              <button type="button" onClick={clearPicked} className="text-destructive p-1 shrink-0">
+              <button type="button" onClick={clearPicked} aria-label={lang === "ar" ? "إزالة الملف الصوتي" : "Remove audio file"} className="text-destructive tap-target shrink-0">
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             )}
@@ -113,7 +113,7 @@ const AudioPicker = ({
               {lang === "ar" ? "استبدال" : "Replace"}
             </button>
             {onRemoveExisting && (
-              <button type="button" onClick={onRemoveExisting} className="text-destructive p-1 shrink-0">
+              <button type="button" onClick={onRemoveExisting} aria-label={lang === "ar" ? "إزالة الملف الصوتي" : "Remove audio file"} className="text-destructive tap-target shrink-0">
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             )}

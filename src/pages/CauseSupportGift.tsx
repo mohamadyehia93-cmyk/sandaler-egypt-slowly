@@ -8,6 +8,7 @@ import CauseUnmanagedNotice from "@/components/CauseUnmanagedNotice";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { submitPledge } from "@/lib/submitPledge";
+import { useRequestRescue } from "@/hooks/useRequestRescue";
 
 /**
  * Suggested bundles the visitor can PLEDGE, not stock the cause holds. The
@@ -78,6 +79,17 @@ const CauseSupportGift = () => {
   const [address, setAddress] = useState("");
   const [preferredDate, setPreferredDate] = useState("");
   const [notes, setNotes] = useState("");
+
+  // Keeps the pledge details if signing in is needed, and returns here afterwards.
+  type Rescue = { itemDescription: string; fullName: string; phone: string; address: string; preferredDate: string; notes: string };
+  const { signInToContinue, clearRescue } = useRequestRescue<Rescue>(`gift:${id ?? ""}`, (d) => {
+    if (d.itemDescription) setItemDescription(d.itemDescription);
+    if (d.fullName) setFullName(d.fullName);
+    if (d.phone) setPhone(d.phone);
+    if (d.address) setAddress(d.address);
+    if (d.preferredDate) setPreferredDate(d.preferredDate);
+    if (d.notes) setNotes(d.notes);
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   if (causeLoading) return <div className="min-h-screen bg-background" />;
@@ -112,8 +124,8 @@ const CauseSupportGift = () => {
 
   const handleConfirm = async () => {
     if (!user) {
-      toast.error(ar ? "يرجى تسجيل الدخول لتسجيل تعهدك" : "Please sign in to register your pledge");
-      navigate("/auth");
+      toast.error(ar ? "سجّل الدخول لتسجيل تعهدك — لن نفقد ما كتبته" : "Sign in to register your pledge — we'll keep what you typed");
+      signInToContinue({ itemDescription, fullName, phone, address, preferredDate, notes });
       return;
     }
     setSubmitting(true);
@@ -144,6 +156,7 @@ const CauseSupportGift = () => {
       toast.error(ar ? "تعذر تسجيل التعهد" : "Could not register the pledge");
       return;
     }
+    clearRescue();
     setStep("success");
   };
 
@@ -166,7 +179,7 @@ const CauseSupportGift = () => {
     <div className="min-h-screen bg-surface pb-28">
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
         {step !== "success" && (
-          <button onClick={handleBack} className="p-1.5 rounded-full hover:bg-secondary">
+          <button onClick={handleBack} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
         )}

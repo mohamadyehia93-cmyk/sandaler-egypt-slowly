@@ -168,12 +168,12 @@ const EventDetail = () => {
       />
 
       <header className="flex items-center gap-2 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
-        <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary">
+        <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h1 className="flex-1 text-lg font-bold text-foreground line-clamp-1">{title}</h1>
-        <WishlistButton itemType="event" itemId={event?.id} className="p-1.5 rounded-full hover:bg-secondary" />
-        <button onClick={share} className="p-1.5 rounded-full hover:bg-secondary" aria-label={t("event.share")}>
+        <WishlistButton itemType="event" itemId={event?.id} className="tap-target rounded-full hover:bg-secondary" />
+        <button onClick={share} className="tap-target rounded-full hover:bg-secondary" aria-label={t("event.share")}>
           <Share2 className="w-5 h-5 text-foreground" />
         </button>
       </header>

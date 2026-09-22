@@ -12,6 +12,7 @@ import { dbToLegacyCause } from "@/lib/dbAdapters";
 import { useRegions } from "@/hooks/useListings";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import NotFoundView from "@/components/NotFound";
+import DetailSkeleton from "@/components/DetailSkeleton";
 
 const supportOptions = [
   { key: "gift", icon: Gift, label: { en: "Send a Gift", ar: "أرسل هدية" }, desc: { en: "Support through gift packages for the community", ar: "ادعم من خلال هدايا للمجتمع" }, color: "bg-amber-500/10 text-amber-600", path: "gift" },
@@ -26,7 +27,7 @@ const CauseDetail = () => {
   const { lang, t } = useI18n();
   const { data: dbRegions } = useRegions();
 
-  const { data: dbCause } = useQuery({
+  const { data: dbCause, isLoading: causeLoading } = useQuery({
     queryKey: ["cause", id],
     queryFn: () => fetchByIdOrSlug("causes", id!),
     enabled: !!id,
@@ -50,7 +51,11 @@ const CauseDetail = () => {
 
   // DB row only. A missing cause must 404 — never fall back to a sample cause,
   // which would show a different organisation's fundraising numbers.
+  // The loading branch has to come FIRST: returning NotFound while the query is
+  // still in flight flashed "not found" on every visit, and never resolved at
+  // all on a slow connection.
   const cause = dbToLegacyCause(dbCause);
+  if (causeLoading || (!!id && dbCause === undefined)) return <DetailSkeleton variant="city" />;
   if (!cause) return <NotFoundView context="cause" />;
   const region = (dbRegions ?? []).find((r) => r.id === cause.regionId);
   // No payment path exists and no contribution has ever been recorded, so the

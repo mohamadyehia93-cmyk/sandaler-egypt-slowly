@@ -74,7 +74,7 @@ const VideoPicker = ({ file, onChange, existingUrl, onRemoveExisting, uploading 
             {uploading ? (
               <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
             ) : (
-              <button type="button" onClick={clearPicked} className="p-1 text-destructive">
+              <button type="button" onClick={clearPicked} aria-label={ar ? "إزالة الفيديو" : "Remove video"} className="tap-target text-destructive">
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             )}
