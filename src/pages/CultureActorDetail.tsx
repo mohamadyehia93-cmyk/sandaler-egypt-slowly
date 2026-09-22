@@ -121,7 +121,7 @@ const CultureActorDetail = () => {
           style={{ background: `linear-gradient(135deg, ${accent}90, ${accent}30)` }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-        <button onClick={() => navigate(-1)} className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-sm z-10">
+        <button onClick={() => navigate(-1)} className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-sm z-10" aria-label={lang === "ar" ? "رجوع" : "Back"}>
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <ShareButton title={lang === "ar" ? (actor as any).name_ar : (actor as any).name_en} className="absolute top-4 right-4 p-2 rounded-full bg-background/80 backdrop-blur-sm z-10" />

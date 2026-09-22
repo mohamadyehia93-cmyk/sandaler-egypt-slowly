@@ -60,6 +60,8 @@ const NewSession = () => {
     formKey: "new-session",
     userId: user?.id ?? null,
     data: form,
+    // This screen only ever creates a session — there is no edit mode to skip.
+    enabled: true,
     isDirty: draftDirty,
   });
   const handleResumeDraft = () => {

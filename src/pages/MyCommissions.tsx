@@ -48,7 +48,7 @@ const MyCommissions = () => {
   return (
     <div className="min-h-screen bg-surface pb-24">
       <header className="bg-card border-b border-border px-4 py-4 flex items-center gap-3">
-        <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5 text-foreground" /></button>
+        <button onClick={() => navigate(-1)} className="p-1" aria-label={lang === "ar" ? "رجوع" : "Back"}><ArrowLeft className="w-5 h-5 text-foreground" /></button>
         <h1 className="text-base font-bold text-foreground flex items-center gap-2">
           <Briefcase className="w-4 h-4 text-primary" />
           {ar ? "التكليفات التي أرسلتها" : "Commissions I've sent"}

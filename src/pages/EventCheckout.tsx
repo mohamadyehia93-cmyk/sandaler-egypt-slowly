@@ -192,7 +192,7 @@ const EventCheckout = () => {
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     className="w-9 h-9 rounded-full border border-border flex items-center justify-center disabled:opacity-40"
                     disabled={quantity <= 1}
-                  >
+                   aria-label={lang === "ar" ? "إنقاص" : "Decrease"}>
                     <Minus className="w-4 h-4" />
                   </button>
                   <span className="text-lg font-bold w-6 text-center">{quantity}</span>

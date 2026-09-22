@@ -40,7 +40,7 @@ const MyPrograms = () => {
   return (
     <div className="min-h-screen bg-surface pb-24">
       <header className="bg-role-organization text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
-        <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={() => navigate(-1)} className="p-1" aria-label={lang === "ar" ? "رجوع" : "Back"}><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{lang === "ar" ? "برامجي" : "My Programs"}</h1>
       </header>
 
@@ -70,10 +70,10 @@ const MyPrograms = () => {
                 className="bg-role-organization/10 text-role-organization"
               />
 
-              <button onClick={() => navigate(`/dashboard/organization/edit-program/${e.id}`)} className="p-2 rounded-lg bg-role-organization/10 text-role-organization">
+              <button onClick={() => navigate(`/dashboard/organization/edit-program/${e.id}`)} className="p-2 rounded-lg bg-role-organization/10 text-role-organization" aria-label={lang === "ar" ? "تعديل" : "Edit"}>
                 <Pencil className="w-4 h-4" />
               </button>
-              <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
+              <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive" aria-label={lang === "ar" ? "حذف" : "Delete"}>
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>

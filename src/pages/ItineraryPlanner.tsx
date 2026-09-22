@@ -434,7 +434,7 @@ const ItineraryPlanner = () => {
   return (
     <div className="min-h-screen bg-surface pb-20 flex flex-col">
       <header className="flex items-center gap-3 px-4 py-3 bg-background border-b border-border">
-        <button onClick={() => navigate(-1)}>
+        <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"}>
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <div className="flex items-center gap-2 flex-1">

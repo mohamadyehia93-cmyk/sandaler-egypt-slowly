@@ -97,7 +97,7 @@ const TransportDetail = () => {
   return (
     <div className={`min-h-screen bg-background ${isEditorial ? "pb-10" : "pb-28"}`}>
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
-        <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary">
+        <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h1 className="text-lg font-bold text-foreground flex-1 truncate">{name}</h1>
@@ -118,7 +118,7 @@ const TransportDetail = () => {
                   key={`${p}-${i}`}
                   onClick={() => setPhotoIdx(i)}
                   className={`w-14 h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 ${i === photoIdx ? "border-primary" : "border-transparent"}`}
-                >
+                 aria-label={lang === "ar" ? "صورة" : "Show photo"}>
                   <img src={p} alt="" className="w-full h-full object-cover" />
                 </button>
               ))}

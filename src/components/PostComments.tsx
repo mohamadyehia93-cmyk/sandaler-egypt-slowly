@@ -124,7 +124,7 @@ const PostComments = ({ postKey }: Props) => {
             onClick={() => submit(replyDrafts[c.id] || "", c.id)}
             disabled={!(replyDrafts[c.id] || "").trim() || addComment.isPending}
             className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-40"
-          >
+           aria-label={lang === "ar" ? "إرسال" : "Send"}>
             <Send className="w-3.5 h-3.5 rtl:-scale-x-100" />
           </button>
         </div>
@@ -169,7 +169,7 @@ const PostComments = ({ postKey }: Props) => {
             onClick={() => submit(draft)}
             disabled={!draft.trim() || addComment.isPending}
             className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-40"
-          >
+           aria-label={lang === "ar" ? "إرسال" : "Send"}>
             <Send className="w-4 h-4 rtl:-scale-x-100" />
           </button>
         </div>

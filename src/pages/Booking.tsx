@@ -344,14 +344,14 @@ const Booking = () => {
                 <button
                   onClick={() => setGuests(Math.max(1, guests - 1))}
                   className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center"
-                >
+                 aria-label="Decrease">
                   <Minus className="w-4 h-4 text-foreground" />
                 </button>
                 <span className="text-lg font-bold text-foreground min-w-[2ch] text-center">{guests}</span>
                 <button
                   onClick={() => setGuests(Math.min(10, guests + 1))}
                   className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center"
-                >
+                 aria-label="Increase">
                   <Plus className="w-4 h-4 text-foreground" />
                 </button>
               </div>

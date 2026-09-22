@@ -269,7 +269,7 @@ const ExperienceDetail = () => {
 
       {/* ── TOP NAV ─────────────────────────────────────────────── */}
       <div className="h-11 flex items-center justify-between px-4 bg-card sticky top-0 z-40">
-        <button onClick={() => navigate(-1)} className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center">
+        <button onClick={() => navigate(-1)} className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center" aria-label={"Back"}>
           <ArrowLeft className="w-4 h-4 text-foreground" />
         </button>
         <span className="text-xs text-muted-foreground font-normal truncate max-w-[55%]">
@@ -346,11 +346,11 @@ const ExperienceDetail = () => {
               <p className="text-[11px] text-muted-foreground">{unitPrice} {t("common.egp")} {t("common.per_person")}</p>
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={() => setGuests(Math.max(1, guests - 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center">
+              <button onClick={() => setGuests(Math.max(1, guests - 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center" aria-label="Decrease">
                 <Minus className="w-3.5 h-3.5 text-foreground" />
               </button>
               <span className="text-[15px] font-semibold text-foreground w-5 text-center">{guests}</span>
-              <button onClick={() => setGuests(Math.min(exp.capacity_max || 12, guests + 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center">
+              <button onClick={() => setGuests(Math.min(exp.capacity_max || 12, guests + 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center" aria-label="Increase">
                 <Plus className="w-3.5 h-3.5 text-foreground" />
               </button>
             </div>
@@ -656,9 +656,9 @@ const ExperienceDetail = () => {
               {t(sheetGuests > 1 ? "experience.n_adults_other" : "experience.n_adults_one", { count: sheetGuests })}
             </p>
             <div className="flex items-center gap-3">
-              <button onClick={() => setSheetGuests(Math.max(1, sheetGuests - 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center"><Minus className="w-3.5 h-3.5" /></button>
+              <button onClick={() => setSheetGuests(Math.max(1, sheetGuests - 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center" aria-label="Decrease"><Minus className="w-3.5 h-3.5" /></button>
               <span className="text-[15px] font-semibold w-5 text-center">{sheetGuests}</span>
-              <button onClick={() => setSheetGuests(Math.min(exp.capacity_max || 12, sheetGuests + 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center"><Plus className="w-3.5 h-3.5" /></button>
+              <button onClick={() => setSheetGuests(Math.min(exp.capacity_max || 12, sheetGuests + 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center" aria-label="Increase"><Plus className="w-3.5 h-3.5" /></button>
             </div>
           </div>
 

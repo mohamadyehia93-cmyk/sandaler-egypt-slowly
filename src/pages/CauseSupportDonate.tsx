@@ -190,7 +190,7 @@ const CauseSupportDonate = () => {
               <button
                 onClick={() => setRecurring(!recurring)}
                 className={`w-11 h-6 rounded-full transition-colors ${recurring ? "bg-primary" : "bg-border"}`}
-              >
+               aria-label={lang === "ar" ? "تبرع شهري" : "Monthly donation"}>
                 <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${recurring ? "translate-x-5.5" : "translate-x-0.5"}`} />
               </button>
             </div>

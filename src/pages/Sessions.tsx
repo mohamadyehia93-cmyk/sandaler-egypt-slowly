@@ -27,7 +27,7 @@ const Sessions = () => {
         }
       />
       <header className="sticky top-0 z-40 flex items-center gap-3 bg-background px-4 py-3">
-        <button onClick={() => navigate(-1)} className="rounded-full p-1.5 hover:bg-secondary">
+        <button onClick={() => navigate(-1)} className="rounded-full p-1.5 hover:bg-secondary" aria-label={lang === "ar" ? "رجوع" : "Back"}>
           <ArrowLeft className="h-5 w-5 text-foreground" />
         </button>
         <h1 className="text-lg font-bold text-foreground">{ar ? "جلسات الخبراء" : "Expert Sessions"}</h1>

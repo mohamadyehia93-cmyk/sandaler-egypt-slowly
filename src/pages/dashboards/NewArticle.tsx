@@ -248,7 +248,7 @@ const NewArticle = () => {
             {form.tags.map((tag, i) => (
               <div key={i} className="flex gap-2">
                 <input className={`${inputClass} flex-1`} placeholder={lang === "ar" ? "مثال: تراث" : "e.g. heritage"} value={tag} onChange={(e) => updateTag(i, e.target.value)} maxLength={30} />
-                {form.tags.length > 1 && <button onClick={() => removeTag(i)} className="p-2 text-destructive"><Trash2 className="w-4 h-4" /></button>}
+                {form.tags.length > 1 && <button onClick={() => removeTag(i)} className="tap-target text-destructive" aria-label={lang === "ar" ? "إزالة" : "Remove"}><Trash2 className="w-4 h-4" /></button>}
               </div>
             ))}
             <button onClick={addTag} className="flex items-center gap-1 text-xs font-medium text-role-culture-actor"><Plus className="w-3.5 h-3.5" /> {lang === "ar" ? "إضافة وسم" : "Add tag"}</button>

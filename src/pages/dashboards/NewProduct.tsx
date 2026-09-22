@@ -260,7 +260,7 @@ const NewProduct = () => {
   return (
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-role-product-seller text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
-        <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={() => navigate(-1)} className="p-1" aria-label={lang === "ar" ? "رجوع" : "Back"}><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل المنتج" : "Edit Product") : (lang === "ar" ? "إضافة منتج" : "Add Product")}</h1>
       </header>
 
@@ -437,7 +437,7 @@ const NewProduct = () => {
               <div key={i} className="rounded-xl border border-border bg-card p-3 space-y-2">
                 <div className="flex gap-2">
                   <input className={`${inputClass} flex-1`} placeholder={lang === "ar" ? "الاسم بالإنجليزية (Size)" : "Name in English (Size)"} value={v.labelEn} onChange={(e) => setVariant(i, { labelEn: e.target.value })} maxLength={40} />
-                  <button onClick={() => setVariants((p) => p.filter((_, idx) => idx !== i))} className="p-2 text-destructive"><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => setVariants((p) => p.filter((_, idx) => idx !== i))} className="tap-target text-destructive" aria-label={lang === "ar" ? "إزالة" : "Remove"}><Trash2 className="w-4 h-4" /></button>
                 </div>
                 <input className={inputClass} dir="rtl" placeholder="الاسم بالعربية (المقاس)" value={v.labelAr} onChange={(e) => setVariant(i, { labelAr: e.target.value })} maxLength={40} />
                 <input className={inputClass} placeholder={lang === "ar" ? "الخيارات مفصولة بفاصلة: S, M, L" : "Options, comma separated: S, M, L"} value={v.options} onChange={(e) => setVariant(i, { options: e.target.value })} maxLength={200} />
@@ -466,7 +466,7 @@ const NewProduct = () => {
               <div key={i} className="rounded-xl border border-border bg-card p-3 space-y-2">
                 <div className="flex gap-2">
                   <input className={`${inputClass} flex-1`} placeholder={lang === "ar" ? "الطريقة بالإنجليزية" : "Method in English"} value={d.methodEn} onChange={(e) => setDeliveryRow(i, { methodEn: e.target.value })} maxLength={60} />
-                  <button onClick={() => setDelivery((p) => p.filter((_, idx) => idx !== i))} className="p-2 text-destructive"><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => setDelivery((p) => p.filter((_, idx) => idx !== i))} className="tap-target text-destructive" aria-label={lang === "ar" ? "إزالة" : "Remove"}><Trash2 className="w-4 h-4" /></button>
                 </div>
                 <input className={inputClass} dir="rtl" placeholder="الطريقة بالعربية" value={d.methodAr} onChange={(e) => setDeliveryRow(i, { methodAr: e.target.value })} maxLength={60} />
                 <input type="number" className={inputClass} placeholder={lang === "ar" ? `التكلفة (${form.currency})` : `Cost (${form.currency})`} value={d.cost} onChange={(e) => setDeliveryRow(i, { cost: e.target.value })} min="0" />

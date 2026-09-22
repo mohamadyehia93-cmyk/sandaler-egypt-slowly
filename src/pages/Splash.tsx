@@ -630,7 +630,7 @@ const SplashPage = () => {
             className="min-h-screen bg-background flex flex-col"
           >
             <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
-              <button onClick={() => goTo("splash", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+              <button onClick={() => goTo("splash", -1)} className="tap-target rounded-full hover:bg-secondary" aria-label={lang === "ar" ? "رجوع" : "Back"}>
                 <ArrowLeft className="w-5 h-5 text-foreground" />
               </button>
               <div>
@@ -685,7 +685,7 @@ const SplashPage = () => {
             className="min-h-screen bg-background flex flex-col"
           >
             <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
-              <button onClick={() => goTo("role", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+              <button onClick={() => goTo("role", -1)} className="tap-target rounded-full hover:bg-secondary" aria-label={lang === "ar" ? "رجوع" : "Back"}>
                 <ArrowLeft className="w-5 h-5 text-foreground" />
               </button>
               <div>
@@ -979,7 +979,7 @@ const SplashPage = () => {
             className="min-h-screen bg-background flex flex-col"
           >
             <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
-              <button onClick={() => goTo("role", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+              <button onClick={() => goTo("role", -1)} className="tap-target rounded-full hover:bg-secondary" aria-label={lang === "ar" ? "رجوع" : "Back"}>
                 <ArrowLeft className="w-5 h-5 text-foreground" />
               </button>
               <div className="flex-1">
@@ -1123,7 +1123,7 @@ const SplashPage = () => {
             className="min-h-screen bg-background flex flex-col"
           >
             <header className="flex items-center gap-3 px-4 py-3 border-b border-border">
-              <button onClick={() => goTo("city", -1)} className="p-1.5 rounded-full hover:bg-secondary">
+              <button onClick={() => goTo("city", -1)} className="tap-target rounded-full hover:bg-secondary" aria-label={lang === "ar" ? "رجوع" : "Back"}>
                 <ArrowLeft className="w-5 h-5 text-foreground" />
               </button>
               <div>

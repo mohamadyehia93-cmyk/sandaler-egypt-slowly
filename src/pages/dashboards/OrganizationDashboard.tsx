@@ -78,7 +78,7 @@ const OrganizationDashboard = () => {
     <div className="min-h-screen bg-surface pb-20">
       <header className="bg-role-organization text-white px-4 py-4">
         <div className="flex items-center justify-between mb-3">
-          <button onClick={() => navigate("/profile")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+          <button onClick={() => navigate("/profile")} className="p-1" aria-label={lang === "ar" ? "رجوع" : "Back"}><ArrowLeft className="w-5 h-5" /></button>
           <div className="flex items-center gap-2">
             <EditProfileHeaderButton />
             <VisitorModeHeaderToggle />

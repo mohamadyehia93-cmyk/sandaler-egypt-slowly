@@ -233,7 +233,7 @@ const NewCollection = () => {
               <div key={i} className="bg-card rounded-xl p-3 space-y-2 border border-border">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-role-culture-actor">{lang === "ar" ? `عنصر ${i + 1}` : `Entry ${i + 1}`}</span>
-                  {form.entries.length > 1 && <button onClick={() => removeEntry(i)} className="text-destructive"><Trash2 className="w-3.5 h-3.5" /></button>}
+                  {form.entries.length > 1 && <button onClick={() => removeEntry(i)} className="text-destructive" aria-label={lang === "ar" ? "إزالة" : "Remove"}><Trash2 className="w-3.5 h-3.5" /></button>}
                 </div>
                 <input className={inputClass} placeholder={lang === "ar" ? "عنوان العنصر" : "Entry title"} value={entry.title} onChange={(e) => updateEntry(i, "title", e.target.value)} maxLength={100} />
                 <textarea className={`${inputClass} min-h-[60px] resize-none`} placeholder={lang === "ar" ? "ملخص مختصر..." : "Brief summary..."} value={entry.summary} onChange={(e) => updateEntry(i, "summary", e.target.value)} maxLength={500} />
@@ -250,7 +250,7 @@ const NewCollection = () => {
             {form.references.map((ref, i) => (
               <div key={i} className="flex gap-2">
                 <input className={`${inputClass} flex-1`} placeholder={lang === "ar" ? "مرجع أكاديمي..." : "Academic reference..."} value={ref} onChange={(e) => updateRef(i, e.target.value)} maxLength={200} />
-                {form.references.length > 1 && <button onClick={() => removeRef(i)} className="p-2 text-destructive"><Trash2 className="w-4 h-4" /></button>}
+                {form.references.length > 1 && <button onClick={() => removeRef(i)} className="tap-target text-destructive" aria-label={lang === "ar" ? "إزالة" : "Remove"}><Trash2 className="w-4 h-4" /></button>}
               </div>
             ))}
             <button onClick={addRef} className="flex items-center gap-1 text-xs font-medium text-role-culture-actor"><Plus className="w-3.5 h-3.5" /> {lang === "ar" ? "إضافة مرجع" : "Add reference"}</button>

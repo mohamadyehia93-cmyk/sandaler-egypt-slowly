@@ -274,7 +274,7 @@ const CityDetail = () => {
     <div className="min-h-screen bg-surface pb-20">
       {/* Header */}
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40">
-        <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary">
+        <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h1 className="text-lg font-bold text-foreground">{city.name[lang]}</h1>

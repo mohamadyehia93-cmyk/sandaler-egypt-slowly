@@ -289,7 +289,7 @@ const ProductDetail = () => {
         <button
           onClick={() => navigate(-1)}
           className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center"
-        >
+         aria-label={lang === "ar" ? "رجوع" : "Back"}>
           <ArrowLeft className="w-4 h-4 text-foreground" />
         </button>
         <span className="text-xs text-muted-foreground truncate max-w-[55%]">
@@ -324,7 +324,7 @@ const ProductDetail = () => {
                   className={`w-14 h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 ${
                     i === photoIdx ? "border-primary" : "border-transparent"
                   }`}
-                >
+                 aria-label={lang === "ar" ? "صورة" : "Show photo"}>
                   <img src={p} alt="" className="w-full h-full object-cover" />
                 </button>
               ))}
@@ -606,7 +606,7 @@ const ProductDetail = () => {
           >
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-foreground">{ar ? "إتمام الطلب" : "Place Order"}</h3>
-              <button onClick={() => setSheetOpen(false)} className="p-1 text-muted-foreground">
+              <button onClick={() => setSheetOpen(false)} className="tap-target text-muted-foreground" aria-label={lang === "ar" ? "إغلاق" : "Close"}>
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -641,14 +641,14 @@ const ProductDetail = () => {
                 <button
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
                   className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center text-foreground"
-                >
+                 aria-label={lang === "ar" ? "إنقاص" : "Decrease"}>
                   <Minus className="w-4 h-4" />
                 </button>
                 <span className="text-base font-bold text-foreground w-6 text-center">{qty}</span>
                 <button
                   onClick={() => setQty((q) => q + 1)}
                   className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary"
-                >
+                 aria-label={lang === "ar" ? "زيادة" : "Increase"}>
                   <Plus className="w-4 h-4" />
                 </button>
               </div>
