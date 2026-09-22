@@ -405,7 +405,7 @@ const NewAudioTour = () => {
   return (
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-role-culture-actor text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
-        <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={() => navigate(-1)} className="p-1" aria-label={lang === "ar" ? "رجوع" : "Back"}><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل الجولة" : "Edit Audio Tour") : (lang === "ar" ? "جولة صوتية جديدة" : "New Audio Tour")}</h1>
       </header>
 
@@ -541,7 +541,7 @@ const NewAudioTour = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-role-culture-actor">{lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`}</span>
                   {stops.length > 1 && (
-                    <button onClick={() => removeStop(i)} className="text-destructive p-1">
+                    <button onClick={() => removeStop(i)} className="text-destructive p-1" aria-label={lang === "ar" ? "إزالة" : "Remove"}>
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   )}
@@ -642,7 +642,7 @@ const NewAudioTour = () => {
                           >
                             <ArrowDown className="w-3.5 h-3.5" />
                           </button>
-                          <button onClick={() => removeSegment(i, j)} className="text-destructive p-1">
+                          <button onClick={() => removeSegment(i, j)} className="text-destructive p-1" aria-label={lang === "ar" ? "إزالة" : "Remove"}>
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>

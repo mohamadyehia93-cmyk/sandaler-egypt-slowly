@@ -43,7 +43,7 @@ const MyTrips = () => {
   return (
     <div className="min-h-screen bg-surface pb-24">
       <header className="bg-role-trip-organizer text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
-        <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={() => navigate(-1)} className="p-1" aria-label={lang === "ar" ? "رجوع" : "Back"}><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{lang === "ar" ? "رحلاتي" : "My Trips"}</h1>
       </header>
 
@@ -69,10 +69,10 @@ const MyTrips = () => {
                 <span className="text-[10px] font-medium text-success">{e.status}</span>
               </div>
               <PreviewButton path={`/trip/${e.slug || e.id}`} className="bg-role-trip-organizer/10 text-role-trip-organizer" />
-              <button onClick={() => navigate(`/dashboard/trip-organizer/edit-trip/${e.id}`)} className="p-2 rounded-lg bg-role-trip-organizer/10 text-role-trip-organizer">
+              <button onClick={() => navigate(`/dashboard/trip-organizer/edit-trip/${e.id}`)} className="p-2 rounded-lg bg-role-trip-organizer/10 text-role-trip-organizer" aria-label={lang === "ar" ? "تعديل" : "Edit"}>
                 <Pencil className="w-4 h-4" />
               </button>
-              <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
+              <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive" aria-label={lang === "ar" ? "حذف" : "Delete"}>
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>

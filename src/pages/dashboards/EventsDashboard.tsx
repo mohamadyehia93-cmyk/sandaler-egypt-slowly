@@ -128,7 +128,7 @@ const EventsDashboard = () => {
   return (
     <div className="min-h-screen bg-surface pb-24">
       <header className="bg-role-trip-organizer text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
-        <button onClick={() => navigate("/dashboard/trip-organizer")} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={() => navigate("/dashboard/trip-organizer")} className="p-1" aria-label={lang === "ar" ? "رجوع" : "Back"}><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{lang === "ar" ? "إدارة الفعاليات" : "Events Manager"}</h1>
         {isAdmin && (
           <span className="ms-auto text-[10px] font-semibold bg-white/20 px-2 py-0.5 rounded-full">
@@ -268,7 +268,7 @@ const EventsDashboard = () => {
                       <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openAttendees === e.id ? "rotate-180" : ""}`} />
                     </button>
 
-                    <button onClick={() => handleDelete(e.id)} className="ms-auto p-2 rounded-lg bg-destructive/10 text-destructive">
+                    <button onClick={() => handleDelete(e.id)} className="ms-auto p-2 rounded-lg bg-destructive/10 text-destructive" aria-label={lang === "ar" ? "حذف" : "Delete"}>
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>

@@ -52,7 +52,7 @@ const MyContent = () => {
   return (
     <div className="min-h-screen bg-surface pb-24">
       <header className="bg-role-culture-actor text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
-        <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={() => navigate(-1)} className="p-1" aria-label={lang === "ar" ? "رجوع" : "Back"}><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{lang === "ar" ? "محتواي" : "My Content"}</h1>
       </header>
 
@@ -82,19 +82,19 @@ const MyContent = () => {
                 </span>
               </div>
               {e.status === "published" ? (
-                <button onClick={() => handleStatus(e.id, "draft")} title={lang === "ar" ? "تحويل إلى مسودة" : "Unpublish"} className="p-2 rounded-lg bg-secondary text-muted-foreground">
+                <button onClick={() => handleStatus(e.id, "draft")} title={lang === "ar" ? "تحويل إلى مسودة" : "Unpublish"} className="p-2 rounded-lg bg-secondary text-muted-foreground" aria-label={lang === "ar" ? "تحويل إلى مسودة" : "Move to draft"}>
                   <Undo2 className="w-4 h-4" />
                 </button>
               ) : (
-                <button onClick={() => handleStatus(e.id, "published")} title={lang === "ar" ? "نشر" : "Publish"} className="p-2 rounded-lg bg-success/10 text-success">
+                <button onClick={() => handleStatus(e.id, "published")} title={lang === "ar" ? "نشر" : "Publish"} className="p-2 rounded-lg bg-success/10 text-success" aria-label={lang === "ar" ? "نشر" : "Publish"}>
                   <Send className="w-4 h-4" />
                 </button>
               )}
               <PreviewButton path={`/post/${e.slug || e.id}`} className="bg-role-culture-actor/10 text-role-culture-actor" />
-              <button onClick={() => navigate(`/dashboard/culture-actor/edit-article/${e.id}`)} className="p-2 rounded-lg bg-role-culture-actor/10 text-role-culture-actor">
+              <button onClick={() => navigate(`/dashboard/culture-actor/edit-article/${e.id}`)} className="p-2 rounded-lg bg-role-culture-actor/10 text-role-culture-actor" aria-label={lang === "ar" ? "تعديل" : "Edit"}>
                 <Pencil className="w-4 h-4" />
               </button>
-              <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive">
+              <button onClick={() => handleDelete(e.id)} className="p-2 rounded-lg bg-destructive/10 text-destructive" aria-label={lang === "ar" ? "حذف" : "Delete"}>
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>

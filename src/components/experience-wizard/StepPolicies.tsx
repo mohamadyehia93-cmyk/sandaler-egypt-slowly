@@ -105,7 +105,7 @@ const StepPolicies = ({ form, set, updateForm }: Props) => {
             <div key={i} className="flex gap-2">
               <input className={`${inputClass} flex-1`} placeholder={lang === "ar" ? "مثال: واقي شمس" : "e.g. Sunscreen"} value={item} onChange={(e) => updateWhatToBring(i, e.target.value)} maxLength={100} />
               {form.whatToBring.length > 1 && (
-                <button onClick={() => updateForm({ whatToBring: form.whatToBring.filter((_, j) => j !== i) })} className="p-2 text-destructive"><Trash2 className="w-4 h-4" /></button>
+                <button onClick={() => updateForm({ whatToBring: form.whatToBring.filter((_, j) => j !== i) })} className="p-2 text-destructive" aria-label={lang === "ar" ? "حذف" : "Delete"}><Trash2 className="w-4 h-4" /></button>
               )}
             </div>
           ))}

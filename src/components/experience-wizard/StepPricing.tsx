@@ -66,7 +66,7 @@ const StepPricing = ({ form, set, updateForm }: Props) => {
             <div key={i} className="flex gap-2">
               <input className={`${inputClass} flex-1`} placeholder={lang === "ar" ? "مثال: غداء تقليدي" : "e.g. Traditional lunch"} value={item} onChange={(e) => updateListItem("includes", i, e.target.value)} maxLength={100} />
               {form.includes.length > 1 && (
-                <button onClick={() => removeListItem("includes", i)} className="p-2 text-destructive"><Trash2 className="w-4 h-4" /></button>
+                <button onClick={() => removeListItem("includes", i)} className="p-2 text-destructive" aria-label={lang === "ar" ? "حذف" : "Delete"}><Trash2 className="w-4 h-4" /></button>
               )}
             </div>
           ))}
@@ -87,7 +87,7 @@ const StepPricing = ({ form, set, updateForm }: Props) => {
             <div key={i} className="flex gap-2">
               <input className={`${inputClass} flex-1`} placeholder={lang === "ar" ? "مثال: المواصلات" : "e.g. Transportation"} value={item} onChange={(e) => updateListItem("excludes", i, e.target.value)} maxLength={100} />
               {form.excludes.length > 1 && (
-                <button onClick={() => removeListItem("excludes", i)} className="p-2 text-destructive"><Trash2 className="w-4 h-4" /></button>
+                <button onClick={() => removeListItem("excludes", i)} className="p-2 text-destructive" aria-label={lang === "ar" ? "حذف" : "Delete"}><Trash2 className="w-4 h-4" /></button>
               )}
             </div>
           ))}

@@ -158,7 +158,7 @@ const ProviderProfile = () => {
         <img src={provider.cover_image || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-4 z-10">
-          <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur flex items-center justify-center">
+          <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur flex items-center justify-center" aria-label={lang === "ar" ? "رجوع" : "Back"}>
             <ArrowLeft className="w-4 h-4 text-white" />
           </button>
           <ShareButton title={lang === "ar" ? (provider as any).name_ar : (provider as any).name_en} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur flex items-center justify-center" iconClassName="w-4 h-4 text-white" />

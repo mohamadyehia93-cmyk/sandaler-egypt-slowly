@@ -117,7 +117,7 @@ const StepLocation = ({ form, set, updateForm }: Props) => {
                 />
               </div>
               {form.itinerary.length > 1 && (
-                <button onClick={() => updateForm({ itinerary: form.itinerary.filter((_, j) => j !== i) })} className="p-2 text-destructive mt-1"><Trash2 className="w-4 h-4" /></button>
+                <button onClick={() => updateForm({ itinerary: form.itinerary.filter((_, j) => j !== i) })} className="p-2 text-destructive mt-1" aria-label={lang === "ar" ? "حذف" : "Delete"}><Trash2 className="w-4 h-4" /></button>
               )}
             </div>
           ))}

@@ -274,7 +274,7 @@ const NewTrip = () => {
   return (
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-role-trip-organizer text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
-        <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={() => navigate(-1)} className="p-1" aria-label={lang === "ar" ? "رجوع" : "Back"}><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">{isEdit ? (lang === "ar" ? "تعديل الرحلة" : "Edit Trip") : (lang === "ar" ? "إنشاء رحلة" : "Create Trip")}</h1>
       </header>
 
@@ -387,7 +387,7 @@ const NewTrip = () => {
             {form.destinations.map((d, i) => (
               <div key={i} className="flex gap-2">
                 <div className="flex-1"><CityNameSelect value={d} onChange={(cityName) => updateDest(i, cityName)} className={inputClass} /></div>
-                {form.destinations.length > 1 && <button onClick={() => removeDest(i)} className="p-2 text-destructive"><Trash2 className="w-4 h-4" /></button>}
+                {form.destinations.length > 1 && <button onClick={() => removeDest(i)} className="tap-target text-destructive" aria-label={lang === "ar" ? "إزالة" : "Remove"}><Trash2 className="w-4 h-4" /></button>}
               </div>
             ))}
             <button onClick={addDest} className="flex items-center gap-1 text-xs font-medium text-role-trip-organizer"><Plus className="w-3.5 h-3.5" /> {lang === "ar" ? "إضافة وجهة" : "Add destination"}</button>
@@ -404,7 +404,7 @@ const NewTrip = () => {
                   <input className={inputClass} placeholder={lang === "ar" ? "عنوان اليوم..." : "Day title..."} value={item.title} onChange={(e) => updateItinerary(i, "title", e.target.value)} maxLength={200} />
                   <textarea className={`${inputClass} py-2.5 min-h-[60px] resize-y`} placeholder={lang === "ar" ? "أضف وصفًا — اختياري" : "Add detail — optional"} value={item.description} onChange={(e) => updateItinerary(i, "description", e.target.value)} maxLength={400} />
                 </div>
-                {form.itinerary.length > 1 && <button onClick={() => removeItinerary(i)} className="p-2 text-destructive mt-1"><Trash2 className="w-4 h-4" /></button>}
+                {form.itinerary.length > 1 && <button onClick={() => removeItinerary(i)} className="tap-target text-destructive mt-1" aria-label={lang === "ar" ? "إزالة" : "Remove"}><Trash2 className="w-4 h-4" /></button>}
               </div>
             ))}
             <button onClick={addItinerary} className="flex items-center gap-1 text-xs font-medium text-role-trip-organizer ml-8"><Plus className="w-3.5 h-3.5" /> {lang === "ar" ? "إضافة يوم" : "Add day"}</button>
@@ -417,7 +417,7 @@ const NewTrip = () => {
             {form.includes.map((item, i) => (
               <div key={i} className="flex gap-2">
                 <input className={`${inputClass} flex-1`} placeholder={lang === "ar" ? "مثال: وجبة غداء" : "e.g. Lunch meal"} value={item} onChange={(e) => updateIncludes(i, e.target.value)} maxLength={80} />
-                {form.includes.length > 1 && <button onClick={() => removeIncludes(i)} className="p-2 text-destructive"><Trash2 className="w-4 h-4" /></button>}
+                {form.includes.length > 1 && <button onClick={() => removeIncludes(i)} className="tap-target text-destructive" aria-label={lang === "ar" ? "إزالة" : "Remove"}><Trash2 className="w-4 h-4" /></button>}
               </div>
             ))}
             <button onClick={addIncludes} className="flex items-center gap-1 text-xs font-medium text-role-trip-organizer"><Plus className="w-3.5 h-3.5" /> {lang === "ar" ? "إضافة عنصر" : "Add item"}</button>

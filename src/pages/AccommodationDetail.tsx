@@ -109,7 +109,7 @@ const AccommodationDetail = () => {
   return (
     <div className={`min-h-screen bg-background ${isEditorial ? "pb-10" : "pb-24"}`}>
       <div className="h-11 flex items-center justify-between px-4 bg-card sticky top-0 z-40">
-        <button onClick={() => navigate(-1)} className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center">
+        <button onClick={() => navigate(-1)} className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center" aria-label={lang === "ar" ? "رجوع" : "Back"}>
           <ArrowLeft className="w-4 h-4 text-foreground" />
         </button>
         <span className="text-xs text-muted-foreground truncate max-w-[55%]">{typeLabel || (ar ? "مكان إقامة" : "Place to stay")}</span>
@@ -136,7 +136,7 @@ const AccommodationDetail = () => {
                   key={`${p}-${i}`}
                   onClick={() => setPhotoIdx(i)}
                   className={`w-14 h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 ${i === photoIdx ? "border-primary" : "border-transparent"}`}
-                >
+                 aria-label={lang === "ar" ? "صورة" : "Show photo"}>
                   <img src={p} alt="" className="w-full h-full object-cover" />
                 </button>
               ))}

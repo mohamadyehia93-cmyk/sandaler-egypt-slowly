@@ -344,7 +344,7 @@ const NewProgram = () => {
             {form.goals.map((g, i) => (
               <div key={i} className="flex gap-2">
                 <input className={`${inputClass} flex-1`} placeholder={lang === "ar" ? "هدف..." : "Goal..."} value={g} onChange={(e) => updateGoal(i, e.target.value)} maxLength={100} />
-                {form.goals.length > 1 && <button onClick={() => removeGoal(i)} className="p-2 text-destructive"><Trash2 className="w-4 h-4" /></button>}
+                {form.goals.length > 1 && <button onClick={() => removeGoal(i)} className="tap-target text-destructive" aria-label={lang === "ar" ? "إزالة" : "Remove"}><Trash2 className="w-4 h-4" /></button>}
               </div>
             ))}
             <button onClick={addGoal} className="flex items-center gap-1 text-xs font-medium text-role-organization"><Plus className="w-3.5 h-3.5" /> {lang === "ar" ? "إضافة هدف" : "Add goal"}</button>

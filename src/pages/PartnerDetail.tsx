@@ -54,7 +54,7 @@ const PartnerDetail = () => {
         <button
           onClick={() => navigate(-1)}
           className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-sm z-10"
-        >
+         aria-label={lang === "ar" ? "رجوع" : "Back"}>
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
       </div>

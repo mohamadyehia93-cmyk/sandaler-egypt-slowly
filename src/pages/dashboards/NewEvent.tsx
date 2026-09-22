@@ -213,7 +213,7 @@ const NewEvent = () => {
   return (
     <div className="min-h-screen bg-surface pb-10">
       <header className="bg-primary text-primary-foreground px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
-        <button onClick={() => navigate(-1)} className="p-1"><ArrowLeft className="w-5 h-5" /></button>
+        <button onClick={() => navigate(-1)} className="p-1" aria-label={lang === "ar" ? "رجوع" : "Back"}><ArrowLeft className="w-5 h-5" /></button>
         <h1 className="text-lg font-bold">
           {editId
             ? lang === "ar" ? "تعديل الفعالية" : "Edit Event"
@@ -330,7 +330,7 @@ const NewEvent = () => {
           <button
             onClick={() => set("is_free", !form.is_free)}
             className={`w-11 h-6 rounded-full transition-colors relative ${form.is_free ? "bg-primary" : "bg-muted"}`}
-          >
+           aria-label={lang === "ar" ? "مجاني" : "Free"}>
             <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all ${form.is_free ? "start-0.5 ms-0" : "start-[22px]"}`} />
           </button>
         </div>

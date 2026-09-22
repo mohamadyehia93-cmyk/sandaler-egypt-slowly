@@ -70,7 +70,7 @@ const CauseDetail = () => {
       <div className="relative">
         <img src={cause.image} alt={cause.title[lang]} className="w-full h-64 object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-        <button onClick={() => navigate(-1)} className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-sm">
+        <button onClick={() => navigate(-1)} className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-sm" aria-label={lang === "ar" ? "رجوع" : "Back"}>
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <div className="absolute top-4 right-4 flex gap-2">
