@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { contentTypeLabel, type ContentType } from "@/lib/contentTypes";
 import type { WishlistItemType } from "@/hooks/useWishlist";
+import { useCardSize } from "./cardSize";
 import PriceBadge from "./PriceBadge";
 import WishlistButton from "./WishlistButton";
 
@@ -41,6 +42,7 @@ const ContentCard = ({
 }: ContentCardProps) => {
   const navigate = useNavigate();
   const { lang } = useI18n();
+  const lg = useCardSize() === "lg";
 
   return (
     <article
@@ -54,7 +56,7 @@ const ContentCard = ({
           navigate(href);
         }
       }}
-      className={`group relative w-full overflow-hidden rounded-xl bg-card shadow-card cursor-pointer transition-transform active:scale-[0.99] ${className}`}
+      className={`group relative w-full overflow-hidden rounded-xl bg-card focus-ring shadow-card cursor-pointer transition-transform active:scale-[0.99] ${className}`}
     >
       <div className="relative aspect-[3/2] w-full bg-secondary">
         {image ? (
@@ -79,19 +81,21 @@ const ContentCard = ({
           />
         )}
 
-        <div className="absolute bottom-0 start-0 end-0 p-4">
+        <div className={`absolute bottom-0 start-0 end-0 ${lg ? "p-5" : "p-4"}`}>
           <span
-            className={`block text-[10px] font-semibold text-primary-foreground/80 ${
+            className={`block ${lg ? "text-[11px]" : "text-[10px]"} font-semibold text-primary-foreground/80 ${
               lang === "ar" ? "" : "uppercase tracking-[0.14em]"
             }`}
           >
             {contentTypeLabel(type, lang)}
           </span>
-          <h3 className="mt-1 line-clamp-2 text-base font-bold leading-snug text-primary-foreground">
+          <h3 className={`mt-1 line-clamp-2 font-bold leading-snug text-primary-foreground ${
+              lg ? "text-[19px] lg:text-xl" : "text-base"
+            }`}>
             {title}
           </h3>
           {note && (
-            <span className="mt-1 block text-[11px] font-medium text-primary-foreground/85">
+            <span className={`mt-1 block ${lg ? "text-xs" : "text-[11px]"} font-medium text-primary-foreground/85`}>
               {note}
             </span>
           )}
