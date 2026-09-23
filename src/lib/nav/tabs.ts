@@ -69,7 +69,6 @@ const HIDDEN_PREFIXES = [
   // checkout / booking steps
   "/booking",
   "/event-ticket/",
-  "/program/", // support actions handled below by segment test
   "/flag-issue",
   // create / edit wizards
   "/dashboard/culture-actor/new-",
@@ -91,15 +90,20 @@ const HIDDEN_PREFIXES = [
 /** Booking-like sub-flows: /cause/:id/donate, /program/:id/volunteer, /event/:id/tickets */
 const FOCUSED_SUFFIXES = ["/donate", "/volunteer", "/consult", "/gift", "/tickets", "/slots"];
 
+/**
+ * Segment-aware prefix test: "/booking" must not swallow "/bookings", while
+ * wizard entries ending in "-" or "/" stay raw prefixes on purpose.
+ */
+const matchesPrefix = (path: string, entry: string) => {
+  if (entry.endsWith("-") || entry.endsWith("/")) return path.startsWith(entry);
+  return path === entry || path.startsWith(entry + "/");
+};
+
 export const showsBottomNav = (pathname: string): boolean => {
   const path = pathname.replace(/\/+$/, "") || "/";
-  if (path === "/program" || path === "/programs") return true;
-  // /program/:id itself keeps the bar; only its support actions hide it.
-  if (/^\/program\/[^/]+$/.test(path)) return true;
-  if (path === "/statuses") return true;
-  if (HIDDEN_PREFIXES.some((p) => path === p || path.startsWith(p))) return false;
+  if (HIDDEN_PREFIXES.some((p) => matchesPrefix(path, p))) return false;
   if (FOCUSED_SUFFIXES.some((s) => path.endsWith(s))) return false;
-  // a single chat conversation
+  // a single chat conversation opened as its own route
   if (/^\/inbox\/[^/]+$/.test(path)) return false;
   return true;
 };
