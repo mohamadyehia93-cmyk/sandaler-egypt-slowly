@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { SEO } from "@/components/SEO";
-import BottomNav from "@/components/BottomNav";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ABOUT_SECTIONS, HOME_PURPOSE_LINE } from "@/content/siteCopy";
 
@@ -17,7 +16,7 @@ const About = () => {
   const Back = lang === "ar" ? ArrowRight : ArrowLeft;
 
   return (
-    <div className="min-h-screen bg-surface pb-24">
+    <div className="min-h-screen bg-surface">
       <SEO url="/about" />
 
       <header className="flex items-center gap-2 px-4 py-3 bg-primary-dark">
@@ -61,8 +60,6 @@ const About = () => {
           {lang === "ar" ? "حقوق الصور" : "Image credits"}
         </button>
       </div>
-
-      <BottomNav />
     </div>
   );
 };

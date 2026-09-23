@@ -6,7 +6,6 @@ import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import BottomNav from "@/components/BottomNav";
 import { useAuth } from "@/hooks/useAuth";
 import { usePostComments, useAddComment } from "@/hooks/usePostComments";
 import { toast } from "sonner";
@@ -184,7 +183,7 @@ const Community = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       {/* Header */}
       <header className="sticky top-0 z-40 flex items-center gap-3 px-4 py-3 bg-background border-b border-border">
         <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"}>
@@ -491,8 +490,6 @@ const Community = () => {
       </div>
       </>
       )}
-
-      <BottomNav />
     </div>
   );
 };

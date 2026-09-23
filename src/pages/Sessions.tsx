@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, CalendarClock, Users } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useMeetups } from "@/hooks/useListings";
-import BottomNav from "@/components/BottomNav";
 import SessionRequestForm from "@/components/SessionRequestForm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SEO } from "@/components/SEO";
@@ -17,7 +16,7 @@ const Sessions = () => {
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-surface pb-24">
+    <div className="min-h-screen bg-surface">
       <SEO
         title={ar ? "جلسات الخبراء | صندل" : "Expert Sessions | Sandal"}
         description={
@@ -90,8 +89,6 @@ const Sessions = () => {
           ))
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

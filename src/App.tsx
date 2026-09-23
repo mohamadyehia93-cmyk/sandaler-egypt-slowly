@@ -11,6 +11,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import RouteGuard from "@/components/RouteGuard";
 import RouteTracker from "@/components/RouteTracker";
+import AppChrome from "@/components/AppChrome";
 import Diagnostics from "./pages/Diagnostics.tsx";
 import OAuthConsent from "./pages/OAuthConsent.tsx";
 
@@ -124,6 +125,8 @@ const MySessions = lazy(() => import("./pages/dashboards/MySessions.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
 const Credits = lazy(() => import("./pages/Credits.tsx"));
 const About = lazy(() => import("./pages/About.tsx"));
+const Places = lazy(() => import("./pages/Places.tsx"));
+const Plan = lazy(() => import("./pages/Plan.tsx"));
 
 
 
@@ -162,6 +165,8 @@ const App = () => {
             <Route path="/claim/:token" element={<ClaimProfile />} />
 
             <Route path="/" element={<Index />} />
+            <Route path="/places" element={<Places />} />
+            <Route path="/plan" element={<Plan />} />
             <Route path="/calendar" element={<EventCalendar />} />
             <Route path="/event/:id" element={<EventDetail />} />
             <Route path="/experience/:id" element={<ExperienceDetail />} />
@@ -292,6 +297,7 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
               </Suspense>
+              <AppChrome />
           </RouteGuard>
         </BrowserRouter>
         </UserRoleProvider>

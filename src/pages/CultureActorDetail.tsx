@@ -113,7 +113,7 @@ const CultureActorDetail = () => {
   const social = actor.social_links || {};
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background">
       {/* Hero */}
       <div className="relative h-52">
         <div

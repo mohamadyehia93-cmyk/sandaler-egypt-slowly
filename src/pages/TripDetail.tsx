@@ -59,7 +59,7 @@ const TripDetail = () => {
   const exclusions = lang === "ar" ? (trip.exclusions_ar || []) : (trip.exclusions_en || []);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background">
       <div className="relative">
         <img src={trip.image || "/placeholder.svg"} alt={title} className="w-full h-64 object-cover" />
         <button onClick={() => navigate(-1)} className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-sm" aria-label={lang === "ar" ? "رجوع" : "Back"}>
@@ -270,7 +270,7 @@ const TripDetail = () => {
 
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
+      <div className="fixed bottom-[68px] left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
         <div>
           <span className="text-lg font-bold text-primary-dark">{trip.price} {t("common.egp")}</span>
           <span className="text-xs text-muted-foreground block">{lang === "ar" ? "للشخص" : "per person"}</span>

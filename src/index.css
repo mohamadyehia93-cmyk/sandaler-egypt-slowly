@@ -195,5 +195,15 @@ html, body {
   .tap-target {
     @apply relative min-h-[44px] min-w-[44px] inline-flex items-center justify-center;
   }
+
+  /* iOS home-indicator safe area for anything pinned to the bottom. */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Applied by AppChrome whenever the navigation bar is visible. */
+  .has-bottom-nav {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
 }
 

@@ -47,7 +47,7 @@ const PartnerDetail = () => {
   const color = partner.color || "hsl(var(--primary))";
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background">
       <div className="relative h-44">
         <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${color}90, ${color}30)` }} />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />

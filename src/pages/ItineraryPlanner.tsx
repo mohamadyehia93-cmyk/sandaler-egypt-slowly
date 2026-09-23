@@ -9,7 +9,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useExperiences, useAccommodations, useTrips, useAudioTours, useRegions } from "@/hooks/useListings";
-import BottomNav from "@/components/BottomNav";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -393,7 +392,7 @@ const ItineraryPlanner = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-surface pb-20 flex flex-col">
+      <div className="min-h-screen bg-surface flex flex-col">
         <header className="flex items-center gap-3 px-4 py-3 bg-background border-b border-border">
           <button onClick={() => navigate(-1)} aria-label="Back">
             <ArrowLeft className="w-5 h-5 text-foreground" />
@@ -426,13 +425,12 @@ const ItineraryPlanner = () => {
             {lang === "ar" ? "تسجيل الدخول للمتابعة" : "Sign in to continue"}
           </Button>
         </div>
-        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-surface pb-20 flex flex-col">
+    <div className="min-h-screen bg-surface flex flex-col">
       <header className="flex items-center gap-3 px-4 py-3 bg-background border-b border-border">
         <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"}>
           <ArrowLeft className="w-5 h-5 text-foreground" />
@@ -538,8 +536,6 @@ const ItineraryPlanner = () => {
           </Button>
         </form>
       </div>
-
-      <BottomNav />
     </div>
   );
 };

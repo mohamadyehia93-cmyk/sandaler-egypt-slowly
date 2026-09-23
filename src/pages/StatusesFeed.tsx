@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Sparkles, Link as LinkIcon, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
-import BottomNav from "@/components/BottomNav";
 
 const todayUTC = () => new Date().toISOString().slice(0, 10);
 
@@ -94,7 +93,7 @@ const StatusesFeed = () => {
   }, [statuses, providerByUser, filter]);
 
   return (
-    <div dir={isAr ? "rtl" : "ltr"} className="min-h-screen bg-surface pb-24">
+    <div dir={isAr ? "rtl" : "ltr"} className="min-h-screen bg-surface">
       <header className="sticky top-0 z-40 bg-background border-b border-border">
         <div className="flex items-center gap-3 px-4 py-3">
           <button
@@ -229,8 +228,6 @@ const StatusesFeed = () => {
           })
         )}
       </main>
-
-      <BottomNav />
     </div>
   );
 };

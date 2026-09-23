@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import BottomNav from "@/components/BottomNav";
 import {
   commissionKindLabel,
   commissionStatusClasses,
@@ -46,7 +45,7 @@ const MyCommissions = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-24">
+    <div className="min-h-screen bg-surface">
       <header className="bg-card border-b border-border px-4 py-4 flex items-center gap-3">
         <button onClick={() => navigate(-1)} className="p-1" aria-label={lang === "ar" ? "رجوع" : "Back"}><ArrowLeft className="w-5 h-5 text-foreground" /></button>
         <h1 className="text-base font-bold text-foreground flex items-center gap-2">
@@ -144,8 +143,6 @@ const MyCommissions = () => {
           ))
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

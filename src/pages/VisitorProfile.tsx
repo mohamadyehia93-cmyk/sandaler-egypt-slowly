@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import BottomNav from "@/components/BottomNav";
 import FollowButton from "@/components/FollowButton";
 import { useFollowerCount } from "@/hooks/useFollows";
 import NotFound from "@/components/NotFound";
@@ -44,7 +43,7 @@ const VisitorProfile = () => {
   const joined = profile.created_at ? new Date(profile.created_at).getFullYear() : null;
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       {/* Header */}
       <div className="bg-primary h-32 relative">
         <button
@@ -129,7 +128,6 @@ const VisitorProfile = () => {
       )}
 
       <div className="h-4" />
-      <BottomNav />
     </div>
   );
 };

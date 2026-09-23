@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import BottomNav from "@/components/BottomNav";
 
 export const requestStatusLabel = (status: string, ar: boolean) => {
   switch (status) {
@@ -57,7 +56,7 @@ const MySessionRequests = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-24">
+    <div className="min-h-screen bg-surface">
       <header className="sticky top-0 z-40 flex items-center gap-3 bg-background px-4 py-3">
         <button onClick={() => navigate(-1)} className="rounded-full p-1.5 hover:bg-secondary" aria-label={lang === "ar" ? "رجوع" : "Back"}>
           <ArrowLeft className="h-5 w-5 text-foreground" />
@@ -106,8 +105,6 @@ const MySessionRequests = () => {
           ))
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

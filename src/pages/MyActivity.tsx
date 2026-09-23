@@ -4,7 +4,6 @@ import { ArrowLeft, MessageSquare, Star, PenLine } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import BottomNav from "@/components/BottomNav";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
@@ -68,7 +67,7 @@ const MyActivity = () => {
   const dateOf = (v: string) => new Date(v).toLocaleDateString(ar ? "ar-EG" : "en-GB");
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
         <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
           <ArrowLeft className="w-5 h-5 text-foreground rtl:rotate-180" />
@@ -171,8 +170,6 @@ const MyActivity = () => {
           </>
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

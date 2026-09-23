@@ -171,7 +171,7 @@ const CauseDetail = () => {
       )}
 
       {/* Sticky Bottom */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-end z-50">
+      <div className="fixed bottom-[68px] left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-end z-50">
         {isManaged ? (
           <button
             onClick={() => navigate(`/cause/${id}/donate`)}

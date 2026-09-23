@@ -6,6 +6,7 @@ import { useMessages } from "@/hooks/useMessages";
 import ChatBubble from "./ChatBubble";
 import TypingIndicator from "./TypingIndicator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useImmersiveView } from "@/lib/nav/immersive";
 
 interface ChatViewProps {
   conversationId: string;
@@ -17,6 +18,7 @@ interface ChatViewProps {
 const ChatView = ({ conversationId, otherName, otherAvatar, onBack }: ChatViewProps) => {
   const { lang } = useI18n();
   const { user } = useAuth();
+  useImmersiveView(); // an open conversation hides the navigation bar
   const { messages, loading, sendMessage, broadcastTyping, otherTyping } = useMessages(conversationId);
   const [draft, setDraft] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);

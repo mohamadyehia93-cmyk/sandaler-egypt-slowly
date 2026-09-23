@@ -1,47 +1,39 @@
-import { Compass, Heart, MessageCircle, User, LayoutDashboard, Sparkles } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useI18n } from "@/lib/i18n";
+import { NAV_TABS, activeTabKey } from "@/lib/nav/tabs";
 
-const visitorTabs = [
-  { key: "explore", icon: Compass, labelEn: "Explore", labelAr: "استكشف", path: "/" },
-  { key: "planner", icon: Sparkles, labelEn: "Planner", labelAr: "المخطط", path: "/planner" },
-  { key: "wishlists", icon: Heart, labelEn: "Wishlists", labelAr: "المفضلة", path: "/wishlists" },
-  { key: "inbox", icon: MessageCircle, labelEn: "Inbox", labelAr: "الرسائل", path: "/inbox" },
-  { key: "profile", icon: User, labelEn: "Profile", labelAr: "الملف", path: "/profile" },
-];
-
-const providerTabs = (dashboardPath: string) => [
-  { key: "dashboard", icon: LayoutDashboard, labelEn: "Dashboard", labelAr: "لوحة التحكم", path: dashboardPath },
-  { key: "inbox", icon: MessageCircle, labelEn: "Inbox", labelAr: "الرسائل", path: "/inbox" },
-  { key: "profile", icon: User, labelEn: "Profile", labelAr: "الملف", path: "/profile" },
-];
-
+/**
+ * The single persistent navigation bar. Five tabs, icon + short label,
+ * bilingual and RTL-correct (flex order follows the document direction).
+ */
 const BottomNav = () => {
   const { lang } = useI18n();
   const location = useLocation();
   const navigate = useNavigate();
-  const { isProvider, isVisitorMode, dashboardPath } = useUserRole();
-
-  const showProviderNav = isProvider && !isVisitorMode;
-  const tabs = showProviderNav && dashboardPath ? providerTabs(dashboardPath) : visitorTabs;
+  const active = activeTabKey(location.pathname);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-primary shadow-elevated safe-bottom">
-      <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
-        {tabs.map(({ key, icon: Icon, labelEn, labelAr, path }) => {
-          const active = location.pathname === path || (key === "dashboard" && location.pathname.startsWith("/dashboard"));
+    <nav
+      aria-label={lang === "ar" ? "التنقل الرئيسي" : "Main navigation"}
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-primary-dark/30 bg-primary shadow-elevated safe-bottom"
+    >
+      <div className="mx-auto flex max-w-lg items-stretch justify-around">
+        {NAV_TABS.map(({ key, icon: Icon, label, path }) => {
+          const isActive = active === key;
           return (
             <button
               key={key}
               onClick={() => navigate(path)}
-              aria-label={lang === "ar" ? labelAr : labelEn}
-              className={`flex flex-col items-center gap-1 px-4 py-2 transition-all ${
-                active ? "text-primary-foreground scale-110" : "text-primary-foreground/60"
+              aria-current={isActive ? "page" : undefined}
+              aria-label={label[lang]}
+              className={`tap-target flex flex-1 flex-col items-center justify-center gap-1 py-2.5 transition-colors ${
+                isActive ? "text-primary-foreground" : "text-primary-foreground/70"
               }`}
             >
-              <Icon className="w-6 h-6" strokeWidth={active ? 2.5 : 1.8} />
-              <span className={`w-1 h-1 rounded-full bg-primary-foreground transition-opacity ${active ? "opacity-100" : "opacity-0"}`} />
+              <Icon className="h-[22px] w-[22px]" strokeWidth={isActive ? 2.4 : 1.8} />
+              <span className={`text-[10px] leading-none ${isActive ? "font-bold" : "font-medium"}`}>
+                {label[lang]}
+              </span>
             </button>
           );
         })}

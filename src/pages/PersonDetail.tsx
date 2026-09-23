@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { parseAvailability, formatSlot } from "@/lib/availability";
 import { directionsToUrl } from "@/lib/mapsLinks";
-import BottomNav from "@/components/BottomNav";
 import FollowButton from "@/components/FollowButton";
 import NotFoundView from "@/components/NotFound";
 import ExpertCollections from "@/components/ExpertCollections";
@@ -88,7 +87,7 @@ const PersonDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-surface pb-20 p-4 space-y-4" aria-busy="true">
+      <div className="min-h-screen bg-surface p-4 space-y-4" aria-busy="true">
         <Skeleton className="h-8 w-40" />
         <Skeleton className="h-40 w-full rounded-xl" />
         <Skeleton className="h-24 w-full rounded-xl" />
@@ -118,7 +117,7 @@ const PersonDetail = () => {
 
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       {/* Header */}
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40">
         <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
@@ -334,8 +333,6 @@ const PersonDetail = () => {
           </div>
         </div>
       )}
-
-      <BottomNav />
     </div>
   );
 };

@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, MapPin, Sparkles, Clock, BookOpen, Route as RouteIcon, Calendar } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
-import BottomNav from "@/components/BottomNav";
 import NotFoundView from "@/components/NotFound";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -83,7 +82,7 @@ const HighlightDetail = () => {
   const bestTime = ar ? city.best_time_ar : city.best_time_en;
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40">
         <button onClick={() => navigate(-1)} className="p-1.5 rounded-full hover:bg-secondary" aria-label="Back">
           <ArrowLeft className="w-5 h-5 text-foreground" />
@@ -198,8 +197,6 @@ const HighlightDetail = () => {
           </section>
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

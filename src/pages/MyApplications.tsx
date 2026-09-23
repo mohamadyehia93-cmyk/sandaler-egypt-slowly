@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import BottomNav from "@/components/BottomNav";
 
 type ApplicationRow = {
   id: string;
@@ -76,7 +75,7 @@ const MyApplications = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-24">
+    <div className="min-h-screen bg-surface">
       <header className="bg-primary text-primary-foreground px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1" aria-label={lang === "ar" ? "رجوع" : "Back"}>
           <ArrowLeft className="w-5 h-5" />
@@ -149,8 +148,6 @@ const MyApplications = () => {
           })
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

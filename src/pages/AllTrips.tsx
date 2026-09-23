@@ -6,7 +6,6 @@ import { useTrips, useRegions } from "@/hooks/useListings";
 import { EXPERIENCE_THEMES, type ExperienceTheme } from "@/lib/listingTaxonomy";
 import CityBadge from "@/components/CityBadge";
 import { Skeleton } from "@/components/ui/skeleton";
-import BottomNav from "@/components/BottomNav";
 
 const AllTrips = () => {
   const { lang, t } = useI18n();
@@ -39,7 +38,7 @@ const AllTrips = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       <header className="sticky top-0 z-30 bg-background border-b border-border">
         <div className="px-4 py-3 flex items-center gap-3">
           <button onClick={() => navigate(-1)} aria-label="Back">
@@ -155,8 +154,6 @@ const AllTrips = () => {
           ))
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

@@ -6,7 +6,6 @@ import {
   FileText, Headphones, ShoppingBag, BedDouble, Bus, HandHeart, Users, Palette,
   Building2, Store, MapPin, Map as MapIcon, Clock, BookOpen,
 } from "lucide-react";
-import BottomNav from "@/components/BottomNav";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -145,7 +144,7 @@ const Search = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-20" dir={isAr ? "rtl" : "ltr"}>
+    <div className="min-h-screen bg-surface" dir={isAr ? "rtl" : "ltr"}>
       <header className="sticky top-0 z-40 bg-background border-b border-border">
         <div className="flex items-center gap-2 px-3 py-3">
           <button
@@ -319,8 +318,6 @@ const Search = () => {
           })}
         </div>
       )}
-
-      <BottomNav />
     </div>
   );
 };

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { User, MapPin, ChevronRight, LogOut, LogIn, Bookmark, Briefcase, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import BottomNav from "@/components/BottomNav";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -29,7 +28,7 @@ const Profile = () => {
   const { t } = useTranslation();
   const { lang } = useLanguage();
   const navigate = useNavigate();
-  const { role } = useUserRole();
+  const { role, isProvider, dashboardPath } = useUserRole();
   const { user, loading, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
   const { isAmbassador } = useIsAmbassador();
@@ -70,7 +69,7 @@ const Profile = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-surface pb-20 flex flex-col items-center justify-center px-6 gap-4">
+      <div className="min-h-screen bg-surface flex flex-col items-center justify-center px-6 gap-4">
         <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
           <User className="w-8 h-8 text-primary" />
         </div>
@@ -92,7 +91,6 @@ const Profile = () => {
         <div className="mt-2">
           <LanguageToggle />
         </div>
-        <BottomNav />
       </div>
     );
   }
@@ -115,6 +113,13 @@ const Profile = () => {
     : [];
 
   const menuItems = [
+    // Messages live under Profile now that the bar has five journey tabs.
+    { label: lang === "ar" ? "الرسائل" : "Messages", path: "/inbox" },
+    // Providers reach their working dashboard from here.
+    ...(isProvider && dashboardPath
+      ? [{ label: lang === "ar" ? "لوحة التحكم" : "Provider dashboard", path: dashboardPath }]
+      : []),
+    { label: lang === "ar" ? "تبديل الدور" : "Switch role", path: "/switch-role" },
     // Ambassador is a capability, so its entry point lives here rather than in a dashboard.
     ...(isAmbassador ? [{ label: lang === "ar" ? "إبلاغ عن مشكلة" : "Flag an issue", path: "/flag-issue" }] : []),
     ...(isAdmin ? [{ label: lang === "ar" ? "لوحة الإدارة" : "Admin panel", path: "/admin" }] : []),
@@ -138,7 +143,7 @@ const Profile = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       <header className="px-4 py-4 bg-background flex items-center justify-between">
         <h1 className="text-xl font-bold text-primary-dark">{t("nav.profile")}</h1>
         <div className="flex items-center gap-2">
@@ -264,8 +269,6 @@ const Profile = () => {
           ))}
         </div>
       </div>
-
-      <BottomNav />
     </div>
   );
 };

@@ -28,7 +28,7 @@ const SectionSkeleton = ({ title = true }: { title?: boolean }) => (
 
 export const DetailSkeleton = ({ variant }: { variant: "region" | "city" }) => {
   return (
-    <div className="min-h-screen bg-surface pb-20" aria-busy="true" aria-live="polite">
+    <div className="min-h-screen bg-surface" aria-busy="true" aria-live="polite">
       {/* Header */}
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40">
         <Skeleton className="h-8 w-8 rounded-full" />

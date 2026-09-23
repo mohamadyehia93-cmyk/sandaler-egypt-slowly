@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, CalendarClock, ChevronRight, Inbox } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
-import BottomNav from "@/components/BottomNav";
 import {
   useVisitorActivity,
   isUpcoming,
@@ -135,7 +134,7 @@ const MyDashboard = () => {
     );
 
   return (
-    <div className="min-h-screen bg-surface pb-24">
+    <div className="min-h-screen bg-surface">
       <header className="bg-primary text-primary-foreground px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate(-1)} className="p-1" aria-label={ar ? "رجوع" : "Back"}>
           <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
@@ -233,8 +232,6 @@ const MyDashboard = () => {
           </div>
         </section>
       </div>
-
-      <BottomNav />
     </div>
   );
 };

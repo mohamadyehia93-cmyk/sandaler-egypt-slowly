@@ -14,7 +14,6 @@ import SectionHeader from "@/components/SectionHeader";
 import EmptySection from "@/components/EmptySection";
 import EventsSection from "@/components/EventsSection";
 import RegionMap from "@/components/RegionMap";
-import BottomNav from "@/components/BottomNav";
 import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
@@ -330,7 +329,7 @@ const RegionDetail = () => {
     : cities.find((c) => c.id === selectedCity)?.name[lang] || selectedCity;
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       {/* Header */}
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40">
         <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
@@ -676,8 +675,6 @@ const RegionDetail = () => {
 
 
       </div>
-
-      <BottomNav />
     </div>
   );
 };

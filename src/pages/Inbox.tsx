@@ -4,7 +4,6 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useConversations } from "@/hooks/useMessages";
 import type { MessagingTargetKind } from "@/lib/messagingTarget";
-import BottomNav from "@/components/BottomNav";
 import ConversationList from "@/components/inbox/ConversationList";
 import ChatView from "@/components/inbox/ChatView";
 import { MessageCircle } from "lucide-react";
@@ -47,7 +46,7 @@ const Inbox = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-surface pb-20">
+      <div className="min-h-screen bg-surface">
         <header className="px-4 py-4 bg-background sticky top-0 z-40">
           <h1 className="text-xl font-bold text-foreground">{t("nav.inbox")}</h1>
         </header>
@@ -64,7 +63,6 @@ const Inbox = () => {
             {lang === "ar" ? "تسجيل الدخول" : "Sign In"}
           </button>
         </div>
-        <BottomNav />
       </div>
     );
   }
@@ -81,7 +79,7 @@ const Inbox = () => {
   }
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       <header className="px-4 py-4 bg-background sticky top-0 z-40">
         <h1 className="text-xl font-bold text-foreground">{t("nav.inbox")}</h1>
       </header>
@@ -95,7 +93,6 @@ const Inbox = () => {
         loading={loading}
         onSelect={(id) => setActiveId(id)}
       />
-      <BottomNav />
     </div>
   );
 };

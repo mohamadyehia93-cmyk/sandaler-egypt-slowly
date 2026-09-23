@@ -5,7 +5,6 @@ import {
   Heart, Trash2, Compass, Route, CalendarDays, FileText, Headphones,
   ShoppingBag, BedDouble, Bus, HandHeart, LogIn,
 } from "lucide-react";
-import BottomNav from "@/components/BottomNav";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyWishlist, useWishlist, WishlistItemType } from "@/hooks/useWishlist";
@@ -187,7 +186,7 @@ const Wishlists = () => {
   // Signed out — prompt sign-in, never a spinner.
   if (!authLoading && !user) {
     return (
-      <div className="min-h-screen bg-surface pb-20" dir={isAr ? "rtl" : "ltr"}>
+      <div className="min-h-screen bg-surface" dir={isAr ? "rtl" : "ltr"}>
         {header}
         <div className="flex flex-col items-center justify-center h-[60vh] text-center px-6">
           <Heart className="w-16 h-16 text-muted-foreground/30 mb-4" />
@@ -207,7 +206,6 @@ const Wishlists = () => {
             {isAr ? "تسجيل الدخول" : "Sign in"}
           </Link>
         </div>
-        <BottomNav />
       </div>
     );
   }
@@ -215,7 +213,7 @@ const Wishlists = () => {
   const loading = authLoading || rowsLoading || (grouped.size > 0 && itemsLoading);
 
   return (
-    <div className="min-h-screen bg-surface pb-20" dir={isAr ? "rtl" : "ltr"}>
+    <div className="min-h-screen bg-surface" dir={isAr ? "rtl" : "ltr"}>
       {header}
 
       {loading && (
@@ -301,8 +299,6 @@ const Wishlists = () => {
           })}
         </div>
       )}
-
-      <BottomNav />
     </div>
   );
 };
