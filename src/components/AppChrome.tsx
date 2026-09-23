@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import { showsBottomNav } from "@/lib/nav/tabs";
@@ -5,17 +6,20 @@ import { showsBottomNav } from "@/lib/nav/tabs";
 /**
  * Mounts the one navigation bar app-wide. Pages never render it themselves,
  * so there is a single allowlist/denylist (see src/lib/nav/tabs.ts).
- * The spacer keeps page content clear of the bar and the iOS safe area.
+ * The body class adds bottom padding (plus the iOS safe area) so nothing
+ * ever sits behind the bar.
  */
 const AppChrome = () => {
   const { pathname } = useLocation();
-  if (!showsBottomNav(pathname)) return null;
-  return (
-    <>
-      <div aria-hidden="true" className="h-[68px] safe-bottom" />
-      <BottomNav />
-    </>
-  );
+  const visible = showsBottomNav(pathname);
+
+  useEffect(() => {
+    document.body.classList.toggle("has-bottom-nav", visible);
+    return () => document.body.classList.remove("has-bottom-nav");
+  }, [visible]);
+
+  if (!visible) return null;
+  return <BottomNav />;
 };
 
 export default AppChrome;
