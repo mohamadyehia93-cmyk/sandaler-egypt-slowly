@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import BottomNav from "@/components/BottomNav";
 import { showsBottomNav } from "@/lib/nav/tabs";
+import { useIsImmersive } from "@/lib/nav/immersive";
 
 /**
  * Mounts the one navigation bar app-wide. Pages never render it themselves,
@@ -11,7 +12,8 @@ import { showsBottomNav } from "@/lib/nav/tabs";
  */
 const AppChrome = () => {
   const { pathname } = useLocation();
-  const visible = showsBottomNav(pathname);
+  const immersive = useIsImmersive();
+  const visible = showsBottomNav(pathname) && !immersive;
 
   useEffect(() => {
     document.body.classList.toggle("has-bottom-nav", visible);
