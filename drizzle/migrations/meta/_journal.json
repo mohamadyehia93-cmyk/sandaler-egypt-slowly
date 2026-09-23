@@ -8,6 +8,13 @@
       "when": 1789824184368,
       "tag": "0000_get_my_preferences_function",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790186182003,
+      "tag": "0001_search_post_bodies",
+      "breakpoints": true
     }
   ]
 }

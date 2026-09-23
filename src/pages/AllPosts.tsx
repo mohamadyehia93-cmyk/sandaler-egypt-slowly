@@ -1,3 +1,4 @@
+import { postCategoryLabel } from "@/lib/postCategories";
 import { ArrowLeft, Mic, Film, Camera, MessageSquare, ChefHat, ClipboardList, Map, FileText, Search, SlidersHorizontal, X as XIcon, Check } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
@@ -54,7 +55,7 @@ const AllPosts = () => {
         image: p.image,
         regionId: p.region_id,
         cityId: p.city_id,
-        category: { en: p.category ?? "General", ar: p.category ?? "عام" },
+        category: p.category ? postCategoryLabel(p.category) : { en: "General", ar: "عام" },
         author: bylineNames(p),
         readTime: p.read_time_minutes ?? 5,
         contentType: (p as any).content_type ?? null,
