@@ -13,7 +13,9 @@ const Places = () => {
   const { data: regions, isLoading } = useRegions();
   const { data: cities } = useCities();
 
-  const name = (r: any) => (lang === "ar" ? r.name_ar || r.name_en : r.name_en);
+  type Named = { id: string; name_en: string | null; name_ar: string | null; image?: string | null; region_id?: string | null };
+
+  const name = (r: Named) => (lang === "ar" ? r.name_ar || r.name_en : r.name_en);
 
   return (
     <div className="min-h-screen bg-surface">
@@ -31,9 +33,9 @@ const Places = () => {
           ))}
 
         <div className="space-y-4">
-          {(regions ?? []).map((r: any) => {
+          {((regions ?? []) as Named[]).map((r) => {
             const photo = getRegionImage(r.id) ?? r.image ?? null;
-            const regionCities = (cities ?? []).filter((c: any) => c.region_id === r.id);
+            const regionCities = ((cities ?? []) as Named[]).filter((c) => c.region_id === r.id);
             return (
               <section key={r.id} className="overflow-hidden rounded-xl border border-border bg-card shadow-card">
                 <button
@@ -53,7 +55,7 @@ const Places = () => {
                 </button>
                 {regionCities.length > 0 ? (
                   <div className="flex flex-wrap gap-2 p-3">
-                    {regionCities.map((c: any) => (
+                    {regionCities.map((c) => (
                       <button
                         key={c.id}
                         onClick={() => navigate(`/city/${c.id}`)}
