@@ -1,3 +1,4 @@
+import { postCategoryLabel } from "@/lib/postCategories";
 import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -122,7 +123,7 @@ const PostDetail = () => {
     image: row.image || "/placeholder.svg",
     title: { en: row.title_en, ar: row.title_ar },
     body: { en: row.body_en || "", ar: row.body_ar || "" },
-    category: { en: row.category || "", ar: row.category || "" },
+    category: postCategoryLabel(row.category),
     author: bylineNames(row),
     authorId: row.author_id,
     isEditorial: isEditorialPost(row),
@@ -147,7 +148,7 @@ const PostDetail = () => {
       slug: p.slug,
       image: p.image || "/placeholder.svg",
       title: { en: p.title_en, ar: p.title_ar },
-      category: { en: p.category || "", ar: p.category || "" },
+      category: postCategoryLabel(p.category),
       readTime: p.read_time_minutes ?? 5,
       contentType: p.content_type,
     }));
