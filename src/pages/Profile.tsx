@@ -28,7 +28,7 @@ const Profile = () => {
   const { t } = useTranslation();
   const { lang } = useLanguage();
   const navigate = useNavigate();
-  const { role } = useUserRole();
+  const { role, isProvider, dashboardPath } = useUserRole();
   const { user, loading, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
   const { isAmbassador } = useIsAmbassador();
@@ -113,6 +113,13 @@ const Profile = () => {
     : [];
 
   const menuItems = [
+    // Messages live under Profile now that the bar has five journey tabs.
+    { label: lang === "ar" ? "الرسائل" : "Messages", path: "/inbox" },
+    // Providers reach their working dashboard from here.
+    ...(isProvider && dashboardPath
+      ? [{ label: lang === "ar" ? "لوحة التحكم" : "Provider dashboard", path: dashboardPath }]
+      : []),
+    { label: lang === "ar" ? "تبديل الدور" : "Switch role", path: "/switch-role" },
     // Ambassador is a capability, so its entry point lives here rather than in a dashboard.
     ...(isAmbassador ? [{ label: lang === "ar" ? "إبلاغ عن مشكلة" : "Flag an issue", path: "/flag-issue" }] : []),
     ...(isAdmin ? [{ label: lang === "ar" ? "لوحة الإدارة" : "Admin panel", path: "/admin" }] : []),
