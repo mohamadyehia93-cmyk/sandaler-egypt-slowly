@@ -57,12 +57,13 @@ const ContentCard = ({
       className={`group relative w-full overflow-hidden rounded-xl bg-card shadow-card cursor-pointer transition-transform active:scale-[0.99] ${className}`}
     >
       <div className="relative aspect-[3/2] w-full bg-secondary">
-        <img
-          src={image || "/placeholder.svg"}
-          alt={title}
-          loading="lazy"
-          className="h-full w-full object-cover"
-        />
+        {image ? (
+          <img src={image} alt={title} loading="lazy" className="h-full w-full object-cover" />
+        ) : (
+          // No cover photo (e.g. a text announcement): a calm brand block, never
+          // the stretched placeholder graphic.
+          <div className="h-full w-full bg-gradient-to-br from-primary to-primary-dark" />
+        )}
         <div className="absolute inset-0 gradient-overlay" />
 
         {showPrice && (
