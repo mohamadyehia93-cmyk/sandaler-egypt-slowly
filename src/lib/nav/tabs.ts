@@ -87,8 +87,11 @@ const HIDDEN_PREFIXES = [
   "/status",
 ];
 
-/** Booking-like sub-flows: /cause/:id/donate, /program/:id/volunteer, /event/:id/tickets */
-const FOCUSED_SUFFIXES = ["/donate", "/volunteer", "/consult", "/gift", "/tickets", "/slots"];
+/** Booking-like sub-flows: /cause/:id/donate, /program/:id/volunteer, /...:id/slots */
+const FOCUSED_SUFFIXES = ["/donate", "/volunteer", "/consult", "/gift", "/slots"];
+
+/** Event checkout only — /tickets on its own is the visitor's ticket list. */
+const FOCUSED_PATTERNS = [/^\/event\/[^/]+\/tickets$/];
 
 /**
  * Segment-aware prefix test: "/booking" must not swallow "/bookings", while
