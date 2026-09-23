@@ -106,6 +106,7 @@ export const showsBottomNav = (pathname: string): boolean => {
   const path = pathname.replace(/\/+$/, "") || "/";
   if (HIDDEN_PREFIXES.some((p) => matchesPrefix(path, p))) return false;
   if (FOCUSED_SUFFIXES.some((s) => path.endsWith(s))) return false;
+  if (FOCUSED_PATTERNS.some((re) => re.test(path))) return false;
   // a single chat conversation opened as its own route
   if (/^\/inbox\/[^/]+$/.test(path)) return false;
   return true;
