@@ -1,3 +1,4 @@
+import { useCardSize } from "./cardSize";
 import { Children, useRef, useState, type ReactNode } from "react";
 
 type Props = {
@@ -16,6 +17,7 @@ const CardCarousel = ({ children, showDots = true, className = "" }: Props) => {
   const items = Children.toArray(children);
   const railRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const lg = useCardSize() === "lg";
 
   const onScroll = () => {
     const rail = railRef.current;
@@ -32,12 +34,16 @@ const CardCarousel = ({ children, showDots = true, className = "" }: Props) => {
       <div
         ref={railRef}
         onScroll={onScroll}
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-1 hide-scrollbar scroll-smooth"
+        className={`flex snap-x snap-mandatory ${lg ? "gap-4 lg:gap-6" : "gap-4"} overflow-x-auto px-4 pb-1 hide-scrollbar scroll-smooth scroll-px-4`}
       >
         {items.map((child, i) => (
           <div
             key={i}
-            className="w-[86%] shrink-0 snap-start sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)]"
+            className={`shrink-0 snap-start ${
+              lg
+                ? "w-[85vw] max-w-[440px] sm:w-[calc((100%-1rem)/2)] sm:max-w-none lg:w-[calc((100%-3rem)/3)]"
+                : "w-[86%] sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)]"
+            }`}
           >
             {child}
           </div>
@@ -45,7 +51,7 @@ const CardCarousel = ({ children, showDots = true, className = "" }: Props) => {
       </div>
 
       {showDots && items.length > 1 && (
-        <div className="mt-3 flex items-center justify-center gap-1.5">
+        <div className="mt-4 flex items-center justify-center gap-1.5">
           {items.map((_, i) => (
             <span
               key={i}

@@ -20,6 +20,7 @@ import Partners from "@/components/Partners";
 import { ChevronDown } from "lucide-react";
 import { HOME_PURPOSE_LINE } from "@/content/siteCopy";
 import { useI18n } from "@/lib/i18n";
+import { CardSizeContext } from "@/components/cardSize";
 
 /** Legacy ?tab= links now preselect the matching filter chip. */
 const TAB_TO_FILTER: Record<string, DiscoverFilterId> = {
@@ -116,7 +117,8 @@ const Index = () => {
 
       <DiscoverFilters active={filter} onChange={setFilter} />
 
-      <div className="max-w-5xl mx-auto pt-8">
+      <CardSizeContext.Provider value="lg">
+      <div className="max-w-6xl mx-auto pt-10 [&>section]:mb-16">
         {/* Stories and inspiration lead the feed */}
         {show("stories") && <LatestPosts />}
         {show("events") && <EventsSection events={dbEvents} />}
@@ -187,6 +189,7 @@ const Index = () => {
           </div>
         </section>
       </div>
+      </CardSizeContext.Provider>
 
       {/* Community FAB — sits above the nav bar */}
       <button
