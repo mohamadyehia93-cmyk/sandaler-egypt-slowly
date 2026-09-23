@@ -37,7 +37,7 @@ const ImpactDashboard = () => {
   const causesSupported = new Set((pledges as any[]).map((p) => p.cause_id).filter(Boolean)).size;
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
         <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
           <ArrowLeft className="w-5 h-5 text-foreground" />

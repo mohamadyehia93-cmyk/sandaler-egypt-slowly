@@ -171,7 +171,7 @@ const CultureActorDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       {/* Header */}
       <header className="bg-role-culture-actor text-white px-4 py-4">
         <div className="flex items-center justify-between mb-3">

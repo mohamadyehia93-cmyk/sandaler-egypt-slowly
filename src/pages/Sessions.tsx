@@ -16,7 +16,7 @@ const Sessions = () => {
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-surface pb-24">
+    <div className="min-h-screen bg-surface">
       <SEO
         title={ar ? "جلسات الخبراء | صندل" : "Expert Sessions | Sandal"}
         description={

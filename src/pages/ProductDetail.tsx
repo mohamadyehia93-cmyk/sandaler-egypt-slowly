@@ -283,7 +283,7 @@ const ProductDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background">
       {/* ── TOP NAV — actions live here, so nothing overlaps the title ── */}
       <div className="h-11 flex items-center justify-between px-4 bg-card sticky top-0 z-40">
         <button

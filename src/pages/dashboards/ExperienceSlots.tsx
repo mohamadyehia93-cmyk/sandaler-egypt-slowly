@@ -249,7 +249,7 @@ const ExperienceSlots = () => {
   }
 
   return (
-    <div className="min-h-screen bg-surface pb-24">
+    <div className="min-h-screen bg-surface">
       {header}
 
       <div className="px-4 py-4 space-y-4">

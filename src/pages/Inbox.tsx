@@ -46,7 +46,7 @@ const Inbox = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-surface pb-20">
+      <div className="min-h-screen bg-surface">
         <header className="px-4 py-4 bg-background sticky top-0 z-40">
           <h1 className="text-xl font-bold text-foreground">{t("nav.inbox")}</h1>
         </header>
@@ -79,7 +79,7 @@ const Inbox = () => {
   }
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       <header className="px-4 py-4 bg-background sticky top-0 z-40">
         <h1 className="text-xl font-bold text-foreground">{t("nav.inbox")}</h1>
       </header>

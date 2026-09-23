@@ -93,7 +93,7 @@ const StatusesFeed = () => {
   }, [statuses, providerByUser, filter]);
 
   return (
-    <div dir={isAr ? "rtl" : "ltr"} className="min-h-screen bg-surface pb-24">
+    <div dir={isAr ? "rtl" : "ltr"} className="min-h-screen bg-surface">
       <header className="sticky top-0 z-40 bg-background border-b border-border">
         <div className="flex items-center gap-3 px-4 py-3">
           <button

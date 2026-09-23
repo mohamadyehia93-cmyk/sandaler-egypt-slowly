@@ -135,7 +135,7 @@ const Diagnostics = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background">
       <Helmet>
         <title>App Diagnostics | Sandaler</title>
         <meta name="description" content="Inspect the last loaded route, backend API status and captured frontend errors." />

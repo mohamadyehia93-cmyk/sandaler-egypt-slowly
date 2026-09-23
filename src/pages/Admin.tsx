@@ -294,7 +294,7 @@ const Admin = () => {
 
 
   return (
-    <div className="min-h-screen bg-surface pb-24">
+    <div className="min-h-screen bg-surface">
       <header className="bg-primary-dark text-white px-4 py-4 flex items-center gap-3 sticky top-0 z-30">
         <button onClick={() => navigate("/profile")} className="p-1" aria-label={ar ? "رجوع" : "Back"}>
           <ArrowLeft className={`w-5 h-5 ${ar ? "rotate-180" : ""}`} />

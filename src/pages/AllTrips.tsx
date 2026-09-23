@@ -38,7 +38,7 @@ const AllTrips = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       <header className="sticky top-0 z-30 bg-background border-b border-border">
         <div className="px-4 py-3 flex items-center gap-3">
           <button onClick={() => navigate(-1)} aria-label="Back">

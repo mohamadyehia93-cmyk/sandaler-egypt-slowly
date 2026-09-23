@@ -75,7 +75,7 @@ const ProductSellerDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       <header className="bg-role-product-seller text-white px-4 py-4">
         <div className="flex items-center justify-between mb-3">
           <button onClick={() => navigate("/profile")} className="p-1" aria-label={lang === "ar" ? "رجوع" : "Back"}><ArrowLeft className="w-5 h-5" /></button>

@@ -135,7 +135,7 @@ const OrganizationDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background pb-20 p-4 space-y-4" aria-busy="true">
+      <div className="min-h-screen bg-background p-4 space-y-4" aria-busy="true">
         <Skeleton className="h-40 w-full rounded-xl" />
         <Skeleton className="h-24 w-full rounded-xl" />
         <Skeleton className="h-24 w-full rounded-xl" />
@@ -153,7 +153,7 @@ const OrganizationDetail = () => {
   const place = location || cityName || regionName;
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background">
       {/* Cover */}
       <div className="relative h-44 bg-gradient-to-br from-primary/30 to-primary/10">
         {org.image && <img src={org.image} alt="" className="w-full h-full object-cover opacity-40" />}

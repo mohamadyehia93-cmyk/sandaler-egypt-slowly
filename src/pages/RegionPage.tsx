@@ -112,7 +112,7 @@ export default function RegionPage() {
         url={`/regions/${slug}`}
       />
 
-      <div className={`min-h-screen bg-background font-cairo pb-20 ${isRTL ? "rtl" : "ltr"}`}>
+      <div className={`min-h-screen bg-background font-cairo ${isRTL ? "rtl" : "ltr"}`}>
         {/* HERO */}
         <div className="relative h-64 overflow-hidden" style={heroStyle}>
           <div className="absolute inset-0 flex flex-col">

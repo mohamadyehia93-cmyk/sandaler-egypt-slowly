@@ -16,7 +16,7 @@ const About = () => {
   const Back = lang === "ar" ? ArrowRight : ArrowLeft;
 
   return (
-    <div className="min-h-screen bg-surface pb-24">
+    <div className="min-h-screen bg-surface">
       <SEO url="/about" />
 
       <header className="flex items-center gap-2 px-4 py-3 bg-primary-dark">

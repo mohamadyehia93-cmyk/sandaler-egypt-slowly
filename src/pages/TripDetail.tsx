@@ -59,7 +59,7 @@ const TripDetail = () => {
   const exclusions = lang === "ar" ? (trip.exclusions_ar || []) : (trip.exclusions_en || []);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background">
       <div className="relative">
         <img src={trip.image || "/placeholder.svg"} alt={title} className="w-full h-64 object-cover" />
         <button onClick={() => navigate(-1)} className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-sm" aria-label={lang === "ar" ? "رجوع" : "Back"}>

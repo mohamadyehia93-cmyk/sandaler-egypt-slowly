@@ -84,7 +84,7 @@ const ProgramDetail = () => {
   const end = formatDate(program.end_date, lang);
 
   return (
-    <main className="min-h-screen bg-background pb-24">
+    <main className="min-h-screen bg-background">
       <div className="relative h-64 bg-secondary">
         {program.image ? <img src={program.image} alt={title} className="h-full w-full object-cover" /> : <Target className="absolute inset-0 m-auto h-12 w-12 text-muted-foreground" />}
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 to-transparent" />

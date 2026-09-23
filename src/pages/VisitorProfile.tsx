@@ -43,7 +43,7 @@ const VisitorProfile = () => {
   const joined = profile.created_at ? new Date(profile.created_at).getFullYear() : null;
 
   return (
-    <div className="min-h-screen bg-surface pb-20">
+    <div className="min-h-screen bg-surface">
       {/* Header */}
       <div className="bg-primary h-32 relative">
         <button

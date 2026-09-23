@@ -176,7 +176,7 @@ const PostDetail = () => {
     : (lang === "ar" ? "دقائق قراءة" : "min read");
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background">
       {/* Hero */}
       <div className="relative h-64">
         <img src={post.image} alt={post.title[lang]} className="w-full h-full object-cover" />

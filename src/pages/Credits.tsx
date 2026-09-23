@@ -51,7 +51,7 @@ const Credits = () => {
   const Back = isAr ? ArrowRight : ArrowLeft;
 
   return (
-    <div className="min-h-screen bg-surface pb-24" dir={isAr ? "rtl" : "ltr"}>
+    <div className="min-h-screen bg-surface" dir={isAr ? "rtl" : "ltr"}>
       <SEO
         url="/credits"
         title={isAr ? "حقوق الصور" : "Image credits"}

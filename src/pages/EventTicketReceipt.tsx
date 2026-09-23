@@ -107,7 +107,7 @@ const EventTicketReceipt = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-24">
+    <div className="min-h-screen bg-surface">
       <header className="flex items-center gap-2 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
         <button onClick={() => navigate("/tickets")} className="tap-target rounded-full hover:bg-secondary" aria-label={lang === "ar" ? "رجوع" : "Back"}>
           <ArrowLeft className="w-5 h-5 text-foreground" />
