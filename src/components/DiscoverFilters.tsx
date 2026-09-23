@@ -6,9 +6,6 @@ export type DiscoverFilterId =
   | "audio-tours"
   | "experiences"
   | "trips"
-  | "stays"
-  | "rides"
-  | "products"
   | "stories";
 
 export const DISCOVER_FILTERS: { id: DiscoverFilterId; label: { en: string; ar: string } }[] = [
@@ -17,9 +14,6 @@ export const DISCOVER_FILTERS: { id: DiscoverFilterId; label: { en: string; ar: 
   { id: "audio-tours", label: { en: "Audio Tours", ar: "جولات صوتية" } },
   { id: "experiences", label: { en: "Experiences", ar: "تجارب" } },
   { id: "trips", label: { en: "Trips", ar: "رحلات" } },
-  { id: "stays", label: { en: "Stays", ar: "إقامات" } },
-  { id: "rides", label: { en: "Rides", ar: "تنقّل" } },
-  { id: "products", label: { en: "Products", ar: "منتجات" } },
   { id: "stories", label: { en: "Stories", ar: "حكايات" } },
 ];
 

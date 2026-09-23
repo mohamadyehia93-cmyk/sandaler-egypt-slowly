@@ -13,11 +13,8 @@ import LatestPosts from "@/components/LatestPosts";
 import AudioTourCards from "@/components/AudioTourCards";
 import ExperienceCards from "@/components/ExperienceCards";
 import TripCards from "@/components/TripCards";
-import AccommodationCards from "@/components/AccommodationCards";
-import TransportCards from "@/components/TransportCards";
 import HomeCausesSection from "@/components/HomeCausesSection";
 import EventsSection from "@/components/EventsSection";
-import ProductGrid from "@/components/ProductGrid";
 import CollectionsSection from "@/components/CollectionsSection";
 import Partners from "@/components/Partners";
 import { ChevronDown } from "lucide-react";
@@ -126,9 +123,6 @@ const Index = () => {
         {show("audio-tours") && <AudioTourCards />}
         {show("experiences") && <ExperienceCards />}
         {show("trips") && <TripCards />}
-        {show("stays") && <AccommodationCards />}
-        {show("rides") && <TransportCards />}
-        {show("products") && <ProductGrid />}
 
         {showExtras && (
           <>
