@@ -24,7 +24,6 @@ import { EventRow, isPastEvent, eventCategoryText, sortEventsUpcomingFirst } fro
 import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
-import BottomNav from "@/components/BottomNav";
 import WishlistButton from "@/components/WishlistButton";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import SectionHeader from "@/components/SectionHeader";
@@ -392,8 +391,6 @@ const EventDetail = () => {
           </p>
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

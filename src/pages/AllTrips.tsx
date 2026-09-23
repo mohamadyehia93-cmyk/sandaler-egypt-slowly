@@ -6,7 +6,6 @@ import { useTrips, useRegions } from "@/hooks/useListings";
 import { EXPERIENCE_THEMES, type ExperienceTheme } from "@/lib/listingTaxonomy";
 import CityBadge from "@/components/CityBadge";
 import { Skeleton } from "@/components/ui/skeleton";
-import BottomNav from "@/components/BottomNav";
 
 const AllTrips = () => {
   const { lang, t } = useI18n();
@@ -155,8 +154,6 @@ const AllTrips = () => {
           ))
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

@@ -11,7 +11,6 @@ import SectionHeader from "@/components/SectionHeader";
 import EmptySection from "@/components/EmptySection";
 import EventsSection from "@/components/EventsSection";
 import CityOfferingsMap, { OfferingPin } from "@/components/CityOfferingsMap";
-import BottomNav from "@/components/BottomNav";
 import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
@@ -687,8 +686,6 @@ const CityDetail = () => {
           );
         })()}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

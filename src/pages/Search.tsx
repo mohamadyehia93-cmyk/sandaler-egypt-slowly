@@ -6,7 +6,6 @@ import {
   FileText, Headphones, ShoppingBag, BedDouble, Bus, HandHeart, Users, Palette,
   Building2, Store, MapPin, Map as MapIcon, Clock, BookOpen,
 } from "lucide-react";
-import BottomNav from "@/components/BottomNav";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -319,8 +318,6 @@ const Search = () => {
           })}
         </div>
       )}
-
-      <BottomNav />
     </div>
   );
 };

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { User, MapPin, ChevronRight, LogOut, LogIn, Bookmark, Briefcase, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import BottomNav from "@/components/BottomNav";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -92,7 +91,6 @@ const Profile = () => {
         <div className="mt-2">
           <LanguageToggle />
         </div>
-        <BottomNav />
       </div>
     );
   }
@@ -264,8 +262,6 @@ const Profile = () => {
           ))}
         </div>
       </div>
-
-      <BottomNav />
     </div>
   );
 };

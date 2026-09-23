@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Sparkles, Link as LinkIcon, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
-import BottomNav from "@/components/BottomNav";
 
 const todayUTC = () => new Date().toISOString().slice(0, 10);
 
@@ -229,8 +228,6 @@ const StatusesFeed = () => {
           })
         )}
       </main>
-
-      <BottomNav />
     </div>
   );
 };

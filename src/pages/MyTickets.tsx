@@ -4,7 +4,6 @@ import { ArrowLeft, Ticket } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import BottomNav from "@/components/BottomNav";
 
 type Row = {
   id: string;
@@ -96,8 +95,6 @@ const MyTickets = () => {
           ))
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

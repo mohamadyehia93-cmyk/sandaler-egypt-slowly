@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, CalendarClock, ChevronRight, Inbox } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
-import BottomNav from "@/components/BottomNav";
 import {
   useVisitorActivity,
   isUpcoming,
@@ -233,8 +232,6 @@ const MyDashboard = () => {
           </div>
         </section>
       </div>
-
-      <BottomNav />
     </div>
   );
 };

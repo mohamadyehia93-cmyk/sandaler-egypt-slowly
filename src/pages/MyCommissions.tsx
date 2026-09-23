@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import BottomNav from "@/components/BottomNav";
 import {
   commissionKindLabel,
   commissionStatusClasses,
@@ -144,8 +143,6 @@ const MyCommissions = () => {
           ))
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

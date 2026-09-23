@@ -4,7 +4,6 @@ import { ArrowLeft, Package } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import BottomNav from "@/components/BottomNav";
 
 type OrderRow = {
   id: string;
@@ -122,8 +121,6 @@ const MyOrders = () => {
           })
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

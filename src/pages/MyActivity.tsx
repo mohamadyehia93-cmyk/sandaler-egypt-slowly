@@ -4,7 +4,6 @@ import { ArrowLeft, MessageSquare, Star, PenLine } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import BottomNav from "@/components/BottomNav";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
@@ -171,8 +170,6 @@ const MyActivity = () => {
           </>
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

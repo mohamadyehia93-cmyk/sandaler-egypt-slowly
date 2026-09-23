@@ -5,7 +5,6 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyFollows } from "@/hooks/useFollows";
 import { supabase } from "@/integrations/supabase/client";
-import BottomNav from "@/components/BottomNav";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /** Route for a followed target, by the target_type stored on the follow row. */
@@ -149,8 +148,6 @@ const Following = () => {
           </div>
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

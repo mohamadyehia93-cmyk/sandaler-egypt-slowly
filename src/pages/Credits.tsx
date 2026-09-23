@@ -4,7 +4,6 @@ import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
 import { SEO } from "@/components/SEO";
-import BottomNav from "@/components/BottomNav";
 
 type Credit = {
   id: string;
@@ -170,8 +169,6 @@ const Credits = () => {
             : "If you are the rights holder of an image and believe an attribution is incorrect, contact us and we will correct it or remove the image."}
         </p>
       </div>
-
-      <BottomNav />
     </div>
   );
 };

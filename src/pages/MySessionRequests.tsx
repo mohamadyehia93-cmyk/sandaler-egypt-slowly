@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import BottomNav from "@/components/BottomNav";
 
 export const requestStatusLabel = (status: string, ar: boolean) => {
   switch (status) {
@@ -106,8 +105,6 @@ const MySessionRequests = () => {
           ))
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };

@@ -5,7 +5,6 @@ import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import DetailSkeleton from "@/components/DetailSkeleton";
 import NotFoundView from "@/components/NotFound";
-import BottomNav from "@/components/BottomNav";
 
 type TicketRow = {
   id: string;
@@ -212,8 +211,6 @@ const EventTicketReceipt = () => {
           <Ticket className="w-4 h-4" /> {ar ? "كل تذاكري" : "All my tickets"}
         </button>
       </div>
-
-      <BottomNav />
     </div>
   );
 };

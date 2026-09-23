@@ -7,7 +7,6 @@ import { SEO } from "@/components/SEO";
 import { ArrowLeft, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import BottomNav from "@/components/BottomNav";
 import ShareButton from "@/components/ShareButton";
 
 export default function RegionPage() {
@@ -330,8 +329,6 @@ export default function RegionPage() {
             )}
           </TabsContent>
         </Tabs>
-
-        <BottomNav />
       </div>
     </>
   );

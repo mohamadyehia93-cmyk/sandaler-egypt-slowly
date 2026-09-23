@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { parseAvailability, formatSlot } from "@/lib/availability";
 import { directionsToUrl } from "@/lib/mapsLinks";
-import BottomNav from "@/components/BottomNav";
 import FollowButton from "@/components/FollowButton";
 import NotFoundView from "@/components/NotFound";
 import ExpertCollections from "@/components/ExpertCollections";
@@ -334,8 +333,6 @@ const PersonDetail = () => {
           </div>
         </div>
       )}
-
-      <BottomNav />
     </div>
   );
 };

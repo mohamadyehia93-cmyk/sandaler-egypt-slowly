@@ -6,7 +6,6 @@ import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import BottomNav from "@/components/BottomNav";
 import { useAuth } from "@/hooks/useAuth";
 import { usePostComments, useAddComment } from "@/hooks/usePostComments";
 import { toast } from "sonner";
@@ -491,8 +490,6 @@ const Community = () => {
       </div>
       </>
       )}
-
-      <BottomNav />
     </div>
   );
 };

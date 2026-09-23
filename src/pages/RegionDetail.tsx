@@ -14,7 +14,6 @@ import SectionHeader from "@/components/SectionHeader";
 import EmptySection from "@/components/EmptySection";
 import EventsSection from "@/components/EventsSection";
 import RegionMap from "@/components/RegionMap";
-import BottomNav from "@/components/BottomNav";
 import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
@@ -676,8 +675,6 @@ const RegionDetail = () => {
 
 
       </div>
-
-      <BottomNav />
     </div>
   );
 };

@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { SEO } from "@/components/SEO";
-import BottomNav from "@/components/BottomNav";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ABOUT_SECTIONS, HOME_PURPOSE_LINE } from "@/content/siteCopy";
 
@@ -61,8 +60,6 @@ const About = () => {
           {lang === "ar" ? "حقوق الصور" : "Image credits"}
         </button>
       </div>
-
-      <BottomNav />
     </div>
   );
 };

@@ -5,7 +5,6 @@ import {
   Heart, Trash2, Compass, Route, CalendarDays, FileText, Headphones,
   ShoppingBag, BedDouble, Bus, HandHeart, LogIn,
 } from "lucide-react";
-import BottomNav from "@/components/BottomNav";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyWishlist, useWishlist, WishlistItemType } from "@/hooks/useWishlist";
@@ -207,7 +206,6 @@ const Wishlists = () => {
             {isAr ? "تسجيل الدخول" : "Sign in"}
           </Link>
         </div>
-        <BottomNav />
       </div>
     );
   }
@@ -301,8 +299,6 @@ const Wishlists = () => {
           })}
         </div>
       )}
-
-      <BottomNav />
     </div>
   );
 };

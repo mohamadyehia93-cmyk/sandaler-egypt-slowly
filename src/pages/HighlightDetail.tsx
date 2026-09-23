@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, MapPin, Sparkles, Clock, BookOpen, Route as RouteIcon, Calendar } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
-import BottomNav from "@/components/BottomNav";
 import NotFoundView from "@/components/NotFound";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -198,8 +197,6 @@ const HighlightDetail = () => {
           </section>
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 };
