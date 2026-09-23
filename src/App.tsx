@@ -11,6 +11,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import RouteGuard from "@/components/RouteGuard";
 import RouteTracker from "@/components/RouteTracker";
+import AppChrome from "@/components/AppChrome";
 import Diagnostics from "./pages/Diagnostics.tsx";
 import OAuthConsent from "./pages/OAuthConsent.tsx";
 
@@ -296,6 +297,7 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
               </Suspense>
+              <AppChrome />
           </RouteGuard>
         </BrowserRouter>
         </UserRoleProvider>
