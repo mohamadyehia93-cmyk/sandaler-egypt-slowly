@@ -15,6 +15,13 @@
       "when": 1790186182003,
       "tag": "0001_search_post_bodies",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790186199347,
+      "tag": "0002_search_post_bodies_v2",
+      "breakpoints": true
     }
   ]
 }
