@@ -293,7 +293,7 @@ const AccommodationDetail = () => {
 
       {/* REQUEST BAR — hosted stays only; no payment is taken anywhere in the app */}
       {!isEditorial && (
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
+      <div className="fixed bottom-[68px] left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
         <div>
           <span className="text-lg font-bold text-primary-dark">{money(place.price_per_night)}</span>
           <span className="text-xs text-muted-foreground block">{t("common.perNight")}</span>

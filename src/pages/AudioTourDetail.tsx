@@ -839,7 +839,7 @@ const AudioTourDetail = () => {
 
       {/* Audio Player — only when this tour has its own narration */}
       {audioSrc ? (
-        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
+        <div className="fixed bottom-[68px] left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
           {(virtualMode || usesPlaylist) && stopsCount > 0 && (
             <p dir="auto" data-testid="now-playing" className="text-[10px] text-muted-foreground mb-1 text-start truncate">
               {lang === "ar"
@@ -895,7 +895,7 @@ const AudioTourDetail = () => {
         </div>
 
       ) : (
-        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
+        <div className="fixed bottom-[68px] left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
           <div className="flex items-start gap-2 text-muted-foreground">
             <Headphones className="w-4 h-4 mt-0.5 shrink-0" />
             <div>

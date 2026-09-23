@@ -617,7 +617,7 @@ const ExperienceDetail = () => {
       {/* ── MESSAGE BAR (in-app only) ───────────────────────────── */}
       <button
         onClick={() => navigate(`/inbox?personId=${providerId || exp.provider_id || ""}&kind=provider`)}
-        className="fixed bottom-[80px] left-0 right-0 z-50 bg-secondary border-t border-primary/40 px-4 py-2.5 flex items-center gap-2.5 text-start"
+        className="fixed bottom-[136px] left-0 right-0 z-50 bg-secondary border-t border-primary/40 px-4 py-2.5 flex items-center gap-2.5 text-start"
       >
         <div className="w-[22px] h-[22px] rounded-full bg-primary flex items-center justify-center flex-shrink-0">
           <MessageCircle className="w-[11px] h-[11px] text-primary-foreground" />
@@ -628,7 +628,7 @@ const ExperienceDetail = () => {
       </button>
 
       {/* ── STICKY BOOKING BAR ─────────────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-2px_12px_rgba(0,0,0,0.06)] px-4 py-3 pb-7 flex items-center justify-between">
+      <div className="fixed bottom-[68px] left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-2px_12px_rgba(0,0,0,0.06)] px-4 py-3 pb-7 flex items-center justify-between">
         <div>
           <span className="text-xl font-bold text-primary">{unitPrice} {t("common.egp")}</span>
           <span className="text-[13px] text-muted-foreground"> {t("common.per_person")}</span>

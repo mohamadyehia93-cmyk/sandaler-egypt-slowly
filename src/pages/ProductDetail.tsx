@@ -578,7 +578,7 @@ const ProductDetail = () => {
       </div>
 
       {/* ── STICKY BAR ── */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
+      <div className="fixed bottom-[68px] left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
         <div className="min-w-0">
           <span className="text-lg font-bold text-primary-dark">{money(unitPrice)}</span>
           {product.made_to_order && product.lead_time_days ? (

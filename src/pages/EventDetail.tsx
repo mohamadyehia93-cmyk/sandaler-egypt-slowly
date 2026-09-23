@@ -361,7 +361,7 @@ const EventDetail = () => {
       )}
 
       {/* Sticky CTA */}
-      <div className="fixed bottom-16 inset-x-0 z-30 bg-background/95 backdrop-blur border-t border-border px-4 py-3 flex items-center gap-3">
+      <div className="fixed bottom-[68px] inset-x-0 z-30 bg-background/95 backdrop-blur border-t border-border px-4 py-3 flex items-center gap-3">
         <div className="min-w-0">
           <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{t("event.admission")}</p>
           <p className="text-lg font-bold text-primary-dark leading-tight">{priceLabel}</p>
