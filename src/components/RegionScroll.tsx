@@ -6,7 +6,7 @@ import CardCarousel from "./CardCarousel";
 import ContentCard from "./ContentCard";
 import { Skeleton } from "./ui/skeleton";
 
-type RegionRow = { id: string; name_en?: string | null; name_ar?: string | null; image?: string | null };
+type RegionRow = { id: string; name_en?: string | null; name_ar?: string | null; image?: string | null; tagline_en?: string | null; tagline_ar?: string | null };
 
 /** Regions as the same large landscape cards as the rest of the homepage. */
 const RegionScroll = () => {
@@ -28,6 +28,7 @@ const RegionScroll = () => {
               title={(lang === "ar" ? r.name_ar || r.name_en : r.name_en) || ""}
               image={getRegionImage(r.id) ?? r.image ?? null}
               href={`/region/${r.id}`}
+              subtitle={(lang === "ar" ? r.tagline_ar || r.tagline_en : r.tagline_en) || null}
               showPrice={false}
             />
           ))}

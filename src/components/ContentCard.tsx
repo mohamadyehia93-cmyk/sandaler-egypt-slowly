@@ -21,6 +21,8 @@ export type ContentCardProps = {
   wishlist?: { itemType: WishlistItemType; itemId?: string | null; variant?: "heart" | "bookmark" };
   /** Small line under the title, e.g. a date. Use sparingly. */
   note?: string;
+  /** Optional one-line description under the title, clamped to 2 lines. */
+  subtitle?: string | null;
   className?: string;
 };
 
@@ -38,6 +40,7 @@ const ContentCard = ({
   showPrice = true,
   wishlist,
   note,
+  subtitle,
   className = "",
 }: ContentCardProps) => {
   const navigate = useNavigate();
@@ -94,6 +97,11 @@ const ContentCard = ({
             }`}>
             {title}
           </h3>
+          {subtitle && (
+            <p className={`mt-1 line-clamp-2 ${lg ? "text-[13px]" : "text-xs"} font-medium leading-snug text-primary-foreground/90`}>
+              {subtitle}
+            </p>
+          )}
           {note && (
             <span className={`mt-1 block ${lg ? "text-xs" : "text-[11px]"} font-medium text-primary-foreground/85`}>
               {note}

@@ -121,6 +121,7 @@ const Index = () => {
       <div className="max-w-6xl mx-auto pt-10 [&>section]:mb-16">
         {/* Stories and inspiration lead the feed */}
         {show("stories") && <LatestPosts />}
+        {filter === "all" && <RegionScroll />}
         {show("events") && <EventsSection events={dbEvents} />}
         {show("audio-tours") && <AudioTourCards />}
         {show("experiences") && <ExperienceCards />}
@@ -137,7 +138,6 @@ const Index = () => {
               <span className="h-px flex-1 bg-border" />
             </div>
 
-            <RegionScroll />
             <CollectionsSection />
             <HomeCausesSection />
           </>
