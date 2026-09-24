@@ -11,7 +11,8 @@ import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { supabase } from "@/integrations/supabase/client";
 import { bylineNames, isEditorialPost, SANDAL_BYLINE, SANDAL_MARK } from "@/lib/postByline";
 
-import { usePosts } from "@/hooks/useListings";
+import { usePosts, useExperiences, useAudioTours, useAccommodations } from "@/hooks/useListings";
+import ContentCard from "@/components/ContentCard";
 import WishlistButton from "@/components/WishlistButton";
 import { contentTypeConfig } from "@/components/LatestPosts";
 import NotFoundView from "@/components/NotFound";
@@ -69,6 +70,24 @@ const PostDetail = () => {
     enabled: !!id,
   });
   const { data: allPosts } = usePosts();
+  const { data: dbExperiences = [] } = useExperiences();
+  const { data: dbAudioTours = [] } = useAudioTours();
+  const { data: dbAccommodations = [] } = useAccommodations();
+
+  // Photo credit for the hero image (only when a real credit row exists).
+  const heroUrl = (row as { image?: string | null } | null | undefined)?.image;
+  const { data: credit } = useQuery({
+    queryKey: ["image-credit", heroUrl],
+    enabled: !!heroUrl,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("image_credits")
+        .select("artist, license, license_url, source_url")
+        .eq("image_url", heroUrl!)
+        .limit(1);
+      return data?.[0] ?? null;
+    },
+  });
 
   // Author bio card: resolve the REAL culture-actor profile owned by this author.
   // Never match against sample actors — that showed a stranger's bio on a post.
@@ -121,7 +140,8 @@ const PostDetail = () => {
     id: row.id,
     slug: row.slug,
     image: row.image || "/placeholder.svg",
-    title: { en: row.title_en, ar: row.title_ar },
+    title: { en: row.title_en, ar: row.title_ar || row.title_en },
+    excerpt: { en: row.excerpt_en || "", ar: row.excerpt_ar || row.excerpt_en || "" },
     body: { en: row.body_en || "", ar: row.body_ar || "" },
     category: postCategoryLabel(row.category),
     author: bylineNames(row),
@@ -140,8 +160,13 @@ const PostDetail = () => {
   const CtIcon = ct?.icon;
   const contentType = post.contentType as string | undefined;
 
-  const relatedPosts = (allPosts ?? [])
-    .filter((p: any) => p && p.id !== post.id && p.region_id === post.regionId)
+  // City-first: same city ranked above same-region fallbacks.
+  const others = (allPosts ?? []).filter((p) => p && p.id !== post.id);
+  const inCity = post.cityId ? others.filter((p) => p.city_id === post.cityId) : [];
+  const inRegion = post.regionId
+    ? others.filter((p) => p.region_id === post.regionId && !inCity.includes(p))
+    : [];
+  const relatedPosts = [...inCity, ...inRegion]
     .slice(0, 3)
     .map((p: any) => ({
       id: p.id,
@@ -152,6 +177,29 @@ const PostDetail = () => {
       readTime: p.read_time_minutes ?? 5,
       contentType: p.content_type,
     }));
+
+  // "Go there": published bookable items in the same city (same filters as CityDetail).
+  const pick = (en?: string | null, ar?: string | null) => (lang === "ar" ? ar || en : en) || "";
+  const goThere = post.cityId
+    ? [
+        ...dbExperiences.filter((e) => e.city_id === post.cityId).map((e) => ({
+          key: `x-${e.id}`, type: "experience" as const, title: pick(e.title_en, e.title_ar), image: e.image,
+          href: `/experience/${e.slug || e.id}`, price: e.price, note: undefined as string | undefined,
+          wishlist: { itemType: "experience" as const, itemId: e.id },
+        })),
+        ...dbAudioTours.filter((a) => a.city_id === post.cityId).map((a) => ({
+          key: `a-${a.id}`, type: "audio-tour" as const, title: pick(a.title_en, a.title_ar), image: a.image,
+          href: `/audio-tour/${a.slug || a.id}`, price: a.price, note: undefined as string | undefined,
+          wishlist: { itemType: "audio_tour" as const, itemId: a.id },
+        })),
+        ...dbAccommodations.filter((a) => a.city_id === post.cityId).map((a) => ({
+          key: `s-${a.id}`, type: "stay" as const, title: pick(a.name_en, a.name_ar), image: a.image,
+          href: `/stay/${a.slug || a.id}`, price: a.price_per_night,
+          note: a.price_per_night ? (lang === "ar" ? "لكل ليلة" : "per night") : undefined,
+          wishlist: { itemType: "accommodation" as const, itemId: a.id },
+        })),
+      ].slice(0, 2)
+    : [];
 
   const formattedDate = new Date(post.date).toLocaleDateString(lang === "ar" ? "ar-EG" : "en-US", {
     year: "numeric", month: "long", day: "numeric",
@@ -170,6 +218,8 @@ const PostDetail = () => {
   });
 
 
+  const firstTextIdx = blocks.findIndex((b) => b.type === "text" && b.text.trim().length > 0);
+
   const timeLabel = ct
     ? (ct === contentTypeConfig.podcast || ct === contentTypeConfig.documentary || ct === contentTypeConfig["recipe-video"])
       ? (lang === "ar" ? "دقيقة" : "min")
@@ -179,17 +229,17 @@ const PostDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <div className="relative h-64">
+      <div className="relative h-64 lg:h-[28rem]">
         <img src={post.image} alt={post.title[lang]} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        <button onClick={() => navigate(-1)} className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-sm" aria-label={lang === "ar" ? "رجوع" : "Back"}>
-          <ArrowLeft className="w-5 h-5 text-foreground" />
+        <button onClick={() => navigate(-1)} className="absolute top-4 start-4 p-2 rounded-full bg-background/80 backdrop-blur-sm" aria-label={lang === "ar" ? "رجوع" : "Back"}>
+          <ArrowLeft className="w-5 h-5 text-foreground rtl:-scale-x-100" />
         </button>
-        <div className="absolute top-4 right-4 flex gap-2">
-          <ShareButton title={lang === "ar" ? (post as any).title_ar : (post as any).title_en} />
+        <div className="absolute top-4 end-4 flex gap-2">
+          <ShareButton title={post.title[lang]} />
           <WishlistButton itemType="post" itemId={post.id} variant="bookmark" />
         </div>
-        <div className="absolute bottom-4 left-4 right-4">
+        <div className="absolute bottom-4 start-4 end-4 lg:bottom-8 lg:mx-auto lg:max-w-[680px] lg:start-0 lg:end-0 lg:px-4">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
             {ct && CtIcon && (
               <span className={`inline-flex items-center gap-1 ${ct.color} text-white text-[10px] font-semibold px-2 py-0.5 rounded-full`}>
@@ -202,9 +252,30 @@ const PostDetail = () => {
             </span>
             {(post as any).cityId && <CityBadge cityId={(post as any).cityId} variant="overlay" />}
           </div>
-          <h1 className="text-xl font-bold text-white leading-tight">{post.title[lang]}</h1>
+          <h1 className="text-xl lg:text-3xl font-bold text-white leading-tight">{post.title[lang]}</h1>
         </div>
       </div>
+
+      {/* Photo credit — only when a real image_credits row exists */}
+      {credit && (credit.artist || credit.license) && (
+        <p className="mx-auto max-w-[680px] px-4 pt-2 text-[11px] text-muted-foreground" data-testid="photo-credit">
+          {lang === "ar" ? "الصورة: " : "Photo: "}
+          {credit.source_url ? (
+            <a href={credit.source_url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">
+              {credit.artist || (lang === "ar" ? "ويكيميديا كومنز" : "Wikimedia Commons")}
+            </a>
+          ) : credit.artist}
+          {credit.license && <> · {credit.license}</>}
+        </p>
+      )}
+
+      <div className="mx-auto max-w-[680px]">
+      {/* Standfirst */}
+      {post.excerpt[lang] && (
+        <p className={`article-standfirst lang-${lang} px-4 pt-5 pb-4 text-foreground/85 border-b border-border`} data-testid="standfirst">
+          {post.excerpt[lang]}
+        </p>
+      )}
 
       {/* Media: only real uploaded images. There is no audio/video storage for
           posts yet, so no player is rendered — a simulated one would be a lie. */}
@@ -277,18 +348,18 @@ const PostDetail = () => {
 
 
       {/* Body */}
-      <article className="px-4 pt-5 space-y-4">
+      <article className={`article-prose lang-${lang} px-4 pt-6 space-y-5 text-foreground`} data-testid="article-body">
         {blocks.map((b, i) =>
           b.type === "heading" ? (
-            <h2 key={i} className="text-base font-bold text-foreground pt-1">{b.text}</h2>
+            <h2 key={i}>{b.text}</h2>
           ) : b.type === "list" ? (
-            <ul key={i} className="list-disc ps-5 space-y-1.5">
+            <ul key={i} className="list-disc ps-6 space-y-2">
               {b.items.map((it, j) => (
-                <li key={j} className="text-sm text-foreground leading-relaxed">{it}</li>
+                <li key={j}>{it}</li>
               ))}
             </ul>
           ) : (
-            <p key={i} className="text-sm text-foreground leading-relaxed whitespace-pre-line">{b.text}</p>
+            <p key={i} className={`whitespace-pre-line ${i === firstTextIdx ? "drop-cap" : ""}`}>{b.text}</p>
           )
         )}
 
@@ -342,6 +413,23 @@ const PostDetail = () => {
         );
       })()}
 
+      {/* Go there — only when real published bookable items exist in this city */}
+      {goThere.length > 0 && (
+        <section className="mt-8 px-4" data-testid="go-there">
+          <h2 className="text-base font-bold text-foreground">
+            {lang === "ar" ? "زُرها بنفسك" : "Go there yourself"}
+          </h2>
+          <p className="text-xs text-muted-foreground mb-3">
+            {lang === "ar" ? "أشياء يمكنك حجزها في هذه المدينة" : "Things you can book in this city"}
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {goThere.map((g) => (
+              <ContentCard key={g.key} type={g.type} title={g.title} image={g.image} href={g.href} price={g.price} note={g.note} wishlist={g.wishlist} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Related Posts */}
       {relatedPosts.length > 0 && (
         <div className="mt-8 px-4">
@@ -383,6 +471,7 @@ const PostDetail = () => {
 
       {/* Comments */}
       <PostComments postKey={post.id} />
+      </div>
     </div>
   );
 };
