@@ -207,3 +207,12 @@ html, body {
   }
 }
 
+
+/* ── Article body typography (PostDetail only) ── */
+.article-prose { font-family: "Source Serif 4", Georgia, serif; font-size: 1.125rem; line-height: 1.7; }
+.article-prose h2 { font-family: "Source Serif 4", Georgia, serif; font-weight: 600; font-size: 1.5rem; line-height: 1.3; margin-top: 2rem; }
+.article-prose.lang-ar { font-family: "Amiri", "Cairo", serif; font-size: 1.3125rem; line-height: 1.95; }
+.article-prose.lang-ar h2 { font-family: "Amiri", "Cairo", serif; font-weight: 700; font-size: 1.625rem; line-height: 1.5; }
+.article-standfirst { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-weight: 500; font-size: 1.25rem; line-height: 1.5; }
+.article-standfirst.lang-ar { font-family: "Amiri", "Cairo", serif; font-style: normal; font-weight: 400; font-size: 1.375rem; line-height: 1.75; }
+.article-prose.lang-en .drop-cap::first-letter { float: left; font-size: 3.6em; line-height: 0.85; font-weight: 600; margin: 0.08em 0.1em 0 0; color: hsl(var(--primary-dark, var(--primary))); }
