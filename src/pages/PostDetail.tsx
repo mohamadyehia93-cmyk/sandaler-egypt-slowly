@@ -75,7 +75,7 @@ const PostDetail = () => {
   const { data: dbAccommodations = [] } = useAccommodations();
 
   // Photo credit for the hero image (only when a real credit row exists).
-  const heroUrl = (row as any)?.image as string | null | undefined;
+  const heroUrl = (row as { image?: string | null } | null | undefined)?.image;
   const { data: credit } = useQuery({
     queryKey: ["image-credit", heroUrl],
     enabled: !!heroUrl,
@@ -161,10 +161,10 @@ const PostDetail = () => {
   const contentType = post.contentType as string | undefined;
 
   // City-first: same city ranked above same-region fallbacks.
-  const others = (allPosts ?? []).filter((p: any) => p && p.id !== post.id);
-  const inCity = post.cityId ? others.filter((p: any) => p.city_id === post.cityId) : [];
+  const others = (allPosts ?? []).filter((p) => p && p.id !== post.id);
+  const inCity = post.cityId ? others.filter((p) => p.city_id === post.cityId) : [];
   const inRegion = post.regionId
-    ? others.filter((p: any) => p.region_id === post.regionId && !inCity.includes(p))
+    ? others.filter((p) => p.region_id === post.regionId && !inCity.includes(p))
     : [];
   const relatedPosts = [...inCity, ...inRegion]
     .slice(0, 3)
@@ -182,17 +182,17 @@ const PostDetail = () => {
   const pick = (en?: string | null, ar?: string | null) => (lang === "ar" ? ar || en : en) || "";
   const goThere = post.cityId
     ? [
-        ...(dbExperiences as any[]).filter((e) => e.city_id === post.cityId).map((e) => ({
+        ...dbExperiences.filter((e) => e.city_id === post.cityId).map((e) => ({
           key: `x-${e.id}`, type: "experience" as const, title: pick(e.title_en, e.title_ar), image: e.image,
           href: `/experience/${e.slug || e.id}`, price: e.price, note: undefined as string | undefined,
           wishlist: { itemType: "experience" as const, itemId: e.id },
         })),
-        ...(dbAudioTours as any[]).filter((a) => a.city_id === post.cityId).map((a) => ({
+        ...dbAudioTours.filter((a) => a.city_id === post.cityId).map((a) => ({
           key: `a-${a.id}`, type: "audio-tour" as const, title: pick(a.title_en, a.title_ar), image: a.image,
           href: `/audio-tour/${a.slug || a.id}`, price: a.price, note: undefined as string | undefined,
           wishlist: { itemType: "audio_tour" as const, itemId: a.id },
         })),
-        ...(dbAccommodations as any[]).filter((a) => a.city_id === post.cityId).map((a) => ({
+        ...dbAccommodations.filter((a) => a.city_id === post.cityId).map((a) => ({
           key: `s-${a.id}`, type: "stay" as const, title: pick(a.name_en, a.name_ar), image: a.image,
           href: `/stay/${a.slug || a.id}`, price: a.price_per_night,
           note: a.price_per_night ? (lang === "ar" ? "لكل ليلة" : "per night") : undefined,
