@@ -1,0 +1,13 @@
+[
+ {"file":"article-rosetta.jpg","source_url":"https://commons.wikimedia.org/wiki/File:Amasyali_House,_Rosetta,_Egypt_09.jpg","artist":"لا روسا","licence":"CC BY-SA 4.0"},
+ {"file":"article-damietta.jpg","source_url":"https://commons.wikimedia.org/wiki/File:DumyatElAsMosqueFacade.jpg","artist":"Roland Unger","licence":"CC BY-SA 3.0"},
+ {"file":"article-port-said.jpg","source_url":"https://commons.wikimedia.org/wiki/File:A_unique_house_of_Port_Said.JPG","artist":"Amr Fayez (TheEgyptian at English Wikipedia)","licence":"CC BY-SA 3.0"},
+ {"file":"article-ismailia.jpg","source_url":"https://commons.wikimedia.org/wiki/File:Ismailia_police_clash_1952_(1).jpg","artist":"Al-Ahram","licence":"Public domain"},
+ {"file":"article-tanta.jpg","source_url":"https://commons.wikimedia.org/wiki/File:Mauled_Ahmed_El-Badawi-Tanta.jpg","artist":"Faris knight","licence":"CC BY-SA 4.0"},
+ {"file":"article-aswan.jpg","source_url":"https://commons.wikimedia.org/wiki/File:Assuan_Unvollendeter_Obelisk_35.jpg","artist":"Olaf Tausch","licence":"CC BY 3.0"},
+ {"file":"article-suez.jpg","source_url":"https://commons.wikimedia.org/wiki/File:Destroyed-israeli-tank-Suez_-Batle-1973.jpg","artist":"Egyptian Armed Forces (القوات المسلحة المصرية)","licence":"Public domain"},
+ {"file":"provider-gabal-maryam-farms.jpg","source_url":"https://meacccbwpzrrcoanlojw.supabase.co/storage/v1/object/public/listing-images/a331ceb5-9aad-4be8-8fed-57caa25d562f/1788535810283-t74k1zlm7jo.jpg","artist":"Gabal Maryam Farms (uploaded by provider)","licence":"Provider-supplied, used with permission"},
+ {"file":"provider-reismailia.jpg","source_url":"https://meacccbwpzrrcoanlojw.supabase.co/storage/v1/object/public/listing-images/0c4e8db3-ebd8-41ea-a081-3fe38f6d19f6/1790249717208-dsn2q2ryhfl.png","artist":"Reismailia (uploaded by provider)","licence":"Provider-supplied, used with permission"},
+ {"file":"provider-stabene-logo.jpg","source_url":"https://meacccbwpzrrcoanlojw.supabase.co/storage/v1/object/public/profile-photos/439a4650-74d6-4d6d-b019-43d835cfd1ec/1788707441023-xyo86cjgzt8.png","artist":"StaBene (uploaded by provider)","licence":"Provider-supplied logo, used with permission"},
+ {"file":"screen-*.png","source_url":"https://sandal.lovable.app","artist":"Sandal app screenshots","licence":"Sandal"}
+]
