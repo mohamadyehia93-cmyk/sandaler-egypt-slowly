@@ -11,6 +11,7 @@ import EditProfileHeaderButton from "@/components/dashboard/EditProfileHeaderBut
 import DailyStatusCard from "@/components/DailyStatusCard";
 import OwnerReservationRequests from "@/components/OwnerReservationRequests";
 import ProviderDraftBanner from "@/components/dashboard/ProviderDraftBanner";
+import OwnedExperiencesPanel from "@/components/dashboard/OwnedExperiencesPanel";
 
 const TripOrganizerDashboard = () => {
   const { lang } = useI18n();
@@ -92,6 +93,7 @@ const TripOrganizerDashboard = () => {
 
       <div className="px-4 pt-4">
         <ProviderDraftBanner />
+        <div className="mt-4"><OwnedExperiencesPanel /></div>
       </div>
 
       <div className="px-4 py-4 space-y-4">

@@ -11,6 +11,7 @@ import DailyStatusCard from "@/components/DailyStatusCard";
 import OrgApplicationsList from "@/components/OrgApplicationsList";
 import CausePledgesList from "@/components/CausePledgesList";
 import ProviderDraftBanner from "@/components/dashboard/ProviderDraftBanner";
+import OwnedExperiencesPanel from "@/components/dashboard/OwnedExperiencesPanel";
 
 const OrganizationDashboard = () => {
   const { lang } = useI18n();
@@ -102,6 +103,7 @@ const OrganizationDashboard = () => {
 
       <div className="px-4 pt-4">
         <ProviderDraftBanner />
+        <div className="mt-4"><OwnedExperiencesPanel /></div>
       </div>
 
       <div className="px-4 py-4 space-y-4">

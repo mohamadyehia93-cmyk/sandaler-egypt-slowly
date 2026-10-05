@@ -12,6 +12,7 @@ import DailyStatusCard from "@/components/DailyStatusCard";
 import SellerOrdersList from "@/components/SellerOrdersList";
 import OwnerReservationRequests from "@/components/OwnerReservationRequests";
 import ProviderDraftBanner from "@/components/dashboard/ProviderDraftBanner";
+import OwnedExperiencesPanel from "@/components/dashboard/OwnedExperiencesPanel";
 
 const LOW_STOCK_THRESHOLD = 3;
 
@@ -98,6 +99,7 @@ const ProductSellerDashboard = () => {
 
       <div className="px-4 pt-4">
         <ProviderDraftBanner />
+        <div className="mt-4"><OwnedExperiencesPanel /></div>
       </div>
 
       <div className="px-4 py-4 space-y-4">

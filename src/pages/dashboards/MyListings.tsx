@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchMyProviderId } from "@/lib/providerRecord";
+import { useUserRole } from "@/hooks/useUserRole";
 
 import { ArrowLeft, Plus, Trash2, Eye, Compass, Pencil, CalendarClock, EyeOff } from "lucide-react";
 import { toast } from "sonner";
@@ -14,6 +15,8 @@ const MyListings = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  // Other provider roles can manage experiences they own, but creating new ones stays a service-provider action.
+  const { role } = useUserRole();
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["my-experiences", user?.id],
@@ -116,9 +119,11 @@ const MyListings = () => {
           ))
         )}
 
+        {role === "service-provider" && (
         <button onClick={() => navigate("/dashboard/service-provider/new-experience")} className="w-full bg-role-service-provider text-white rounded-xl py-3.5 font-semibold text-sm flex items-center justify-center gap-2 mt-2">
           <Plus className="w-4 h-4" /> {lang === "ar" ? "تجربة جديدة" : "New Experience"}
         </button>
+        )}
       </div>
     </div>
   );

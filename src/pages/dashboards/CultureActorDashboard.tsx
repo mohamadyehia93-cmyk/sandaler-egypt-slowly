@@ -10,6 +10,7 @@ import DailyStatusCard from "@/components/DailyStatusCard";
 import ActorCommissionsList from "@/components/ActorCommissionsList";
 import SessionRequestsList from "@/components/SessionRequestsList";
 import ProviderDraftBanner from "@/components/dashboard/ProviderDraftBanner";
+import OwnedExperiencesPanel from "@/components/dashboard/OwnedExperiencesPanel";
 
 // Static editorial copy curated by the Sandal team — NOT personalised and not
 // backed by any table. Do not present these as generated suggestions.
@@ -204,6 +205,7 @@ const CultureActorDashboard = () => {
 
       <div className="px-4 pt-4">
         <ProviderDraftBanner />
+        <div className="mt-4"><OwnedExperiencesPanel /></div>
       </div>
 
       <div className="px-4 py-4 space-y-4">
