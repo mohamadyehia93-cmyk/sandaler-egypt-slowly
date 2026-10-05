@@ -25,7 +25,7 @@ const OwnedExperiencesPanel = () => {
     enabled: !!user,
     queryFn: async () => {
       const providerId = await fetchMyProviderId(user!.id);
-      if (!providerId) return { experiences: [], pending: 0 };
+      if (!providerId) return { experiences: [], pending: [] as { id: string; guests: number; created_at: string; experience_id: string }[] };
       const { data: experiences, error } = await supabase
         .from("experiences")
         .select("id, title_en, title_ar, status")
