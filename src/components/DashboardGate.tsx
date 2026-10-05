@@ -24,11 +24,23 @@ const ROUTE_ROLES: { prefix: string; role: LocalRole }[] = (
 /** Role-neutral dashboard routes: any provider role may use them. */
 const ANY_PROVIDER_PREFIXES = ["/dashboard/events", "/dashboard/new-event"];
 
+/**
+ * Managing an experience you already own is open to every provider role:
+ * any provider can manage any listing they own. These pages check ownership
+ * themselves and RLS enforces it, so the gate only requires "a provider".
+ */
+const OWNED_EXPERIENCE_ROUTES = [
+  /^\/dashboard\/service-provider\/my-listings\/?$/,
+  /^\/dashboard\/service-provider\/edit-experience\/[^/]+\/?$/,
+  /^\/dashboard\/service-provider\/listing\/[^/]+\/slots\/?$/,
+];
+
 export const requiredRoleForPath = (path: string): LocalRole | "any-provider" | null => {
   if (!path.startsWith("/dashboard")) return null;
   if (ANY_PROVIDER_PREFIXES.some((p) => path === p || path.startsWith(p + "/"))) {
     return "any-provider";
   }
+  if (OWNED_EXPERIENCE_ROUTES.some((re) => re.test(path))) return "any-provider";
   const match = ROUTE_ROLES.filter((r) => path === r.prefix || path.startsWith(r.prefix + "/")).sort(
     (a, b) => b.prefix.length - a.prefix.length
   )[0];
