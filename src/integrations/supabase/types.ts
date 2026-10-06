@@ -1084,6 +1084,8 @@ export type Database = {
       }
       experiences: {
         Row: {
+          cancellation_policy_ar: string | null
+          cancellation_policy_en: string | null
           capacity_max: number | null
           capacity_min: number | null
           city_id: string | null
@@ -1098,11 +1100,16 @@ export type Database = {
           id: string
           image: string | null
           images: string[] | null
+          included_ar: string | null
+          included_en: string | null
           itinerary_ar: Json | null
           itinerary_en: Json | null
+          languages: string[] | null
           meeting_point_lat: number | null
           meeting_point_lng: number | null
           meeting_point_name: string | null
+          not_included_ar: string | null
+          not_included_en: string | null
           price: number
           provider_id: string | null
           rating: number | null
@@ -1121,6 +1128,8 @@ export type Database = {
           verified: boolean | null
         }
         Insert: {
+          cancellation_policy_ar?: string | null
+          cancellation_policy_en?: string | null
           capacity_max?: number | null
           capacity_min?: number | null
           city_id?: string | null
@@ -1135,11 +1144,16 @@ export type Database = {
           id?: string
           image?: string | null
           images?: string[] | null
+          included_ar?: string | null
+          included_en?: string | null
           itinerary_ar?: Json | null
           itinerary_en?: Json | null
+          languages?: string[] | null
           meeting_point_lat?: number | null
           meeting_point_lng?: number | null
           meeting_point_name?: string | null
+          not_included_ar?: string | null
+          not_included_en?: string | null
           price?: number
           provider_id?: string | null
           rating?: number | null
@@ -1158,6 +1172,8 @@ export type Database = {
           verified?: boolean | null
         }
         Update: {
+          cancellation_policy_ar?: string | null
+          cancellation_policy_en?: string | null
           capacity_max?: number | null
           capacity_min?: number | null
           city_id?: string | null
@@ -1172,11 +1188,16 @@ export type Database = {
           id?: string
           image?: string | null
           images?: string[] | null
+          included_ar?: string | null
+          included_en?: string | null
           itinerary_ar?: Json | null
           itinerary_en?: Json | null
+          languages?: string[] | null
           meeting_point_lat?: number | null
           meeting_point_lng?: number | null
           meeting_point_name?: string | null
+          not_included_ar?: string | null
+          not_included_en?: string | null
           price?: number
           provider_id?: string | null
           rating?: number | null
