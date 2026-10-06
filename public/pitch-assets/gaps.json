@@ -1,0 +1,1596 @@
+{
+ "generated_at": "2026-10-06T12:31:53.273182Z",
+ "note": "Read-only audit. Flags are automatic heuristics; EN/AR title mismatch checked by hand where noted.",
+ "counts": {
+  "profiles": 12,
+  "organizations": 2,
+  "listings": {
+   "experience": 8,
+   "product": 4,
+   "program": 1
+  },
+  "flags": 210
+ },
+ "providers": [
+  {
+   "kind": "provider",
+   "label": "Gabal Maryam Farms (Ibrahim Saleh)",
+   "id": "4f87d89d-5e3e-44b1-b402-5e99812aa0b8",
+   "user_id": "a331ceb5-9aad-4be8-8fed-57caa25d562f",
+   "role": "service-provider",
+   "roles": [],
+   "slug": "gabal-maryam-farms-a331ce",
+   "name_en": "Gabal Maryam Farms",
+   "name_ar": "مزارع جبل مريم",
+   "status": "published",
+   "city_en": "Ismailia",
+   "city_ar": "الإسماعيلية",
+   "region_en": null,
+   "avatar_present": true,
+   "cover_present": false,
+   "bio_en": "مزارع جبل مريم \nمزرعه ريفيه فطار ريفي وغداء ريفي  \nعيش تجربه حصاد المنجه والفروله والخضروات \nوانشطه مثل حلب الأبقار وعمل الجبنه الفلاحي وخبير العيش الفلاحي ورايه الحيوانات وعيش الحياه الصيفيه",
+   "bio_ar": null,
+   "tagline_en": null,
+   "tagline_ar": null,
+   "specialties": [
+    "nature-exp"
+   ],
+   "languages": null,
+   "email_domain": "gmail.com",
+   "email_looks_mistyped": false,
+   "phone_present": false,
+   "whatsapp_present": true,
+   "website": null,
+   "social_links_present": false,
+   "verified": false,
+   "onboarding": "self-signup account (user_id set)",
+   "claim_tokens": [],
+   "created_at": "2026-09-04T15:11:43.598222+00:00",
+   "translation_meta": {
+    "raw": {
+     "name_en": {
+      "at": "2026-09-04T15:11:43.215Z",
+      "from": "ar",
+      "source": "machine"
+     }
+    },
+    "machine_translated_fields": [
+     "name_en"
+    ]
+   },
+   "flags": [
+    "bio_en written in Arabic",
+    "missing bio_ar",
+    "missing tagline_en",
+    "missing tagline_ar",
+    "no cover image",
+    "no social links",
+    "not verified",
+    "machine-translated: name_en"
+   ],
+   "organizations": [],
+   "listings": [
+    {
+     "type": "experience",
+     "id": "7bef5f2a-91a4-4d2e-ab70-689165dd99ad",
+     "slug": null,
+     "url": "https://sandal.lovable.app/experience/7bef5f2a-91a4-4d2e-ab70-689165dd99ad",
+     "title_en": "Mango from",
+     "title_ar": ", مزارع مانجو",
+     "description_en": "Mango from",
+     "description_ar": "مزرعه ريفيه متكامله فطار يفي غداء ريفي حصاد الفواكه والخضروات",
+     "theme": "nature",
+     "theme_other": null,
+     "price": 300,
+     "currency": "EGP",
+     "price_basis": "per person (experiences are priced per guest)",
+     "duration_minutes": 180,
+     "capacity_min": 1,
+     "capacity_max": 10,
+     "meeting_point_name": null,
+     "meeting_point_coords_set": true,
+     "city_id": "ismailia",
+     "region_id": "suez-canal",
+     "itinerary_en": [],
+     "itinerary_ar": [],
+     "important_notes_en": null,
+     "important_notes_ar": "متعلقاته الشخصيه",
+     "included": null,
+     "not_included": null,
+     "cancellation_policy": null,
+     "languages": null,
+     "image_count": 5,
+     "main_image_providers_own": true,
+     "main_image": "https://meacccbwpzrrcoanlojw.supabase.co/storage/v1/object/public/listing-images/a331ceb5-9aad-4be8-8fed-57caa25d562f/1788535810283-t74k1zlm7jo.jpg",
+     "future_slots": {
+      "n": 58,
+      "a": "2026-11-06",
+      "b": "2027-05-29",
+      "mins": 10,
+      "maxs": 10
+     },
+     "translation_meta": {
+      "raw": {},
+      "machine_translated_fields": []
+     },
+     "flags": [
+      "missing remarks_en",
+      "no meeting point name",
+      "no itinerary EN",
+      "no itinerary AR",
+      "no included/not-included fields in schema (not captured)",
+      "no cancellation policy field for experiences",
+      "no languages field for experiences"
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "provider",
+   "label": "Boutique du Canal (Fayrouz Ashraf)",
+   "id": "99fced87-ddfa-4530-8610-7f8faeea6491",
+   "user_id": "ad8c5ebd-b049-4cdb-947e-ca1997031341",
+   "role": "product-seller",
+   "roles": [],
+   "slug": "botique-due-canal-ad8c5e",
+   "name_en": "Botique Due Canal",
+   "name_ar": "بوتيك القنال",
+   "status": "published",
+   "city_en": "Ismailia",
+   "city_ar": "الإسماعيلية",
+   "region_en": null,
+   "avatar_present": true,
+   "cover_present": false,
+   "bio_en": "Boutique du Canal is a cultural and creative brand that reimagines the heritage and identity of Ismailia through contemporary products and digital experiences. The boutique transforms the city’s architectural, urban, and cultural heritage into meaningful souvenirs and creative products, including tote bags, accessories, artworks, music-inspired products, and other locally inspired designs.\n\nThe concept also extends beyond physical products to digital heritage experiences, such as Virtual Reality tours, Augmented Reality experiences, and interactive storytelling. By connecting heritage with design, technology, and entrepreneurship, Boutique du Canal aims to make Ismailia’s identity accessible to both local communities and visitors, while creating new ways to appreciate, share, and invest in the city’s cultural heritage.",
+   "bio_ar": null,
+   "tagline_en": null,
+   "tagline_ar": null,
+   "specialties": [
+    "woodwork"
+   ],
+   "languages": null,
+   "email_domain": "gmail.com",
+   "email_looks_mistyped": false,
+   "phone_present": false,
+   "whatsapp_present": false,
+   "website": null,
+   "social_links_present": false,
+   "verified": false,
+   "onboarding": "self-signup account (user_id set)",
+   "claim_tokens": [],
+   "created_at": "2026-09-24T11:51:30.299611+00:00",
+   "translation_meta": {
+    "raw": {
+     "name_en": {
+      "source": "human"
+     }
+    },
+    "machine_translated_fields": []
+   },
+   "flags": [
+    "missing bio_ar",
+    "missing tagline_en",
+    "missing tagline_ar",
+    "no cover image",
+    "no phone/WhatsApp",
+    "no social links",
+    "not verified",
+    "typo in name: 'Botique Due Canal' (Boutique du Canal)"
+   ],
+   "organizations": [],
+   "listings": [
+    {
+     "type": "product",
+     "id": "5b8f86b5-95ca-45a5-9e51-8b22eff05a44",
+     "slug": "simsimiyya-instrument-keychain-ad8c5e",
+     "title_en": "Simsimiyya Instrument Keychain",
+     "title_ar": "ميدالية السمسمية",
+     "description_en": "A souvenir keychain inspired by the Simsimiyya, an authentic musical symbol of the Canal cities' heritage and Ismailia's cultural identity.",
+     "description_ar": "ميدالية تذكارية مستوحاة من آلة السمسمية، رمز موسيقي أصيل من تراث مدن القناة وهوية الإسماعيلية الثقافية.",
+     "origin_story_en": null,
+     "origin_story_ar": "هذه المنتجات هي نتاج ورش عمل مبادرة ريسماعيلية (ReIsmailia)، وشارك في تصميمها وتنفيذها متطوعون من أبناء الإسماعيلية، من طلبة وسكان محليين مهتمين بتراث مدينتهم. استُلهمت الأفكار من القصص والروايات والذكريات واللقاءات مع سكان المدينة، ليتم تحويل ما يروونه عن أماكنهم وهويتهم إلى منتجات معاصرة تعبّر عن الإسماعيلية. ومن خلال هذه التجربة، خرجت فكرة Boutique du Canal كامتداد للمبادرة، بهدف تحويل التراث المحلي إلى منتجات وتجارب يشارك المجتمع نفسه في صناعتها ورواية قصتها.",
+     "category": "Palm & Wood Crafts",
+     "price": 50,
+     "currency": "EGP",
+     "price_basis": "per item",
+     "stock": 48,
+     "made_to_order": true,
+     "lead_time_days": 3,
+     "materials_en": "Wood",
+     "materials_ar": "خشب",
+     "dimensions": "7x5 cm",
+     "weight_grams": null,
+     "variants": [],
+     "delivery_options": [],
+     "care_en": null,
+     "care_ar": null,
+     "city_id": "ismailia",
+     "coords_set": false,
+     "image_count": 1,
+     "main_image_providers_own": true,
+     "translation_meta": {
+      "raw": {
+       "materials_en": {
+        "at": "2026-09-24T11:57:35.142Z",
+        "from": "ar",
+        "source": "machine"
+       }
+      },
+      "machine_translated_fields": [
+       "materials_en"
+      ]
+     },
+     "flags": [
+      "missing origin_story_en",
+      "materials looks like placeholder/too short: 'خشب'",
+      "missing care_en",
+      "missing care_ar",
+      "no weight",
+      "no delivery/shipping options",
+      "machine-translated: materials_en"
+     ]
+    },
+    {
+     "type": "product",
+     "id": "a70608b3-022c-40d4-bc16-d1adf09588a0",
+     "slug": "ismailia-landmarks-ad8c5e",
+     "title_en": "Ismailia Landmarks",
+     "title_ar": "معالم الاسماعيليه",
+     "description_en": "A souvenir stand embodying the Suez Canal Authority Museum building, inspired by its architectural details as an art piece carrying a part of the city's history.",
+     "description_ar": "ستاند تذكاري يجمع أبرز معالم الإسماعيلية في مجسّم معماري واحد، يحتفي بالهوية العمرانية المميزة للمدينة.",
+     "origin_story_en": null,
+     "origin_story_ar": "هذه المنتجات هي نتاج ورش عمل مبادرة ريسماعيلية (ReIsmailia)، وشارك في تصميمها وتنفيذها متطوعون من أبناء الإسماعيلية، من طلبة وسكان محليين مهتمين بتراث مدينتهم. استُلهمت الأفكار من القصص والروايات والذكريات واللقاءات مع سكان المدينة، ليتم تحويل ما يروونه عن أماكنهم وهويتهم إلى منتجات معاصرة تعبّر عن الإسماعيلية. ومن خلال هذه التجربة، خرجت فكرة Boutique du Canal كامتداد للمبادرة، بهدف تحويل التراث المحلي إلى منتجات وتجارب يشارك المجتمع نفسه في صناعتها ورواية قصتها.",
+     "category": "Palm & Wood Crafts",
+     "price": 300,
+     "currency": "EGP",
+     "price_basis": "per item",
+     "stock": 0,
+     "made_to_order": true,
+     "lead_time_days": null,
+     "materials_en": "Wood",
+     "materials_ar": "خشب",
+     "dimensions": "30x20cm",
+     "weight_grams": null,
+     "variants": [],
+     "delivery_options": [],
+     "care_en": null,
+     "care_ar": null,
+     "city_id": "ismailia",
+     "coords_set": false,
+     "image_count": 1,
+     "main_image_providers_own": true,
+     "translation_meta": {
+      "raw": {
+       "materials_en": {
+        "at": "2026-09-24T12:02:48.846Z",
+        "from": "ar",
+        "source": "machine"
+       }
+      },
+      "machine_translated_fields": [
+       "materials_en"
+      ]
+     },
+     "flags": [
+      "missing origin_story_en",
+      "materials looks like placeholder/too short: 'خشب'",
+      "missing care_en",
+      "missing care_ar",
+      "made-to-order without lead time",
+      "no weight",
+      "no delivery/shipping options",
+      "machine-translated: materials_en"
+     ]
+    },
+    {
+     "type": "product",
+     "id": "87fdf549-dd56-4c94-921b-f9a3a19730b3",
+     "slug": "new-suez-canal-museum-stand-ad8c5e",
+     "title_en": "New Suez Canal Museum Stand",
+     "title_ar": "ستاند متحف قناة السويس الجديد",
+     "description_en": "A souvenir stand embodying the Suez Canal Authority Museum building, inspired by its architectural details as an art piece carrying a part of the city's history.",
+     "description_ar": "ستاند تذكاري يجسّد مبنى متحف هيئة قناة السويس، مستوحى من تفاصيله المعمارية كقطعة فنية تحمل جزءًا من تاريخ المدينة.",
+     "origin_story_en": null,
+     "origin_story_ar": "هذه المنتجات هي نتاج ورش عمل مبادرة ريسماعيلية (ReIsmailia)، وشارك في تصميمها وتنفيذها متطوعون من أبناء الإسماعيلية، من طلبة وسكان محليين مهتمين بتراث مدينتهم. استُلهمت الأفكار من القصص والروايات والذكريات واللقاءات مع سكان المدينة، ليتم تحويل ما يروونه عن أماكنهم وهويتهم إلى منتجات معاصرة تعبّر عن الإسماعيلية. ومن خلال هذه التجربة، خرجت فكرة Boutique du Canal كامتداد للمبادرة، بهدف تحويل التراث المحلي إلى منتجات وتجارب يشارك المجتمع نفسه في صناعتها ورواية قصتها.",
+     "category": "Palm & Wood Crafts",
+     "price": 199,
+     "currency": "EGP",
+     "price_basis": "per item",
+     "stock": 0,
+     "made_to_order": true,
+     "lead_time_days": null,
+     "materials_en": "Wood",
+     "materials_ar": "الخشب",
+     "dimensions": "20x7",
+     "weight_grams": null,
+     "variants": [],
+     "delivery_options": [],
+     "care_en": null,
+     "care_ar": null,
+     "city_id": "ismailia",
+     "coords_set": false,
+     "image_count": 1,
+     "main_image_providers_own": true,
+     "translation_meta": {
+      "raw": {
+       "name_en": {
+        "at": "2026-09-24T12:04:01.237Z",
+        "from": "ar",
+        "source": "machine"
+       },
+       "materials_en": {
+        "at": "2026-09-24T12:04:19.390Z",
+        "from": "ar",
+        "source": "machine"
+       },
+       "description_en": {
+        "at": "2026-09-24T12:03:35.848Z",
+        "from": "ar",
+        "source": "machine"
+       },
+       "seller_village_en": {
+        "at": "2026-09-24T12:04:15.740Z",
+        "from": "ar",
+        "source": "machine"
+       }
+      },
+      "machine_translated_fields": [
+       "name_en",
+       "materials_en",
+       "description_en",
+       "seller_village_en"
+      ]
+     },
+     "flags": [
+      "missing origin_story_en",
+      "missing care_en",
+      "missing care_ar",
+      "made-to-order without lead time",
+      "no weight",
+      "no delivery/shipping options",
+      "machine-translated: name_en, materials_en, description_en, seller_village_en"
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "provider",
+   "label": "Reismailia (Fayrouz Ashraf) - account 1",
+   "id": "adaa9e45-57fe-4fee-b9db-84a449607c49",
+   "user_id": "c4993886-59b6-4e4b-a038-2eae2e3dbc4b",
+   "role": "organization",
+   "roles": [],
+   "slug": "fayrouz-ashraf-amin-c49938",
+   "name_en": "Reismailia",
+   "name_ar": "ريسماعيليه",
+   "status": "draft",
+   "city_en": "Ismailia",
+   "city_ar": "الإسماعيلية",
+   "region_en": null,
+   "avatar_present": false,
+   "cover_present": false,
+   "bio_en": "Founder of Reismailia initiative working on heritage preservation and raising awareness",
+   "bio_ar": null,
+   "tagline_en": null,
+   "tagline_ar": null,
+   "specialties": [
+    "heritage-preservation",
+    "community-dev",
+    "education",
+    "volunteers",
+    "consulting"
+   ],
+   "languages": null,
+   "email_domain": "gmail.com",
+   "email_looks_mistyped": false,
+   "phone_present": false,
+   "whatsapp_present": true,
+   "website": null,
+   "social_links_present": false,
+   "verified": false,
+   "onboarding": "self-signup account (user_id set)",
+   "claim_tokens": [],
+   "created_at": "2026-09-11T19:26:11.356901+00:00",
+   "translation_meta": {
+    "raw": {
+     "name_en": {
+      "source": "human"
+     }
+    },
+    "machine_translated_fields": []
+   },
+   "flags": [
+    "missing bio_ar",
+    "missing tagline_en",
+    "missing tagline_ar",
+    "profile not published (draft)",
+    "no avatar",
+    "no cover image",
+    "no social links",
+    "not verified",
+    "duplicate provider account with same name",
+    "no published listings"
+   ],
+   "organizations": [
+    {
+     "id": "5f19c006-ee12-44ac-afcf-73346ca16244",
+     "slug": "org-fayrouz-ashraf-amin-c49938",
+     "owner_id": "c4993886-59b6-4e4b-a038-2eae2e3dbc4b",
+     "name_en": "Reismailia",
+     "name_ar": "ريسماعيليه",
+     "description_en": "Founder of Reismailia initiative working on heritage preservation and raising awareness",
+     "description_ar": null,
+     "mission_en": null,
+     "mission_ar": null,
+     "org_type": null,
+     "region_id": "suez-canal",
+     "city_id": "ismailia",
+     "location_en": "Ismailia",
+     "location_ar": "الإسماعيلية",
+     "logo": null,
+     "image": null,
+     "website": null,
+     "volunteers_count": 0,
+     "donations_total": 0,
+     "programs": [],
+     "status": "published",
+     "created_at": "2026-09-11T19:26:12.674562+00:00",
+     "updated_at": "2026-09-24T11:46:04.974793+00:00",
+     "focus_areas_en": [
+      "Education",
+      "Heritage Preservation",
+      "Community Development",
+      "Volunteers",
+      "Expert Consulting"
+     ],
+     "focus_areas_ar": [],
+     "translation_meta": {
+      "raw": {},
+      "machine_translated_fields": []
+     },
+     "flags": [
+      "missing description_ar",
+      "missing mission_en",
+      "missing mission_ar",
+      "no logo",
+      "no cover image"
+     ]
+    }
+   ],
+   "listings": []
+  },
+  {
+   "kind": "provider",
+   "label": "Galleria (Hala El Abd)",
+   "id": "58bcbeef-c009-4f14-977a-47b19874ecb5",
+   "user_id": "79e89671-d317-4140-bec0-f76b3f2a3b81",
+   "role": "service-provider",
+   "roles": [],
+   "slug": "galleria-79e896",
+   "name_en": "Galleria",
+   "name_ar": "جالريا",
+   "status": "published",
+   "city_en": "Damietta",
+   "city_ar": "دمياط",
+   "region_en": null,
+   "avatar_present": false,
+   "cover_present": false,
+   "bio_en": "مساحة ثقافية تقدم ورش فنية فى دمياط الجديدة",
+   "bio_ar": null,
+   "tagline_en": null,
+   "tagline_ar": null,
+   "specialties": [
+    "workshops"
+   ],
+   "languages": null,
+   "email_domain": "gmail.com",
+   "email_looks_mistyped": false,
+   "phone_present": false,
+   "whatsapp_present": true,
+   "website": null,
+   "social_links_present": false,
+   "verified": false,
+   "onboarding": "self-signup account (user_id set)",
+   "claim_tokens": [],
+   "created_at": "2026-09-30T16:32:08.969929+00:00",
+   "translation_meta": {
+    "raw": {
+     "name_en": {
+      "source": "human"
+     }
+    },
+    "machine_translated_fields": []
+   },
+   "flags": [
+    "bio_en written in Arabic",
+    "missing bio_ar",
+    "missing tagline_en",
+    "missing tagline_ar",
+    "no avatar",
+    "no cover image",
+    "no social links",
+    "not verified"
+   ],
+   "organizations": [],
+   "listings": [
+    {
+     "type": "experience",
+     "id": "80d7087a-1642-48a3-a8aa-9e8c763db300",
+     "slug": null,
+     "url": "https://sandal.lovable.app/experience/80d7087a-1642-48a3-a8aa-9e8c763db300",
+     "title_en": "Game callers",
+     "title_ar": "لعبة ألوان",
+     "description_en": "Add Color to the Details of Your Day…\nMarker & Ink Drawing Workshop\n\nDrawing is not just a talent; it is your own personal space to relax, unwind, and enjoy.\n\nWe invite you to experience a unique artistic journey where we step away from the noise of everyday life and learn together the art of drawing with markers and ink.\n\nNo previous experience is required!\n\nWe will guide you step by step:\n\n1. Tracing & Pencil Sketching:\n    We will prepare the drawing together using a clean and precise approach.\n2. Bringing the Drawing to Life:\n    Learn how to create depth, contrast, and dimension using smooth lines and a balanced distribution of light and shadow.\n3. Elegant Black Ink:\n    Explore the beauty of refined black-ink techniques and how they can enhance your artwork.",
+     "description_ar": "لون تفاصيل يومك.. ورشة الرسم بألوان الماركر والتحبير الرسم ليس مجرد موهبة، بل هو مساحتك الخاصة للهدوء والاستمتاع.\nندعوك لتجربة فنية فريدة، نبتعد فيها عن صخب الحياة اليومية لنتعلم معاً فن الرسم بالماركر والتحبير لا تحتاج إلى خبرة سابقة!\nسنبدأ معك خطوة بخطوة:\n١. الطباعة والرصاص: نجهز الرسمة معاً بأسلوب نظيف\n. التحين تضل الحياة والتباين لى السمار باستخيام خطوط بسلاسة وتوزيع الظل والنور\nحبر الأسود الراقية.",
+     "theme": "culture",
+     "theme_other": null,
+     "price": 300,
+     "currency": "EGP",
+     "price_basis": "per person (experiences are priced per guest)",
+     "duration_minutes": 180,
+     "capacity_min": 5,
+     "capacity_max": 10,
+     "meeting_point_name": "بجوار مطعم ابو صالح على البحر ",
+     "meeting_point_coords_set": true,
+     "city_id": "damietta",
+     "region_id": "nile-delta",
+     "itinerary_en": [],
+     "itinerary_ar": [],
+     "important_notes_en": null,
+     "important_notes_ar": null,
+     "included": null,
+     "not_included": null,
+     "cancellation_policy": null,
+     "languages": null,
+     "image_count": 5,
+     "main_image_providers_own": true,
+     "main_image": "https://meacccbwpzrrcoanlojw.supabase.co/storage/v1/object/public/listing-images/79e89671-d317-4140-bec0-f76b3f2a3b81/1790786591949-4kxzngje5gh.jpeg",
+     "future_slots": {
+      "n": 32,
+      "a": "2026-11-06",
+      "b": "2027-05-28",
+      "mins": 10,
+      "maxs": 10
+     },
+     "translation_meta": {
+      "raw": {},
+      "machine_translated_fields": []
+     },
+     "flags": [
+      "missing remarks_en",
+      "missing remarks_ar",
+      "no itinerary EN",
+      "no itinerary AR",
+      "no included/not-included fields in schema (not captured)",
+      "no cancellation policy field for experiences",
+      "no languages field for experiences"
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "provider",
+   "label": "Nefertiti Papyrus (Alaa Nabil)",
+   "id": "407522a3-0440-43e5-b135-5744d373314e",
+   "user_id": "ea6b8154-8ded-4709-a08e-13b022c78e02",
+   "role": "product-seller",
+   "roles": [],
+   "slug": "nefertiti-payprus-ea6b81",
+   "name_en": "Nefertiti Payprus",
+   "name_ar": "برديات نفيرتيتي",
+   "status": "published",
+   "city_en": "Bilbeis",
+   "city_ar": "بلبيس",
+   "region_en": "Nile Delta",
+   "avatar_present": true,
+   "cover_present": false,
+   "bio_en": "- ورشة تصنيع و طباعة ورق البردي - قرية القراموص - محافظة الشرقية",
+   "bio_ar": null,
+   "tagline_en": null,
+   "tagline_ar": null,
+   "specialties": [
+    "woodwork"
+   ],
+   "languages": null,
+   "email_domain": "gmail.com",
+   "email_looks_mistyped": false,
+   "phone_present": false,
+   "whatsapp_present": false,
+   "website": null,
+   "social_links_present": false,
+   "verified": false,
+   "onboarding": "self-signup account (user_id set)",
+   "claim_tokens": [],
+   "created_at": "2026-10-05T10:53:57.574562+00:00",
+   "translation_meta": {
+    "raw": {
+     "name_en": {
+      "source": "human"
+     }
+    },
+    "machine_translated_fields": []
+   },
+   "flags": [
+    "bio_en written in Arabic",
+    "missing bio_ar",
+    "missing tagline_en",
+    "missing tagline_ar",
+    "no cover image",
+    "no phone/WhatsApp",
+    "no social links",
+    "not verified",
+    "typo in name: 'Payprus'"
+   ],
+   "organizations": [],
+   "listings": [
+    {
+     "type": "product",
+     "id": "eea1d07d-a765-4355-ae39-13218b30740d",
+     "slug": "pharaonic-papyrus-art-ea6b81",
+     "title_en": "Pharaonic Papyrus Art",
+     "title_ar": "برديات فرعونية",
+     "description_en": "Papyrus sheets made from the papyrus plants grown in the village of Al-Qaramous, printed with Pharaonic motifs inspired by ancient temples and rituals.",
+     "description_ar": "برديات مصنوعة من نبات البردي الذي ينمو فى قرية القرامواص و مطبوع عليه نقوش فرعونية مستوحاة من المعابد و الطقوس",
+     "origin_story_en": "The people of Al-Qaramous village work together in farming and producing papyrus paper, decorating and printing it. This village is the most important site for growing the ancient papyrus plant in Egypt.",
+     "origin_story_ar": "يشترك أهل قرية القراموص فى زراعة و انتاج اوراق البردي و تزينه و طباعته و تمثل هذه القرية اهم مكان لزراعة نبات البردي الاثري فى مصر",
+     "category": "Art & Paintings",
+     "price": 300,
+     "currency": "EGP",
+     "price_basis": "per item",
+     "stock": 50,
+     "made_to_order": false,
+     "lead_time_days": null,
+     "materials_en": "Papyrus",
+     "materials_ar": "البردي",
+     "dimensions": "20 * 40 cm",
+     "weight_grams": 100,
+     "variants": [],
+     "delivery_options": [
+      {
+       "cost": 50,
+       "notes_ar": "يرجى المتابعة مع شركة الشحن",
+       "notes_en": null,
+       "method_ar": "شحن داخل مصر",
+       "method_en": "Shipping within Egypt"
+      },
+      {
+       "cost": null,
+       "notes_ar": "الرجاء كتاب العنوان بشكل دقيق",
+       "notes_en": null,
+       "method_ar": "البريد المصري",
+       "method_en": null
+      }
+     ],
+     "care_en": "Keep away from direct sunlight and humidity.",
+     "care_ar": "يحفظ بعيد عن الشمس و الرطوبة",
+     "city_id": "bilbeis",
+     "coords_set": false,
+     "image_count": 4,
+     "main_image_providers_own": true,
+     "translation_meta": {
+      "raw": {
+       "care_en": {
+        "at": "2026-10-05T10:57:38.925Z",
+        "from": "ar",
+        "source": "machine"
+       },
+       "name_en": {
+        "at": "2026-10-05T10:54:25.103Z",
+        "from": "ar",
+        "source": "machine"
+       },
+       "materials_en": {
+        "at": "2026-10-05T10:57:00.252Z",
+        "from": "ar",
+        "source": "machine"
+       },
+       "description_en": {
+        "at": "2026-10-05T10:55:24.287Z",
+        "from": "ar",
+        "source": "machine"
+       },
+       "origin_story_en": {
+        "at": "2026-10-05T10:56:52.773Z",
+        "from": "ar",
+        "source": "machine"
+       },
+       "seller_village_en": {
+        "at": "2026-10-05T10:55:57.884Z",
+        "from": "ar",
+        "source": "machine"
+       }
+      },
+      "machine_translated_fields": [
+       "care_en",
+       "name_en",
+       "materials_en",
+       "description_en",
+       "origin_story_en",
+       "seller_village_en"
+      ]
+     },
+     "flags": [
+      "machine-translated: care_en, name_en, materials_en, description_en, origin_story_en, seller_village_en"
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "provider",
+   "label": "Hive to Gulf / Ahmed Eleryan",
+   "id": "09009130-548c-4655-a15f-adcfab961d59",
+   "user_id": "48fe2787-8e7b-4697-8ae2-94d0cee78596",
+   "role": "service-provider",
+   "roles": [],
+   "slug": "ahmed-eleryan-48fe27",
+   "name_en": "Ahmed Eleryan",
+   "name_ar": "احمد العريان",
+   "status": "published",
+   "city_en": "Tanta",
+   "city_ar": "طنطا",
+   "region_en": null,
+   "avatar_present": false,
+   "cover_present": false,
+   "bio_en": "Ahmed Eleryan, an Egyptian documentary photographer.",
+   "bio_ar": null,
+   "tagline_en": null,
+   "tagline_ar": null,
+   "specialties": [
+    "cultural-events",
+    "guided-tours"
+   ],
+   "languages": null,
+   "email_domain": "gmail.com",
+   "email_looks_mistyped": false,
+   "phone_present": false,
+   "whatsapp_present": true,
+   "website": null,
+   "social_links_present": false,
+   "verified": false,
+   "onboarding": "self-signup account (user_id set)",
+   "claim_tokens": [],
+   "created_at": "2026-09-04T15:14:04.632182+00:00",
+   "translation_meta": {
+    "raw": {
+     "name_en": {
+      "source": "human"
+     }
+    },
+    "machine_translated_fields": []
+   },
+   "flags": [
+    "missing bio_ar",
+    "missing tagline_en",
+    "missing tagline_ar",
+    "no avatar",
+    "no cover image",
+    "no social links",
+    "not verified"
+   ],
+   "organizations": [],
+   "listings": [
+    {
+     "type": "experience",
+     "id": "665d3a9e-ce1d-450e-b487-a0a23a8d0092",
+     "slug": null,
+     "url": "https://sandal.lovable.app/experience/665d3a9e-ce1d-450e-b487-a0a23a8d0092",
+     "title_en": "A trip to apiaries",
+     "title_ar": "رحله الى المناحل",
+     "description_en": "A Trip to the Apiaries of Hessa Shabsheer\n\nIn the heart of the Egyptian countryside lies the village of Hessa Shabsheer, a village known for beekeeping and its trade",
+     "description_ar": "في قلب الريف المصري، تقع قرية حصة شبشير، قرية اشتهرت بتربية النحل وتجارته، لا كمصدر للعسل فقط، بل كتجارة قائمة بذاتها لتصدير طرود النحل نفسها إلى دول الخليج.\n\nعلى مدى عقود، شكّلت هذه التجارة نبض الحياة الاقتصادية في القرية، ورفعت مستوى معيشة أهلها في فترات ازدهارها. النحالون هنا يورثون المهنة جيلاً بعد جيل، ويعرفون كل تفصيلة في حياة النحلة، من تربيتها وتغذيتها إلى تجهيزها للسفر في طرود محكمة تعبر الحدود.\n\nالرحلة إلى حصة شبشير فرصة للاقتراب من هذا العالم عن قرب: مشاهدة الخلايا وسط الحقول، التعرف على مراحل تجهيز الطرود، والاستماع إلى حكايات النحالين أنفسهم عن مهنة تحمل في طياتها الشغف والمشقة معاً، خاصة في ظل التحديات الأخيرة المرتبطة بارتفاع أسعار السكر الذي يُستخدم في تغذية النحل.\n\nهي قرية صغيرة، لكنها مثال حي على كيف يمكن لحرفة تقليدية أن تربط ريفاً مصرياً بأسواق خارج حدوده.",
+     "theme": "nature",
+     "theme_other": null,
+     "price": 2500,
+     "currency": "EGP",
+     "price_basis": "per person (experiences are priced per guest)",
+     "duration_minutes": 240,
+     "capacity_min": 1,
+     "capacity_max": 10,
+     "meeting_point_name": "امام مسجد الاحمدي بطنطا",
+     "meeting_point_coords_set": true,
+     "city_id": "tanta",
+     "region_id": "nile-delta",
+     "itinerary_en": [],
+     "itinerary_ar": [],
+     "important_notes_en": null,
+     "important_notes_ar": null,
+     "included": null,
+     "not_included": null,
+     "cancellation_policy": null,
+     "languages": null,
+     "image_count": 1,
+     "main_image_providers_own": true,
+     "main_image": "https://meacccbwpzrrcoanlojw.supabase.co/storage/v1/object/public/listing-images/48fe2787-admin/apiaries-cover.jpg",
+     "future_slots": {
+      "n": 21,
+      "a": "2026-11-07",
+      "b": "2027-05-29",
+      "mins": 10,
+      "maxs": 10
+     },
+     "translation_meta": {
+      "raw": {},
+      "machine_translated_fields": []
+     },
+     "flags": [
+      "missing remarks_en",
+      "missing remarks_ar",
+      "no itinerary EN",
+      "no itinerary AR",
+      "no included/not-included fields in schema (not captured)",
+      "no cancellation policy field for experiences",
+      "no languages field for experiences"
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "provider",
+   "label": "Aya El Shehaby",
+   "id": "e8cfaf83-0edf-4400-9e2c-fdbfa120b133",
+   "user_id": "115dfdb3-a1cc-4234-955b-252a4c3584a1",
+   "role": "trip-organizer",
+   "roles": [],
+   "slug": "aya-115dfd",
+   "name_en": "Aya",
+   "name_ar": "آية الشهابي",
+   "status": "draft",
+   "city_en": "Damietta",
+   "city_ar": "دمياط",
+   "region_en": null,
+   "avatar_present": false,
+   "cover_present": false,
+   "bio_en": null,
+   "bio_ar": null,
+   "tagline_en": null,
+   "tagline_ar": null,
+   "specialties": [
+    "photography-tours"
+   ],
+   "languages": null,
+   "email_domain": "gmail.com",
+   "email_looks_mistyped": false,
+   "phone_present": false,
+   "whatsapp_present": false,
+   "website": null,
+   "social_links_present": false,
+   "verified": false,
+   "onboarding": "self-signup account (user_id set)",
+   "claim_tokens": [],
+   "created_at": "2026-09-24T20:51:32.171341+00:00",
+   "translation_meta": {
+    "raw": {
+     "name_en": {
+      "source": "human"
+     }
+    },
+    "machine_translated_fields": []
+   },
+   "flags": [
+    "name looks like placeholder/too short: 'Aya'",
+    "missing bio_en",
+    "missing bio_ar",
+    "missing tagline_en",
+    "missing tagline_ar",
+    "profile not published (draft)",
+    "no avatar",
+    "no cover image",
+    "no phone/WhatsApp",
+    "no social links",
+    "not verified"
+   ],
+   "organizations": [],
+   "listings": [
+    {
+     "type": "experience",
+     "id": "d2fb3487-daa5-4c79-930d-1f5ea54e47c8",
+     "slug": "ras-el-bar-huts-photo-walk-115dfd",
+     "url": "https://sandal.lovable.app/experience/ras-el-bar-huts-photo-walk-115dfd",
+     "title_en": "جولة تصوير بين عشش راس البر",
+     "title_ar": "جولة تصوير بين عشش رأس البر",
+     "description_en": "هنلف مابين عشش راس البر ونتفرج عالمعمار على مدار السنين اللي فاتت",
+     "description_ar": "هنلف ما بين عشش راس البر ونتفرج على المعمار وتطوره على مدار السنين اللي فاتت.",
+     "theme": null,
+     "theme_other": null,
+     "price": 200,
+     "currency": "EGP",
+     "price_basis": "per person (experiences are priced per guest)",
+     "duration_minutes": 150,
+     "capacity_min": 1,
+     "capacity_max": 15,
+     "meeting_point_name": "Damietta → Damietta",
+     "meeting_point_coords_set": false,
+     "city_id": "damietta",
+     "region_id": "nile-delta",
+     "itinerary_en": [
+      {
+       "day": 1,
+       "title": "جولة بين عشش راس البر",
+       "description": ""
+      }
+     ],
+     "itinerary_ar": [],
+     "important_notes_en": null,
+     "important_notes_ar": null,
+     "included": null,
+     "not_included": null,
+     "cancellation_policy": null,
+     "languages": null,
+     "image_count": 1,
+     "main_image_providers_own": true,
+     "main_image": "https://meacccbwpzrrcoanlojw.supabase.co/storage/v1/object/public/listing-images/115dfdb3-admin/ras-el-bar-cover.jpg",
+     "future_slots": {
+      "n": 7,
+      "a": "2026-11-14",
+      "b": "2027-05-15",
+      "mins": 15,
+      "maxs": 15
+     },
+     "translation_meta": {
+      "raw": {
+       "title_ar": {
+        "at": "2026-09-24T20:52:20.839Z",
+        "from": "en",
+        "source": "machine"
+       },
+       "description_ar": {
+        "at": "2026-09-24T20:52:58.009Z",
+        "from": "en",
+        "source": "machine"
+       }
+      },
+      "machine_translated_fields": [
+       "title_ar",
+       "description_ar"
+      ]
+     },
+     "flags": [
+      "title_en written in Arabic",
+      "description_en written in Arabic",
+      "missing remarks_en",
+      "missing remarks_ar",
+      "no category/theme",
+      "meeting point coordinates missing",
+      "no itinerary AR",
+      "no included/not-included fields in schema (not captured)",
+      "no cancellation policy field for experiences",
+      "no languages field for experiences",
+      "machine-translated: title_ar, description_ar"
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "provider",
+   "label": "Damma w Haz (Ahmed Nour)",
+   "id": "70a8555f-cd20-457e-8d54-bbe9c400c711",
+   "user_id": "84205a07-0074-4fd6-af2b-dfa01ee817e8",
+   "role": "service-provider",
+   "roles": [],
+   "slug": "damma-w-hazz-84205a",
+   "name_en": "Damma W Hazz",
+   "name_ar": "فرقة ضمة وحظ",
+   "status": "published",
+   "city_en": "Ismailia",
+   "city_ar": "الإسماعيلية",
+   "region_en": null,
+   "avatar_present": true,
+   "cover_present": false,
+   "bio_en": "فرقة سمسمية من قلب الاسماعيلية",
+   "bio_ar": null,
+   "tagline_en": null,
+   "tagline_ar": null,
+   "specialties": [
+    "cultural-events"
+   ],
+   "languages": null,
+   "email_domain": "gmai.com",
+   "email_looks_mistyped": true,
+   "phone_present": false,
+   "whatsapp_present": false,
+   "website": null,
+   "social_links_present": false,
+   "verified": false,
+   "onboarding": "self-signup account (user_id set)",
+   "claim_tokens": [],
+   "created_at": "2026-10-05T09:04:41.306128+00:00",
+   "translation_meta": {
+    "raw": {
+     "name_en": {
+      "source": "human"
+     }
+    },
+    "machine_translated_fields": []
+   },
+   "flags": [
+    "bio_en written in Arabic",
+    "missing bio_ar",
+    "missing tagline_en",
+    "missing tagline_ar",
+    "no cover image",
+    "email domain mistyped (gmai.com) — Sandal emails won't arrive",
+    "no phone/WhatsApp",
+    "no social links",
+    "not verified"
+   ],
+   "organizations": [],
+   "listings": [
+    {
+     "type": "experience",
+     "id": "74ac3200-fcb9-454a-a7e8-fa7f8f2fc0ec",
+     "slug": null,
+     "url": "https://sandal.lovable.app/experience/74ac3200-fcb9-454a-a7e8-fa7f8f2fc0ec",
+     "title_en": "Semsemia concert for Hertiage songs from Suez Canal on a boat in Timsah Lake",
+     "title_ar": "حفلة سمسمية للاغانى التراثية من قناة السويس  فى مركب فى بحيرة التمساح",
+     "description_en": "ساعة من الاغانى التراثية الخاصة بمنطقة القناة عن لحظات تاريخية مثل المقاومة الشعبية و التهجير و الحياة اليومية تقدمها فرقة ضمة و حظ من خلال رحلة بحرية فى بحيرة التمساح و مشاهدة اهم معالم الاسماعيلية من زواية القناة",
+     "description_ar": "ساعة من الاغانى التراثية الخاصة بمنطقة القناة عن لحظات تاريخية مثل المقاومة الشعبية و التهجير و الحياة اليومية تقدمها فرقة ضمة و حظ من خلال رحلة بحرية فى بحيرة التمساح و مشاهدة اهم معالم الاسماعيلية من زواية القناة",
+     "theme": "other",
+     "theme_other": "موسيقي",
+     "price": 400,
+     "currency": "EGP",
+     "price_basis": "per person (experiences are priced per guest)",
+     "duration_minutes": 60,
+     "capacity_min": 8,
+     "capacity_max": 14,
+     "meeting_point_name": null,
+     "meeting_point_coords_set": true,
+     "city_id": "ismailia",
+     "region_id": "suez-canal",
+     "itinerary_en": [],
+     "itinerary_ar": [],
+     "important_notes_en": null,
+     "important_notes_ar": null,
+     "included": null,
+     "not_included": null,
+     "cancellation_policy": null,
+     "languages": null,
+     "image_count": 2,
+     "main_image_providers_own": true,
+     "main_image": "https://meacccbwpzrrcoanlojw.supabase.co/storage/v1/object/public/listing-images/84205a07-0074-4fd6-af2b-dfa01ee817e8/1791191336476-42oh6h8j321.jpg",
+     "future_slots": {
+      "n": 68,
+      "a": "2026-10-09",
+      "b": "2027-05-29",
+      "mins": 14,
+      "maxs": 14
+     },
+     "translation_meta": {
+      "raw": {},
+      "machine_translated_fields": []
+     },
+     "flags": [
+      "description_en written in Arabic",
+      "description EN and AR identical",
+      "missing remarks_en",
+      "missing remarks_ar",
+      "no meeting point name",
+      "no itinerary EN",
+      "no itinerary AR",
+      "no included/not-included fields in schema (not captured)",
+      "no cancellation policy field for experiences",
+      "no languages field for experiences"
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "provider",
+   "label": "StaBene/Astabina (Mohamed Mossad)",
+   "id": "d8cca838-558b-451a-a2d6-f2c3d183f7de",
+   "user_id": "439a4650-74d6-4d6d-b019-43d835cfd1ec",
+   "role": "trip-organizer",
+   "roles": [],
+   "slug": "stabene-439a46",
+   "name_en": "StaBene",
+   "name_ar": "استبينا",
+   "status": "published",
+   "city_en": "Port Said",
+   "city_ar": "بورسعيد",
+   "region_en": "Suez Canal",
+   "avatar_present": true,
+   "cover_present": false,
+   "bio_en": "Become the warmest Port Said meeting point and community space for building and fostering authentic activities and initiatives",
+   "bio_ar": null,
+   "tagline_en": null,
+   "tagline_ar": null,
+   "specialties": [
+    "multi-day",
+    "day-trips",
+    "cultural-tours",
+    "photography-tours",
+    "food-tours"
+   ],
+   "languages": null,
+   "email_domain": "gmail.com",
+   "email_looks_mistyped": false,
+   "phone_present": false,
+   "whatsapp_present": true,
+   "website": null,
+   "social_links_present": false,
+   "verified": false,
+   "onboarding": "self-signup account (user_id set)",
+   "claim_tokens": [],
+   "created_at": "2026-09-06T15:10:44.625579+00:00",
+   "translation_meta": {
+    "raw": {
+     "name_en": {
+      "source": "human"
+     }
+    },
+    "machine_translated_fields": []
+   },
+   "flags": [
+    "missing bio_ar",
+    "missing tagline_en",
+    "missing tagline_ar",
+    "no cover image",
+    "no social links",
+    "not verified"
+   ],
+   "organizations": [],
+   "listings": [
+    {
+     "type": "experience",
+     "id": "a1ef70a7-f4b1-4531-a606-035848a32eb2",
+     "slug": "astabina-bike-tours-exp-439a46",
+     "url": "https://sandal.lovable.app/experience/astabina-bike-tours-exp-439a46",
+     "title_en": "Astabina Bike Tours",
+     "title_ar": "جولات عجل استبينا",
+     "description_en": "A new weekend and a new bike tour 🚴‍♂️✨\nWe meet Friday at 5 PM at Astebina",
+     "description_ar": "ويك إند جديد وجولة عجل جديدة 🚴‍♂️✨\nميعادنا الجمعة الساعة ٥ مساءً من عند استبينا",
+     "theme": null,
+     "theme_other": null,
+     "price": 70,
+     "currency": "EGP",
+     "price_basis": "per person (experiences are priced per guest)",
+     "duration_minutes": 120,
+     "capacity_min": 1,
+     "capacity_max": null,
+     "meeting_point_name": "بورسعيد",
+     "meeting_point_coords_set": true,
+     "city_id": "port-said",
+     "region_id": "suez-canal",
+     "itinerary_en": [],
+     "itinerary_ar": [],
+     "important_notes_en": null,
+     "important_notes_ar": null,
+     "included": null,
+     "not_included": null,
+     "cancellation_policy": null,
+     "languages": null,
+     "image_count": 1,
+     "main_image_providers_own": true,
+     "main_image": "https://meacccbwpzrrcoanlojw.supabase.co/storage/v1/object/public/listing-images/439a4650-admin/astabina-bike-tours-cover.jpg",
+     "future_slots": {
+      "n": 31,
+      "a": "2026-11-06",
+      "b": "2027-05-28",
+      "mins": 15,
+      "maxs": 15
+     },
+     "translation_meta": {
+      "raw": {
+       "description_en": {
+        "at": "2026-09-26T00:23:23.742Z",
+        "from": "ar",
+        "source": "machine"
+       }
+      },
+      "machine_translated_fields": [
+       "description_en"
+      ]
+     },
+     "flags": [
+      "missing remarks_en",
+      "missing remarks_ar",
+      "no category/theme",
+      "no max capacity",
+      "no itinerary EN",
+      "no itinerary AR",
+      "no included/not-included fields in schema (not captured)",
+      "no cancellation policy field for experiences",
+      "no languages field for experiences",
+      "machine-translated: description_en"
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "provider",
+   "label": "Reismailia (Fayrouz Ashraf) - account 2",
+   "id": "8ebe6cc4-dcfb-4e40-90cd-5c80c96d0acd",
+   "user_id": "0c4e8db3-ebd8-41ea-a081-3fe38f6d19f6",
+   "role": "service-provider",
+   "roles": [],
+   "slug": "reismailia-0c4e8d",
+   "name_en": "Reismailia",
+   "name_ar": "ريسماعيليه",
+   "status": "published",
+   "city_en": "Ismailia",
+   "city_ar": "الإسماعيلية",
+   "region_en": null,
+   "avatar_present": true,
+   "cover_present": false,
+   "bio_en": "REACT – Revitalizing Environments through Adaptive City Transformation is a social-impact startup working at the intersection of urban development, heritage, research, innovation, and community empowerment. It develops research-based and practical solutions for sustainable urban transformation while creating opportunities for collaboration between professionals, researchers, students, institutions, and local communities.\n\nReismailia is REACT’s flagship community initiative, focusing on the revitalization of Ismailia through heritage awareness, documentation, research, education, community engagement, and cultural activities. As the social/community arm, Reismailia organizes workshops, lectures, heritage walks, surveys, awareness campaigns, and research activities that connect people with the city’s tangible and intangible heritage.\n\nTogether, REACT provides the entrepreneurial and professional platform, while Reismailia drives the community and social impact, turning research and ideas into initiatives that contribute to Ismailia’s identity, heritage, and future development.",
+   "bio_ar": null,
+   "tagline_en": null,
+   "tagline_ar": null,
+   "specialties": [
+    "guided-tours",
+    "cultural-events",
+    "nature-exp"
+   ],
+   "languages": null,
+   "email_domain": "gmail.com",
+   "email_looks_mistyped": false,
+   "phone_present": false,
+   "whatsapp_present": false,
+   "website": null,
+   "social_links_present": false,
+   "verified": false,
+   "onboarding": "self-signup account (user_id set)",
+   "claim_tokens": [],
+   "created_at": "2026-09-24T11:24:51.535033+00:00",
+   "translation_meta": {
+    "raw": {
+     "name_en": {
+      "source": "human"
+     }
+    },
+    "machine_translated_fields": []
+   },
+   "flags": [
+    "missing bio_ar",
+    "missing tagline_en",
+    "missing tagline_ar",
+    "no cover image",
+    "no phone/WhatsApp",
+    "no social links",
+    "not verified",
+    "duplicate provider account with same name"
+   ],
+   "organizations": [],
+   "listings": [
+    {
+     "type": "experience",
+     "id": "90836480-126e-44a5-8b26-d5316ffcd9e9",
+     "slug": null,
+     "url": "https://sandal.lovable.app/experience/90836480-126e-44a5-8b26-d5316ffcd9e9",
+     "title_en": "Ismailia architectural and urban identity interactive tour",
+     "title_ar": "جوله تفاعلية للهوية المعمارية والعمرانية للاسماعيليه",
+     "description_en": "A guided journey through Ismailia’s history, architecture, and urban identity. The tour explores the city’s key historic buildings and landmarks, tracing its architectural and urban development and the relationship between the built environment and the people who shaped it. It also highlights the social impact of urban transformation and the influence of the Suez Canal and colonial period on the city’s architecture, planning, and cultural identity. Through stories, discussion, and observation, participants discover how Ismailia’s heritage continues to shape the city and its communities today.",
+     "description_ar": "جولة للتعرف على تاريخ الإسماعيلية وعمارتها وهويتها العمرانية من خلال زيارة أهم المباني والمعالم التاريخية بالمدينة. تتناول الجولة تطور العمارة والتخطيط العمراني، والعلاقة بين المباني وسكان المدينة، وتأثير التحولات العمرانية على المجتمع، إلى جانب تأثير قناة السويس والفترة الاستعمارية على شكل المدينة وعمارتها وهويتها الثقافية. ومن خلال الحكي والمناقشة والملاحظة، يتعرف المشاركون على كيفية استمرار تراث الإسماعيلية في تشكيل المدينة ومجتمعها حتى اليوم.",
+     "theme": "history",
+     "theme_other": null,
+     "price": 300,
+     "currency": "EGP",
+     "price_basis": "per person (experiences are priced per guest)",
+     "duration_minutes": 300,
+     "capacity_min": 7,
+     "capacity_max": 20,
+     "meeting_point_name": "شارع النخيل بمنطقه فيلات الهيئة",
+     "meeting_point_coords_set": true,
+     "city_id": "ismailia",
+     "region_id": "suez-canal",
+     "itinerary_en": [],
+     "itinerary_ar": [],
+     "important_notes_en": null,
+     "important_notes_ar": null,
+     "included": null,
+     "not_included": null,
+     "cancellation_policy": null,
+     "languages": null,
+     "image_count": 4,
+     "main_image_providers_own": true,
+     "main_image": "https://meacccbwpzrrcoanlojw.supabase.co/storage/v1/object/public/listing-images/0c4e8db3-ebd8-41ea-a081-3fe38f6d19f6/1790249717208-dsn2q2ryhfl.png",
+     "future_slots": {
+      "n": 12,
+      "a": "2026-11-14",
+      "b": "2027-05-22",
+      "mins": 20,
+      "maxs": 20
+     },
+     "translation_meta": {
+      "raw": {},
+      "machine_translated_fields": []
+     },
+     "flags": [
+      "missing remarks_en",
+      "missing remarks_ar",
+      "no itinerary EN",
+      "no itinerary AR",
+      "no included/not-included fields in schema (not captured)",
+      "no cancellation policy field for experiences",
+      "no languages field for experiences"
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "provider",
+   "label": "Altoratheya (Mohamed Ghaly)",
+   "id": "adb274ff-1679-4113-86dd-2adc839f2cc6",
+   "user_id": "9025ad7c-1f99-41b8-8f81-be9c9b7e03d9",
+   "role": "organization",
+   "roles": [],
+   "slug": "altoratheya-heritage-initiative-9025ad",
+   "name_en": "Altoratheya Heritage Initiative",
+   "name_ar": null,
+   "status": "draft",
+   "city_en": null,
+   "city_ar": null,
+   "region_en": null,
+   "avatar_present": false,
+   "cover_present": false,
+   "bio_en": null,
+   "bio_ar": null,
+   "tagline_en": null,
+   "tagline_ar": null,
+   "specialties": [],
+   "languages": null,
+   "email_domain": "gmail.com",
+   "email_looks_mistyped": false,
+   "phone_present": false,
+   "whatsapp_present": false,
+   "website": null,
+   "social_links_present": false,
+   "verified": false,
+   "onboarding": "self-signup account (user_id set)",
+   "claim_tokens": [],
+   "created_at": "2026-09-25T09:30:56.527266+00:00",
+   "translation_meta": {
+    "raw": {
+     "name_en": {
+      "source": "human"
+     }
+    },
+    "machine_translated_fields": []
+   },
+   "flags": [
+    "missing name_ar",
+    "missing bio_en",
+    "missing bio_ar",
+    "missing tagline_en",
+    "missing tagline_ar",
+    "profile not published (draft)",
+    "no avatar",
+    "no cover image",
+    "no city",
+    "no specialties",
+    "no phone/WhatsApp",
+    "no social links",
+    "not verified"
+   ],
+   "organizations": [
+    {
+     "id": "3c31a46b-5c39-4a35-823b-e6e79414adf6",
+     "slug": "org-altoratheya-heritage-initiative-9025ad",
+     "owner_id": "9025ad7c-1f99-41b8-8f81-be9c9b7e03d9",
+     "name_en": "Altoratheya Heritage Initiative",
+     "name_ar": null,
+     "description_en": null,
+     "description_ar": null,
+     "mission_en": null,
+     "mission_ar": null,
+     "org_type": null,
+     "region_id": null,
+     "city_id": null,
+     "location_en": null,
+     "location_ar": null,
+     "logo": null,
+     "image": null,
+     "website": null,
+     "volunteers_count": 0,
+     "donations_total": 0,
+     "programs": [],
+     "status": "published",
+     "created_at": "2026-09-25T09:30:56.629817+00:00",
+     "updated_at": "2026-09-25T09:30:56.629817+00:00",
+     "focus_areas_en": null,
+     "focus_areas_ar": null,
+     "translation_meta": {
+      "raw": {},
+      "machine_translated_fields": []
+     },
+     "flags": [
+      "missing name_ar",
+      "missing description_en",
+      "missing description_ar",
+      "missing mission_en",
+      "missing mission_ar",
+      "no logo",
+      "no cover image",
+      "no city"
+     ]
+    }
+   ],
+   "listings": [
+    {
+     "type": "program",
+     "id": "21027a33-ca1f-48c5-9dcc-d2e420333c58",
+     "slug": "simsimiyya-making-workshop-and-city-oral-history-9025ad",
+     "owner_id": "9025ad7c-1f99-41b8-8f81-be9c9b7e03d9",
+     "organization_id": null,
+     "title_en": "Simsimiyya making workshop and city oral history",
+     "title_ar": "ورشة تصنيع سمسمية و تاريخ شفهى عن تاريخ المدينة",
+     "description_en": "The El Torathia Foundation for Arts and Culture hosts, at the Simsimiyya Museum in Port Said, an event that blends craftsmanship and memory around the Simsimiyya instrument—the voice of the Canal cities and a core part of their identity.\n\nThe first part features a hands-on workshop where participants learn how to make a Simsimiyya step-by-step, from choosing the wood and tensioning the strings to tuning, led by one of the local craftsmen who inherited the trade.\n\nThe second part is an oral history session narrated by the city's sons and elders, sharing stories of Port Said and its milestones: the Canal era, displacement, the return, and the daily life and music that accompanied them. This narrative preserves history through the voices of those who lived it, not just those who wrote about it.\n\nThis event is an extension of the foundation’s work in safeguarding the musical heritage of the Canal cities. It is open to anyone interested in local memory and is suitable for both adults and children.",
+     "description_ar": "تستضيف مؤسسة التراثية للفنون والثقافة، عبر متحف السمسمية ببورسعيد، فعالية تجمع بين الصنعة والذاكرة، حول آلة السمسمية بوصفها صوت مدن القناة وجزءًا من هويتها.\n\nفي الجزء الأول، ورشة عملية يتعلّم فيها المشاركون كيفية صناعة السمسمية خطوة بخطوة، من اختيار الخشب وشدّ الأوتار إلى ضبط الدوزان، على يد أحد صنّاعها المحليين الذين توارثوا الحرفة.\n\nأما الجزء الثاني فجلسة تاريخ شفهي يرويها أبناء المدينة وكبار السن من أهلها، عن بورسعيد ومحطاتها: زمن القناة والتهجير والعودة، والحياة اليومية والموسيقى التي رافقتها. رواية تحفظ التاريخ بصوت من عاشوه، لا من كتب عنه.\n\nوتأتي الفعالية امتدادًا لعمل المؤسسة في صون التراث الموسيقي لمدن القناة، وهي مفتوحة لمن يهتم بالذاكرة المحلية، وتناسب الكبار والصغار على حدّ سواء.",
+     "program_type": "Cultural Preservation",
+     "location_en": "Computer Institute - Port Said",
+     "location_ar": "معهد الحاسب الالي - بورسعيد",
+     "start_date": "2026-01-11",
+     "end_date": "2027-01-01",
+     "volunteers_needed": 13,
+     "donation_target": 10000,
+     "goals": [
+      "نقل مهارة عملية: يخرج المشاركون وقد تعرّفوا على مراحل صناعة السمسمية بأيديهم",
+      "توثيق الذاكرة المحلية: تسجيل شهادات أبناء المدينة وكبار السن حول تاريخ بورسعيد،",
+      "ربط الصنعة بالهوية: ترسيخ وعي المشاركين بالسمسمية بوصفها رمزًا موسيقيًا وثقافيًا لمدن القناة"
+     ],
+     "image": "https://meacccbwpzrrcoanlojw.supabase.co/storage/v1/object/public/listing-images/9025ad7c-1f99-41b8-8f81-be9c9b7e03d9/1790935258905-3f1bfszlv8v.jpg",
+     "status": "published",
+     "created_at": "2026-10-02T10:01:03.954922+00:00",
+     "updated_at": "2026-10-02T10:01:03.954922+00:00",
+     "region_id": "suez-canal",
+     "city_id": "port-said",
+     "latitude": 31.2547229295835,
+     "longitude": 32.276937140491064,
+     "video_url": null,
+     "volunteer_applications": 0,
+     "translation_meta": {
+      "raw": {
+       "location_en": {
+        "at": "2026-10-02T09:59:56.146Z",
+        "from": "ar",
+        "source": "machine"
+       }
+      },
+      "machine_translated_fields": [
+       "location_en"
+      ]
+     },
+     "flags": [
+      "machine-translated: location_en"
+     ]
+    }
+   ]
+  },
+  {
+   "kind": "provider",
+   "label": "Ismailia Biography (Mohamed Hozyen)",
+   "id": "636fc1df-b439-461e-b0ec-ca46610380c7",
+   "user_id": "0f74e2d2-15f7-41fd-b3f8-d103fd0e6a0c",
+   "role": "service-provider",
+   "roles": [],
+   "slug": "ismailia-biography-0f74e2",
+   "name_en": "Ismailia Biography",
+   "name_ar": "سيرة الاسماعيلية",
+   "status": "published",
+   "city_en": "Ismailia",
+   "city_ar": "الإسماعيلية",
+   "region_en": null,
+   "avatar_present": true,
+   "cover_present": false,
+   "bio_en": "مبادرة تراثية  تعنى بتاريخ مدينة الاسماعلية و حاضرها",
+   "bio_ar": null,
+   "tagline_en": null,
+   "tagline_ar": null,
+   "specialties": [
+    "guided-tours"
+   ],
+   "languages": null,
+   "email_domain": "gamil.com",
+   "email_looks_mistyped": true,
+   "phone_present": false,
+   "whatsapp_present": false,
+   "website": null,
+   "social_links_present": false,
+   "verified": false,
+   "onboarding": "self-signup account (user_id set)",
+   "claim_tokens": [],
+   "created_at": "2026-10-05T09:23:37.340652+00:00",
+   "translation_meta": {
+    "raw": {
+     "name_en": {
+      "source": "human"
+     }
+    },
+    "machine_translated_fields": []
+   },
+   "flags": [
+    "bio_en written in Arabic",
+    "missing bio_ar",
+    "missing tagline_en",
+    "missing tagline_ar",
+    "no cover image",
+    "email domain mistyped (gamil.com) — Sandal emails won't arrive",
+    "no phone/WhatsApp",
+    "no social links",
+    "not verified"
+   ],
+   "organizations": [],
+   "listings": [
+    {
+     "type": "experience",
+     "id": "1a7b5720-7cf5-46b9-a5a6-571c0dea4720",
+     "slug": null,
+     "url": "https://sandal.lovable.app/experience/1a7b5720-7cf5-46b9-a5a6-571c0dea4720",
+     "title_en": "A historical walking tour in Ismailia",
+     "title_ar": "جولة تاريخية فى مدينة الاسماعيلية",
+     "description_en": "جولة مشي فى مدينة الاسماعيلية و استعراض تاريخها منذ التاسيس و افتتاح القناة و حتى حرب اكتوبر مرورا علي المحطات التاريخية الفارقة مثل حرب التحرير و المقاومة الشعبية و تأميم قناة السويس و غيرها من الحظات الموثقة فى جغرافيا المدينة و علامتها و ذاكرة شعبها",
+     "description_ar": "جولة مشي فى مدينة الاسماعيلية و استعراض تاريخها منذ التاسيس و افتتاح القناة و حتى حرب اكتوبر مرورا علي المحطات التاريخية الفارقة مثل حرب التحرير و المقاومة الشعبية و تأميم قناة السويس و غيرها من الحظات الموثقة فى جغرافيا المدينة و علامتها و ذاكرة شعبها",
+     "theme": "history",
+     "theme_other": null,
+     "price": 250,
+     "currency": "EGP",
+     "price_basis": "per person (experiences are priced per guest)",
+     "duration_minutes": 180,
+     "capacity_min": 6,
+     "capacity_max": 15,
+     "meeting_point_name": null,
+     "meeting_point_coords_set": true,
+     "city_id": "ismailia",
+     "region_id": "suez-canal",
+     "itinerary_en": [],
+     "itinerary_ar": [
+      {
+       "step": "مبنى شركة قناة السويس - المتحف العالمى حاليا",
+       "description": "- لحظة التاسيس و حفر الفناة و افتتاحها و نشأة المدينة"
+      },
+      {
+       "step": "نادى الجولف بجوار فلل الهيئة",
+       "description": "المجتمع الفرنسي و تاريخه و دوره فى المدينة منذ النشأة و حتى التاميم"
+      },
+      {
+       "step": "وسط المدينة",
+       "description": "المجتمعات الاجنبية المختلفة و تاريخها و اثارها المتبقية"
+      },
+      {
+       "step": "المسجد العباسي",
+       "description": "حى العرب و سكانه و نشأته علي اطراف المدينة و علاقته بالاحياء الاخري"
+      },
+      {
+       "step": "تمثال الصمود فى شارع محمد علي",
+       "description": "حرب الاستنزاف و فترة التهجير و المقاومة"
+      },
+      {
+       "step": "المعدية نمرة 7 و تمثال الشهيد عبد المنعم رياض",
+       "description": "حرب اكتوبر و العبور و اعادة افتتاح القناة"
+      }
+     ],
+     "important_notes_en": null,
+     "important_notes_ar": null,
+     "included": null,
+     "not_included": null,
+     "cancellation_policy": null,
+     "languages": null,
+     "image_count": 3,
+     "main_image_providers_own": true,
+     "main_image": "https://meacccbwpzrrcoanlojw.supabase.co/storage/v1/object/public/listing-images/0f74e2d2-15f7-41fd-b3f8-d103fd0e6a0c/1791192408110-h6vj6l4us8c.jpg",
+     "future_slots": {
+      "n": 68,
+      "a": "2026-10-10",
+      "b": "2027-05-30",
+      "mins": 15,
+      "maxs": 15
+     },
+     "translation_meta": {
+      "raw": {},
+      "machine_translated_fields": []
+     },
+     "flags": [
+      "description_en written in Arabic",
+      "description EN and AR identical",
+      "missing remarks_en",
+      "missing remarks_ar",
+      "no meeting point name",
+      "no itinerary EN",
+      "no included/not-included fields in schema (not captured)",
+      "no cancellation policy field for experiences",
+      "no languages field for experiences"
+     ]
+    }
+   ]
+  }
+ ]
+}
