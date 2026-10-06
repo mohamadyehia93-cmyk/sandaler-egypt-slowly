@@ -1,1 +1,2 @@
 - Any provider may manage listings they own regardless of primary role: owned-experience dashboard routes are gated as "any-provider" (DashboardGate) and non-service-provider dashboards render OwnedExperiencesPanel; ownership is enforced by RLS. Why: providers may own listings outside their role's default type.
+- Experience cancellation policy: the detail page shows the listing's own text, else a display-level platform default (never written into rows). Why: every listing needs a policy without fabricating per-row data.

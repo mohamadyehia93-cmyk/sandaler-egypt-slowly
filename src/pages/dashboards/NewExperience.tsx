@@ -100,6 +100,13 @@ const NewExperience = () => {
           regionId: data.region_id ?? "",
           remarks_en: (data as any).remarks_en ?? "",
           remarks_ar: (data as any).remarks_ar ?? "",
+          included_en: data.included_en ?? "",
+          included_ar: data.included_ar ?? "",
+          not_included_en: data.not_included_en ?? "",
+          not_included_ar: data.not_included_ar ?? "",
+          cancellation_policy_en: data.cancellation_policy_en ?? "",
+          cancellation_policy_ar: data.cancellation_policy_ar ?? "",
+          languages: (data.languages ?? []).join(", "),
           meetingPointName: data.meeting_point_name ?? "",
           meetingPointLat: data.meeting_point_lat != null ? String(data.meeting_point_lat) : "",
           meetingPointLng: data.meeting_point_lng != null ? String(data.meeting_point_lng) : "",
@@ -238,6 +245,13 @@ const NewExperience = () => {
         region_id: form.regionId || null,
         remarks_en: form.remarks_en.trim() || null,
         remarks_ar: form.remarks_ar.trim() || null,
+        included_en: (form.included_en ?? "").trim() || null,
+        included_ar: (form.included_ar ?? "").trim() || null,
+        not_included_en: (form.not_included_en ?? "").trim() || null,
+        not_included_ar: (form.not_included_ar ?? "").trim() || null,
+        cancellation_policy_en: (form.cancellation_policy_en ?? "").trim() || null,
+        cancellation_policy_ar: (form.cancellation_policy_ar ?? "").trim() || null,
+        languages: (() => { const l = (form.languages ?? "").split(/[,،]/).map((x) => x.trim()).filter(Boolean); return l.length ? l : null; })(),
       };
 
 

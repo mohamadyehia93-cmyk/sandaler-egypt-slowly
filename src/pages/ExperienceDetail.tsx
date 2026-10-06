@@ -37,6 +37,9 @@ const formatSlotDate = (dateStr: string) => {
   return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 };
 
+const DEFAULT_CANCELLATION_EN = "Free cancellation up to 48 hours before the start. After that, at the host’s discretion.";
+const DEFAULT_CANCELLATION_AR = "إلغاء مجاني حتى ٤٨ ساعة قبل الميعاد، وبعدها حسب تقدير المضيف.";
+
 /**
  * INTEGRITY RULE for this page: every block below must be backed by a real column
  * on THIS row or a real query scoped to this row. No sample reviews, no invented
@@ -407,6 +410,41 @@ const ExperienceDetail = () => {
           </>
         )}
 
+        {/* ── INCLUDED / NOT INCLUDED / LANGUAGES (only when filled) ── */}
+        {(() => {
+          const e = exp as any;
+          const pick = (k: string) => (ar ? e[`${k}_ar`] || e[`${k}_en`] : e[`${k}_en`] || e[`${k}_ar`]) as string | null;
+          const inc = pick("included");
+          const exc = pick("not_included");
+          const langs: string[] = Array.isArray(e.languages) ? e.languages.filter(Boolean) : [];
+          if (!inc && !exc && !langs.length) return null;
+          return (
+            <>
+              <Divider />
+              <div className="space-y-3">
+                {inc && (
+                  <div>
+                    <h2 className="text-sm font-semibold text-foreground mb-1">{ar ? "يشمل" : "What's included"}</h2>
+                    <p className="text-xs text-foreground leading-[1.6] whitespace-pre-line">{inc}</p>
+                  </div>
+                )}
+                {exc && (
+                  <div>
+                    <h2 className="text-sm font-semibold text-foreground mb-1">{ar ? "لا يشمل" : "Not included"}</h2>
+                    <p className="text-xs text-foreground leading-[1.6] whitespace-pre-line">{exc}</p>
+                  </div>
+                )}
+                {langs.length > 0 && (
+                  <div>
+                    <h2 className="text-sm font-semibold text-foreground mb-1">{ar ? "اللغات" : "Languages"}</h2>
+                    <p className="text-xs text-foreground">{langs.join(ar ? "، " : ", ")}</p>
+                  </div>
+                )}
+              </div>
+            </>
+          );
+        })()}
+
         {/* ── ITINERARY (only steps the row actually stores) ──────── */}
         {(() => {
           type Step = { step?: string; description?: string };
@@ -444,6 +482,18 @@ const ExperienceDetail = () => {
             </>
           );
         })()}
+
+        {/* ── CANCELLATION (listing's own, else platform default) ── */}
+        <Divider />
+        <div>
+          <h2 className="text-sm font-semibold text-foreground mb-1">{ar ? "سياسة الإلغاء" : "Cancellation policy"}</h2>
+          <p className="text-xs text-foreground leading-[1.6] whitespace-pre-line" data-testid="cancellation-policy">
+            {(ar
+              ? (exp as any).cancellation_policy_ar || (exp as any).cancellation_policy_en
+              : (exp as any).cancellation_policy_en || (exp as any).cancellation_policy_ar) ||
+              (ar ? DEFAULT_CANCELLATION_AR : DEFAULT_CANCELLATION_EN)}
+          </p>
+        </div>
 
         {/* ── AVAILABILITY (real slots only) ─────────────────────── */}
         <Divider />
