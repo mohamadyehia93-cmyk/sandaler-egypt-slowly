@@ -28,6 +28,14 @@ export interface ExperienceFormData {
   regionId: string;
   remarks_en: string;
   remarks_ar: string;
+  included_en: string;
+  included_ar: string;
+  not_included_en: string;
+  not_included_ar: string;
+  cancellation_policy_en: string;
+  cancellation_policy_ar: string;
+  /** Comma-separated in the form; stored as text[] */
+  languages: string;
   meetingPointName: string;
   meetingPointLat: string;
   meetingPointLng: string;
@@ -65,6 +73,13 @@ export const defaultFormData: ExperienceFormData = {
   regionId: "",
   remarks_en: "",
   remarks_ar: "",
+  included_en: "",
+  included_ar: "",
+  not_included_en: "",
+  not_included_ar: "",
+  cancellation_policy_en: "",
+  cancellation_policy_ar: "",
+  languages: "",
   meetingPointName: "",
   meetingPointLat: "",
   meetingPointLng: "",

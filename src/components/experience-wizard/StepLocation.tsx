@@ -99,6 +99,44 @@ const StepLocation = ({ form, set, updateForm }: Props) => {
         />
       </div>
 
+      {/* Included / not included / cancellation / languages */}
+      {([
+        ["included", "ما يشمله السعر", "What's included", 400],
+        ["not_included", "ما لا يشمله السعر", "Not included", 400],
+        ["cancellation_policy", "سياسة الإلغاء (اختياري)", "Cancellation policy (optional)", 400],
+      ] as const).map(([k, la, le, max]) => {
+        const primary = (ar ? `${k}_ar` : `${k}_en`) as keyof ExperienceFormData;
+        const secondary = (ar ? `${k}_en` : `${k}_ar`) as keyof ExperienceFormData;
+        return (
+          <div key={k}>
+            <label className={labelClass}>{ar ? la : le}</label>
+            <textarea
+              className={`${inputClass} min-h-[70px] resize-y`}
+              value={(form[primary] as string) ?? ""}
+              onChange={(e) => set(primary, e.target.value)}
+              maxLength={max}
+            />
+            <input
+              className={`${inputClass} py-2.5 mt-2`}
+              placeholder={ar ? "English (optional)" : "بالعربية (اختياري)"}
+              value={(form[secondary] as string) ?? ""}
+              onChange={(e) => set(secondary, e.target.value)}
+              maxLength={max}
+            />
+          </div>
+        );
+      })}
+      <div>
+        <label className={labelClass}>{ar ? "لغات التجربة" : "Languages"}</label>
+        <input
+          className={inputClass}
+          placeholder={ar ? "مثال: العربية، English" : "e.g. Arabic, English"}
+          value={form.languages ?? ""}
+          onChange={(e) => set("languages", e.target.value)}
+          maxLength={120}
+        />
+      </div>
+
       {/* Itinerary */}
       <div>
         <label className={labelClass}>{ar ? "خطة الرحلة" : "Itinerary Steps"}</label>
