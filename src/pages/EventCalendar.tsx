@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, CalendarDays, List } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
@@ -140,6 +140,10 @@ const EventCalendar = () => {
   const lead = (first.getDay() - weekStart + 7) % 7;
   const daysInMonth = new Date(y, mo, 0).getDate();
   const weekdayNames = Array.from({ length: 7 }, (_, i) => new Date(2024, 0, 7 + ((weekStart + i) % 7)).toLocaleDateString(loc, { weekday: "narrow" }));
+  const tabsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    tabsRef.current?.querySelector<HTMLElement>("[aria-selected=true]")?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [activeMonth, view, isLoading]);
   const selectedDay = day && day.startsWith(activeMonth || "") ? day : null;
   const dayEvents = selectedDay ? byDay.get(selectedDay) ?? [] : [];
 
@@ -182,7 +186,7 @@ const EventCalendar = () => {
           <p className="py-12 text-center text-muted-foreground">{ar ? "لا توجد مواعيد منشورة بعد." : "Nothing with a date is published yet."}</p>
         ) : view === "month" ? (
           <>
-            <div role="tablist" className="flex gap-2 overflow-x-auto hide-scrollbar py-4 -mx-4 px-4 border-b border-border">
+            <div ref={tabsRef} role="tablist" className="flex gap-2 overflow-x-auto hide-scrollbar py-4 -mx-4 px-4 border-b border-border">
               {months.map((m) => (
                 <button key={m} role="tab" aria-selected={m === activeMonth} type="button" onClick={() => { setMonth(m); setDay(null); }}
                   className={chip(m === activeMonth)}>
