@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import ShareButton from "@/components/ShareButton";
 import WishlistButton from "@/components/WishlistButton";
@@ -15,12 +15,14 @@ interface Props {
   wishlistId?: string | null;
   /** Mobile-only thumbnail row under the hero (when >1 photo). */
   thumbnails?: boolean;
+  /** Shown when the row has no images (calm placeholder, never a stock photo). */
+  placeholder?: ReactNode;
 }
 
 const roundBtn = "tap-target rounded-full bg-background/80 backdrop-blur-sm text-foreground";
 
 /** Full-bleed gallery of the row's REAL images only — never duplicates a file to fake a gallery. */
-const ListingHero = ({ images, title, eyebrow, ar, onBack, wishlistType, wishlistId, thumbnails }: Props) => {
+const ListingHero = ({ images, title, eyebrow, ar, onBack, wishlistType, wishlistId, thumbnails, placeholder }: Props) => {
   const photos = Array.from(new Set(images.filter(Boolean)));
   const scroller = useRef<HTMLDivElement>(null);
   const [idx, setIdx] = useState(0);
@@ -62,7 +64,7 @@ const ListingHero = ({ images, title, eyebrow, ar, onBack, wishlistType, wishlis
             />
           ))}
         </div>
-      ) : null}
+      ) : placeholder ?? null}
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/25 to-transparent" />
 
