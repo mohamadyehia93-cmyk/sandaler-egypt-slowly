@@ -300,8 +300,8 @@ const ExperienceDetail = () => {
           {/* a) Standfirst + body */}
           {description && (
             <div className="py-6">
-              <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{standfirst}</p>
-              {rest && <p className="mt-4 text-[15px] leading-7 text-foreground/90 whitespace-pre-line">{rest}</p>}
+              {standfirst && <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{standfirst}</p>}
+              {rest && <p className="mt-4 first:mt-0 text-[15px] leading-7 text-foreground/90 whitespace-pre-line">{rest}</p>}
               <MachineTranslatedNote meta={e.translation_meta} field={ar ? "description_ar" : "description_en"} className="mt-2" />
             </div>
           )}
