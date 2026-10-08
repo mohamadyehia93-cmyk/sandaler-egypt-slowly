@@ -452,7 +452,7 @@ const ProductDetail = () => {
         </aside>
       </div>
 
-      <ActionBar price={money(unitPrice)} note={leadNote || undefined} buttonLabel={orderLabel} onPrimary={() => openOrder()} onMessage={msgSeller} ar={ar} />
+      <ActionBar price={money(unitPrice)} note={leadNote || undefined} buttonLabel={orderLabel} onPrimary={() => openOrder(true)} onMessage={msgSeller} ar={ar} />
 
       {sheetOpen && (
         <div className="fixed inset-0 z-[60] flex items-end lg:items-center lg:justify-center bg-foreground/40" onClick={() => setSheetOpen(false)}>
