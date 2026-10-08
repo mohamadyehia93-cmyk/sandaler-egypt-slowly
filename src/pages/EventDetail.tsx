@@ -204,6 +204,7 @@ const EventDetail = () => {
         onBack={() => navigate(-1)}
         wishlistType="event"
         wishlistId={event.id}
+        overlap
         placeholder={
           <div className="w-full h-full bg-gradient-to-br from-primary/40 via-secondary to-accent/40 flex items-center justify-center">
             <Calendar className="w-14 h-14 text-primary-dark/60" aria-hidden />
