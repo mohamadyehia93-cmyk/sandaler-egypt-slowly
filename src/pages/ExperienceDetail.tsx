@@ -103,12 +103,15 @@ const ExperienceDetail = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("experiences")
-        .select("id, slug, title_en, title_ar, price, rating, duration_minutes, theme, image")
+        .select("id, slug, title_en, title_ar, price, rating, duration_minutes, theme, image, city_id")
         .eq("region_id", exp!.region_id)
+        .eq("status", "published")
         .neq("id", expId!)
-        .limit(5);
+        .limit(20);
       if (error) throw error;
-      return data;
+      // Same city first, then the rest of the region.
+      const cid = exp!.city_id;
+      return [...(data || [])].sort((a, b) => Number(b.city_id === cid) - Number(a.city_id === cid)).slice(0, 6);
     },
     enabled: !!exp?.region_id && !!expId,
   });
@@ -502,7 +505,7 @@ const ExperienceDetail = () => {
 
           {/* k) More nearby */}
           {relatedExps && relatedExps.length > 0 && (
-            <Section title={ar ? "تجارب أخرى قريبة" : "More experiences nearby"} ar={ar}>
+            <Section title={cityName && relatedExps.every((r) => r.city_id === exp.city_id) ? (ar ? `المزيد في ${cityName}` : `More in ${cityName}`) : (ar ? "المزيد بالقرب" : "More nearby")} ar={ar}>
               <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0 pb-1 snap-x">
                 {relatedExps.map((r) => {
                   const rTitle = ar ? r.title_ar || r.title_en : r.title_en;
