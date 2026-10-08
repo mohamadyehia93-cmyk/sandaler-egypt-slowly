@@ -24,7 +24,8 @@ const Places = () => {
   const counts = useMemo(() => {
     const offers = new Map<string, number>();
     const articles = new Map<string, number>();
-    sources.forEach((rows) => (rows as any[] | undefined)?.forEach((r) => r.city_id && offers.set(r.city_id, (offers.get(r.city_id) ?? 0) + 1)));
+    const today = new Date().toISOString().slice(0, 10);
+    sources.forEach((rows) => (rows as any[] | undefined)?.forEach((r) => r.city_id && !(r.start_date && String(r.end_date || r.start_date).slice(0, 10) < today) && offers.set(r.city_id, (offers.get(r.city_id) ?? 0) + 1)));
     (posts as any[] | undefined)?.forEach((r) => r.city_id && articles.set(r.city_id, (articles.get(r.city_id) ?? 0) + 1));
     return { offers, articles };
     // eslint-disable-next-line react-hooks/exhaustive-deps
