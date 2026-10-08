@@ -49,9 +49,9 @@ const TripCards = () => {
     "flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-card text-xs font-medium text-foreground";
 
   return (
-    <section id="trips" className="mb-12 scroll-mt-28">
+    <section id="trips" className="py-6 scroll-mt-28">
       <div className="px-4 mb-4 flex items-end justify-between">
-        <h2 className={`text-[11px] font-semibold text-muted-foreground ${lang === "ar" ? "" : "uppercase tracking-[0.12em]"}`}>
+        <h2 className={`listing-h2 ${lang === "ar" ? "lang-ar" : "lang-en"} text-foreground`}>
           {t("section.trips")}
         </h2>
         <button
