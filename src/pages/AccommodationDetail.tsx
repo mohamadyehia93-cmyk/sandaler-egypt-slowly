@@ -1,42 +1,60 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
-  ArrowLeft, Users, BedDouble, Bath, Clock, Check, CalendarIcon, ScrollText, Moon, BookOpen,
+  Users, BedDouble, Bath, Clock, Check, Moon, BookOpen, MapPin, Home, Wifi, Car, Utensils, Snowflake, Coffee,
+  Waves, Tv, Flame, Trees, Minus, Plus, ShieldCheck,
 } from "lucide-react";
-import { format } from "date-fns";
 
 import { useI18n } from "@/lib/i18n";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { supabase } from "@/integrations/supabase/client";
 import { accommodationTypeLabel } from "@/lib/listingTaxonomy";
-import { cn } from "@/lib/utils";
-import { str, num } from "@/lib/rowValues";
 
-import WishlistButton from "@/components/WishlistButton";
-import ShareButton from "@/components/ShareButton";
 import LocationChips from "@/components/LocationChips";
 import ProviderBioCard from "@/components/ProviderBioCard";
 import MessageOwnerButton from "@/components/MessageOwnerButton";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import NotFoundView from "@/components/NotFound";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import ListingHero from "@/components/listing/ListingHero";
+import KeyFacts, { type KeyFact } from "@/components/listing/KeyFacts";
+import Section from "@/components/listing/Section";
+import ActionBar from "@/components/listing/ActionBar";
+import ReadBeforeYouGo from "@/components/listing/ReadBeforeYouGo";
+import StaticMap from "@/components/listing/StaticMap";
+import RangeDatePicker from "@/components/listing/RangeDatePicker";
+import WideCard, { WideRow } from "@/components/listing/WideCard";
+import { fmtNumber, formatSlotDay, splitStandfirst } from "@/components/listing/format";
 
 /**
  * HONESTY RULE: this page renders only what the row contains. Every section
  * hides itself when its data is absent — no invented amenities, ratings,
  * policies or availability, and no badge the row has not earned.
+ * Availability is not stored for stays, so no date is shown as unavailable.
  */
+
+const AMENITY_ICONS: [RegExp, typeof Check][] = [
+  [/wi-?fi|internet|واي|إنترنت|انترنت/i, Wifi],
+  [/park|موقف|جراج/i, Car],
+  [/kitchen|cook|مطبخ/i, Utensils],
+  [/air|a\/c|\bac\b|تكييف|مكيف/i, Snowflake],
+  [/breakfast|coffee|tea|إفطار|فطور|قهوة|شاي/i, Coffee],
+  [/pool|sea|beach|lake|nile|river|مسبح|بحر|شاطئ|بحيرة|نيل/i, Waves],
+  [/tv|television|تلفزيون|تلفاز/i, Tv],
+  [/fire|bonfire|bbq|grill|نار|شواء/i, Flame],
+  [/garden|terrace|roof|حديقة|تراس|سطح/i, Trees],
+];
+const amenityIcon = (a: string) => AMENITY_ICONS.find(([re]) => re.test(a))?.[1] ?? Check;
+
 const AccommodationDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { lang, t } = useI18n();
+  const { lang } = useI18n();
   const ar = lang === "ar";
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [photoIdx, setPhotoIdx] = useState(0);
+  const [checkIn, setCheckIn] = useState<string | null>(null);
+  const [checkOut, setCheckOut] = useState<string | null>(null);
+  const [guests, setGuests] = useState(1);
 
   const { data: place, isLoading } = useQuery({
     queryKey: ["accommodation", id],
@@ -44,267 +62,259 @@ const AccommodationDetail = () => {
     enabled: !!id,
   });
 
-  const { data: similar } = useQuery({
-    queryKey: ["accommodation-similar", place?.id, place?.city_id],
+  const { data: cityRow } = useQuery({
+    queryKey: ["city-name", place?.city_id],
+    enabled: !!place?.city_id,
+    queryFn: async () => (await supabase.from("cities").select("name_en, name_ar").eq("id", place!.city_id).maybeSingle()).data,
+  });
+
+  // Same city first, then same region; published only.
+  const { data: similar = [] } = useQuery({
+    queryKey: ["accommodation-similar", place?.id, place?.city_id, place?.region_id],
     enabled: !!place,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("accommodations")
-        .select("id, slug, name_en, name_ar, image, price_per_night, currency")
-        .eq("status", "published")
-        .neq("id", place!.id)
-        .eq("city_id", place!.city_id)
-        .limit(6);
-      return data ?? [];
+      const cols = "id, slug, name_en, name_ar, image, price_per_night, currency, city_id, accommodation_type";
+      const out: any[] = [];
+      if (place!.city_id) {
+        const { data } = await supabase.from("accommodations").select(cols).eq("status", "published").neq("id", place!.id).eq("city_id", place!.city_id).limit(6);
+        out.push(...(data ?? []));
+      }
+      if (out.length < 6 && place!.region_id) {
+        const { data } = await supabase.from("accommodations").select(cols).eq("status", "published").neq("id", place!.id).eq("region_id", place!.region_id).limit(6);
+        (data ?? []).forEach((r: any) => { if (!out.some((o) => o.id === r.id)) out.push(r); });
+      }
+      return out.slice(0, 6);
     },
   });
 
+  const nights = useMemo(() => {
+    if (!checkIn || !checkOut) return 0;
+    return Math.round((new Date(checkOut + "T00:00:00").getTime() - new Date(checkIn + "T00:00:00").getTime()) / 86400000);
+  }, [checkIn, checkOut]);
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-4 space-y-4">
-        <Skeleton className="h-64 w-full rounded-xl" />
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
+      <div className="min-h-screen bg-background">
+        <Skeleton className="h-[56vh] max-h-[460px] w-full rounded-none" />
+        <div className="max-w-[680px] mx-auto px-4 py-4 space-y-3">
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-24 w-full" />
+        </div>
       </div>
     );
   }
 
   if (!place) return <NotFoundView context="stay" />;
 
-  const name = ar ? place.name_ar || place.name_en : place.name_en;
-  const description = ar ? place.description_ar || place.description_en : place.description_en;
+  const name = (ar ? place.name_ar || place.name_en : place.name_en) || "";
+  const description = (ar ? place.description_ar || place.description_en : place.description_en) || "";
   const unitType = ar ? place.unit_type_ar || place.unit_type_en : place.unit_type_en;
   const houseRules = ar ? place.house_rules_ar || place.house_rules_en : place.house_rules_en;
   const cancellation = ar ? place.cancellation_ar || place.cancellation_en : place.cancellation_en;
-  const hostName = ar ? place.host_name_ar || place.host_name_en : place.host_name_en;
-  // Amenities live in two parallel arrays; show the reader's language and fall
-  // back to the other when only one was authored.
   const amenEn: string[] = (place.amenities_en || place.amenities || []).filter(Boolean);
   const amenAr: string[] = (place.amenities_ar || []).filter(Boolean);
-  const amenities: string[] = (ar ? (amenAr.length ? amenAr : amenEn) : (amenEn.length ? amenEn : amenAr));
+  const amenities: string[] = ar ? (amenAr.length ? amenAr : amenEn) : (amenEn.length ? amenEn : amenAr);
   const typeLabel = accommodationTypeLabel(place.accommodation_type, lang);
   // EDITORIAL = Sandal's own reference entry (no owner, nothing to book).
-  // HOSTED = a real person's home, managed by them.
   const isEditorial = place.listing_kind !== "hosted" || !place.host_id;
+  const cityName = cityRow ? (ar ? cityRow.name_ar || cityRow.name_en : cityRow.name_en) : null;
 
-  const photos: string[] = (Array.isArray(place.images) ? place.images.filter(Boolean) : []).length
-    ? place.images.filter(Boolean)
-    : place.image
-      ? [place.image]
-      : [];
-  const hero = photos[Math.min(photoIdx, Math.max(photos.length - 1, 0))];
-
+  const photos: string[] = [...(Array.isArray(place.images) ? place.images : []), place.image].filter(Boolean) as string[];
   const currency = (place.currency || "EGP").trim();
-  const money = (n: number) => `${Number(n || 0).toLocaleString(ar ? "ar-EG" : "en-US")} ${ar && currency === "EGP" ? t("common.egp") : currency}`;
+  const cur = currency === "EGP" ? (ar ? "ج.م" : "EGP") : currency;
+  const money = (n: number) => `${fmtNumber(Number(n || 0), ar)} ${cur}`;
+  const perNight = ar ? "لليلة" : "per night";
+  const { first, rest } = splitStandfirst(description);
+  const maxGuests = place.sleeps || 12;
 
-  const facts = [
-    place.sleeps ? { icon: Users, label: ar ? "يتسع لـ" : "Sleeps", value: String(place.sleeps) } : null,
-    place.bedrooms != null ? { icon: BedDouble, label: ar ? "غرف نوم" : "Bedrooms", value: String(place.bedrooms) } : null,
-    place.bathrooms != null ? { icon: Bath, label: ar ? "حمامات" : "Bathrooms", value: String(place.bathrooms) } : null,
-    place.min_nights ? { icon: Moon, label: ar ? "أقل عدد ليالٍ" : "Min. nights", value: String(place.min_nights) } : null,
-    place.check_in_time ? { icon: Clock, label: ar ? "الوصول" : "Check-in", value: place.check_in_time } : null,
-    place.check_out_time ? { icon: Clock, label: ar ? "المغادرة" : "Check-out", value: place.check_out_time } : null,
-  ].filter(Boolean) as { icon: typeof Users; label: string; value: string }[];
+  const facts: KeyFact[] = [];
+  if (typeLabel || unitType) facts.push({ icon: Home, label: [typeLabel, unitType].filter(Boolean).join(" · ") });
+  if (place.sleeps) facts.push({ icon: Users, label: ar ? `حتى ${fmtNumber(place.sleeps, ar)} ضيوف` : `Sleeps ${place.sleeps}` });
+  if (place.bedrooms != null) facts.push({ icon: BedDouble, label: ar ? `${fmtNumber(place.bedrooms, ar)} غرف نوم` : `${place.bedrooms} ${place.bedrooms === 1 ? "bedroom" : "bedrooms"}` });
+  if (place.bathrooms != null) facts.push({ icon: Bath, label: ar ? `${fmtNumber(place.bathrooms, ar)} حمامات` : `${place.bathrooms} ${place.bathrooms === 1 ? "bathroom" : "bathrooms"}` });
+  if (cityName) facts.push({ icon: MapPin, label: cityName });
+  if (place.price_per_night) facts.push({ icon: Moon, label: `${money(place.price_per_night)} ${perNight}` });
+
+  const hasCoords = place.latitude != null && place.longitude != null;
+  const subtotal = nights * (place.price_per_night || 0);
+  const tooShort = !!place.min_nights && nights > 0 && nights < place.min_nights;
+  const honestLine = ar
+    ? "لا يتم الدفع داخل التطبيق. يؤكد المضيف التوفر ويرتب الدفع معك."
+    : "No payment is taken in the app. The host confirms availability and arranges payment with you.";
+  // The booking page reads type, id and guests for stays (dates are chosen there).
+  const goBook = () => navigate(`/booking?type=stay&id=${place.id}&guests=${guests}`);
+  const messageHost = () => navigate(`/inbox?personId=${place.host_id}&kind=provider`);
+
+  const stepper = (
+    <div className="flex items-center justify-between py-3">
+      <span className="text-[15px] font-semibold text-foreground">{ar ? "الضيوف" : "Guests"}</span>
+      <div className="flex items-center gap-2">
+        <button type="button" onClick={() => setGuests(Math.max(1, guests - 1))} aria-label={ar ? "تقليل" : "Decrease"} className="tap-target rounded-full border border-border"><Minus className="w-4 h-4" /></button>
+        <span className="text-base font-semibold w-6 text-center" aria-live="polite">{fmtNumber(guests, ar)}</span>
+        <button type="button" onClick={() => setGuests(Math.min(maxGuests, guests + 1))} aria-label={ar ? "زيادة" : "Increase"} className="tap-target rounded-full border border-border"><Plus className="w-4 h-4" /></button>
+      </div>
+    </div>
+  );
+
+  const totals = nights > 0 && (
+    <div className="pt-3 border-t border-border text-[15px]">
+      <div className="flex justify-between text-foreground">
+        <span>{money(place.price_per_night)} × {fmtNumber(nights, ar)} {ar ? "ليالٍ" : nights === 1 ? "night" : "nights"}</span>
+        <span className="font-bold">{money(subtotal)}</span>
+      </div>
+      {tooShort && (
+        <p className="text-[13px] text-destructive mt-1">
+          {ar ? `أقل مدة إقامة ${fmtNumber(place.min_nights, ar)} ليالٍ.` : `Minimum stay is ${place.min_nights} nights.`}
+        </p>
+      )}
+    </div>
+  );
+
+  const rangeSummary = checkIn
+    ? `${formatSlotDay(checkIn, ar)} → ${checkOut ? formatSlotDay(checkOut, ar) : (ar ? "اختر المغادرة" : "choose check-out")}`
+    : (ar ? "اختر تاريخ الوصول" : "Choose check-in");
 
   return (
-    <div className={`min-h-screen bg-background ${isEditorial ? "pb-10" : "pb-24"}`}>
-      <div className="h-11 flex items-center justify-between px-4 bg-card sticky top-0 z-40">
-        <button onClick={() => navigate(-1)} className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center" aria-label={lang === "ar" ? "رجوع" : "Back"}>
-          <ArrowLeft className="w-4 h-4 text-foreground" />
-        </button>
-        <span className="text-xs text-muted-foreground truncate max-w-[55%]">{typeLabel || (ar ? "مكان إقامة" : "Place to stay")}</span>
-        <div className="flex gap-2">
-          <ShareButton title={name} className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center" iconClassName="w-3.5 h-3.5 text-foreground" />
-          <WishlistButton
-            itemType="accommodation"
-            itemId={place.id}
-            className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center transition-transform [&>svg]:w-3.5 [&>svg]:h-3.5"
-          />
-        </div>
-      </div>
+    <div className={`min-h-screen bg-background ${isEditorial ? "pb-24" : "pb-44 lg:pb-16"}`}>
+      <ListingHero
+        images={photos}
+        title={name}
+        eyebrow={[typeLabel || (ar ? "إقامة" : "Stay"), cityName].filter(Boolean).join(" · ")}
+        ar={ar}
+        onBack={() => navigate(-1)}
+        wishlistType="accommodation"
+        wishlistId={place.id}
+        thumbnails
+      />
+      <KeyFacts facts={facts} />
 
-      {/* GALLERY — only the images this row actually has */}
-      {photos.length > 0 && (
-        <div>
-          <div className="h-[260px] bg-secondary">
-            <img src={hero} alt={name} className="w-full h-full object-cover" />
-          </div>
-          {photos.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto hide-scrollbar px-4 py-2">
-              {photos.map((p, i) => (
-                <button
-                  key={`${p}-${i}`}
-                  onClick={() => setPhotoIdx(i)}
-                  className={`w-14 h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 ${i === photoIdx ? "border-primary" : "border-transparent"}`}
-                 aria-label={lang === "ar" ? "صورة" : "Show photo"}>
-                  <img src={p} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      <div className="max-w-[680px] lg:max-w-[1040px] mx-auto px-4 lg:flex lg:gap-10 lg:items-start">
+        <main className="flex-1 min-w-0 max-w-[680px]">
+          {first && <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground pt-6`}>{first}</p>}
+          <LocationChips cityId={place.city_id} regionId={place.region_id} className="mt-3" />
 
-      <div className="px-4 pt-4">
-        <h1 className="text-xl font-bold text-foreground leading-snug">{name}</h1>
-        <p className="text-lg font-bold text-primary-dark mt-1">
-          {money(place.price_per_night)} <span className="text-xs font-medium text-muted-foreground">{t("common.perNight")}</span>
-        </p>
-        <div className="flex items-center gap-2 flex-wrap mt-2">
           {isEditorial && (
-            <span className="text-[11px] font-semibold bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full inline-flex items-center gap-1">
-              <BookOpen className="w-3 h-3" />
-              {ar ? "معلومات سندال" : "Sandal guide info"}
-            </span>
-          )}
-          {typeLabel && <span className="text-[11px] font-medium bg-primary/10 text-primary px-2.5 py-1 rounded-full">{typeLabel}</span>}
-          {unitType && <span className="text-[11px] font-medium bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full">{unitType}</span>}
-        </div>
-        <LocationChips cityId={place.city_id} regionId={place.region_id} className="mt-2" />
-
-        {/* DESCRIPTION — near the top, the host's own words */}
-        {description && (
-          <>
-            <h2 className="text-base font-bold text-primary-dark mb-2 mt-6">{ar ? "عن المكان" : "About this place"}</h2>
-            <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{description}</p>
-            <MachineTranslatedNote meta={place.translation_meta} field={ar ? "description_ar" : "description_en"} />
-          </>
-        )}
-
-        {/* FACTS */}
-        {facts.length > 0 && (
-          <div className="grid grid-cols-2 gap-3 mt-6">
-            {facts.map((f, i) => (
-              <div key={i} className="p-3 rounded-lg bg-surface flex items-center gap-2">
-                <f.icon className="w-4 h-4 text-primary shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-[10px] text-muted-foreground">{f.label}</p>
-                  <p className="text-sm font-semibold text-foreground truncate">{f.value}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* AMENITIES */}
-        {amenities.length > 0 && (
-          <>
-            <h2 className="text-base font-bold text-primary-dark mb-3 mt-6">{ar ? "المرافق والخدمات" : "What's included"}</h2>
-            <div className="grid grid-cols-2 gap-2">
-              {amenities.map((a, i) => (
-                <div key={i} className="flex items-center gap-2 p-2.5 rounded-lg bg-surface">
-                  <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                  <span className="text-xs text-foreground">{a}</span>
-                </div>
-              ))}
+            <div className="mt-4 rounded-xl border border-border bg-muted/40 p-3 flex gap-2">
+              <BookOpen className="w-4 h-4 text-primary-dark shrink-0 mt-1" />
+              <p className="text-[13px] text-muted-foreground leading-relaxed">
+                {ar
+                  ? "معلومة دليلية من سندال. هذا المكان غير مُدار على التطبيق، لذا لا يمكن الحجز أو المراسلة من هنا."
+                  : "Practical information from Sandal. This place isn't managed on the app, so it can't be booked or messaged here."}
+              </p>
             </div>
-          </>
-        )}
+          )}
 
-        {/* HOUSE RULES / CANCELLATION — the host's own terms only */}
-        {houseRules && (
-          <>
-            <h2 className="text-base font-bold text-primary-dark mb-2 mt-6 flex items-center gap-2">
-              <ScrollText className="w-4 h-4 text-primary" />{ar ? "قواعد المنزل" : "House rules"}
-            </h2>
-            <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{houseRules}</p>
-          </>
-        )}
-        {cancellation && (
-          <>
-            <h2 className="text-base font-bold text-primary-dark mb-2 mt-6 flex items-center gap-2">
-              <ScrollText className="w-4 h-4 text-primary" />{ar ? "شروط الإلغاء" : "Cancellation terms"}
-            </h2>
-            <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{cancellation}</p>
-          </>
-        )}
+          {rest && (
+            <Section title={ar ? "عن المكان" : "About this place"} ar={ar} className="mt-6">
+              <p className="whitespace-pre-line">{rest}</p>
+              <MachineTranslatedNote meta={place.translation_meta} field={ar ? "description_ar" : "description_en"} />
+            </Section>
+          )}
 
-        {/* PREFERRED DATE — hosted stays only; editorial entries take no requests */}
-        {!isEditorial && (<>
-        <h2 className="text-base font-bold text-primary-dark mb-3 mt-6">{ar ? "التاريخ المفضل" : "Preferred date"}</h2>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("w-full justify-start text-left font-normal mb-2", !selectedDate && "text-muted-foreground")}>
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {selectedDate ? format(selectedDate, "PPP") : ar ? "اختر تاريخاً" : "Pick a date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-              initialFocus
-              className={cn("p-3 pointer-events-auto")}
-              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-            />
-          </PopoverContent>
-        </Popover>
-        <p className="text-[11px] text-muted-foreground">
-          {ar ? "يؤكد المضيف التوافر بعد إرسال طلبك." : "The host confirms availability after you send your request."}
-        </p>
-        </>)}
+          {!isEditorial && (
+            <Section title={ar ? "مضيفك" : "Your host"} ar={ar}>
+              <div className="-mx-4"><ProviderBioCard providerId={place.host_id} roleLabel={{ en: "Your host", ar: "مضيفك" }} /></div>
+              <div className="mt-3 flex"><MessageOwnerButton ownerId={place.host_id} kind="provider" label={ar ? "راسل المضيف" : "Message host"} /></div>
+            </Section>
+          )}
 
-        {/* EDITORIAL LABEL — honest about what this page is */}
-        {isEditorial && (
-          <div className="mt-6 rounded-xl border border-border bg-surface p-3 flex gap-2">
-            <BookOpen className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {ar
-                ? "معلومة دليلية من سندال. هذا المكان غير مُدار على التطبيق، لذا لا يمكن الحجز أو المراسلة من هنا."
-                : "Practical information from Sandal. This place isn't managed on the app, so it can't be booked or messaged here."}
-            </p>
-          </div>
+          {amenities.length > 0 && (
+            <Section title={ar ? "ما يقدمه هذا المكان" : "What this place offers"} ar={ar}>
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-3">
+                {amenities.map((a, i) => {
+                  const Icon = amenityIcon(a);
+                  return (
+                    <li key={i} className="flex items-center gap-2.5">
+                      <Icon className="w-5 h-5 text-primary-dark flex-shrink-0" aria-hidden />
+                      <span>{a}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Section>
+          )}
+
+          {(houseRules || place.check_in_time || place.check_out_time || place.min_nights) && (
+            <Section title={ar ? "قواعد المكان" : "House rules"} ar={ar}>
+              <dl className="divide-y divide-border">
+                {place.check_in_time && <div className="flex justify-between py-2.5"><dt className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary-dark" />{ar ? "الوصول" : "Check-in"}</dt><dd className="font-semibold">{place.check_in_time}</dd></div>}
+                {place.check_out_time && <div className="flex justify-between py-2.5"><dt className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary-dark" />{ar ? "المغادرة" : "Check-out"}</dt><dd className="font-semibold">{place.check_out_time}</dd></div>}
+                {place.min_nights ? <div className="flex justify-between py-2.5"><dt className="flex items-center gap-2"><Moon className="w-4 h-4 text-primary-dark" />{ar ? "أقل عدد ليالٍ" : "Minimum stay"}</dt><dd className="font-semibold">{fmtNumber(place.min_nights, ar)}</dd></div> : null}
+              </dl>
+              {houseRules && <p className="whitespace-pre-line mt-3">{houseRules}</p>}
+            </Section>
+          )}
+
+          {!isEditorial && (
+            <Section id="choose-dates" title={ar ? "اختر التواريخ" : "Choose your dates"} ar={ar}>
+              <p className="text-[15px] font-semibold text-foreground mb-3">{rangeSummary}</p>
+              <RangeDatePicker checkIn={checkIn} checkOut={checkOut} onChange={(a, b) => { setCheckIn(a); setCheckOut(b); }} ar={ar} />
+              {stepper}
+              {totals}
+              <p className="mt-3 text-[13px] text-muted-foreground">{honestLine}</p>
+            </Section>
+          )}
+
+          {hasCoords && (
+            <Section title={ar ? "الموقع" : "Location"} ar={ar}>
+              <StaticMap lat={Number(place.latitude)} lng={Number(place.longitude)} ar={ar} label={cityName} title={ar ? "خريطة المكان" : "Map of the stay"} />
+            </Section>
+          )}
+
+          {cancellation && (
+            <Section title={ar ? "شروط الإلغاء" : "Cancellation"} ar={ar}>
+              <p className="flex gap-2"><ShieldCheck className="w-5 h-5 text-primary-dark flex-shrink-0 mt-1" /><span className="whitespace-pre-line">{cancellation}</span></p>
+            </Section>
+          )}
+
+          {/* Reviews: there is no reviews table for stays, so no section is shown. */}
+
+          <ReadBeforeYouGo cityId={place.city_id} regionId={place.region_id} ar={ar} />
+
+          {similar.length > 0 && (
+            <Section title={cityName && similar.every((s: any) => s.city_id === place.city_id) ? (ar ? `إقامات أخرى في ${cityName}` : `More stays in ${cityName}`) : (ar ? "إقامات قريبة" : "More stays nearby")} ar={ar}>
+              <WideRow>
+                {similar.map((s: any) => (
+                  <WideCard key={s.id} path={`/stay/${s.slug || s.id}`} ar={ar} image={s.image}
+                    title={(ar ? s.name_ar || s.name_en : s.name_en) || ""}
+                    meta={[accommodationTypeLabel(s.accommodation_type, lang), s.price_per_night ? `${fmtNumber(s.price_per_night, ar)} ${(s.currency || "EGP") === "EGP" ? cur : s.currency} ${perNight}` : null].filter(Boolean).join(" · ")} />
+                ))}
+              </WideRow>
+            </Section>
+          )}
+        </main>
+
+        {!isEditorial && (
+          <aside className="hidden lg:block w-[320px] flex-shrink-0 sticky top-6 mt-6">
+            <div className="rounded-2xl border border-border bg-card shadow-card p-4">
+              <p className="text-2xl font-bold text-foreground">{money(place.price_per_night)}</p>
+              <p className="text-[13px] text-muted-foreground">{perNight}</p>
+              <button type="button" onClick={() => document.getElementById("choose-dates")?.scrollIntoView({ behavior: "smooth" })}
+                className="mt-3 w-full text-start rounded-xl border border-border px-3 py-2 text-[15px] min-h-[44px]">{rangeSummary}</button>
+              {stepper}
+              {totals}
+              <button type="button" onClick={goBook} className="mt-3 w-full h-12 rounded-xl bg-primary text-primary-foreground text-[15px] font-bold">
+                {ar ? "اطلب الحجز" : "Request to book"}
+              </button>
+              <button type="button" onClick={messageHost} className="mt-2 w-full h-11 rounded-xl border border-border text-sm font-semibold text-foreground">
+                {ar ? "راسل المضيف" : "Message host"}
+              </button>
+              <p className="mt-3 text-[13px] text-muted-foreground">{honestLine}</p>
+            </div>
+          </aside>
         )}
       </div>
 
-      {/* HOST — only a hosted stay has one */}
-      {!isEditorial ? (
-        <>
-          <ProviderBioCard providerId={place.host_id} roleLabel={{ en: "Your host", ar: "مضيفك" }} />
-          <div className="mx-4 mt-3 flex">
-            <MessageOwnerButton ownerId={place.host_id} kind="provider" label={ar ? "مراسلة المضيف" : "Message host"} />
-          </div>
-        </>
-      ) : null}
-
-      {/* SIMILAR — always last */}
-      {similar && similar.length > 0 && (
-        <section className="px-4 mt-6">
-          <h2 className="text-base font-bold text-primary-dark mb-3">{ar ? "أماكن إقامة قريبة" : "Nearby stays"}</h2>
-          <div className="grid grid-cols-3 gap-3">
-            {similar.map((s: Record<string, unknown> & { id: string }) => (
-              <div key={s.id} onClick={() => navigate(`/stay/${str(s.slug) || s.id}`)} className="rounded-lg shadow-card bg-card overflow-hidden cursor-pointer">
-                <div className="h-16 bg-secondary">
-                  {str(s.image) && <img src={str(s.image)} alt="" className="w-full h-full object-cover" />}
-                </div>
-                <div className="p-2">
-                  <h3 className="text-[11px] font-semibold text-foreground line-clamp-2">{ar ? str(s.name_ar) || str(s.name_en) : str(s.name_en)}</h3>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">
-                    {num(s.price_per_night).toLocaleString(ar ? "ar-EG" : "en-US")}{" "}
-                    {ar && (str(s.currency) || "EGP") === "EGP" ? t("common.egp") : str(s.currency) || "EGP"}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* REQUEST BAR — hosted stays only; no payment is taken anywhere in the app */}
       {!isEditorial && (
-      <div className="fixed bottom-[68px] left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
-        <div>
-          <span className="text-lg font-bold text-primary-dark">{money(place.price_per_night)}</span>
-          <span className="text-xs text-muted-foreground block">{t("common.perNight")}</span>
-        </div>
-        <button
-          onClick={() => navigate(`/booking?type=stay&id=${place.id}`)}
-          className="px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
-        >
-          {ar ? "إرسال طلب" : "Send request"}
-        </button>
-      </div>
+        <ActionBar
+          ar={ar}
+          price={money(place.price_per_night)}
+          note={nights > 0 ? `${fmtNumber(nights, ar)} ${ar ? "ليالٍ" : nights === 1 ? "night" : "nights"} · ${money(subtotal)}` : perNight}
+          buttonLabel={ar ? "اطلب الحجز" : "Request to book"}
+          onPrimary={goBook}
+          onMessage={messageHost}
+        />
       )}
     </div>
   );

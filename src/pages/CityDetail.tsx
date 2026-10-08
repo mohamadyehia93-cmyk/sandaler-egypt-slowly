@@ -1,154 +1,50 @@
-import { useState, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Users, Calendar, Sparkles, Compass, Heart, BookOpen, Palette, Mountain, Route, Clock } from "lucide-react";
-import WishlistButton from "@/components/WishlistButton";
-import { useI18n } from "@/lib/i18n";
-import { bylineNames } from "@/lib/postByline";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { MapPin, Calendar, BookOpen, LayoutGrid, Headphones, Play, ChevronRight, ChevronLeft } from "lucide-react";
+import type { ReactNode } from "react";
+import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
-import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents, useCauses, usePrograms } from "@/hooks/useListings";
-import SectionHeader from "@/components/SectionHeader";
-import EmptySection from "@/components/EmptySection";
-import EventsSection from "@/components/EventsSection";
-import CityOfferingsMap, { OfferingPin } from "@/components/CityOfferingsMap";
-import SmartImage from "@/components/ui/SmartImage";
+import { useAudioTours, useTransport, useExperiences, useTrips, useAccommodations, useProducts, useWhosWho, usePosts, useEvents, useCauses, usePrograms, useOrganizations } from "@/hooks/useListings";
+import { postCategoryLabel } from "@/lib/postCategories";
+import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
+import CityOfferingsMap, { type OfferingPin } from "@/components/CityOfferingsMap";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
 import ProgramsCausesSection from "@/components/ProgramsCausesSection";
+import Avatar from "@/components/AvatarFallback";
+import ListingHero from "@/components/listing/ListingHero";
+import KeyFacts, { type KeyFact } from "@/components/listing/KeyFacts";
+import Section from "@/components/listing/Section";
+import WideCard, { WideRow } from "@/components/listing/WideCard";
+import { fmtNumber, formatDuration, listingLocale, splitStandfirst } from "@/components/listing/format";
 
-type PostItem = {
-  id: string;
-  slug?: string;
-  title: { en: string; ar: string };
-  category: { en: string; ar: string };
-  author: { en: string; ar: string };
-  image: string;
-  readTime: number;
-  cityId?: string;
-  regionId?: string;
-};
+/**
+ * INTEGRITY RULE: the city hub shows only the city's own row and real published
+ * rows linked to it. No sample listings, no invented counts; every section hides
+ * itself when empty.
+ */
 
-const CityPostsSection = ({
-  posts,
-  lang,
-  navigate,
-}: {
-  posts: PostItem[];
-  lang: "en" | "ar";
-  navigate: ReturnType<typeof useNavigate>;
-}) => {
-  const [activeCategory, setActiveCategory] = useState("all");
-
-  const categories = useMemo(() => {
-    const cats = new Map<string, string>();
-    posts.forEach((p) => {
-      const key = p.category.en.toLowerCase();
-      if (!cats.has(key)) cats.set(key, p.category[lang]);
-    });
-    return Array.from(cats.entries()).map(([key, label]) => ({ key, label }));
-  }, [posts, lang]);
-
-  const filtered =
-    activeCategory === "all"
-      ? posts
-      : posts.filter((p) => p.category.en.toLowerCase() === activeCategory);
-
-  const allLabel = lang === "ar" ? "الكل" : "All";
-
-  return (
-    <div className="space-y-3">
-      <div className="px-4 flex items-center gap-2">
-        <BookOpen className="w-4 h-4 text-primary" />
-        <h3 className="text-base font-bold text-foreground">
-          {lang === "ar" ? "مقالات ومنشورات" : "Posts & Articles"}
-        </h3>
-        <span className="text-xs text-muted-foreground">({posts.length})</span>
-        <button
-          onClick={() => navigate("/posts")}
-          className="ms-auto text-xs font-semibold text-primary hover:underline"
-        >
-          {lang === "ar" ? "عرض الكل ←" : "See all →"}
-        </button>
-      </div>
-
-
-      {/* Category Tabs */}
-      <div className="flex gap-2 px-4 overflow-x-auto hide-scrollbar">
-        <button
-          onClick={() => setActiveCategory("all")}
-          className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-            activeCategory === "all"
-              ? "bg-primary text-primary-foreground"
-              : "bg-secondary text-secondary-foreground"
-          }`}
-        >
-          {allLabel}
-        </button>
-        {categories.map((cat) => (
-          <button
-            key={cat.key}
-            onClick={() => setActiveCategory(cat.key)}
-            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-              activeCategory === cat.key
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground"
-            }`}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Horizontal Post Cards */}
-      <div className="grid grid-cols-3 gap-3 px-4">
-        {filtered.slice(0, 3).map((post) => (
-          <div
-            key={post.id}
-            onClick={() => navigate(`/post/${post.id}`)}
-            className="rounded-xl overflow-hidden shadow-card bg-card cursor-pointer"
-          >
-            <div className="relative h-32">
-              <img src={post.image} alt={post.title[lang]} className="w-full h-full object-cover" />
-              <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
-                {post.category[lang]}
-              </span>
-            </div>
-            <div className="p-3">
-              <h4 className="text-sm font-semibold text-foreground line-clamp-2 leading-snug mb-2">{post.title[lang]}</h4>
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] text-muted-foreground truncate">{post.author[lang]}</span>
-                <span className="flex items-center gap-1 text-[10px] text-muted-foreground shrink-0">
-                  <Clock className="w-3 h-3" />
-                  {post.readTime} {lang === "ar" ? "د" : "min"}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+const today = () => new Date().toISOString().slice(0, 10);
 
 const CityDetail = () => {
   const { cityId } = useParams();
   const navigate = useNavigate();
-  const { lang, t } = useI18n();
+  const { lang } = useI18n();
+  const ar = lang === "ar";
   const { data: dbTransport = [], isLoading: l1 } = useTransport();
   const { data: dbAudioTours = [], isLoading: l2 } = useAudioTours();
   const { data: dbExperiences = [], isLoading: l3 } = useExperiences();
   const { data: dbTrips = [], isLoading: l4 } = useTrips();
   const { data: dbAccommodations = [], isLoading: l5 } = useAccommodations();
   const { data: dbProducts = [], isLoading: l6 } = useProducts();
-  const { data: dbWhosWho = [], isLoading: l7 } = useWhosWho();
+  const { data: dbWhosWho = [] } = useWhosWho();
   const { data: dbPosts = [], isLoading: l8 } = usePosts();
   const { data: dbEvents = [] } = useEvents();
   const { data: dbCauses = [] } = useCauses();
-  const { data: dbPrograms = [], isLoading: l9 } = usePrograms();
-  const isLoading = l1 || l2 || l3 || l4 || l5 || l6 || l7 || l8 || l9;
+  const { data: dbPrograms = [] } = usePrograms();
+  const { data: dbOrgs = [] } = useOrganizations();
+  const isLoading = l1 || l2 || l3 || l4 || l5 || l6 || l8;
 
-  // City copy comes from the cities table only. There is no sample fallback: an
-  // unknown city id must 404 rather than borrow another city's description.
   const { data: cityRow, isLoading: lCity } = useQuery({
     queryKey: ["city", cityId],
     enabled: !!cityId,
@@ -159,532 +55,310 @@ const CityDetail = () => {
     },
   });
 
+  const { data: credit } = useQuery({
+    queryKey: ["image-credit", cityRow?.image],
+    enabled: !!cityRow?.image,
+    queryFn: async () => {
+      const { data } = await supabase.from("image_credits").select("artist, license, source_url").eq("image_url", cityRow!.image!).limit(1);
+      return data?.[0] ?? null;
+    },
+  });
+
+  // Providers whose profile names this city (providers store city as text).
+  const { data: cityProviders = [] } = useQuery({
+    queryKey: ["city-providers", cityRow?.name_en],
+    enabled: !!cityRow?.name_en,
+    queryFn: async () => {
+      const { data } = await (supabase as any).from("providers").select(PROVIDER_PUBLIC_COLUMNS)
+        .ilike("city_en", cityRow!.name_en).eq("status", "published").limit(24);
+      return (data || []) as any[];
+    },
+  });
+
   if (isLoading || lCity) return <DetailSkeleton variant="city" />;
   if (!cityRow) return <NotFoundView context="city" />;
 
-  const city = {
-    id: cityRow.id,
-    regionId: cityRow.region_id || "",
-    name: { en: cityRow.name_en || "", ar: cityRow.name_ar || cityRow.name_en || "" },
-    governorate: { en: cityRow.governorate_en || "", ar: cityRow.governorate_ar || cityRow.governorate_en || "" },
-    population: cityRow.population || "",
-    image: cityRow.image || "",
-    about: {
-      overview: { en: cityRow.overview_en || "", ar: cityRow.overview_ar || "" },
-      history: { en: cityRow.history_en || "", ar: cityRow.history_ar || "" },
-      culture: { en: cityRow.culture_en || "", ar: cityRow.culture_ar || "" },
-      geography: { en: cityRow.geography_en || "", ar: cityRow.geography_ar || "" },
-    },
-    highlights: { en: cityRow.highlights_en || [], ar: cityRow.highlights_ar || [] },
-    knownFor: { en: cityRow.known_for_en || [], ar: cityRow.known_for_ar || [] },
-    bestTime: { en: cityRow.best_time_en || "", ar: cityRow.best_time_ar || "" },
-  };
+  const L = <T,>(en: T, arv: T) => (ar ? arv || en : en || arv);
+  const cityName = L(cityRow.name_en, cityRow.name_ar) || "";
+  const governorate = L(cityRow.governorate_en, cityRow.governorate_ar);
+  const bestTime = L(cityRow.best_time_en, cityRow.best_time_ar);
+  const overview = L(cityRow.overview_en, cityRow.overview_ar) || "";
+  const { first: standfirst, rest: overviewRest } = splitStandfirst(overview);
+  const egp = ar ? "ج.م" : "EGP";
+  const money = (n: number) => (!n ? (ar ? "مجاني" : "Free") : `${fmtNumber(n, ar)} ${egp}`);
+  const inCity = (r: any) => r.city_id === cityId;
 
-  const dedupe = <T extends { id: string }>(arr: T[]) => {
-    const seen = new Set<string>();
-    return arr.filter((x) => (seen.has(x.id) ? false : (seen.add(x.id), true)));
-  };
+  const posts = (dbPosts as any[]).filter(inCity);
+  const experiences = (dbExperiences as any[]).filter(inCity);
+  const trips = (dbTrips as any[]).filter(inCity);
+  const tours = (dbAudioTours as any[]).filter(inCity);
+  const stays = (dbAccommodations as any[]).filter(inCity);
+  const products = (dbProducts as any[]).filter(inCity);
+  const events = (dbEvents as any[]).filter(inCity).filter((e) => (e.end_date || e.start_date || "") >= today())
+    .sort((a, b) => String(a.start_date).localeCompare(String(b.start_date)));
+  const people = (dbWhosWho as any[]).filter(inCity);
+  const orgs = (dbOrgs as any[]).filter(inCity);
+  const transport = (dbTransport as any[]).filter(inCity);
+  const programs = (dbPrograms as any[]).filter(inCity);
+  const causes = (dbCauses as any[]).filter(inCity);
 
-  // DB ROWS ONLY. Sample listings must never be merged into a city page:
-  // they would appear to visitors as real, bookable offerings in that city.
-  const cityExperiences = dedupe([
-    ...(dbExperiences as any[]).filter((e) => e.city_id === cityId).map((e) => ({
-      id: e.slug || e.id, slug: e.slug,
-      title: { en: e.title_en, ar: e.title_ar || e.title_en },
-      image: e.image, price: e.price ?? 0, rating: e.rating ?? 0,
-      cityId: e.city_id, regionId: e.region_id,
-    })),
-  ]);
-  const cityAudioTours = dedupe(
-    (dbAudioTours as any[]).filter((a) => a.city_id === cityId).map((a) => ({
-      id: a.slug || a.id, slug: a.slug,
-      title: { en: a.title_en, ar: a.title_ar || a.title_en },
-      image: a.image, price: a.price ?? 0,
-    }))
+  const offerCount = experiences.length + trips.length + tours.length + stays.length + products.length + events.length;
+  const facts: KeyFact[] = [];
+  if (governorate) facts.push({ icon: MapPin, label: governorate });
+  if (bestTime) facts.push({ icon: Calendar, label: ar ? `أفضل وقت: ${bestTime}` : `Best time: ${bestTime}` });
+  if (offerCount) facts.push({ icon: LayoutGrid, label: ar ? `${fmtNumber(offerCount, ar)} عروض` : `${offerCount} ${offerCount === 1 ? "offer" : "offers"}` });
+  if (posts.length) facts.push({ icon: BookOpen, label: ar ? `${fmtNumber(posts.length, ar)} مقالات` : `${posts.length} ${posts.length === 1 ? "article" : "articles"}` });
+
+  const Chevron = ar ? ChevronLeft : ChevronRight;
+  const Head = ({ title, seeAll }: { title: string; seeAll?: string }) => (
+    <div className="flex items-baseline justify-between gap-3 mb-3">
+      <h2 className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{title}</h2>
+      {seeAll && (
+        <Link to={seeAll} className="inline-flex items-center min-h-[44px] text-sm font-semibold text-primary-dark flex-shrink-0">
+          {ar ? "عرض الكل" : "See all"} <Chevron className="w-4 h-4" />
+        </Link>
+      )}
+    </div>
   );
-  const cityAccommodation = dedupe([
-    ...(dbAccommodations as any[]).filter((a) => a.city_id === cityId).map((a) => ({
-      id: a.slug || a.id, slug: a.slug,
-      title: { en: a.name_en, ar: a.name_ar || a.name_en },
-      type: { en: a.accommodation_type || "Stay", ar: a.accommodation_type || "إقامة" },
-      location: { en: a.host_name_en || "", ar: a.host_name_ar || "" },
-      image: a.image, price: a.price_per_night ?? 0,
-      cityId: a.city_id,
-    })),
-  ]);
-  const cityProducts = dedupe([
-    ...(dbProducts as any[]).filter((p) => p.city_id === cityId).map((p) => ({
-      id: p.slug || p.id, slug: p.slug,
-      title: { en: p.name_en, ar: p.name_ar || p.name_en },
-      village: { en: p.seller_village_en || "", ar: p.seller_village_ar || "" },
-      badge: { en: (p.badges?.[0]) || "", ar: (p.badges?.[0]) || "" },
-      image: p.image, price: p.price ?? 0,
-      cityId: p.city_id,
-    })),
-  ]);
-  const cityPeople = dedupe([
-    ...(dbWhosWho as any[])
-      .filter((w) => w.city_id === cityId && (w.status ?? "published") === "published")
-      .map((w) => ({
-        id: w.slug || w.id, slug: w.slug,
-        name: { en: w.name_en, ar: w.name_ar || w.name_en },
-        role: { en: w.role_en || "", ar: w.role_ar || "" },
-        bio: { en: w.bio_en || "", ar: w.bio_ar || "" },
-        image: w.image, cityId: w.city_id,
-        latitude: w.latitude, longitude: w.longitude,
-      })),
-  ]);
+  const Block = ({ title, seeAll, children }: { title: string; seeAll?: string; children: ReactNode }) => (
+    <Section ar={ar}><Head title={title} seeAll={seeAll} />{children}</Section>
+  );
+  const readTime = (m?: number | null) => (m ? (ar ? `${fmtNumber(m, ar)} دقائق قراءة` : `${m} min read`) : null);
+  const catLabel = (c?: string | null) => (c ? postCategoryLabel(c)[ar ? "ar" : "en"] : null);
+  const title = (r: any) => (ar ? r.title_ar || r.name_ar || r.title_en || r.name_en : r.title_en || r.name_en) || "";
 
-  const cityCauses = (dbCauses as any[]).filter((c) => c.city_id === cityId);
-  const cityPrograms = (dbPrograms as any[]).filter((p) => p.city_id === cityId);
-  const cityPosts = dedupe([
-    ...(dbPosts as any[]).filter((p) => p.city_id === cityId).map((p) => ({
-      id: p.slug || p.id, slug: p.slug,
-      title: { en: p.title_en, ar: p.title_ar || p.title_en },
-      category: { en: p.category || "Article", ar: p.category || "مقال" },
-      author: bylineNames(p),
-      image: p.image, readTime: p.read_time_minutes ?? 5,
-      cityId: p.city_id, regionId: p.region_id,
-    })) as any[],
-  ]);
-  const cityTransport = dbTransport.filter((tr) => tr.city_id === cityId);
-  const cityTrips = dedupe([
-    ...(dbTrips as any[]).filter((tr) => tr.city_id === cityId).map((tr) => ({
-      id: tr.slug || tr.id, slug: tr.slug,
-      title: { en: tr.title_en, ar: tr.title_ar || tr.title_en },
-      route: { en: tr.route_en || "", ar: tr.route_ar || "" },
-      image: tr.image, price: tr.price ?? 0, date: tr.date || "",
-      cityId: tr.city_id,
-    })),
-  ]);
-  const cityEvents = (dbEvents as any[]).filter((e) => e.city_id === cityId);
+  const [lead, ...more] = posts;
+  const thingsToDo = [
+    ...experiences.map((e) => ({ k: `e${e.id}`, path: `/experience/${e.slug || e.id}`, image: e.image, title: title(e), meta: [formatDuration(e.duration_minutes, ar), money(e.price)].filter(Boolean).join(" · ") })),
+    ...trips.map((t) => ({ k: `t${t.id}`, path: `/trip/${t.slug || t.id}`, image: t.image, title: title(t), meta: [t.date || null, money(t.price)].filter(Boolean).join(" · ") })),
+  ];
 
-  /**
-   * A city with nothing listed in a section used to hide the section entirely, so
-   * a quiet city read as a broken page. One honest line naming the city is better:
-   * it says the section exists and is simply empty here.
-   */
-  const nothingYet = (en: string, ar: string) => ({
-    messageEn: `No ${en} listed in ${city.name.en} yet.`,
-    messageAr: `لا ${ar} في ${city.name.ar} بعد.`,
-  });
+  // Map pins (existing CityOfferingsMap) — real rows only.
+  const coord = (r: any, la: string, ln: string) => (typeof r[la] === "number" && typeof r[ln] === "number" ? { lat: r[la], lng: r[ln] } : { lat: null, lng: null });
+  const T = (r: any) => ({ en: r.title_en || r.name_en || "", ar: r.title_ar || r.name_ar || r.title_en || r.name_en || "" });
+  const pins: OfferingPin[] = [
+    ...experiences.map((e) => ({ id: e.slug || e.id, slug: e.slug, category: "experience" as const, title: T(e), ...coord(e, "meeting_point_lat", "meeting_point_lng") })),
+    ...stays.map((a) => ({ id: a.slug || a.id, slug: a.slug, category: "accommodation" as const, title: T(a), ...coord(a, "latitude", "longitude") })),
+    ...products.map((p) => ({ id: p.slug || p.id, slug: p.slug, category: "product" as const, title: T(p), ...coord(p, "latitude", "longitude") })),
+    ...tours.map((a) => ({ id: a.slug || a.id, slug: a.slug, category: "audio" as const, title: T(a), ...coord(a, "latitude", "longitude") })),
+    ...trips.map((t) => ({ id: t.slug || t.id, slug: t.slug, category: "trip" as const, title: T(t), ...coord(t, "latitude", "longitude") })),
+    ...people.map((p) => ({ id: p.slug || p.id, slug: p.slug, category: "person" as const, title: { en: p.name_en, ar: p.name_ar || p.name_en }, ...coord(p, "latitude", "longitude") })),
+    ...causes.map((c) => ({ id: c.slug || c.id, slug: c.slug, category: "cause" as const, title: T(c), ...coord(c, "latitude", "longitude") })),
+  ] as OfferingPin[];
+
+  const peopleChips = [
+    ...cityProviders.map((p) => ({ k: `p${p.id}`, path: `/provider/${p.slug || p.id}`, name: L(p.name_en, p.name_ar), img: p.avatar, sub: null as string | null })),
+    ...orgs.map((o) => ({ k: `o${o.id}`, path: `/organization/${o.slug || o.id}`, name: L(o.name_en, o.name_ar), img: o.logo || o.image, sub: ar ? "مؤسسة" : "Organisation" })),
+    ...people.map((w) => ({ k: `w${w.id}`, path: `/person/${w.slug || w.id}`, name: L(w.name_en, w.name_ar), img: w.image, sub: L(w.role_en, w.role_ar) })),
+  ];
+
+  const highlightsEn: string[] = cityRow.highlights_en || [];
+  const highlightsLoc: string[] = (ar ? cityRow.highlights_ar : cityRow.highlights_en) || [];
+  const about = [
+    { h: ar ? "التاريخ" : "History", t: L(cityRow.history_en, cityRow.history_ar) },
+    { h: ar ? "الثقافة" : "Culture", t: L(cityRow.culture_en, cityRow.culture_ar) },
+    { h: ar ? "الجغرافيا" : "Geography", t: L(cityRow.geography_en, cityRow.geography_ar) },
+  ].filter((x) => x.t);
+  const knownFor: string[] = (ar ? cityRow.known_for_ar : cityRow.known_for_en) || [];
 
   return (
-    <div className="min-h-screen bg-surface">
-      {/* Header */}
-      <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40">
-        <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
-          <ArrowLeft className="w-5 h-5 text-foreground" />
-        </button>
-        <h1 className="text-lg font-bold text-foreground">{city.name[lang]}</h1>
-      </header>
+    <div className="min-h-screen bg-background pb-24">
+      <ListingHero images={[cityRow.image].filter(Boolean) as string[]} title={cityName} eyebrow={governorate || undefined} ar={ar} onBack={() => navigate(-1)} />
+      {credit && (credit.artist || credit.license) && (
+        <p className="mx-auto max-w-[680px] px-4 pt-2 text-[11px] text-muted-foreground" data-testid="photo-credit">
+          {ar ? "الصورة: " : "Photo: "}
+          {credit.source_url ? (
+            <a href={credit.source_url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{credit.artist || (ar ? "ويكيميديا كومنز" : "Wikimedia Commons")}</a>
+          ) : credit.artist}
+          {credit.license && <> · {credit.license}</>}
+        </p>
+      )}
+      <KeyFacts facts={facts} />
 
-      {/* Hero Image */}
-      <div className="relative h-48 mx-4 mt-2 rounded-xl overflow-hidden">
-        <SmartImage src={city.image} alt={city.name[lang]} loading="eager" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-        <div className="absolute bottom-3 left-4 right-4">
-          <h2 className="text-xl font-bold text-white mb-1">{city.name[lang]}</h2>
-          <div className="flex items-center gap-2 text-white/80 text-xs">
-            <MapPin className="w-3 h-3" />
-            <span>{city.governorate[lang]}</span>
-            <span>•</span>
-            <Users className="w-3 h-3" />
-            <span>{city.population}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-5 pt-4">
-        {/* About Section */}
-        <div className="px-4 space-y-4">
-          {city.about.overview[lang] && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Compass className="w-4 h-4 text-primary" />
-                <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "نظرة عامة" : "Overview"}</h3>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{city.about.overview[lang]}</p>
-            </div>
-          )}
-          {city.about.history[lang] && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <BookOpen className="w-4 h-4 text-primary" />
-                <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "التاريخ" : "History"}</h3>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{city.about.history[lang]}</p>
-            </div>
-          )}
-          {city.about.culture[lang] && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Palette className="w-4 h-4 text-primary" />
-                <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "الثقافة" : "Culture"}</h3>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{city.about.culture[lang]}</p>
-            </div>
-          )}
-          {city.about.geography[lang] && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Mountain className="w-4 h-4 text-primary" />
-                <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "الجغرافيا" : "Geography"}</h3>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{city.about.geography[lang]}</p>
-            </div>
-          )}
+      <div className="max-w-[680px] lg:max-w-[1040px] mx-auto px-4">
+        <div className="max-w-[680px]">
+          {standfirst && <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground pt-6 pb-2`}>{standfirst}</p>}
+          {overviewRest && <p className="text-[15px] leading-7 text-foreground/90 pb-4">{overviewRest}</p>}
         </div>
 
-        {/* Highlights */}
-        {city.highlights.en.length > 0 && (
-        <div className="px-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "أبرز المعالم" : "Highlights"}</h3>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {city.highlights.en.map((hEn, i) => {
-              const slug = hEn.toLowerCase().replace(/[''`]/g, "").replace(/[^a-z0-9\u0600-\u06FF]+/g, "-").replace(/^-+|-+$/g, "");
-              const label = city.highlights[lang][i] || hEn;
-              return (
-                <button
-                  key={i}
-                  onClick={() => navigate(`/city/${cityId}/highlight/${slug}`)}
-                  className="bg-card rounded-lg p-3 shadow-card border border-border text-left hover:border-primary hover:shadow-md transition-all active:scale-[0.98]"
-                >
-                  <span className="text-xs font-medium text-foreground">{label}</span>
+        {/* a) Start here */}
+        {lead && (
+          <Block title={ar ? "ابدأ من هنا" : "Start here"} seeAll="/posts">
+            <div className="lg:grid lg:grid-cols-[1.4fr_1fr] lg:gap-8">
+              <Link to={`/post/${lead.slug || lead.id}`} className="block">
+                <div className="aspect-video rounded-xl overflow-hidden bg-muted">{lead.image && <img src={lead.image} alt="" className="w-full h-full object-cover" />}</div>
+                {catLabel(lead.category) && <p className="text-[11px] font-semibold uppercase tracking-wider text-primary-dark mt-3">{catLabel(lead.category)}</p>}
+                <p className={`listing-title ${ar ? "lang-ar" : "lang-en"} text-foreground text-2xl mt-1`}>{title(lead)}</p>
+                {L(lead.excerpt_en, lead.excerpt_ar) && <p className="text-[15px] leading-7 text-foreground/85 mt-2 line-clamp-3">{L(lead.excerpt_en, lead.excerpt_ar)}</p>}
+                {readTime(lead.read_time_minutes) && <p className="text-[13px] text-muted-foreground mt-1">{readTime(lead.read_time_minutes)}</p>}
+              </Link>
+              {more.length > 0 && (
+                <ul className="space-y-4 mt-6 lg:mt-0">
+                  {more.slice(0, 4).map((p) => (
+                    <li key={p.id}>
+                      <Link to={`/post/${p.slug || p.id}`} className="flex gap-3 items-start">
+                        {p.image ? <img src={p.image} alt="" loading="lazy" className="w-24 h-16 rounded-lg object-cover flex-shrink-0" /> : <div className="w-24 h-16 rounded-lg bg-muted flex-shrink-0" />}
+                        <div className="min-w-0">
+                          {catLabel(p.category) && <p className="text-[11px] font-semibold uppercase tracking-wider text-primary-dark">{catLabel(p.category)}</p>}
+                          <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} !text-base leading-snug text-foreground line-clamp-2`}>{title(p)}</p>
+                          {readTime(p.read_time_minutes) && <p className="text-[13px] text-muted-foreground">{readTime(p.read_time_minutes)}</p>}
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </Block>
+        )}
+
+        {/* b) Things to do */}
+        {thingsToDo.length > 0 && (
+          <Block title={ar ? "أشياء تفعلها" : "Things to do"} seeAll={experiences.length ? "/?tab=experiences" : "/trips"}>
+            <WideRow>{thingsToDo.map((c) => <WideCard key={c.k} ar={ar} {...c} />)}</WideRow>
+          </Block>
+        )}
+
+        {/* c) Listen */}
+        {tours.length > 0 && (
+          <Block title={ar ? "استمع" : "Listen"} seeAll="/audio-tours">
+            <WideRow>
+              {tours.map((a) => (
+                <WideCard key={a.id} ar={ar} path={`/audio-tour/${a.slug || a.id}`} image={a.image} title={title(a)}
+                  meta={[formatDuration(a.duration_minutes, ar), money(a.price)].filter(Boolean).join(" · ")}
+                  badge={<span className="w-10 h-10 rounded-full bg-background/90 text-primary-dark flex items-center justify-center shadow-card" aria-hidden>
+                    {a.audio_url ? <Play className="w-4 h-4 ms-0.5" /> : <Headphones className="w-4 h-4" />}
+                  </span>} />
+              ))}
+            </WideRow>
+          </Block>
+        )}
+
+        {/* d) Where to stay */}
+        {stays.length > 0 && (
+          <Block title={ar ? "أين تقيم" : "Where to stay"}>
+            <WideRow>
+              {stays.map((s) => (
+                <WideCard key={s.id} ar={ar} path={`/stay/${s.slug || s.id}`} image={s.image} title={title(s)}
+                  meta={s.price_per_night ? `${fmtNumber(s.price_per_night, ar)} ${egp} ${ar ? "لليلة" : "per night"}` : null} />
+              ))}
+            </WideRow>
+          </Block>
+        )}
+
+        {/* e) What's on */}
+        {events.length > 0 && (
+          <Block title={ar ? "ماذا يحدث" : "What’s on"} seeAll="/calendar">
+            <WideRow>
+              {events.map((e) => {
+                const d = new Date(String(e.start_date).slice(0, 10) + "T00:00:00");
+                return (
+                  <WideCard key={e.id} ar={ar} path={`/event/${e.slug || e.id}`} image={e.image} title={title(e)}
+                    meta={[L(e.venue_en, e.venue_ar), e.is_free || !e.price ? (ar ? "مجاني" : "Free") : money(Number(e.price))].filter(Boolean).join(" · ")}
+                    badge={
+                      <span className="flex flex-col items-center rounded-lg bg-background/95 px-2.5 py-1 shadow-card text-center">
+                        <span className="text-[11px] font-semibold uppercase text-primary-dark leading-tight">{d.toLocaleDateString(listingLocale(ar), { month: "short" })}</span>
+                        <span className="text-lg font-bold leading-none text-foreground">{fmtNumber(d.getDate(), ar)}</span>
+                      </span>
+                    } />
+                );
+              })}
+            </WideRow>
+          </Block>
+        )}
+
+        {/* f) Made here */}
+        {products.length > 0 && (
+          <Block title={ar ? "صُنع هنا" : "Made here"}>
+            <WideRow>
+              {products.map((p) => (
+                <WideCard key={p.id} ar={ar} path={`/product/${p.slug || p.id}`} image={p.image} title={title(p)}
+                  meta={[L(p.seller_name_en, p.seller_name_ar), money(p.price)].filter(Boolean).join(" · ")} />
+              ))}
+            </WideRow>
+          </Block>
+        )}
+
+        {/* Getting around (real rides only) */}
+        {transport.length > 0 && (
+          <Block title={ar ? "التنقل" : "Getting around"}>
+            <ul className="divide-y divide-border">
+              {transport.map((tr) => (
+                <li key={tr.id}>
+                  <Link to={`/transport/${tr.slug || tr.id}`} className="flex items-center justify-between gap-3 py-3 min-h-[44px]">
+                    <span className="font-semibold text-foreground">{title(tr)}</span>
+                    {tr.price ? <span className="text-[13px] text-muted-foreground flex-shrink-0">{money(tr.price)}</span> : null}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Block>
+        )}
+
+        {/* g) People and organisations */}
+        {peopleChips.length > 0 && (
+          <Block title={ar ? "أشخاص ومؤسسات" : "People and organisations"} seeAll={people.length ? "/people" : undefined}>
+            <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0 pb-1">
+              {peopleChips.map((p) => (
+                <button key={p.k} type="button" onClick={() => navigate(p.path)} className="flex-shrink-0 w-[96px] text-center">
+                  <Avatar src={p.img} name={p.name || ""} className="w-20 h-20 rounded-full mx-auto" />
+                  <p className="text-[13px] font-semibold text-foreground mt-2 line-clamp-2 leading-snug">{p.name}</p>
+                  {p.sub && <p className="text-[11px] text-muted-foreground line-clamp-1">{p.sub}</p>}
                 </button>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          </Block>
+        )}
+
+        <div className="[&>section]:border-t [&>section]:border-border [&>section]:py-6 [&>section]:-mx-4">
+          <ProgramsCausesSection programs={programs} causes={causes} />
         </div>
+
+        {/* h) Highlights */}
+        {highlightsEn.length > 0 && (
+          <Block title={ar ? "أبرز المعالم" : "Highlights"}>
+            <ul className="divide-y divide-border max-w-[680px]">
+              {highlightsEn.map((hEn, i) => {
+                const slug = hEn.toLowerCase().replace(/['’`]/g, "").replace(/[^a-z0-9\u0600-\u06FF]+/g, "-").replace(/^-+|-+$/g, "");
+                return (
+                  <li key={i}>
+                    <Link to={`/city/${cityId}/highlight/${slug}`} className="flex items-center justify-between py-3 min-h-[44px] text-foreground">
+                      <span className="font-semibold">{highlightsLoc[i] || hEn}</span>
+                      <Chevron className="w-4 h-4 text-muted-foreground" />
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </Block>
         )}
 
-        {/* Known For */}
-        {city.knownFor[lang].length > 0 && (
-        <div className="px-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Heart className="w-4 h-4 text-primary" />
-            <h3 className="text-base font-bold text-foreground">{lang === "ar" ? "تشتهر بـ" : "Known For"}</h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {city.knownFor[lang].map((k, i) => (
-              <span key={i} className="text-xs font-medium text-primary bg-primary/10 px-3 py-1.5 rounded-full">{k}</span>
-            ))}
-          </div>
-        </div>
-        )}
-
-        {/* Best Time to Visit */}
-        {city.bestTime[lang] && (
-        <div className="px-4">
-          <div className="flex items-center gap-2 bg-card rounded-lg p-3 shadow-card border border-border">
-            <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
-            <div>
-              <span className="text-xs text-muted-foreground">{lang === "ar" ? "أفضل وقت للزيارة" : "Best Time to Visit"}</span>
-              <p className="text-sm font-medium text-foreground">{city.bestTime[lang]}</p>
-            </div>
-          </div>
-        </div>
-        )}
-
-        {/* Categorized Posts/Articles */}
-        {cityPosts.length > 0 ? (
-          <CityPostsSection posts={cityPosts} lang={lang} navigate={navigate} />
-        ) : (
-          <SectionHeader titleKey="section.latestPosts">
-            <EmptySection
-              {...nothingYet("stories", "توجد حكايات")}
-              actionEn="Read stories from everywhere"
-              actionAr="اقرأ حكايات من كل مكان"
-              actionHref="/posts"
-            />
-          </SectionHeader>
-        )}
-
-        {/* Who's Who */}
-        {cityPeople.length > 0 && (
-          <SectionHeader titleKey="section.whosWho" onSeeAll={() => navigate("/people")}>
-            <div className="grid grid-cols-3 gap-3 px-4">
-              {cityPeople.slice(0, 3).map((p) => (
-                <div key={p.id} onClick={() => navigate(`/person/${p.id}`)} className="rounded-lg shadow-card bg-card overflow-hidden cursor-pointer">
-                  <div className="relative h-28">
-                    <img src={p.image || "/placeholder.svg"} alt={p.name[lang]} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute bottom-2 left-2 right-2">
-                      <h3 className="text-xs font-bold text-white line-clamp-1">{p.name[lang]}</h3>
-                    </div>
-                  </div>
-                  <div className="p-2.5">
-                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full mb-1.5">
-                      <Users className="w-2.5 h-2.5" /> {p.role[lang]}
-                    </span>
-                    <p className="text-[10px] text-muted-foreground line-clamp-3 leading-relaxed">{p.bio[lang]}</p>
-                  </div>
+        {(about.length > 0 || knownFor.length > 0) && (
+          <Section title={ar ? `عن ${cityName}` : `About ${cityName}`} ar={ar}>
+            <div className="max-w-[680px] space-y-4">
+              {about.map((a) => (
+                <div key={a.h}>
+                  <h3 className="text-[15px] font-bold text-foreground">{a.h}</h3>
+                  <p>{a.t}</p>
                 </div>
               ))}
-            </div>
-          </SectionHeader>
-        )}
-
-        {/* Events */}
-        <EventsSection events={cityEvents} />
-
-        {/* Experiences */}
-        {cityExperiences.length > 0 ? (
-          <SectionHeader titleKey="section.experiences" onSeeAll={() => navigate("/?tab=experiences")}>
-            <div className="grid grid-cols-3 gap-3 px-4">
-              {cityExperiences.slice(0, 3).map((e) => (
-                <div key={e.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/experience/${(e as any).slug || e.id}`)}>
-                  <div className="relative h-32">
-                    <img src={e.image} alt={e.title[lang]} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="p-3">
-                    <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-1">{e.title[lang]}</h3>
-                    <span className="text-sm font-bold text-primary-dark">
-                      {e.price === 0 ? t("common.free") : `${e.price} ${t("common.egp")}`}
-                    </span>
-                  </div>
+              {knownFor.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {knownFor.map((k, i) => <span key={i} className="px-2.5 py-1 rounded-full bg-muted text-[13px]">{k}</span>)}
                 </div>
-              ))}
+              )}
             </div>
-          </SectionHeader>
-        ) : (
-          <SectionHeader titleKey="section.experiences">
-            <EmptySection
-              {...nothingYet("experiences", "توجد تجارب")}
-              actionEn="Browse all experiences"
-              actionAr="تصفّح كل التجارب"
-              actionHref="/?tab=experiences"
-            />
-          </SectionHeader>
+          </Section>
         )}
 
-        {/* Trips */}
-        {cityTrips.length > 0 ? (
-          <SectionHeader titleKey="section.trips" onSeeAll={() => navigate("/trips")}>
-            <div className="grid grid-cols-3 gap-3 px-4">
-              {cityTrips.slice(0, 3).map((trip) => (
-                <div key={trip.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/trip/${(trip as any).slug || trip.id}`)}>
-                  <div className="relative h-32">
-                    <img src={trip.image} alt={trip.title[lang]} className="w-full h-full object-cover" />
-                    <span className="absolute top-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <Route className="w-3 h-3" /> {trip.route[lang]}
-                    </span>
-                  </div>
-                  <div className="p-3">
-                    <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-1">{trip.title[lang]}</h3>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold text-primary">{trip.price} {t("common.egp")}</span>
-                      <span className="text-[10px] text-muted-foreground">{trip.date}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+        {/* i) Map of offers */}
+        {pins.length > 0 && (
+          <Section title={ar ? `خريطة ${cityName}` : `Map of ${cityName}`} ar={ar}>
+            <div className="-mx-4 lg:mx-0">
+              <CityOfferingsMap cityId={cityId || ""} cityName={{ en: cityRow.name_en, ar: cityRow.name_ar || cityRow.name_en }} offerings={pins} />
             </div>
-          </SectionHeader>
-        ) : (
-          <SectionHeader titleKey="section.trips">
-            <EmptySection
-              {...nothingYet("trips", "توجد رحلات")}
-              actionEn="Browse all trips"
-              actionAr="تصفّح كل الرحلات"
-              actionHref="/trips"
-            />
-          </SectionHeader>
+          </Section>
         )}
-
-        {cityAudioTours.length > 0 ? (
-          <SectionHeader titleKey="section.audioTours" onSeeAll={() => navigate("/audio-tours")}>
-            <div className="grid grid-cols-3 gap-3 px-4">
-              {cityAudioTours.slice(0, 3).map((tour) => (
-                <div key={tour.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/audio-tour/${(tour as any).slug || tour.id}`)}>
-                  <div className="relative h-32">
-                    <img src={tour.image} alt={tour.title[lang]} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="p-3">
-                    <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-1">{tour.title[lang]}</h3>
-                    <span className="text-sm font-bold text-primary-dark">
-                      {tour.price === 0 ? t("common.free") : `${tour.price} ${t("common.egp")}`}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </SectionHeader>
-        ) : (
-          <SectionHeader titleKey="section.audioTours">
-            <EmptySection
-              {...nothingYet("audio tours", "توجد جولات صوتية")}
-              actionEn="Browse all audio tours"
-              actionAr="تصفّح كل الجولات الصوتية"
-              actionHref="/audio-tours"
-            />
-          </SectionHeader>
-        )}
-
-        {/* Places to Stay */}
-        {cityAccommodation.length > 0 ? (
-          <SectionHeader titleKey="section.placesToStay">
-            <div className="grid grid-cols-3 gap-3 px-4">
-              {cityAccommodation.slice(0, 3).map((a) => (
-                <div key={a.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/stay/${(a as any).slug || a.id}`)}>
-                  <div className="relative h-32">
-                    <img src={a.image} alt={a.title[lang]} className="w-full h-full object-cover" />
-                    <WishlistButton itemType="accommodation" itemId={a.id} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm" />
-                    <span className="absolute bottom-2 left-2 bg-primary/90 text-primary-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
-                      {a.type[lang]}
-                    </span>
-                  </div>
-                  <div className="p-3">
-                    <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-0.5">{a.title[lang]}</h3>
-                    <p className="text-xs text-muted-foreground mb-2">{a.location[lang]}</p>
-                    <span className="text-sm font-bold text-primary-dark">
-                      {a.price} {t("common.egp")}<span className="text-xs font-normal text-muted-foreground">{t("common.perNight")}</span>
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </SectionHeader>
-        ) : (
-          <SectionHeader titleKey="section.placesToStay">
-            <EmptySection
-              {...nothingYet("stays", "توجد إقامات")}
-              actionEn="Do you host here? Join Sandal"
-              actionAr="تستضيف هنا؟ انضم إلى صندل"
-              actionHref="/welcome"
-            />
-          </SectionHeader>
-        )}
-
-        {/* Getting Around */}
-        {cityTransport.length > 0 ? (
-          <SectionHeader titleKey="section.gettingAround">
-            <div className="grid grid-cols-3 gap-3 px-4">
-              {cityTransport.slice(0, 3).map((tr) => (
-                <div key={tr.id} className="rounded-lg shadow-card bg-card p-4 flex flex-col items-center gap-2 cursor-pointer" onClick={() => navigate(`/transport/${tr.slug || tr.id}`)}>
-                  {tr.image ? <img src={tr.image} alt="" className="w-10 h-10 rounded-full object-cover" /> : <span className="text-3xl">🚐</span>}
-                  <h3 className="text-xs font-semibold text-foreground text-center line-clamp-2">{lang === "ar" ? (tr.name_ar || tr.name_en) : tr.name_en}</h3>
-                  <span className="text-sm font-bold text-primary-dark">{tr.price} {t("common.egp")}</span>
-                </div>
-              ))}
-            </div>
-          </SectionHeader>
-        ) : (
-          <SectionHeader titleKey="section.gettingAround">
-            <EmptySection
-              {...nothingYet("rides", "توجد وسائل تنقّل")}
-              actionEn="Do you drive here? Join Sandal"
-              actionAr="تعمل بالنقل هنا؟ انضم إلى صندل"
-              actionHref="/welcome"
-            />
-          </SectionHeader>
-        )}
-
-        {/* Local Products */}
-        {cityProducts.length > 0 ? (
-          <SectionHeader titleKey="section.products">
-            <div className="grid grid-cols-3 gap-3 px-4">
-              {cityProducts.slice(0, 3).map((p) => (
-                <div key={p.id} className="rounded-lg overflow-hidden shadow-card bg-card cursor-pointer" onClick={() => navigate(`/product/${(p as any).slug || p.id}`)}>
-                  <div className="relative h-32">
-                    <img src={p.image} alt={p.title[lang]} className="w-full h-full object-cover" />
-                    <WishlistButton itemType="product" itemId={p.id} className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm" />
-                    <span className="absolute bottom-2 left-2 bg-accent text-accent-foreground text-[10px] font-medium px-2 py-0.5 rounded-full">
-                      {p.badge[lang]}
-                    </span>
-                  </div>
-                  <div className="p-2.5">
-                    <h3 className="text-xs font-semibold text-foreground line-clamp-2 mb-1">{p.title[lang]}</h3>
-                    <p className="text-[10px] text-muted-foreground mb-1">{p.village[lang]}</p>
-                    <span className="text-sm font-bold text-primary-dark">{p.price} {t("common.egp")}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </SectionHeader>
-        ) : (
-          <SectionHeader titleKey="section.products">
-            <EmptySection
-              {...nothingYet("products", "توجد منتجات")}
-              actionEn="Do you make things here? Join Sandal"
-              actionAr="تصنع منتجات هنا؟ انضم إلى صندل"
-              actionHref="/welcome"
-            />
-          </SectionHeader>
-        )}
-
-        {/* Programs & Causes — one merged feed with per-item labels */}
-        <ProgramsCausesSection programs={cityPrograms} causes={cityCauses} />
-
-        {/* Map of Offerings */}
-        {(() => {
-          // Coords helper: read either snake_case (DB) or camelCase (sample data); experiences also fallback to meeting point
-          const coord = (it: any, latKeys: string[], lngKeys: string[]) => {
-            for (const k of latKeys) {
-              const v = it?.[k];
-              if (typeof v === "number" && !Number.isNaN(v)) {
-                for (const lk of lngKeys) {
-                  const lv = it?.[lk];
-                  if (typeof lv === "number" && !Number.isNaN(lv)) return { lat: v, lng: lv };
-                }
-              }
-            }
-            return { lat: null, lng: null };
-          };
-          const pins: OfferingPin[] = [
-            ...cityExperiences.map((e) => ({
-              id: e.id, slug: (e as any).slug, category: "experience" as const,
-              title: e.title,
-              ...coord(e, ["lat", "latitude", "meeting_point_lat"], ["lng", "longitude", "meeting_point_lng"]),
-            })),
-            ...cityAccommodation.map((a) => ({
-              id: a.id, slug: (a as any).slug, category: "accommodation" as const,
-              title: a.title,
-              ...coord(a, ["lat", "latitude"], ["lng", "longitude"]),
-            })),
-            ...cityProducts.map((p) => ({
-              id: p.id, slug: (p as any).slug, category: "product" as const,
-              title: p.title, subtitle: p.village,
-              ...coord(p, ["lat", "latitude"], ["lng", "longitude"]),
-            })),
-            ...cityAudioTours.map((a) => ({
-              id: a.id, slug: (a as any).slug, category: "audio" as const,
-              title: a.title,
-              ...coord(a, ["lat", "latitude"], ["lng", "longitude"]),
-            })),
-            ...cityTrips.map((t) => ({
-              id: t.id, slug: (t as any).slug, category: "trip" as const,
-              title: t.title,
-              ...coord(t, ["lat", "latitude"], ["lng", "longitude"]),
-            })),
-            ...cityPeople.map((p) => ({
-              id: p.id, slug: (p as any).slug, category: "person" as const,
-              title: p.name, subtitle: p.role,
-              ...coord(p, ["lat", "latitude"], ["lng", "longitude"]),
-            })),
-            ...cityCauses.map((c) => ({
-              id: c.slug || c.id, slug: (c as any).slug, category: "cause" as const,
-              title: { en: c.title_en ?? "", ar: c.title_ar ?? c.title_en ?? "" },
-              ...coord(c, ["lat", "latitude"], ["lng", "longitude"]),
-            })),
-          ];
-          if (pins.length === 0) return null;
-          return (
-            <div className="space-y-3">
-              <div className="px-4 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" />
-                <h3 className="text-base font-bold text-foreground">
-                  {lang === "ar" ? `خريطة ${city.name.ar}` : `Map of ${city.name.en}`}
-                </h3>
-                <span className="text-xs text-muted-foreground">({pins.length})</span>
-              </div>
-              <CityOfferingsMap cityId={cityId || ""} cityName={city.name} offerings={pins} />
-            </div>
-          );
-        })()}
       </div>
     </div>
   );

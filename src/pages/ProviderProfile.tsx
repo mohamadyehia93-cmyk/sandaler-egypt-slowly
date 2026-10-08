@@ -35,7 +35,7 @@ const roleLabels: Record<string, { en: string; ar: string }> = {
   organization: { en: "Organisation", ar: "مؤسسة" },
 };
 
-type OfferType = "experience" | "trip" | "stay" | "product" | "event";
+type OfferType = "experience" | "trip" | "stay" | "product" | "event" | "programme";
 type Offer = { type: OfferType; id: string; path: string; title: string; image: string | null; meta: string };
 
 // Owner columns all hold providers.id (see src/lib/providerRecord.ts).
@@ -53,6 +53,7 @@ const TYPE_LABEL: Record<OfferType, { en: string; ar: string }> = {
   stay: { en: "Stays", ar: "إقامات" },
   product: { en: "Products", ar: "منتجات" },
   event: { en: "Events", ar: "فعاليات" },
+  programme: { en: "Programmes", ar: "برامج" },
 };
 
 const ProviderProfile = () => {
@@ -77,7 +78,7 @@ const ProviderProfile = () => {
   });
 
   const { data: rawOffers = [] } = useQuery({
-    queryKey: ["provider-offers", provider?.id],
+    queryKey: ["provider-offers", provider?.id, provider?.role],
     queryFn: async () => {
       const results = await Promise.all(
         SOURCES.map(async (s) => {
@@ -85,6 +86,17 @@ const ProviderProfile = () => {
           return error ? [] : (data || []).map((r: any) => ({ ...r, __type: s.type, __route: s.route }));
         }),
       );
+      // Organisations also offer programmes and causes (shown under one "Programmes" tab).
+      // programs.owner_id holds the account (user) id; causes.owner_id may hold either id.
+      if (provider!.role === "organization") {
+        const ids = [provider!.id, provider!.user_id].filter(Boolean);
+        const [pr, ca] = await Promise.all([
+          (supabase as any).from("programs").select("id, slug, title_en, title_ar, image, start_date, end_date").in("owner_id", ids).eq("status", "published").limit(24),
+          (supabase as any).from("causes").select("id, slug, title_en, title_ar, image, category_en, category_ar").in("owner_id", ids).eq("status", "published").limit(24),
+        ]);
+        results.push((pr.data || []).map((r: any) => ({ ...r, __type: "programme", __route: "/program" })));
+        results.push((ca.data || []).map((r: any) => ({ ...r, __type: "programme", __route: "/cause", __cause: true })));
+      }
       return results.flat();
     },
     enabled: !!provider?.id,
@@ -124,6 +136,9 @@ const ProviderProfile = () => {
       r.start_date ? new Date(r.start_date.slice(0, 10) + "T00:00:00").toLocaleDateString(listingLocale(ar), { day: "numeric", month: "short" }) : null,
       r.is_free || !r.price ? (ar ? "مجاني" : "Free") : money(r.price),
     ];
+    if (r.__type === "programme") meta = r.__cause
+      ? [ar ? "قضية" : "Cause", ar ? r.category_ar || r.category_en : r.category_en]
+      : [ar ? "برنامج" : "Programme", r.start_date ? new Date(r.start_date.slice(0, 10) + "T00:00:00").toLocaleDateString(listingLocale(ar), { day: "numeric", month: "short", year: "numeric" }) : null];
     return { type: r.__type, id: r.id, path: `${r.__route}/${r.slug || r.id}`, title, image: r.image || null, meta: meta.filter(Boolean).join(" · ") };
   }), [rawOffers, ar, egp]);
 
