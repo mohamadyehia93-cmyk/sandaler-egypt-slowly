@@ -105,7 +105,7 @@ const EventCalendar = () => {
     const p = isPast(e);
     return (
       <button type="button" onClick={() => navigate(route(e))} className={`w-full text-start ${p ? "opacity-60" : ""}`}>
-        <PosterDate start={e.date} end={e.end} ar={ar} past={p} countdown={countdownLabel(e.date, p, ar)}
+        <PosterDate start={e.date} end={e.end} ar={ar} past={p} time={e.time} countdown={countdownLabel(e.date, p, ar)}
           where={[e.venue?.[lang], cityName(e.cityId)].filter(Boolean).join(" · ") || null} />
         <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} !text-base text-foreground mt-2 px-1`}>{e.title[lang]}</p>
         <p className="text-[13px] text-muted-foreground px-1">{typeLabel(e.type)} · {priceLabel(e.price)}</p>
