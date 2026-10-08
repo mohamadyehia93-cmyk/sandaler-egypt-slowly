@@ -16,19 +16,15 @@ const SectionHeader = forwardRef(({ titleKey, onSeeAll, id, children }: SectionH
   const isAr = lang === "ar";
 
   return (
-    <section ref={ref} id={id} className="mb-12 scroll-mt-28">
-      <div className="flex items-end justify-between px-4 mb-4">
-        <h2
-          className={`text-[11px] font-semibold text-muted-foreground ${
-            isAr ? "" : "uppercase tracking-[0.12em]"
-          }`}
-        >
+    <section ref={ref} id={id} className="py-6 scroll-mt-28">
+      <div className="flex items-baseline justify-between gap-3 px-4 mb-3">
+        <h2 className={`listing-h2 ${isAr ? "lang-ar" : "lang-en"} text-foreground`}>
           {t(titleKey)}
         </h2>
         {onSeeAll && (
           <button
             onClick={onSeeAll}
-            className="flex items-center gap-0.5 text-xs font-medium text-muted-foreground/80 hover:text-primary transition-colors"
+            className="flex items-center gap-0.5 min-h-[44px] text-sm font-semibold text-primary-dark flex-shrink-0"
           >
             {t("section.seeAll")}
             <Arrow className="w-3.5 h-3.5" />

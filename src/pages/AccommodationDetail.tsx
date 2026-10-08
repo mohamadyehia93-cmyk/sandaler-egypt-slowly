@@ -142,8 +142,12 @@ const AccommodationDetail = () => {
   const honestLine = ar
     ? "لا يتم الدفع داخل التطبيق. يؤكد المضيف التوفر ويرتب الدفع معك."
     : "No payment is taken in the app. The host confirms availability and arranges payment with you.";
-  // The booking page reads type, id and guests for stays (dates are chosen there).
-  const goBook = () => navigate(`/booking?type=stay&id=${place.id}&guests=${guests}`);
+  const goBook = () => {
+    const q = new URLSearchParams({ type: "stay", id: place.id, guests: String(guests) });
+    if (checkIn) q.set("checkin", checkIn);
+    if (checkIn && checkOut) q.set("checkout", checkOut);
+    navigate(`/booking?${q.toString()}`);
+  };
   const messageHost = () => navigate(`/inbox?personId=${place.host_id}&kind=provider`);
 
   const stepper = (

@@ -84,7 +84,10 @@ const Booking = () => {
   });
 
   const [guests, setGuests] = useState(Number(params.get("guests")) || 1);
-  const [selectedDate, setSelectedDate] = useState("");
+  // Stays: the stay page may pass &checkin=YYYY-MM-DD&checkout=YYYY-MM-DD.
+  const isoParam = (k: string) => { const v = params.get(k) || ""; return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : ""; };
+  const [selectedDate, setSelectedDate] = useState(type === "stay" ? isoParam("checkin") : "");
+  const [checkOut, setCheckOut] = useState(type === "stay" ? isoParam("checkout") : "");
   const [selectedSlotId, setSelectedSlotId] = useState<string>(slotId || "");
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [step, setStep] = useState<"details" | "payment" | "confirmed">("details");
@@ -164,7 +167,10 @@ const Booking = () => {
   const isExperience = type === "experience";
   const chosenSlot = (slots || []).find((s: any) => s.id === selectedSlotId);
   const unitPrice = chosenSlot?.price ?? item.price ?? item.price_per_night ?? 0;
-  const nights = isStay ? 1 : 0;
+  const nightsBetween = selectedDate && checkOut
+    ? Math.round((new Date(checkOut + "T00:00:00").getTime() - new Date(selectedDate + "T00:00:00").getTime()) / 86400000)
+    : 0;
+  const nights = isStay ? Math.max(1, nightsBetween) : 0;
   const quantity = isProduct ? guests : 1;
   const subtotal = isProduct ? unitPrice * quantity : isStay ? unitPrice * nights : unitPrice * guests;
   // Estimated only. No card is charged anywhere in this flow, so this is presented
@@ -383,7 +389,18 @@ const Booking = () => {
                   </p>
                 )
               ) : (
+                isStay ? (
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className="text-[13px] text-muted-foreground">{ar ? "الوصول" : "Check-in"}
+                      <input type="date" value={selectedDate} min={new Date().toISOString().slice(0, 10)} onChange={(e) => { setSelectedDate(e.target.value); if (checkOut && checkOut <= e.target.value) setCheckOut(""); }} className={`${inputCls} mt-1`} />
+                    </label>
+                    <label className="text-[13px] text-muted-foreground">{ar ? "المغادرة" : "Check-out"}
+                      <input type="date" value={checkOut} min={selectedDate || new Date().toISOString().slice(0, 10)} onChange={(e) => setCheckOut(e.target.value)} className={`${inputCls} mt-1`} />
+                    </label>
+                  </div>
+                ) : (
                 <input type="date" value={selectedDate} min={new Date().toISOString().slice(0, 10)} onChange={(e) => setSelectedDate(e.target.value)} className={inputCls} aria-label={t("booking.date_label")} />
+                )
               )}
             </section>
           )}

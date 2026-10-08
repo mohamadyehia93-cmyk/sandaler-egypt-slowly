@@ -18,9 +18,9 @@ const ExperienceCards = () => {
   );
 
   return (
-    <section id="experiences" className="mb-12 scroll-mt-28">
+    <section id="experiences" className="py-6 scroll-mt-28">
       <div className="px-4 mb-4 flex items-center justify-between gap-3">
-        <h2 className={`text-[11px] font-semibold text-muted-foreground ${lang === "ar" ? "" : "uppercase tracking-[0.12em]"}`}>
+        <h2 className={`listing-h2 ${lang === "ar" ? "lang-ar" : "lang-en"} text-foreground`}>
           {t("section.experiences")}
         </h2>
         <select

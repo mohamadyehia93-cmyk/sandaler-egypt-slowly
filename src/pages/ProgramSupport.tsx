@@ -159,37 +159,37 @@ const ProgramSupport = () => {
   };
 
   const inputClass = (key: string) =>
-    `w-full rounded-xl border-2 bg-card p-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground ${
+    `w-full rounded-xl border bg-background px-4 py-3 min-h-[48px] text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground ${
       errors[key] ? "border-destructive" : "border-border focus:border-primary"
     }`;
 
   const chipClass = (active: boolean) =>
-    `w-full rounded-xl border-2 p-3 text-start text-xs font-medium transition-colors ${
-      active ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-foreground"
+    `w-full rounded-xl border min-h-[48px] p-3 text-start text-[15px] font-medium transition-colors ${
+      active ? "border-primary bg-primary/10 text-primary-dark" : "border-border bg-background text-foreground"
     }`;
 
   return (
-    <div className="min-h-screen bg-surface pb-16">
-      <header className="sticky top-0 z-40 flex items-center gap-3 border-b border-border bg-background px-4 py-3">
-        <button onClick={() => navigate(`/program/${id}`)} className="rounded-full p-1.5 hover:bg-secondary" aria-label={ar ? "رجوع" : "Back"}>
+    <div className="min-h-screen bg-background pb-24">
+      <header className="sticky top-0 z-40 flex items-center gap-3 border-b border-border bg-background px-4 py-2">
+        <button onClick={() => navigate(`/program/${id}`)} className="tap-target rounded-full hover:bg-muted" aria-label={ar ? "رجوع" : "Back"}>
           <ArrowLeft className="h-5 w-5 text-foreground rtl:rotate-180" />
         </button>
-        <h1 className="text-lg font-bold text-foreground">{config.label[lang]}</h1>
+        <h1 className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{config.label[lang]}</h1>
       </header>
 
-      <div className="px-4 pt-5 space-y-5">
-        <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
-          {program.image && <img src={program.image} alt="" className="h-14 w-14 rounded-lg object-cover" />}
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-foreground">{title}</p>
-            <p className="text-xs text-muted-foreground">{config.desc[lang]}</p>
+      <div className="max-w-[680px] mx-auto px-4 pt-5 space-y-5">
+        <div className="rounded-2xl border border-border bg-card shadow-card p-3 flex gap-3">
+          <div className="w-24 h-20 rounded-xl overflow-hidden bg-muted flex-shrink-0">{program.image && <img src={program.image} alt="" className="w-full h-full object-cover" />}</div>
+          <div className="min-w-0 flex-1 flex flex-col justify-center">
+            <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} !text-base leading-snug text-foreground line-clamp-2`}>{title}</p>
+            <p className="text-[13px] text-muted-foreground">{config.desc[lang]}</p>
           </div>
         </div>
 
         {!ownerId ? (
-          <div className="flex items-start gap-2.5 rounded-xl border border-border bg-card p-4">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-            <p className="text-xs leading-relaxed text-muted-foreground">
+          <div className="flex items-start gap-2.5 rounded-xl border border-border bg-muted/40 p-4">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary-dark" />
+            <p className="text-[13px] leading-relaxed text-muted-foreground">
               {ar
                 ? "لا توجد جهة يمكنها استقبال هذا الطلب لهذا البرنامج حالياً."
                 : "No organisation can currently receive this request for this program."}
@@ -216,10 +216,13 @@ const ProgramSupport = () => {
           </div>
         ) : (
           <div className="space-y-4">
+            {!noPayment && (
+              <p className="text-[13px] text-muted-foreground">{ar ? "لا يتم الدفع داخل التطبيق. تراجع المنظمة طلبك وتتواصل معك." : "No payment is taken in the app. The organisation reviews your request and contacts you."}</p>
+            )}
             {noPayment && (
-              <div className="flex items-start gap-2.5 rounded-xl border border-border bg-card p-4">
-                <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-                <p className="text-xs leading-relaxed text-muted-foreground">
+              <div className="flex items-start gap-2.5 rounded-xl border border-border bg-muted/40 p-4">
+                <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary-dark" />
+                <p className="text-[13px] leading-relaxed text-muted-foreground">
                   {ar
                     ? "لا يوجد دفع أو تسليم داخل التطبيق. املأ التفاصيل أدناه وستتواصل معك المنظمة لترتيبها."
                     : "There is no in-app payment or delivery. Fill in the details below and the organisation will contact you to arrange it."}
@@ -230,7 +233,7 @@ const ProgramSupport = () => {
             {isDonate && (
               <>
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">{ar ? "المبلغ" : "Amount"} *</label>
+                  <label className="mb-1.5 block text-[13px] font-semibold text-foreground">{ar ? "المبلغ" : "Amount"} *</label>
                   <div className="grid grid-cols-3 gap-2">
                     {PRESET_AMOUNTS.map((a) => (
                       <button key={a} onClick={() => { setAmount(a); setUseCustom(false); }} className={chipClass(!useCustom && amount === a)}>
@@ -251,11 +254,11 @@ const ProgramSupport = () => {
                       placeholder={ar ? "أدخل المبلغ بالجنيه" : "Enter amount in EGP"}
                     />
                   )}
-                  {errors.amount && <p className="mt-1 text-[10px] text-destructive">{errors.amount}</p>}
+                  {errors.amount && <p className="mt-1 text-[13px] text-destructive">{errors.amount}</p>}
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">{ar ? "الطريقة المفضلة" : "Preferred method"}</label>
+                  <label className="mb-1.5 block text-[13px] font-semibold text-foreground">{ar ? "الطريقة المفضلة" : "Preferred method"}</label>
                   <div className="space-y-2">
                     {PAY_METHODS.map((m) => (
                       <button key={m.id} onClick={() => setPayMethod(m.id)} className={chipClass(payMethod === m.id)}>
@@ -275,16 +278,16 @@ const ProgramSupport = () => {
             {isGift && (
               <>
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">{ar ? "ما الذي تريد التبرع به؟" : "What are you giving?"} *</label>
+                  <label className="mb-1.5 block text-[13px] font-semibold text-foreground">{ar ? "ما الذي تريد التبرع به؟" : "What are you giving?"} *</label>
                   <input value={itemName} onChange={(e) => setItemName(e.target.value)} maxLength={120} className={inputClass("itemName")} placeholder={ar ? "مثال: 20 حقيبة مدرسية" : "e.g. 20 school backpacks"} />
-                  {errors.itemName && <p className="mt-1 text-[10px] text-destructive">{errors.itemName}</p>}
+                  {errors.itemName && <p className="mt-1 text-[13px] text-destructive">{errors.itemName}</p>}
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">{ar ? "الكمية" : "Quantity"}</label>
+                  <label className="mb-1.5 block text-[13px] font-semibold text-foreground">{ar ? "الكمية" : "Quantity"}</label>
                   <input type="number" min={1} value={quantity} onChange={(e) => setQuantity(e.target.value)} className={inputClass("quantity")} />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-foreground">{ar ? "طريقة التسليم" : "Hand-over"}</label>
+                  <label className="mb-1.5 block text-[13px] font-semibold text-foreground">{ar ? "طريقة التسليم" : "Hand-over"}</label>
                   <div className="space-y-2">
                     {HANDOVER.map((m) => (
                       <button key={m.id} onClick={() => setHandover(m.id)} className={chipClass(handover === m.id)}>
@@ -297,22 +300,22 @@ const ProgramSupport = () => {
             )}
 
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-foreground">{ar ? "الاسم الكامل" : "Full Name"} *</label>
+              <label className="mb-1.5 block text-[13px] font-semibold text-foreground">{ar ? "الاسم الكامل" : "Full Name"} *</label>
               <input value={fullName} onChange={(e) => setFullName(e.target.value)} maxLength={100} className={inputClass("fullName")} placeholder={ar ? "أدخل اسمك" : "Enter your name"} />
-              {errors.fullName && <p className="mt-1 text-[10px] text-destructive">{errors.fullName}</p>}
+              {errors.fullName && <p className="mt-1 text-[13px] text-destructive">{errors.fullName}</p>}
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-foreground">{ar ? "البريد الإلكتروني" : "Email"} *</label>
+              <label className="mb-1.5 block text-[13px] font-semibold text-foreground">{ar ? "البريد الإلكتروني" : "Email"} *</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={255} className={inputClass("email")} placeholder="example@email.com" />
-              {errors.email && <p className="mt-1 text-[10px] text-destructive">{errors.email}</p>}
+              {errors.email && <p className="mt-1 text-[13px] text-destructive">{errors.email}</p>}
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-foreground">{ar ? "رقم الهاتف" : "Phone Number"} *</label>
+              <label className="mb-1.5 block text-[13px] font-semibold text-foreground">{ar ? "رقم الهاتف" : "Phone Number"} *</label>
               <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={20} className={inputClass("phone")} placeholder="+20 1xx xxx xxxx" />
-              {errors.phone && <p className="mt-1 text-[10px] text-destructive">{errors.phone}</p>}
+              {errors.phone && <p className="mt-1 text-[13px] text-destructive">{errors.phone}</p>}
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-foreground">
+              <label className="mb-1.5 block text-[13px] font-semibold text-foreground">
                 {noPayment
                   ? (ar ? "التاريخ المفضل (اختياري)" : "Preferred date (optional)")
                   : isConsult
@@ -322,7 +325,7 @@ const ProgramSupport = () => {
               <input type="date" value={availability} onChange={(e) => setAvailability(e.target.value)} className={inputClass("availability")} />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-foreground">
+              <label className="mb-1.5 block text-[13px] font-semibold text-foreground">
                 {noPayment
                   ? (ar ? "ملاحظة للمنظمة (اختياري)" : "Note to the organisation (optional)")
                   : isConsult
@@ -331,10 +334,10 @@ const ProgramSupport = () => {
                 {!noPayment && " *"}
               </label>
               <textarea value={message} onChange={(e) => setMessage(e.target.value)} maxLength={500} rows={4} className={`${inputClass("message")} resize-none`} placeholder={ar ? "اكتب هنا..." : "Tell the organisation more..."} />
-              {errors.message && <p className="mt-1 text-[10px] text-destructive">{errors.message}</p>}
+              {errors.message && <p className="mt-1 text-[13px] text-destructive">{errors.message}</p>}
             </div>
 
-            <button onClick={handleSubmit} disabled={submitting} className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground disabled:opacity-60">
+            <button onClick={handleSubmit} disabled={submitting} className="w-full h-12 rounded-xl bg-primary text-[15px] font-bold text-primary-foreground disabled:opacity-60">
               {submitting
                 ? (ar ? "جارٍ الإرسال..." : "Sending...")
                 : noPayment

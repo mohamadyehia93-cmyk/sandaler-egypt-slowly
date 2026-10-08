@@ -58,7 +58,7 @@ const Index = () => {
   const showExtras = filter === "all";
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-screen bg-background">
       <SEO url="/" />
       {/* Slim floating header: brand, language, search, bell (carries messages) */}
       <header
@@ -118,7 +118,7 @@ const Index = () => {
       <DiscoverFilters active={filter} onChange={setFilter} />
 
       <CardSizeContext.Provider value="lg">
-      <div className="max-w-6xl mx-auto pt-10 [&>section]:mb-16">
+      <div className="max-w-6xl mx-auto pt-4 [&>section]:mb-0 [&>section+section]:border-t [&>section+section]:border-border">
         {/* Stories and inspiration lead the feed */}
         {show("stories") && <LatestPosts />}
         {filter === "all" && <RegionScroll />}

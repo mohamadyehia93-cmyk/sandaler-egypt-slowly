@@ -125,7 +125,7 @@ const CauseSupportConsult = () => {
   const fmt = consultFormats.find((f) => f.id === selectedFormat);
 
   return (
-    <div className="min-h-screen bg-surface pb-28">
+    <div className="min-h-screen bg-background pb-28">
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
         {step !== "success" && (
           <button onClick={handleBack} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
@@ -276,7 +276,7 @@ const CauseSupportConsult = () => {
                   placeholder={lang === "ar" ? "أدخل اسمك" : "Enter your name"}
                   className={`w-full p-3 rounded-xl border-2 bg-card text-sm text-foreground outline-none placeholder:text-muted-foreground transition-colors ${errors.fullName ? "border-destructive" : "border-border focus:border-primary"}`}
                 />
-                {errors.fullName && <p className="text-[10px] text-destructive mt-1">{errors.fullName}</p>}
+                {errors.fullName && <p className="text-[13px] text-destructive mt-1">{errors.fullName}</p>}
               </div>
 
               {/* Email */}
@@ -286,7 +286,7 @@ const CauseSupportConsult = () => {
                   placeholder="example@email.com"
                   className={`w-full p-3 rounded-xl border-2 bg-card text-sm text-foreground outline-none placeholder:text-muted-foreground transition-colors ${errors.email ? "border-destructive" : "border-border focus:border-primary"}`}
                 />
-                {errors.email && <p className="text-[10px] text-destructive mt-1">{errors.email}</p>}
+                {errors.email && <p className="text-[13px] text-destructive mt-1">{errors.email}</p>}
               </div>
 
               {/* Phone */}
@@ -296,7 +296,7 @@ const CauseSupportConsult = () => {
                   placeholder="+20 1xx xxx xxxx"
                   className={`w-full p-3 rounded-xl border-2 bg-card text-sm text-foreground outline-none placeholder:text-muted-foreground transition-colors ${errors.phone ? "border-destructive" : "border-border focus:border-primary"}`}
                 />
-                {errors.phone && <p className="text-[10px] text-destructive mt-1">{errors.phone}</p>}
+                {errors.phone && <p className="text-[13px] text-destructive mt-1">{errors.phone}</p>}
               </div>
 
               {/* Company (optional) */}
@@ -320,7 +320,7 @@ const CauseSupportConsult = () => {
                     >{yr}</button>
                   ))}
                 </div>
-                {errors.yearsExp && <p className="text-[10px] text-destructive mt-1">{errors.yearsExp}</p>}
+                {errors.yearsExp && <p className="text-[13px] text-destructive mt-1">{errors.yearsExp}</p>}
               </div>
 
               {/* Availability */}
@@ -339,7 +339,7 @@ const CauseSupportConsult = () => {
                     >{a.label[lang]}</button>
                   ))}
                 </div>
-                {errors.availability && <p className="text-[10px] text-destructive mt-1">{errors.availability}</p>}
+                {errors.availability && <p className="text-[13px] text-destructive mt-1">{errors.availability}</p>}
               </div>
 
               {/* Message */}
@@ -350,7 +350,7 @@ const CauseSupportConsult = () => {
                   className={`w-full p-3 rounded-xl border-2 bg-card text-sm text-foreground outline-none placeholder:text-muted-foreground resize-none transition-colors ${errors.message ? "border-destructive" : "border-border focus:border-primary"}`}
                 />
                 <div className="flex justify-between">
-                  {errors.message && <p className="text-[10px] text-destructive mt-1">{errors.message}</p>}
+                  {errors.message && <p className="text-[13px] text-destructive mt-1">{errors.message}</p>}
                   <p className="text-[10px] text-muted-foreground mt-1 ms-auto">{message.length}/500</p>
                 </div>
               </div>
