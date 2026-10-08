@@ -1,10 +1,8 @@
 import MessageOwnerButton from "@/components/MessageOwnerButton";
-import ShareButton from "@/components/ShareButton";
-import { ArrowLeft, Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle, ChevronRight, Feather, Footprints, Layers } from "lucide-react";
+import { Headphones, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, MapPin, Clock, Navigation, Loader2, Download, CheckCircle2, Trash2, WifiOff, AlertCircle, Feather, Footprints, Layers } from "lucide-react";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import WishlistButton from "@/components/WishlistButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +15,14 @@ import { useUserLocation, distanceMeters, formatDistance } from "@/hooks/useUser
 import { useOfflineTour, useOnlineStatus } from "@/hooks/useOfflineTour";
 import { toast } from "sonner";
 import NotFoundView from "@/components/NotFound";
+import ListingHero from "@/components/listing/ListingHero";
+import KeyFacts, { type KeyFact } from "@/components/listing/KeyFacts";
+import Section from "@/components/listing/Section";
+import ActionBar from "@/components/listing/ActionBar";
+import ReadBeforeYouGo from "@/components/listing/ReadBeforeYouGo";
+import Avatar from "@/components/AvatarFallback";
+import { fmtNumber, formatDuration, splitStandfirst } from "@/components/listing/format";
+import { Languages, Tag, Rewind, FastForward } from "lucide-react";
 import { directionsToUrl, routeUrl, hasCoords } from "@/lib/mapsLinks";
 
 
@@ -48,16 +54,18 @@ type PlayItem = {
 };
 
 
-const formatTime = (seconds: number) => {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
+const formatTime = (seconds: number, ar = false) => {
+  const sec = Number.isFinite(seconds) ? seconds : 0;
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  const txt = `${m}:${s.toString().padStart(2, "0")}`;
+  return ar ? txt.replace(/\d/g, (d) => "٠١٢٣٤٥٦٧٨٩"[Number(d)]) : txt;
 };
 
 const AudioTourDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { lang, t } = useI18n();
+  const { lang } = useI18n();
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -87,12 +95,20 @@ const AudioTourDetail = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("culture_actors")
-        .select("id, slug, name_en, name_ar, title_en, title_ar, image, expertise_en, expertise_ar")
+        .select("id, slug, name_en, name_ar, title_en, title_ar, image, expertise_en, expertise_ar, bio_en, bio_ar")
         .eq("id", narratorActorId!)
         .maybeSingle();
       return data;
     },
   });
+
+  const { data: tourCity } = useQuery({
+    queryKey: ["city-name", (tour as any)?.city_id],
+    enabled: !!(tour as any)?.city_id,
+    queryFn: async () => (await supabase.from("cities").select("name_en, name_ar").eq("id", (tour as any).city_id).maybeSingle()).data,
+  });
+  const playerRef = useRef<HTMLDivElement | null>(null);
+  const stopsRef = useRef<HTMLElement | null>(null);
 
   const dbStops = ((tour?.stops as TourStop[] | undefined) || []).filter(Boolean);
 
@@ -358,309 +374,294 @@ const AudioTourDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-4 space-y-4">
-        <Skeleton className="h-64 w-full rounded-xl" />
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-20 w-full" />
+      <div className="min-h-screen bg-background">
+        <Skeleton className="h-[56vh] max-h-[460px] w-full rounded-none" />
+        <div className="max-w-[680px] mx-auto px-4 py-4 space-y-3">
+          <Skeleton className="h-32 w-full rounded-2xl" />
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-20 w-full" />
+        </div>
       </div>
     );
   }
 
   if (!tour) return <NotFoundView context="audio-tour" />;
 
-  const title = lang === "ar" ? (tour.title_ar || tour.title_en) : tour.title_en;
-  const description = lang === "ar" ? (tour.description_ar || tour.description_en) : tour.description_en;
-  const narratorName = lang === "ar" ? (tour.narrator_name_ar || tour.narrator_name_en) : tour.narrator_name_en;
+  const ar = lang === "ar";
+  const title = (ar ? (tour.title_ar || tour.title_en) : tour.title_en) || "";
+  const description = (ar ? (tour.description_ar || tour.description_en) : tour.description_en) || "";
+  const narratorName = ar ? (tour.narrator_name_ar || tour.narrator_name_en) : tour.narrator_name_en;
+  const cityName = tourCity ? (ar ? tourCity.name_ar || tourCity.name_en : tourCity.name_en) : null;
+  const { first, rest } = splitStandfirst(description);
+  const priceLabel = !tour.price ? (ar ? "مجانية" : "Free") : `${fmtNumber(tour.price, ar)} ${ar ? "ج.م" : "EGP"}`;
+  const langs: string[] = Array.isArray(tour.languages) ? tour.languages.filter(Boolean) : [];
+  const langName = (c: string) => ({ en: ar ? "الإنجليزية" : "English", ar: ar ? "العربية" : "Arabic" } as Record<string, string>)[c.toLowerCase()] || c;
+
+  const facts: KeyFact[] = [];
+  const dur = formatDuration(tour.duration_minutes, ar);
+  if (dur) facts.push({ icon: Clock, label: dur });
+  if (stopsCount) facts.push({ icon: MapPin, label: ar ? `${fmtNumber(stopsCount, ar)} محطات` : `${stopsCount} ${stopsCount === 1 ? "stop" : "stops"}` });
+  if (langs.length) facts.push({ icon: Languages, label: langs.map(langName).join(" · ") });
+  facts.push({ icon: Tag, label: priceLabel });
+
+  const startTour = () => {
+    if (audioSrc) {
+      playerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (!isPlaying) togglePlay();
+    } else {
+      stopsRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const playlistMode = virtualMode || usesPlaylist;
+  const nowPlaying = (() => {
+    if (currentItem) {
+      const tt = ar ? currentItem.title_ar || currentItem.title_en : currentItem.title_en || currentItem.title_ar;
+      if (tt) return tt;
+    }
+    const s = dbStops[activeStopIndex];
+    return s ? (ar ? s.label_ar || s.label_en : s.label_en || s.label_ar) : "";
+  })();
+
+  const pillBtn = "min-h-[44px] px-4 rounded-full border border-border text-sm font-semibold text-foreground inline-flex items-center gap-1.5";
 
   return (
-    <div className="min-h-screen bg-background pb-32">
-      {/* Hero */}
-      <div className="relative">
-        <img src={tour.image || "/placeholder.svg"} alt={title} className="w-full h-64 object-cover" />
-        <button onClick={() => navigate(-1)} className="absolute top-4 left-4 p-2 rounded-full bg-background/80 backdrop-blur-sm" aria-label={lang === "ar" ? "رجوع" : "Back"}>
-          <ArrowLeft className="w-5 h-5 text-foreground" />
-        </button>
-        <div className="absolute top-4 right-4 flex gap-2">
-          <ShareButton title={lang === "ar" ? (tour as any).title_ar : (tour as any).title_en} />
-          <WishlistButton itemType="audio_tour" itemId={tour?.id} />
-        </div>
-        <div className="absolute bottom-3 left-4 flex gap-2">
-          <span className="bg-primary/90 text-primary-foreground text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-            <Headphones className="w-3 h-3" /> {lang === "ar" ? "جولة صوتية" : "Audio Tour"}
-          </span>
+    <div className="min-h-screen bg-background pb-44 lg:pb-16">
+      <ListingHero
+        images={[tour.image].filter(Boolean) as string[]}
+        title={title}
+        eyebrow={[ar ? "جولة صوتية" : "Audio tour", cityName].filter(Boolean).join(" · ")}
+        ar={ar}
+        onBack={() => navigate(-1)}
+        wishlistType="audio_tour"
+        wishlistId={tour.id}
+        overlap
+        placeholder={<div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/40 to-accent/40"><Headphones className="w-16 h-16 text-primary-dark/60" /></div>}
+      />
+
+      <div className="max-w-[680px] mx-auto px-4">
+        {/* PLAYER — wired only to this tour's own audio; otherwise an honest "coming soon" */}
+        <div ref={playerRef} className="-mt-6 relative z-10 rounded-2xl border border-border bg-card shadow-card p-4">
+          {audioSrc ? (
+            <>
+              {playlistMode && stopsCount > 0 && (
+                <p dir="auto" data-testid="now-playing" className="text-[13px] text-muted-foreground mb-2 text-start truncate">
+                  {ar ? `المحطة ${fmtNumber(activeStopIndex + 1, ar)} من ${fmtNumber(stopsCount, ar)}` : `Stop ${activeStopIndex + 1} of ${stopsCount}`}
+                  {currentItem?.segIndex != null && <> · {ar ? `المقطع ${fmtNumber(currentItem.segIndex + 1, ar)} من ${fmtNumber(currentItem.segCount, ar)}` : `Segment ${currentItem.segIndex + 1} of ${currentItem.segCount}`}</>}
+                  {nowPlaying && <> · {nowPlaying}</>}
+                </p>
+              )}
+              <div className="flex items-center gap-4">
+                <button data-testid="play-toggle" type="button" onClick={togglePlay} aria-label={isPlaying ? (ar ? "إيقاف مؤقت" : "Pause") : (ar ? "تشغيل" : "Play")}
+                  className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 shadow-elevated">
+                  {isPlaying ? <Pause className="w-7 h-7" /> : <Play className="w-7 h-7 ms-1" />}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <Slider value={[progressPercent]} max={100} step={0.1} onValueChange={handleSeek} aria-label={ar ? "موضع التشغيل" : "Playback position"} />
+                  <div className="flex justify-between mt-2 text-[13px] text-muted-foreground tabular-nums" dir="ltr">
+                    <span>{formatTime(currentTime, ar)}</span>
+                    <span>{formatTime(duration, ar)}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between mt-3">
+                <button type="button" onClick={cycleSpeed} className="tap-target text-[13px] font-bold text-muted-foreground" aria-label={ar ? "سرعة التشغيل" : "Playback speed"}>{fmtNumber(playbackRate, ar)}×</button>
+                <div className="flex items-center gap-1">
+                  {playlistMode && (
+                    <button data-testid="skip-back" type="button" onClick={() => goToVirtualStop(-1)} aria-label={ar ? "السابق" : "Previous"} className="tap-target rounded-full"><SkipBack className={`w-5 h-5 ${ar ? "rotate-180" : ""}`} /></button>
+                  )}
+                  <button type="button" onClick={skipBackward} aria-label={ar ? "رجوع ١٥ ثانية" : "Back 15 seconds"} className="tap-target rounded-full flex-col !gap-0">
+                    <Rewind className="w-5 h-5" /><span className="text-[10px] font-semibold">{ar ? "١٥" : "15"}</span>
+                  </button>
+                  <button type="button" onClick={skipForward} aria-label={ar ? "تقديم ١٥ ثانية" : "Forward 15 seconds"} className="tap-target rounded-full flex-col !gap-0">
+                    <FastForward className="w-5 h-5" /><span className="text-[10px] font-semibold">{ar ? "١٥" : "15"}</span>
+                  </button>
+                  {playlistMode && (
+                    <button data-testid="skip-forward" type="button" onClick={() => goToVirtualStop(1)} aria-label={ar ? "التالي" : "Next"} className="tap-target rounded-full"><SkipForward className={`w-5 h-5 ${ar ? "rotate-180" : ""}`} /></button>
+                  )}
+                </div>
+                <button type="button" onClick={toggleMute} aria-label={isMuted ? (ar ? "إلغاء الكتم" : "Unmute") : (ar ? "كتم الصوت" : "Mute")} className="tap-target rounded-full">
+                  {isMuted ? <VolumeX className="w-5 h-5 text-muted-foreground" /> : <Volume2 className="w-5 h-5" />}
+                </button>
+              </div>
+
+              {/* Playback mode: on-location (GPS) vs listen-anywhere */}
+              <div className="mt-3 rounded-xl bg-muted/50 p-1 flex gap-1">
+                <button type="button" onClick={() => { if (virtualMode) toggleVirtualMode(); }}
+                  className={`flex-1 min-h-[44px] flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold ${!virtualMode ? "bg-background shadow-card text-foreground" : "text-muted-foreground"}`}>
+                  <Navigation className="w-4 h-4" /> {ar ? "أنا في المكان" : "I'm on location"}
+                </button>
+                <button type="button" onClick={() => { if (!virtualMode) toggleVirtualMode(); }}
+                  className={`flex-1 min-h-[44px] flex items-center justify-center gap-1.5 rounded-lg text-[13px] font-semibold ${virtualMode ? "bg-background shadow-card text-foreground" : "text-muted-foreground"}`}>
+                  <Headphones className="w-4 h-4" /> {ar ? "استمع من أي مكان" : "Listen from anywhere"}
+                </button>
+              </div>
+              {virtualMode && (
+                <p className="text-[13px] text-muted-foreground mt-2 leading-snug">
+                  {ar ? "تُشغَّل المحطات بالترتيب وتنتقل تلقائيًا — بدون موقع أو GPS." : "Stops play in order and advance automatically — no location needed."}
+                </p>
+              )}
+            </>
+          ) : (
+            <div className="flex items-center gap-4" data-testid="audio-coming-soon">
+              <div className="w-16 h-16 rounded-full bg-muted text-muted-foreground flex items-center justify-center flex-shrink-0">
+                <Headphones className="w-7 h-7" />
+              </div>
+              <div>
+                <p className="text-[15px] font-semibold text-foreground">{ar ? "الصوت قادم قريبًا" : "Audio coming soon"}</p>
+                <p className="text-[13px] text-muted-foreground leading-snug">
+                  {ar ? "لم يرفع الراوي تسجيل هذه الجولة بعد. يمكنك استعراض المحطات والمسار الآن." : "The narrator hasn't uploaded this tour's recording yet. You can still browse the stops and route."}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="px-4 pt-4">
-        <h1 className="text-xl font-bold text-foreground mb-1">{title}</h1>
-        <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
-          <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {tour.duration_minutes} {lang === "ar" ? "دقيقة" : "min"}</span>
-          <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {stopsCount} {lang === "ar" ? "محطات" : "stops"}</span>
-        </div>
+      <div className="mt-5"><KeyFacts facts={facts} /></div>
 
-        {/* Google Maps navigation — small text actions, never competing with Play */}
-        {(startNavUrl || fullRoute) && (
-          <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+      <div className="max-w-[680px] mx-auto px-4">
+        {first && <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground pt-6`}>{first}</p>}
+
+        {/* Banners */}
+        {!isOnline && (
+          <div className="mt-4 flex items-start gap-2 rounded-xl bg-warning/10 border border-warning px-3 py-2 text-foreground">
+            <WifiOff className="w-4 h-4 mt-1 shrink-0" />
+            <p className="text-[13px] leading-snug">
+              {ar
+                ? offline.downloaded ? "أنت غير متصل بالإنترنت — يتم تشغيل النسخة المحفوظة من الجولة." : "أنت غير متصل بالإنترنت. حمّل الجولة مسبقًا لتشغيلها بدون إنترنت."
+                : offline.downloaded ? "You're offline — playing the saved copy of this tour." : "You're offline. Download the tour ahead of time to use it without internet."}
+            </p>
+          </div>
+        )}
+        {geoUnavailable && (
+          <div className="mt-4 flex items-start gap-2 rounded-xl bg-destructive/10 border border-destructive/30 px-3 py-2 text-destructive">
+            <AlertCircle className="w-4 h-4 mt-1 shrink-0" />
+            <p className="text-[13px] leading-snug">
+              {ar ? "GPS غير متاح. ستعمل الجولة بترتيب المحطات بدون التتبع التلقائي." : "GPS unavailable. The tour will play in stop order without following your location."}
+            </p>
+          </div>
+        )}
+
+        {/* Quick actions: directions, whole route, offline copy */}
+        {(startNavUrl || fullRoute || (audioSrc && mapStops.length > 0)) && (
+          <div className="mt-4 flex flex-wrap gap-2">
             {startNavUrl && (
-              <a
-                href={startNavUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-testid="nav-to-start"
-                className="text-xs font-semibold text-primary flex items-center gap-1.5"
-              >
-                <Navigation className="w-3.5 h-3.5" />
-                {lang === "ar" ? "الاتجاهات إلى نقطة البداية" : "Directions to the start"}
+              <a href={startNavUrl} target="_blank" rel="noopener noreferrer" data-testid="nav-to-start" className={pillBtn}>
+                <Navigation className="w-4 h-4" /> {ar ? "إلى نقطة البداية" : "Directions to the start"}
               </a>
             )}
             {fullRoute && (
-              <a
-                href={fullRoute.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-testid="nav-full-route"
-                className="text-xs font-semibold text-primary flex items-center gap-1.5"
-              >
-                <Footprints className="w-3.5 h-3.5" />
-                {lang === "ar" ? "المسار كامل في خرائط جوجل" : "Whole route in Google Maps"}
+              <a href={fullRoute.url} target="_blank" rel="noopener noreferrer" data-testid="nav-full-route" className={pillBtn}>
+                <Footprints className="w-4 h-4" /> {ar ? "المسار في خرائط جوجل" : "Whole route in Google Maps"}
               </a>
             )}
-            {fullRoute?.truncatedTo && (
-              <span className="text-[11px] text-muted-foreground w-full">
-                {lang === "ar"
-                  ? `تعرض خرائط جوجل أول ${fullRoute.truncatedTo} محطات فقط (حدّ نقاط الطريق).`
-                  : `Google Maps shows the first ${fullRoute.truncatedTo} stops only (waypoint limit).`}
-              </span>
-            )}
-          </div>
-        )}
-
-
-
-        {/* Offline banner */}
-        {!isOnline && (
-          <div className="mb-3 flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-amber-900">
-            <WifiOff className="w-4 h-4 mt-0.5 shrink-0" />
-            <p className="text-xs leading-snug">
-              {lang === "ar"
-                ? offline.downloaded
-                  ? "أنت غير متصل بالإنترنت — يتم تشغيل النسخة المحفوظة من الجولة."
-                  : "أنت غير متصل بالإنترنت. حمّل الجولة مسبقاً لتشغيلها بدون إنترنت."
-                : offline.downloaded
-                ? "You're offline — playing the saved copy of this tour."
-                : "You're offline. Download the tour ahead of time to use it without internet."}
-            </p>
-          </div>
-        )}
-
-        {/* GPS unavailable banner */}
-        {geoUnavailable && (
-          <div className="mb-3 flex items-start gap-2 rounded-xl bg-destructive/10 border border-destructive/30 px-3 py-2 text-destructive">
-            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-            <p className="text-xs leading-snug">
-              {lang === "ar"
-                ? "GPS غير متاح. ستعمل الجولة بترتيب المحطات بدون التتبع التلقائي."
-                : "GPS unavailable. The tour will play in stop order without auto-following your location."}
-            </p>
-          </div>
-        )}
-
-        {/* Download for offline */}
-        {audioSrc && mapStops.length > 0 && (
-
-          <div className="mb-4">
-            {offline.downloaded ? (
-              <div className="flex items-center justify-between gap-2 rounded-xl bg-success/10 border border-success/30 px-3 py-2">
-                <div className="flex items-center gap-2 text-success">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="text-xs font-semibold">
-                    {lang === "ar" ? "متاحة بدون إنترنت" : "Available offline"}
-                  </span>
-                </div>
-                <button
-                  onClick={async () => {
-                    await offline.remove();
-                    toast.success(lang === "ar" ? "تم حذف النسخة المحفوظة" : "Offline copy removed");
-                  }}
-                  className="text-xs text-muted-foreground flex items-center gap-1"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  {lang === "ar" ? "حذف" : "Remove"}
+            {audioSrc && mapStops.length > 0 && (
+              offline.downloaded ? (
+                <button type="button" className={pillBtn} onClick={async () => { await offline.remove(); toast.success(ar ? "تم حذف النسخة المحفوظة" : "Offline copy removed"); }}>
+                  <CheckCircle2 className="w-4 h-4 text-success" /> {ar ? "متاحة بدون إنترنت" : "Available offline"} <Trash2 className="w-4 h-4 text-muted-foreground" />
                 </button>
-              </div>
-            ) : offline.downloading ? (
-              <div className="rounded-xl bg-primary/10 border border-primary/30 px-3 py-2">
-                <div className="flex items-center gap-2 text-primary mb-1">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-xs font-semibold">
-                    {lang === "ar" ? `جارٍ التحميل... ${offline.progress}%` : `Downloading... ${offline.progress}%`}
-                  </span>
-                </div>
-                <div className="h-1.5 bg-primary/20 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary transition-all"
-                    style={{ width: `${offline.progress}%` }}
-                  />
-                </div>
-              </div>
-            ) : (
-              <button
-                onClick={async () => {
-                  toast.info(lang === "ar" ? "بدء تحميل الجولة..." : "Starting download...");
+              ) : offline.downloading ? (
+                <span className={pillBtn}><Loader2 className="w-4 h-4 animate-spin" /> {ar ? `جارٍ التحميل ${fmtNumber(offline.progress, ar)}٪` : `Downloading ${offline.progress}%`}</span>
+              ) : (
+                <button type="button" disabled={!isOnline} className={`${pillBtn} disabled:opacity-50`} onClick={async () => {
+                  toast.info(ar ? "بدء تحميل الجولة..." : "Starting download...");
                   await offline.download(audioSrc, mapStops.map((s) => ({ lat: s.lat, lng: s.lng })));
-                  toast.success(lang === "ar" ? "الجولة متاحة الآن بدون إنترنت" : "Tour saved for offline use");
-                }}
-                disabled={!isOnline}
-                className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-xl py-2.5 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Download className="w-4 h-4" />
-                {lang === "ar" ? "تحميل للاستخدام بدون إنترنت" : "Download for offline use"}
-              </button>
+                  toast.success(ar ? "الجولة متاحة الآن بدون إنترنت" : "Tour saved for offline use");
+                }}>
+                  <Download className="w-4 h-4" /> {ar ? "حفظ للاستماع بدون إنترنت" : "Save for offline"}
+                </button>
+              )
             )}
           </div>
+        )}
+        {fullRoute?.truncatedTo && (
+          <p className="text-[13px] text-muted-foreground mt-2">
+            {ar ? `تعرض خرائط جوجل أول ${fmtNumber(fullRoute.truncatedTo, ar)} محطات فقط.` : `Google Maps shows the first ${fullRoute.truncatedTo} stops only (waypoint limit).`}
+          </p>
+        )}
+
+        {rest && (
+          <Section title={ar ? "عن الجولة" : "About this tour"} ar={ar} className="mt-6">
+            <p className="whitespace-pre-line">{rest}</p>
+            <MachineTranslatedNote meta={(tour as any)?.translation_meta} field={ar ? "description_ar" : "description_en"} />
+          </Section>
         )}
 
         {/* Narrator */}
         {narratorName && (() => {
           const actor = narratorActor as any;
-          const displayName = actor ? (lang === "ar" ? (actor.name_ar || actor.name_en) : actor.name_en) : narratorName;
-          const displayTitle = actor ? (lang === "ar" ? (actor.title_ar || actor.title_en) : actor.title_en) : null;
+          const displayName = actor ? (ar ? (actor.name_ar || actor.name_en) : actor.name_en) : narratorName;
+          const displayTitle = actor ? (ar ? (actor.title_ar || actor.title_en) : actor.title_en) : null;
           const displayImage = actor?.image || tour.narrator_image;
-          const expertise = actor ? ((lang === "ar" ? (actor.expertise_ar || actor.expertise_en) : actor.expertise_en) ?? []) as string[] : [];
+          const bio = actor ? (ar ? actor.bio_ar || actor.bio_en : actor.bio_en || actor.bio_ar) : null;
+          const expertise = actor ? ((ar ? (actor.expertise_ar || actor.expertise_en) : actor.expertise_en) ?? []) as string[] : [];
           const target = actor ? `/culture-actor/${actor.slug ?? actor.id}` : null;
-          const Wrapper: any = target ? "button" : "div";
           return (
-            <Wrapper
-              {...(target ? { onClick: () => navigate(target), type: "button" } : {})}
-              className={`w-full text-start flex items-center gap-3 p-3 rounded-xl bg-surface mb-6 ${target ? "hover:bg-secondary transition-colors cursor-pointer" : ""}`}
-            >
-              {displayImage ? (
-                <img src={displayImage} alt={displayName} className="w-14 h-14 rounded-full object-cover border-2 border-primary/20 flex-shrink-0" />
-              ) : (
-                <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center text-lg flex-shrink-0">🎙️</div>
+            <Section title={ar ? "الراوي" : "Your narrator"} ar={ar}>
+              <div className="flex gap-4 items-start">
+                <Avatar src={displayImage} name={displayName} className="w-16 h-16 rounded-full flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} !text-lg text-foreground`}>{displayName}</p>
+                  {displayTitle && <p className="text-[13px] text-muted-foreground">{displayTitle}</p>}
+                </div>
+              </div>
+              {bio && <p className="mt-3 line-clamp-4">{bio}</p>}
+              {expertise.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-3">
+                  {expertise.slice(0, 4).map((x, i) => <span key={i} className="px-2.5 py-1 rounded-full bg-muted text-[13px]">{x}</span>)}
+                </div>
               )}
-              <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-semibold text-primary uppercase tracking-wide flex items-center gap-1">
-                  <Feather className="w-3 h-3" />
-                  {lang === "ar" ? "الراوي" : "Narrator"}
-                </p>
-                <p className="text-sm font-semibold text-foreground truncate">{displayName}</p>
-                {displayTitle ? (
-                  <p className="text-xs text-muted-foreground truncate">{displayTitle}</p>
-                ) : (
-                  <p className="text-xs text-muted-foreground">{(tour.languages || ["en"]).join(", ")}</p>
+              <div className="flex flex-wrap gap-2 mt-4">
+                {target && (
+                  <button type="button" onClick={() => navigate(target)} className={pillBtn}>
+                    <Feather className="w-4 h-4" /> {ar ? "عرض الملف" : "View profile"}
+                  </button>
                 )}
-                {expertise.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-1.5">
-                    {expertise.slice(0, 2).map((s, i) => (
-                      <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">{s}</span>
-                    ))}
-                  </div>
+                {(narratorActorId || (tour as any).creator_id) && (
+                  <MessageOwnerButton ownerId={narratorActorId || (tour as any).creator_id} kind={narratorActorId ? "culture_actor" : "auto"} label={ar ? "راسل الراوي" : "Message narrator"} />
                 )}
               </div>
-              {target && <ChevronRight className={`w-4 h-4 text-muted-foreground flex-shrink-0 ${lang === "ar" ? "rotate-180" : ""}`} />}
-            </Wrapper>
+            </Section>
           );
         })()}
 
-        {/* Message the narrator: the linked culture actor when set, else the tour creator */}
-        {(narratorActorId || (tour as any).creator_id) && (
-          <div className="-mt-3 mb-6 flex">
-            <MessageOwnerButton
-              ownerId={narratorActorId || (tour as any).creator_id}
-              kind={narratorActorId ? "culture_actor" : "auto"}
-              label={lang === "ar" ? "مراسلة الراوي" : "Message narrator"}
-            />
-          </div>
-        )}
-
-
-        {/* Description */}
-        {description && (
-          <>
-            <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "عن الجولة" : "About This Tour"}</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
-            <MachineTranslatedNote meta={(tour as any)?.translation_meta} field={lang === "ar" ? "description_ar" : "description_en"} className="mb-6" />
-          </>
-        )}
-
-        {/* Playback mode: on-location (GPS) vs virtual / podcast mode */}
-        {audioSrc && (
-          <div className="mb-3 rounded-xl bg-surface border border-border p-1 flex gap-1">
-            <button
-              onClick={() => { if (virtualMode) toggleVirtualMode(); }}
-              className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-colors ${
-                !virtualMode ? "bg-primary text-primary-foreground" : "text-foreground"
-              }`}
-            >
-              <Navigation className="w-3.5 h-3.5" />
-              {lang === "ar" ? "أنا في المكان" : "I'm on location"}
-            </button>
-            <button
-              onClick={() => { if (!virtualMode) toggleVirtualMode(); }}
-              className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-colors ${
-                virtualMode ? "bg-primary text-primary-foreground" : "text-foreground"
-              }`}
-            >
-              <Headphones className="w-3.5 h-3.5" />
-              {lang === "ar" ? "استمع من أي مكان" : "Listen from anywhere"}
-            </button>
-          </div>
-        )}
-        {virtualMode && (
-          <p className="text-[11px] text-muted-foreground mb-3 leading-snug">
-            {lang === "ar"
-              ? "التشغيل الافتراضي: تُشغَّل المحطات بالترتيب وتنتقل تلقائياً — بدون موقع أو GPS."
-              : "Virtual playback: stops play in order and advance automatically — no location or GPS needed."}
-          </p>
-        )}
-
-        {/* Geo CTA / status — hidden in virtual mode */}
-        {mapStops.length > 0 && !virtualMode && (
-
-          <div className="mb-3">
+        {/* Location following (GPS mode) */}
+        {audioSrc && mapStops.length > 0 && !virtualMode && (
+          <div className="pb-2">
             {!geoEnabled ? (
-              <button
-                onClick={enableGeo}
-                className="w-full flex items-center justify-center gap-2 bg-primary/10 text-primary border border-primary/30 rounded-xl py-2.5 text-sm font-semibold"
-              >
-                <Navigation className="w-4 h-4" /> {lang === "ar" ? "ابدأ الجولة بالموقع" : "Start tour with my location"}
+              <button type="button" onClick={enableGeo} className="w-full min-h-[44px] flex items-center justify-center gap-2 bg-primary/10 text-primary-dark border border-primary/30 rounded-xl text-sm font-semibold">
+                <Navigation className="w-4 h-4" /> {ar ? "ابدأ الجولة بالموقع" : "Start tour with my location"}
               </button>
             ) : userLoc.loading && !userLoc.coords ? (
-              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-2">
-                <Loader2 className="w-3.5 h-3.5 animate-spin" /> {lang === "ar" ? "جارٍ تحديد موقعك..." : "Locating you..."}
+              <div className="flex items-center justify-center gap-2 text-[13px] text-muted-foreground py-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> {ar ? "جارٍ تحديد موقعك..." : "Locating you..."}
               </div>
             ) : userLoc.error ? (
-              <div className="text-xs text-destructive bg-destructive/10 rounded-lg px-3 py-2">
-                {lang === "ar" ? "تعذّر الوصول للموقع. فعّل الإذن في المتصفح." : "Couldn't access location. Enable permission in your browser."}
+              <div className="text-[13px] text-destructive bg-destructive/10 rounded-lg px-3 py-2">
+                {ar ? "تعذّر الوصول للموقع. فعّل الإذن في المتصفح." : "Couldn't access location. Enable permission in your browser."}
               </div>
             ) : (
-              <button
-                onClick={() => setFollowGeo((v) => !v)}
-                className={`w-full flex items-center justify-center gap-2 rounded-xl py-2 text-xs font-semibold ${
-                  followGeo ? "bg-primary text-primary-foreground" : "bg-surface text-foreground border border-border"
-                }`}
-              >
-                <Navigation className="w-3.5 h-3.5" />
-                {followGeo
-                  ? (lang === "ar" ? "يتبع موقعك ✓" : "Following your location ✓")
-                  : (lang === "ar" ? "تشغيل تتبع الموقع" : "Resume location tracking")}
+              <button type="button" onClick={() => setFollowGeo((v) => !v)}
+                className={`w-full min-h-[44px] flex items-center justify-center gap-2 rounded-xl text-sm font-semibold ${followGeo ? "bg-primary text-primary-foreground" : "border border-border text-foreground"}`}>
+                <Navigation className="w-4 h-4" />
+                {followGeo ? (ar ? "يتبع موقعك ✓" : "Following your location ✓") : (ar ? "تشغيل تتبع الموقع" : "Resume location tracking")}
               </button>
             )}
           </div>
         )}
 
-        {/* Written walking directions — readable without playing any audio */}
+        {/* Written walking directions */}
         {(() => {
           const dirOf = (i: number) => {
             const s = dbStops[i];
             if (!s) return "";
-            return (lang === "ar" ? s.directions_ar || s.directions_en : s.directions_en || s.directions_ar) || "";
+            return (ar ? s.directions_ar || s.directions_en : s.directions_en || s.directions_ar) || "";
           };
           const labelOf = (i: number) => {
             const s = dbStops[i];
-            if (!s) return lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`;
-            return (lang === "ar" ? s.label_ar || s.label_en : s.label_en || s.label_ar) || "";
+            if (!s) return ar ? `المحطة ${fmtNumber(i + 1, ar)}` : `Stop ${i + 1}`;
+            return (ar ? s.label_ar || s.label_en : s.label_en || s.label_ar) || "";
           };
           const rows = [
             { i: activeStopIndex, text: dirOf(activeStopIndex), current: true },
@@ -668,39 +669,21 @@ const AudioTourDetail = () => {
           ].filter((r) => r.i < stopsCount && !!r.text);
           if (rows.length === 0) return null;
           return (
-            <div className="mb-4 rounded-xl bg-surface border border-border p-3 space-y-3">
-              <p className="text-[11px] font-bold text-primary uppercase tracking-wide flex items-center gap-1.5">
-                <Footprints className="w-3.5 h-3.5" />
-                {lang === "ar" ? "تعليمات المشي" : "Walking directions"}
-              </p>
-              {rows.map((r) => (
-                <div key={r.i} className="text-start">
-                  <p className="text-[10px] font-semibold text-muted-foreground">
-                    {r.current
-                      ? (lang === "ar" ? `إلى المحطة الحالية: ${labelOf(r.i)}` : `To current stop: ${labelOf(r.i)}`)
-                      : (lang === "ar" ? `إلى المحطة التالية: ${labelOf(r.i)}` : `To next stop: ${labelOf(r.i)}`)}
-                  </p>
-                  <p dir="auto" className="text-[13px] text-foreground leading-relaxed mt-0.5">{r.text}</p>
-                </div>
-              ))}
-              {startNavUrl && (
-                <a
-                  href={startNavUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-testid="nav-to-start-card"
-                  className="text-xs font-semibold text-primary flex items-center gap-1.5"
-                >
-                  <Navigation className="w-3.5 h-3.5" />
-                  {lang === "ar" ? "الاتجاهات إلى نقطة البداية" : "Directions to the start"}
-                </a>
-              )}
-            </div>
-
+            <Section title={ar ? "تعليمات المشي" : "Walking directions"} ar={ar}>
+              <div className="space-y-3">
+                {rows.map((r) => (
+                  <div key={r.i}>
+                    <p className="text-[13px] font-semibold text-muted-foreground">
+                      {r.current ? (ar ? `إلى المحطة الحالية: ${labelOf(r.i)}` : `To current stop: ${labelOf(r.i)}`) : (ar ? `إلى المحطة التالية: ${labelOf(r.i)}` : `To next stop: ${labelOf(r.i)}`)}
+                    </p>
+                    <p dir="auto">{r.text}</p>
+                  </div>
+                ))}
+              </div>
+            </Section>
           );
         })()}
 
-        {/* Turn-by-turn guidance to the next stop (GPS mode only) */}
         {dbStops.length > 0 && !virtualMode && (
           <TurnByTurnGuidance
             stops={dbStops}
@@ -709,209 +692,89 @@ const AudioTourDetail = () => {
           />
         )}
 
-
-        {/* Route Map */}
-        {mapStops.length > 0 && (
-          <>
-            <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "خريطة المسار" : "Route Map"}</h2>
-            <TourStopsMap
-              stops={mapStops}
-              userLocation={userLoc.coords ? { lat: userLoc.coords.lat, lng: userLoc.coords.lng } : null}
-              activeStopIndex={activeStopIndex}
-            />
-          </>
+        {/* Stops: map above a numbered vertical timeline */}
+        {stopsCount > 0 && (
+          <Section ref={stopsRef} id="stops" title={ar ? "المحطات" : "The stops"} ar={ar}>
+            {mapStops.length > 0 && (
+              <div className="mb-5">
+                <TourStopsMap
+                  stops={mapStops}
+                  userLocation={userLoc.coords ? { lat: userLoc.coords.lat, lng: userLoc.coords.lng } : null}
+                  activeStopIndex={activeStopIndex}
+                />
+              </div>
+            )}
+            <ol>
+              {Array.from({ length: stopsCount }).map((_, i) => {
+                const stop = dbStops[i];
+                const stopLabel = stop ? (ar ? (stop.label_ar || stop.label_en) : (stop.label_en || stop.label_ar)) : (ar ? `المحطة ${fmtNumber(i + 1, ar)}` : `Stop ${i + 1}`);
+                const stopDesc = stop ? (ar ? (stop.desc_ar || stop.desc_en) : (stop.desc_en || stop.desc_ar)) : "";
+                const d = stop ? (ar ? stop.directions_ar || stop.directions_en : stop.directions_en || stop.directions_ar) : "";
+                const dist = stopDistances[i];
+                const isNear = dist != null && dist <= NEAR_THRESHOLD_M;
+                const segs = (Array.isArray(stop?.segments) ? stop!.segments! : []).filter((g) => (g?.title_en || g?.title_ar || g?.desc_en || g?.desc_ar || g?.audio_url));
+                const active = i === activeStopIndex && (isPlaying || geoEnabled);
+                return (
+                  <li key={i} className="flex gap-3">
+                    <div className="flex flex-col items-center">
+                      <span className={`w-8 h-8 rounded-full text-[13px] font-bold flex items-center justify-center flex-shrink-0 ${active ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary-dark"}`}>{fmtNumber(i + 1, ar)}</span>
+                      {i < stopsCount - 1 && <span className="w-px flex-1 bg-border my-1" />}
+                    </div>
+                    <div className="flex-1 min-w-0 pb-6">
+                      <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} !text-lg text-foreground leading-snug pt-0.5`}>{stopLabel}</p>
+                      {stopDesc && <p dir="auto" className="mt-1">{stopDesc}</p>}
+                      {d && (
+                        <p dir="auto" className="text-[13px] text-primary-dark mt-1 flex items-start gap-1.5"><Footprints className="w-4 h-4 mt-0.5 shrink-0" /><span>{d}</span></p>
+                      )}
+                      {segs.length > 0 && (
+                        <div data-testid={`stop-${i}-segments`} className="mt-2 ps-3 border-s-2 border-primary/25 space-y-2">
+                          <p className="text-[13px] font-semibold text-primary-dark flex items-center gap-1">
+                            <Layers className="w-4 h-4" /> {ar ? `${fmtNumber(segs.length, ar)} مقاطع في هذه المحطة` : `${segs.length} segments at this stop`}
+                          </p>
+                          {segs.map((g, j) => {
+                            const segTitle = (ar ? g.title_ar || g.title_en : g.title_en || g.title_ar) || "";
+                            const segDesc = (ar ? g.desc_ar || g.desc_en : g.desc_en || g.desc_ar) || "";
+                            return (
+                              <div key={j}>
+                                {segTitle && <p dir="auto" className="text-sm font-semibold text-foreground">{fmtNumber(j + 1, ar)}. {segTitle}</p>}
+                                {segDesc && <p dir="auto" className="text-[13px] text-muted-foreground">{segDesc}</p>}
+                                {g.audio_url && <audio controls preload="none" src={g.audio_url} className="w-full h-9 mt-1" />}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {stop?.audio_url && <audio controls preload="none" src={stop.audio_url} className="w-full h-9 mt-2" />}
+                      <div className="flex flex-wrap items-center gap-3 mt-1">
+                        {dist != null && (
+                          <span className="text-[13px] text-muted-foreground flex items-center gap-1"><Navigation className="w-3.5 h-3.5" /> {formatDistance(dist, lang)}</span>
+                        )}
+                        {isNear && <span className="text-[13px] font-semibold text-success bg-success/10 px-2 py-0.5 rounded-full">{ar ? "بجوارك" : "Near you"}</span>}
+                        {hasCoords(stop) && (
+                          <a href={directionsToUrl(stop, "walking")} target="_blank" rel="noopener noreferrer" data-testid={`nav-stop-${i}`}
+                            className="inline-flex items-center gap-1 min-h-[44px] text-[13px] font-semibold text-primary-dark">
+                            <Navigation className="w-3.5 h-3.5" /> {ar ? "الاتجاهات" : "Directions"}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </Section>
         )}
 
-        {/* Stops */}
-        <h2 className="text-base font-bold text-primary-dark mb-3">{lang === "ar" ? "المحطات" : "Tour Stops"}</h2>
-        <div className="mb-6">
-          {Array.from({ length: stopsCount }).map((_, i) => {
-            const stop = dbStops[i];
-            // Fall back to the other language rather than showing nothing:
-            // narrators often author a stop in one language only.
-            const stopLabel = stop ? (lang === "ar" ? (stop.label_ar || stop.label_en) : (stop.label_en || stop.label_ar)) : (lang === "ar" ? `المحطة ${i + 1}` : `Stop ${i + 1}`);
-            const stopDesc = stop ? (lang === "ar" ? (stop.desc_ar || stop.desc_en) : (stop.desc_en || stop.desc_ar)) : "";
-            const dist = stopDistances[i];
-            const isNear = dist != null && dist <= NEAR_THRESHOLD_M;
-            return (
-              <div key={i} className="flex gap-3 pb-4">
-                <div className="flex flex-col items-center">
-                  <div className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center ${
-                    i === activeStopIndex ? "bg-primary text-primary-foreground" : i < activeStopIndex ? "bg-primary/30 text-primary" : "bg-muted text-muted-foreground"
-                  }`}>{i + 1}</div>
-                  {i < stopsCount - 1 && <div className="w-0.5 flex-1 bg-primary/20 mt-1" />}
-                </div>
-                <div className="flex-1 pt-1">
-                  <p className="text-sm font-semibold text-foreground">{stopLabel}</p>
-                  {(() => {
-                    const d = stop ? (lang === "ar" ? stop.directions_ar || stop.directions_en : stop.directions_en || stop.directions_ar) : "";
-                    if (!d) return null;
-                    return (
-                      <p dir="auto" className="text-[12px] text-primary leading-relaxed mt-1 flex items-start gap-1.5 text-start">
-                        <Footprints className="w-3 h-3 mt-0.5 shrink-0" />
-                        <span>{d}</span>
-                      </p>
-                    );
-                  })()}
-                  {stopDesc && (
-                    <p dir="auto" className="text-[12px] text-muted-foreground leading-relaxed mt-1 text-start">
-                      {stopDesc}
-                    </p>
-                  )}
-
-                  {/* Nested segments — what you hear once you're standing here.
-                      Structure is visible without playing anything. */}
-                  {(() => {
-                    const segs = (Array.isArray(stop?.segments) ? stop!.segments! : []).filter(
-                      (g) => (g?.title_en || g?.title_ar || g?.desc_en || g?.desc_ar || g?.audio_url)
-                    );
-                    if (segs.length === 0) return null;
-                    return (
-                      <div data-testid={`stop-${i}-segments`} className="mt-2 ps-3 border-s-2 border-primary/25 space-y-2">
-                        <p className="text-[10px] font-semibold text-primary uppercase tracking-wide flex items-center gap-1">
-                          <Layers className="w-3 h-3" />
-                          {lang === "ar" ? `${segs.length} مقاطع في هذه المحطة` : `${segs.length} segments at this stop`}
-                        </p>
-                        {segs.map((g, j) => {
-                          const segTitle = (lang === "ar" ? g.title_ar || g.title_en : g.title_en || g.title_ar) || "";
-                          const segDesc = (lang === "ar" ? g.desc_ar || g.desc_en : g.desc_en || g.desc_ar) || "";
-                          return (
-                            <div key={j} className="text-start">
-                              {segTitle && (
-                                <p dir="auto" className="text-[12px] font-semibold text-foreground">
-                                  {j + 1}. {segTitle}
-                                </p>
-                              )}
-                              {segDesc && (
-                                <p dir="auto" className="text-[11px] text-muted-foreground leading-relaxed">{segDesc}</p>
-                              )}
-                              {g.audio_url && (
-                                <audio controls preload="none" src={g.audio_url} className="w-full h-8 mt-1" />
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })()}
-
-                  {stop?.audio_url && (
-                    <audio
-                      controls
-                      preload="none"
-                      src={stop.audio_url}
-                      className="w-full h-8 mt-2"
-                    />
-                  )}
-                  {dist != null && (
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <span className="text-[11px] text-muted-foreground flex items-center gap-0.5">
-                        <Navigation className="w-3 h-3" /> {formatDistance(dist, lang)}
-                      </span>
-                      {isNear && (
-                        <span className="text-[10px] font-semibold text-success bg-success/10 px-1.5 py-0.5 rounded-full">
-                          {lang === "ar" ? "بجوارك" : "Near you"}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  {/* Per-stop navigation — only when the narrator pinned this stop */}
-                  {hasCoords(stop) && (
-                    <a
-                      href={directionsToUrl(stop, "walking")}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      data-testid={`nav-stop-${i}`}
-                      className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold text-primary"
-                    >
-                      <Navigation className="w-3 h-3" />
-                      {lang === "ar" ? "الاتجاهات" : "Directions"}
-                    </a>
-                  )}
-
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
+        <ReadBeforeYouGo cityId={(tour as any).city_id} regionId={(tour as any).region_id} ar={ar} />
       </div>
 
-      {/* Audio Player — only when this tour has its own narration */}
-      {audioSrc ? (
-        <div className="fixed bottom-[68px] left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
-          {(virtualMode || usesPlaylist) && stopsCount > 0 && (
-            <p dir="auto" data-testid="now-playing" className="text-[10px] text-muted-foreground mb-1 text-start truncate">
-              {lang === "ar"
-                ? `المحطة ${activeStopIndex + 1} من ${stopsCount}`
-                : `Stop ${activeStopIndex + 1} of ${stopsCount}`}
-              {currentItem?.segIndex != null && (
-                <>
-                  {" · "}
-                  {lang === "ar"
-                    ? `المقطع ${currentItem.segIndex + 1} من ${currentItem.segCount}`
-                    : `Segment ${currentItem.segIndex + 1} of ${currentItem.segCount}`}
-                </>
-              )}
-              {" · "}
-              {(() => {
-                if (currentItem) {
-                  const t = lang === "ar" ? currentItem.title_ar || currentItem.title_en : currentItem.title_en || currentItem.title_ar;
-                  if (t) return t;
-                }
-                const s = dbStops[activeStopIndex];
-                return s ? (lang === "ar" ? s.label_ar || s.label_en : s.label_en || s.label_ar) : "";
-              })()}
-            </p>
-          )}
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-[10px] text-muted-foreground w-10 text-right">{formatTime(currentTime)}</span>
-            <Slider value={[progressPercent]} max={100} step={0.1} onValueChange={handleSeek} className="flex-1" />
-            <span className="text-[10px] text-muted-foreground w-10">{formatTime(duration)}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <button onClick={cycleSpeed} className="text-[10px] font-bold text-muted-foreground w-10">{playbackRate}x</button>
-            <div className="flex items-center gap-4">
-              <button
-                data-testid="skip-back"
-                aria-label={virtualMode || usesPlaylist ? (lang === "ar" ? "السابق" : "Previous") : (lang === "ar" ? "رجوع ١٥ ثانية" : "Back 15 seconds")}
-                onClick={() => (virtualMode || usesPlaylist ? goToVirtualStop(-1) : skipBackward())}
-              >
-                <SkipBack className="w-5 h-5 text-foreground" />
-              </button>
-              <button data-testid="play-toggle" onClick={togglePlay} className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
-              </button>
-              <button
-                data-testid="skip-forward"
-                aria-label={virtualMode || usesPlaylist ? (lang === "ar" ? "التالي" : "Next") : (lang === "ar" ? "تقديم ١٥ ثانية" : "Forward 15 seconds")}
-                onClick={() => (virtualMode || usesPlaylist ? goToVirtualStop(1) : skipForward())}
-              >
-                <SkipForward className="w-5 h-5 text-foreground" />
-              </button>
-            </div>
-            <button onClick={toggleMute}>{isMuted ? <VolumeX className="w-5 h-5 text-muted-foreground" /> : <Volume2 className="w-5 h-5 text-foreground" />}</button>
-          </div>
-        </div>
-
-      ) : (
-        <div className="fixed bottom-[68px] left-0 right-0 bg-card border-t border-border px-4 py-3 z-50">
-          <div className="flex items-start gap-2 text-muted-foreground">
-            <Headphones className="w-4 h-4 mt-0.5 shrink-0" />
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                {lang === "ar" ? "الصوت قادم قريباً" : "Audio coming soon"}
-              </p>
-              <p className="text-[11px] leading-snug">
-                {lang === "ar"
-                  ? "لم يقم الراوي برفع تسجيل هذه الجولة بعد. يمكنك استعراض المحطات والمسار الآن."
-                  : "The narrator hasn't uploaded this tour's recording yet. You can still browse the stops and route."}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
+      <ActionBar
+        ar={ar}
+        price={priceLabel}
+        note={[dur, stopsCount ? (ar ? `${fmtNumber(stopsCount, ar)} محطات` : `${stopsCount} stops`) : null].filter(Boolean).join(" · ")}
+        buttonLabel={audioSrc ? (isPlaying ? (ar ? "إيقاف مؤقت" : "Pause") : (ar ? "ابدأ الجولة" : "Start the tour")) : (ar ? "استعرض المحطات" : "See the stops")}
+        onPrimary={audioSrc && isPlaying ? togglePlay : startTour}
+      />
     </div>
   );
 };
