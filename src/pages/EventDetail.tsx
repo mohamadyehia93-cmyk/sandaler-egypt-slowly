@@ -1,6 +1,6 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, CalendarPlus, Clock, MapPin, Navigation, Users, Tag, Timer, Wallet, MessageCircle, ExternalLink } from "lucide-react";
+import { Calendar, CalendarPlus, Clock, MapPin, Navigation, Timer, Wallet, MessageCircle, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
@@ -13,7 +13,6 @@ import { SEO } from "@/components/SEO";
 import ShareButton from "@/components/ShareButton";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import ListingHero from "@/components/listing/ListingHero";
-import KeyFacts, { type KeyFact } from "@/components/listing/KeyFacts";
 import Section from "@/components/listing/Section";
 import ActionBar from "@/components/listing/ActionBar";
 import ReadBeforeYouGo from "@/components/listing/ReadBeforeYouGo";
@@ -158,10 +157,6 @@ const EventDetail = () => {
   const categoryText = eventCategoryText(event.category, t);
   const eyebrow = [categoryText, cityName].filter(Boolean).join(" · ");
 
-  const facts: KeyFact[] = [{ icon: Wallet, label: priceLabel }];
-  if (event.capacity) facts.push({ icon: Users, label: ar ? `${fmtNumber(event.capacity, ar)} شخص` : `${event.capacity} people` });
-  if (categoryText) facts.push({ icon: Tag, label: categoryText });
-
   const details = [
     categoryText && [ar ? "الفئة" : "Category", categoryText],
     [ar ? "المدة" : "Duration", multiDay ? (ar ? `${fmtNumber(durationDays, ar)} أيام` : `${durationDays} days`) : (ar ? "يوم واحد" : "One day")],
@@ -235,7 +230,6 @@ const EventDetail = () => {
           </div>
 
           <div className="pt-4 pb-2 lg:hidden">{quickActions}</div>
-          <div className="mt-4 -mx-4"><KeyFacts facts={facts} /></div>
 
           {description && (
             <>
@@ -337,7 +331,7 @@ const EventDetail = () => {
           <div className="sticky top-6 rounded-2xl border border-border bg-card shadow-card p-5 space-y-3">
             <div>
               <p className="text-2xl font-bold text-foreground">{priceLabel}</p>
-              <p className="text-[13px] text-muted-foreground">{countdown}</p>
+              {!past && <p className="text-[13px] text-muted-foreground">{countdown}</p>}
             </div>
             {past ? (
               <>
