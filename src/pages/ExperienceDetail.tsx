@@ -1,7 +1,13 @@
-import { useState, useRef, useCallback, useMemo } from "react";
-import WishlistButton from "@/components/WishlistButton";
-import ShareButton from "@/components/ShareButton";
-import { ArrowLeft, MessageCircle, Bus, Train, Plus, Minus } from "lucide-react";
+import { useState, useRef, useMemo, useEffect } from "react";
+import { MessageCircle, Bus, Train, Plus, Minus, Clock, Users, Languages, Tag, MapPin } from "lucide-react";
+import ListingHero from "@/components/listing/ListingHero";
+import KeyFacts, { type KeyFact } from "@/components/listing/KeyFacts";
+import Section from "@/components/listing/Section";
+import ActionBar from "@/components/listing/ActionBar";
+import ReadBeforeYouGo from "@/components/listing/ReadBeforeYouGo";
+import MonthDatePicker from "@/components/listing/MonthDatePicker";
+import { formatDuration, formatClock, formatSlotDay, fmtNumber, splitStandfirst } from "@/components/listing/format";
+import { EXPERIENCE_THEMES } from "@/lib/listingTaxonomy";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -10,32 +16,9 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import NotFoundView from "@/components/NotFound";
 import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
 import { mapsUrl } from "@/lib/cityCoords";
-
-/* ── helpers ──────────────────────────────────────────────────── */
-const StarRow = ({ count, size = 13 }: { count: number; size?: number }) => (
-  <span style={{ fontSize: size, color: "#BA7517", letterSpacing: 1 }}>
-    {"★".repeat(Math.round(count))}{"☆".repeat(5 - Math.round(count))}
-  </span>
-);
-
-const Divider = () => <div className="h-px bg-black/[0.06] my-[10px]" />;
-
-const formatTime = (t: string) => {
-  const [h, m] = t.split(":");
-  const hour = parseInt(h);
-  const ampm = hour >= 12 ? "PM" : "AM";
-  const h12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
-  return `${h12}:${m} ${ampm}`;
-};
-
-const formatSlotDate = (dateStr: string) => {
-  const d = new Date(dateStr + "T00:00:00");
-  return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-};
 
 const DEFAULT_CANCELLATION_EN = "Free cancellation up to 48 hours before the start. After that, at the host’s discretion.";
 const DEFAULT_CANCELLATION_AR = "إلغاء مجاني حتى ٤٨ ساعة قبل الميعاد، وبعدها حسب تقدير المضيف.";
@@ -52,13 +35,11 @@ const ExperienceDetail = () => {
   const { t } = useTranslation();
   const { lang } = useLanguage();
   const ar = lang === "ar";
-  const reviewsRef = useRef<HTMLDivElement>(null);
+  const dateRef = useRef<HTMLElement>(null);
 
-  const [selectedSlot, setSelectedSlot] = useState(0);
-  const [guests, setGuests] = useState(2);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [sheetSlot, setSheetSlot] = useState(0);
-  const [sheetGuests, setSheetGuests] = useState(1);
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
+  const [guests, setGuests] = useState(1);
+  const [bioOpen, setBioOpen] = useState(false);
 
   // ── Fetch experience ──
   const { data: exp, isLoading } = useQuery({
@@ -147,6 +128,17 @@ const ExperienceDetail = () => {
     enabled: !!exp?.city_id,
   });
 
+  // ── City name (for eyebrow + key facts) ──
+  const { data: city } = useQuery({
+    queryKey: ["city-name", exp?.city_id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("cities").select("name_en, name_ar").eq("id", exp!.city_id).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!exp?.city_id,
+  });
+
   // ── Fetch region name ──
   const { data: region } = useQuery({
     queryKey: ["region", exp?.region_id],
@@ -159,593 +151,414 @@ const ExperienceDetail = () => {
   });
 
   // ── Derived values ──
-  const title = exp ? (ar ? exp.title_ar : exp.title_en) : "";
-  const description = exp ? (ar ? (exp.description_ar || exp.description_en) : (exp.description_en || exp.description_ar)) : "";
+  const e = exp as any;
+  const pick = (k: string): string | null => (e ? (ar ? e[`${k}_ar`] || e[`${k}_en`] : e[`${k}_en`] || e[`${k}_ar`]) || null : null);
+  const title = exp ? (ar ? exp.title_ar || exp.title_en : exp.title_en || exp.title_ar) : "";
+  const description = pick("description") || "";
   const hostName = provider
-    ? (ar ? provider.name_ar : provider.name_en)
+    ? (ar ? provider.name_ar || provider.name_en : provider.name_en)
     : exp ? (ar ? (exp.host_name_ar || exp.host_name_en) : exp.host_name_en) : "";
   const regionName = region ? (ar ? region.name_ar : region.name_en) : "";
+  const cityName = city ? (ar ? city.name_ar : city.name_en) : "";
+  const egp = t("common.egp");
 
   // Real slots only — never a sample calendar.
-  const slots = useMemo(() => {
-    if (!dbSlots) return [];
-    return dbSlots.map((s: any) => ({
-      id: s.id,
-      date: formatSlotDate(s.slot_date),
-      time: `${formatTime(s.start_time)} – ${formatTime(s.end_time)}`,
-      price: s.price,
-      spots: s.spots_available,
-      discounted: s.is_discounted,
-      low: s.spots_available <= 3,
-      rawDate: s.slot_date,
-    }));
-  }, [dbSlots]);
+  const slots = useMemo(() => (dbSlots ?? []) as any[], [dbSlots]);
+  useEffect(() => {
+    if (!selectedSlotId && slots.length) setSelectedSlotId(slots[0].id);
+  }, [slots, selectedSlotId]);
+  const [userPicked, setUserPicked] = useState(false);
+  const selected = slots.find((s) => s.id === selectedSlotId) ?? null;
 
-  // Real reviews only. The "verified attendee" badge is intentionally NOT rendered:
-  // nothing in the schema proves the reviewer actually attended this experience.
-  const reviews = useMemo(() => {
-    if (!dbReviews) return [];
-    return dbReviews.map((r: any) => ({
-      initials: r.reviewer_initials || r.reviewer_name?.slice(0, 2)?.toUpperCase() || "??",
-      name: r.reviewer_name,
-      city: r.reviewer_city || "",
-      rating: r.rating,
-      text: r.review_text || "",
-      bg: r.reviewer_avatar_bg || "#9FE1CB",
-    }));
-  }, [dbReviews]);
+  // Real reviews only. No "verified attendee" badge: nothing proves attendance.
+  const reviews = useMemo(() => (dbReviews ?? []).map((r: any) => ({
+    initials: r.reviewer_initials || r.reviewer_name?.slice(0, 2)?.toUpperCase() || "??",
+    name: r.reviewer_name,
+    city: r.reviewer_city || "",
+    rating: r.rating as number,
+    text: r.review_text || "",
+  })), [dbReviews]);
 
-  const hostInitials = (provider?.name_en || exp?.host_name_en || "")
-    .split(" ")
-    .map((w: string) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
-  const hostSubtitle = provider
-    ? [provider.city_en, provider.years_active ? `${provider.years_active} ${ar ? "سنوات خبرة" : "years active"}` : null]
-        .filter(Boolean)
-        .join(" · ")
-    : "";
-
-  // Only facts stored on the provider record.
-  const hostCredentials = provider
-    ? ([
-        ar ? provider.bio_ar || provider.bio_en : provider.bio_en || provider.bio_ar,
-        provider.languages ? t("experience.speaks", { languages: provider.languages }) : null,
-        provider.specialties && Array.isArray(provider.specialties) && provider.specialties.length
-          ? t("experience.specializes_in", { topics: (provider.specialties as any[]).map((s: any) => s.en || s).join(", ") })
-          : null,
-      ].filter(Boolean) as string[])
-    : [];
-
-  const unitPrice = slots[selectedSlot]?.price ?? exp?.price ?? 0;
+  const maxGuests = exp?.capacity_max || 12;
+  const unitPrice = selected?.price ?? exp?.price ?? 0;
   const subtotal = unitPrice * guests;
 
-  const scrollToReviews = useCallback(() => {
-    reviewsRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-
-  // Tags come only from stored columns.
-  const tags = useMemo(() => {
-    if (!exp) return [];
-    const result: { label: string }[] = [];
-    if (exp.theme) result.push({ label: exp.theme });
-    if (exp.meeting_point_name) result.push({ label: exp.meeting_point_name });
-    if (exp.duration_minutes) {
-      const hrs = Math.round(exp.duration_minutes / 60);
-      result.push({ label: `${hrs} ${ar ? "ساعة" : hrs > 1 ? "hours" : "hour"}` });
+  const messageHost = () => navigate(`/inbox?personId=${providerId || exp?.provider_id || ""}&kind=provider`);
+  const goBooking = (slotId?: string | null) =>
+    navigate(`/booking?type=experience&id=${exp?.id || id}${slotId ? `&slot=${slotId}` : ""}&guests=${guests}`);
+  const requestToBook = () => {
+    if (slots.length > 0 && !userPicked) {
+      dateRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
     }
-    if (exp.capacity_max) result.push({ label: `${ar ? "حتى" : "up to"} ${exp.capacity_max} ${ar ? "ضيوف" : "guests"}` });
-    return result;
-  }, [exp, ar]);
-
-  const sheetSlotGroups = useMemo(() => {
-    const groups: { label: string; slots: any[] }[] = [];
-    slots.forEach((s, i) => {
-      const last = groups[groups.length - 1];
-      if (last && last.label === s.date) last.slots.push({ ...s, _idx: i });
-      else groups.push({ label: s.date, slots: [{ ...s, _idx: i }] });
-    });
-    return groups;
-  }, [slots]);
+    goBooking(selected?.id);
+  };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-4 space-y-4">
-        <Skeleton className="h-56 w-full rounded-xl" />
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
-        <Skeleton className="h-32 w-full" />
+      <div className="min-h-screen bg-background">
+        <Skeleton className="h-[56vh] max-h-[460px] w-full rounded-none" />
+        <div className="max-w-[680px] mx-auto p-4 space-y-3">
+          <Skeleton className="h-5 w-2/3" />
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-4 w-4/6" />
+          <Skeleton className="h-40 w-full" />
+        </div>
       </div>
     );
   }
 
   if (!exp) return <NotFoundView context="experience" />;
 
-  const photos = exp.images?.length ? exp.images : [exp.image || "/placeholder.svg"];
-  const remarks = ar ? (exp as any).remarks_ar || (exp as any).remarks_en : (exp as any).remarks_en || (exp as any).remarks_ar;
+  const photos: string[] = exp.images?.length ? exp.images : exp.image ? [exp.image] : [];
+  const remarks = pick("remarks");
+  const included = pick("included");
+  const notIncluded = pick("not_included");
+  const cancellation = pick("cancellation_policy") || (ar ? DEFAULT_CANCELLATION_AR : DEFAULT_CANCELLATION_EN);
+  const langs: string[] = Array.isArray(e.languages) ? e.languages.filter(Boolean) : [];
+  const themeLabel = exp.theme === "other" && e.theme_other
+    ? e.theme_other
+    : EXPERIENCE_THEMES.find((x) => x.key === exp.theme)?.label[ar ? "ar" : "en"] ?? null;
+  const { first: standfirst, rest } = splitStandfirst(description);
   const hasRating = (exp.rating ?? 0) > 0 && reviews.length > 0;
 
-  return (
-    <div className="min-h-screen bg-background pb-[140px]">
+  // Key facts — only columns that exist.
+  const facts: KeyFact[] = [];
+  const dur = formatDuration(exp.duration_minutes, ar);
+  if (dur) facts.push({ icon: Clock, label: dur });
+  if (exp.capacity_max) {
+    facts.push({
+      icon: Users,
+      label: exp.capacity_min && exp.capacity_min > 1 && exp.capacity_min < exp.capacity_max
+        ? `${fmtNumber(exp.capacity_min, ar)}–${fmtNumber(exp.capacity_max, ar)} ${ar ? "ضيوف" : "guests"}`
+        : `${ar ? "حتى" : "up to"} ${fmtNumber(exp.capacity_max, ar)} ${ar ? "ضيوف" : "guests"}`,
+    });
+  }
+  if (langs.length) facts.push({ icon: Languages, label: langs.join(ar ? "، " : ", ") });
+  if (themeLabel) facts.push({ icon: Tag, label: themeLabel });
+  if (cityName) facts.push({ icon: MapPin, label: cityName });
 
-      {/* ── TOP NAV ─────────────────────────────────────────────── */}
-      <div className="h-11 flex items-center justify-between px-4 bg-card sticky top-0 z-40">
-        <button onClick={() => navigate(-1)} className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center" aria-label={"Back"}>
-          <ArrowLeft className="w-4 h-4 text-foreground" />
+  const eyebrow = [ar ? "تجربة" : "Experience", cityName || regionName].filter(Boolean).join(" · ");
+
+  // Itinerary
+  type Step = { step?: string; description?: string };
+  const arr = (v: unknown): Step[] => (Array.isArray(v) ? (v as Step[]) : []);
+  const steps = arr(ar ? (arr(e.itinerary_ar).length ? e.itinerary_ar : e.itinerary_en) : arr(e.itinerary_en).length ? e.itinerary_en : e.itinerary_ar)
+    .filter((s) => (s?.step || "").trim() || (s?.description || "").trim());
+
+  // Host
+  const hostBio = provider ? (ar ? provider.bio_ar || provider.bio_en : provider.bio_en || provider.bio_ar) : null;
+  const hostCity = provider ? (ar ? provider.city_ar || provider.city_en : provider.city_en) : null;
+  const hostSub = [hostCity, provider?.years_active ? (ar ? `${fmtNumber(provider.years_active, ar)} سنوات نشاط` : `${provider.years_active} years active`) : null].filter(Boolean).join(" · ");
+  const hostChips: string[] = [
+    ...(provider?.languages ? String(provider.languages).split(/[,،]/).map((x) => x.trim()).filter(Boolean) : []),
+    ...(Array.isArray(provider?.specialties) ? (provider!.specialties as any[]).map((s: any) => (typeof s === "string" ? s : ar ? s.ar || s.en : s.en)).filter(Boolean) : []),
+  ];
+  const hostInitials = (hostName || "").split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase();
+
+  const priceLabel = `${fmtNumber(unitPrice, ar)} ${egp}`;
+  const perPerson = ar ? "للفرد" : "per person";
+  const bookLabel = ar ? "اطلب الحجز" : "Request to book";
+  const noPayNote = ar
+    ? "لا يتم الدفع داخل التطبيق — يُرسل طلبك إلى المضيف ليؤكد التوفر ويرتب الدفع."
+    : "No payment is taken in the app — your request goes to the host, who confirms availability and arranges payment.";
+
+  const stepper = (
+    <div className="flex items-center justify-between py-3">
+      <span className="text-[15px] font-semibold text-foreground">{ar ? "عدد الضيوف" : "Guests"}</span>
+      <div className="flex items-center gap-2">
+        <button type="button" onClick={() => setGuests(Math.max(1, guests - 1))} aria-label={ar ? "تقليل" : "Fewer guests"} className="tap-target rounded-full border border-border">
+          <Minus className="w-4 h-4" />
         </button>
-        <span className="text-xs text-muted-foreground font-normal truncate max-w-[55%]">
-          {[regionName, t("experience.experiences_subtitle")].filter(Boolean).join(" · ")}
-        </span>
-        <div className="flex gap-2">
-          <ShareButton
-            title={lang === "ar" ? (exp.title_ar || exp.title_en) : exp.title_en}
-            className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center"
-            iconClassName="w-3.5 h-3.5 text-foreground"
-          />
-          <WishlistButton
-            itemType="experience"
-            itemId={exp?.id}
-            className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center transition-transform [&>svg]:w-3.5 [&>svg]:h-3.5"
-          />
-        </div>
+        <span className="text-base font-semibold w-6 text-center" aria-live="polite">{fmtNumber(guests, ar)}</span>
+        <button type="button" onClick={() => setGuests(Math.min(maxGuests, guests + 1))} aria-label={ar ? "زيادة" : "More guests"} className="tap-target rounded-full border border-border">
+          <Plus className="w-4 h-4" />
+        </button>
       </div>
+    </div>
+  );
 
-      {/* ── HERO PHOTO ──────────────────────────────────────────── */}
-      <div className="relative h-[260px]">
-        <img src={photos[0]} alt={title} className="w-full h-full object-cover" />
-        {photos.length > 1 && (
-          <span className="absolute bottom-2.5 right-2.5 bg-black/55 text-primary-foreground text-[11px] px-2 py-0.5 rounded-md">
-            {t("experience.more_photos", { count: photos.length - 1 })}
-          </span>
-        )}
-      </div>
+  const selectedSummary = selected
+    ? `${formatSlotDay(selected.slot_date, ar, { weekday: "long", day: "numeric", month: "long" })} · ${formatClock(selected.start_time, ar)}`
+    : null;
 
-      <div className="px-4">
+  return (
+    <div className="min-h-screen bg-background pb-[150px] lg:pb-16">
+      <ListingHero images={photos} title={title} eyebrow={eyebrow} ar={ar} onBack={() => navigate(-1)} wishlistType="experience" wishlistId={exp.id} />
+      <KeyFacts facts={facts} />
 
-        {/* ── TITLE + TAGS + (real) RATING ───────────────────────── */}
-        <div className="pt-3.5">
-          <h1 className="text-[17px] font-bold text-foreground leading-[1.35] mb-2">{title}</h1>
-          <MachineTranslatedNote meta={(exp as any)?.translation_meta} field={ar ? "title_ar" : "title_en"} className="mb-1.5" />
-          {tags.length > 0 && (
-            <div className="flex gap-1.5 overflow-x-auto hide-scrollbar mb-2.5">
-              {tags.map((tag, i) => (
-                <span key={i} className="flex-shrink-0 px-2.5 py-[3px] rounded-full text-[10px] font-medium border bg-muted border-border text-muted-foreground">
-                  {tag.label}
-                </span>
-              ))}
-            </div>
-          )}
+      <div className="max-w-[1040px] mx-auto px-4 lg:flex lg:gap-10 lg:justify-center">
+        <main className="max-w-[680px] w-full min-w-0">
+          <MachineTranslatedNote meta={e.translation_meta} field={ar ? "title_ar" : "title_en"} className="pt-3" />
           {hasRating && (
-            <div className="flex items-center gap-1.5 flex-wrap mb-2.5">
-              <StarRow count={exp.rating || 0} />
-              <span className="text-[13px] font-semibold text-foreground">{exp.rating}</span>
-              <button onClick={scrollToReviews} className="text-xs text-primary underline">
-                {t("experience.reviews_count", { count: reviews.length })}
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* ── DESCRIPTION (the listing's own words, near the top) ── */}
-        {description && (
-          <>
-            <Divider />
-            <div>
-              <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.about_this_experience")}</h2>
-              <p className="text-[13px] text-muted-foreground leading-relaxed whitespace-pre-line">{description}</p>
-              <MachineTranslatedNote meta={(exp as any)?.translation_meta} field={ar ? "description_ar" : "description_en"} className="mt-1" />
-            </div>
-          </>
-        )}
-
-        {/* ── PRICE + GUESTS ─────────────────────────────────────── */}
-        <Divider />
-        <div>
-          <div className="flex justify-between items-center py-3 border-y border-border">
-            <div>
-              <p className="text-[13px] font-semibold text-foreground">{t("experience.adults")}</p>
-              <p className="text-[11px] text-muted-foreground">{unitPrice} {t("common.egp")} {t("common.per_person")}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <button onClick={() => setGuests(Math.max(1, guests - 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center" aria-label="Decrease">
-                <Minus className="w-3.5 h-3.5 text-foreground" />
-              </button>
-              <span className="text-[15px] font-semibold text-foreground w-5 text-center">{guests}</span>
-              <button onClick={() => setGuests(Math.min(exp.capacity_max || 12, guests + 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center" aria-label="Increase">
-                <Plus className="w-3.5 h-3.5 text-foreground" />
-              </button>
-            </div>
-          </div>
-          <div className="py-2.5 space-y-1.5">
-            <div className="flex justify-between">
-              <span className="text-[13px] text-foreground">{guests} × {unitPrice} {t("common.egp")}</span>
-              <span className="text-[13px] font-semibold text-foreground">{subtotal} {t("common.egp")}</span>
-            </div>
-            <p className="text-[11px] text-muted-foreground">
-              {ar
-                ? "لا يتم الدفع داخل التطبيق — يُرسل طلبك إلى المضيف ليؤكد التوفر ويرتب الدفع."
-                : "No payment is taken in the app — your request goes to the host, who confirms availability and arranges payment."}
-            </p>
-          </div>
-        </div>
-
-        {/* ── MEETING POINT ──────────────────────────────────────── */}
-        {(exp.meeting_point_name || (exp.meeting_point_lat != null && exp.meeting_point_lng != null)) && (
-          <>
-            <Divider />
-            <div>
-              <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.where_well_meet")}</h2>
-              {exp.meeting_point_lat != null && exp.meeting_point_lng != null ? (
-                <a
-                  href={mapsUrl(Number(exp.meeting_point_lat), Number(exp.meeting_point_lng))}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="relative block w-full h-[120px] bg-secondary rounded-[10px] border border-primary/40 flex items-center justify-center overflow-hidden"
-                >
-                  <span className="text-2xl">📍</span>
-                  <span className="absolute bottom-2.5 bg-card border border-border text-primary-dark text-[9px] font-semibold px-1.5 py-0.5 rounded underline">
-                    {exp.meeting_point_name || (ar ? "نقطة اللقاء" : "Meeting point")} · {ar ? "افتح في خرائط جوجل" : "Open in Google Maps"}
-                  </span>
-                </a>
-              ) : (
-                <p className="text-[13px] text-foreground">{exp.meeting_point_name}</p>
-              )}
-            </div>
-          </>
-        )}
-
-        {/* ── REMARKS (host's own notes) ─────────────────────────── */}
-        {remarks && (
-          <>
-            <Divider />
-            <div>
-              <h2 className="text-sm font-semibold text-foreground mb-2">{ar ? "ملاحظات مهمة" : "Main Remarks"}</h2>
-              <div className="bg-secondary border border-primary/40 rounded-[10px] p-3">
-                <p className="text-xs text-foreground leading-[1.6] whitespace-pre-line">{remarks}</p>
-              </div>
-              <MachineTranslatedNote meta={(exp as any)?.translation_meta} field={ar ? "remarks_ar" : "remarks_en"} className="mt-1" />
-            </div>
-          </>
-        )}
-
-        {/* ── INCLUDED / NOT INCLUDED / LANGUAGES (only when filled) ── */}
-        {(() => {
-          const e = exp as any;
-          const pick = (k: string) => (ar ? e[`${k}_ar`] || e[`${k}_en`] : e[`${k}_en`] || e[`${k}_ar`]) as string | null;
-          const inc = pick("included");
-          const exc = pick("not_included");
-          const langs: string[] = Array.isArray(e.languages) ? e.languages.filter(Boolean) : [];
-          if (!inc && !exc && !langs.length) return null;
-          return (
-            <>
-              <Divider />
-              <div className="space-y-3">
-                {inc && (
-                  <div>
-                    <h2 className="text-sm font-semibold text-foreground mb-1">{ar ? "يشمل" : "What's included"}</h2>
-                    <p className="text-xs text-foreground leading-[1.6] whitespace-pre-line">{inc}</p>
-                  </div>
-                )}
-                {exc && (
-                  <div>
-                    <h2 className="text-sm font-semibold text-foreground mb-1">{ar ? "لا يشمل" : "Not included"}</h2>
-                    <p className="text-xs text-foreground leading-[1.6] whitespace-pre-line">{exc}</p>
-                  </div>
-                )}
-                {langs.length > 0 && (
-                  <div>
-                    <h2 className="text-sm font-semibold text-foreground mb-1">{ar ? "اللغات" : "Languages"}</h2>
-                    <p className="text-xs text-foreground">{langs.join(ar ? "، " : ", ")}</p>
-                  </div>
-                )}
-              </div>
-            </>
-          );
-        })()}
-
-        {/* ── ITINERARY (only steps the row actually stores) ──────── */}
-        {(() => {
-          type Step = { step?: string; description?: string };
-          const rawEn = (exp as any).itinerary_en;
-          const rawAr = (exp as any).itinerary_ar;
-          const arr = (v: unknown): Step[] => (Array.isArray(v) ? (v as Step[]) : []);
-          const preferred = ar ? (arr(rawAr).length ? rawAr : rawEn) : arr(rawEn).length ? rawEn : rawAr;
-          const stepsList = arr(preferred).filter(
-            (s) => (s?.step || "").trim() || (s?.description || "").trim()
-          );
-          if (stepsList.length === 0) return null;
-          return (
-            <>
-              <Divider />
-              <div>
-                <h2 className="text-sm font-semibold text-foreground mb-2">{ar ? "خطة التجربة" : "Itinerary"}</h2>
-                <ol className="space-y-2.5">
-                  {stepsList.map((s, i) => (
-                    <li key={i} className="flex gap-2.5">
-                      <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
-                        {i + 1}
-                      </span>
-                      <div className="flex-1">
-                        {(s.step || "").trim() && (
-                          <p className="text-xs font-semibold text-foreground leading-[1.5]">{s.step}</p>
-                        )}
-                        {(s.description || "").trim() && (
-                          <p className="text-xs text-muted-foreground leading-[1.6] mt-0.5 whitespace-pre-line">{s.description}</p>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </>
-          );
-        })()}
-
-        {/* ── CANCELLATION (listing's own, else platform default) ── */}
-        <Divider />
-        <div>
-          <h2 className="text-sm font-semibold text-foreground mb-1">{ar ? "سياسة الإلغاء" : "Cancellation policy"}</h2>
-          <p className="text-xs text-foreground leading-[1.6] whitespace-pre-line" data-testid="cancellation-policy">
-            {(ar
-              ? (exp as any).cancellation_policy_ar || (exp as any).cancellation_policy_en
-              : (exp as any).cancellation_policy_en || (exp as any).cancellation_policy_ar) ||
-              (ar ? DEFAULT_CANCELLATION_AR : DEFAULT_CANCELLATION_EN)}
-          </p>
-        </div>
-
-        {/* ── AVAILABILITY (real slots only) ─────────────────────── */}
-        <Divider />
-        <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.upcoming_availability")}</h2>
-          {slots.length > 0 ? (
-            <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
-              {slots.map((s, i) => (
-                <button
-                  key={s.id}
-                  onClick={() => setSelectedSlot(i)}
-                  className={`flex-shrink-0 w-[158px] rounded-[10px] p-2.5 border text-left transition-colors ${
-                    selectedSlot === i ? "border-primary bg-secondary" : "border-border bg-card"
-                  }`}
-                >
-                  <p className={`text-xs font-semibold ${selectedSlot === i ? "text-primary-dark" : "text-foreground"}`}>{s.date}</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">{s.time}</p>
-                  <div className="flex justify-between items-center mt-1.5">
-                    <span className="text-[11px] font-semibold text-primary">{s.price} {t("common.egp")}</span>
-                    <span className={`text-[10px] ${s.low ? "text-destructive font-medium" : "text-muted-foreground"}`}>{s.spots} {t("experience.spots")}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          ) : (
-            <p className="text-xs text-muted-foreground">
-              {ar
-                ? "لم ينشر المضيف مواعيد بعد. راسله لتحديد موعد."
-                : "The host hasn't published dates yet. Message them to agree a date."}
+            <p className="pt-3 text-sm text-foreground">
+              ★ {fmtNumber(Number(exp.rating), ar)} · {ar ? `${fmtNumber(reviews.length, ar)} تقييمات` : `${reviews.length} reviews`}
             </p>
           )}
-        </div>
 
-        {/* ── HOST ───────────────────────────────────────────────── */}
-        {(hostName || provider) && (
-          <>
-            <Divider />
-            <div>
-              <div className="flex items-start gap-3 mb-2">
+          {/* a) Standfirst + body */}
+          {description && (
+            <div className="py-6">
+              <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{standfirst}</p>
+              {rest && <p className="mt-4 text-[15px] leading-7 text-foreground/90 whitespace-pre-line">{rest}</p>}
+              <MachineTranslatedNote meta={e.translation_meta} field={ar ? "description_ar" : "description_en"} className="mt-2" />
+            </div>
+          )}
+
+          {/* c) What you'll do */}
+          {steps.length > 0 && (
+            <Section title={ar ? "ماذا ستفعل" : "What you’ll do"} ar={ar}>
+              <ol className="relative">
+                {steps.map((s, i) => (
+                  <li key={i} className="relative flex gap-4 pb-5 last:pb-0">
+                    {i < steps.length - 1 && <span className="absolute top-8 bottom-0 start-[15px] w-px bg-border" aria-hidden />}
+                    <span className="relative z-10 w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center flex-shrink-0">
+                      {fmtNumber(i + 1, ar)}
+                    </span>
+                    <div className="pt-0.5 min-w-0">
+                      {(s.step || "").trim() && <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} !text-[1.05rem] text-foreground`}>{s.step}</p>}
+                      {(s.description || "").trim() && <p className="text-[15px] leading-7 text-foreground/80 whitespace-pre-line">{s.description}</p>}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </Section>
+          )}
+
+          {/* d) Your host */}
+          {(hostName || provider) && (
+            <Section title={ar ? "مضيفك" : "Your host"} ar={ar}>
+              <div className="flex items-center gap-4">
                 {provider?.avatar ? (
-                  <img src={provider.avatar} alt={hostName} className="w-11 h-11 rounded-full object-cover flex-shrink-0" />
+                  <img src={provider.avatar} alt={hostName} className="w-16 h-16 rounded-full object-cover flex-shrink-0" />
                 ) : (
-                  <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-[15px] font-semibold flex-shrink-0">
-                    {hostInitials || "·"}
-                  </div>
+                  <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-semibold flex-shrink-0">{hostInitials || "·"}</div>
                 )}
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{hostName}</p>
-                  {hostSubtitle && <p className="text-[11px] text-muted-foreground">{hostSubtitle}</p>}
+                <div className="min-w-0">
+                  <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{hostName}</p>
+                  {hostSub && <p className="text-[13px] text-muted-foreground">{hostSub}</p>}
                 </div>
               </div>
-              {hostCredentials.length > 0 && (
-                <div className="bg-muted rounded-lg p-2.5 mb-2 space-y-1">
-                  {hostCredentials.map((c, i) => (
-                    <div key={i} className="flex items-start gap-1.5">
-                      <span className="w-[5px] h-[5px] rounded-full bg-primary mt-1 flex-shrink-0" />
-                      <span className="text-[11px] text-muted-foreground">{c}</span>
-                    </div>
+              {hostBio && (
+                <div className="mt-3">
+                  <p className={`whitespace-pre-line ${bioOpen ? "" : "line-clamp-4"}`}>{hostBio}</p>
+                  {hostBio.length > 220 && (
+                    <button type="button" onClick={() => setBioOpen(!bioOpen)} className="mt-1 text-sm font-semibold text-primary-dark underline min-h-[44px]">
+                      {bioOpen ? (ar ? "أقل" : "less") : (ar ? "المزيد" : "more")}
+                    </button>
+                  )}
+                </div>
+              )}
+              {hostChips.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-3">
+                  {hostChips.map((c, i) => (
+                    <span key={i} className="px-2.5 py-1 rounded-full bg-muted text-[13px] text-foreground">{c}</span>
                   ))}
                 </div>
               )}
-              <button
-                onClick={() => navigate(`/inbox?personId=${providerId || exp.provider_id || ""}&kind=provider`)}
-                className="w-full h-10 rounded-lg border border-primary text-primary text-xs font-semibold"
-              >
-                {t("experience.message_host", { name: hostName?.split(" ")[0] || "" })}
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* ── REVIEWS (real or honest empty state) ───────────────── */}
-        <Divider />
-        <div ref={reviewsRef}>
-          <h2 className="text-sm font-semibold text-foreground mb-2">
-            {ar ? "التقييمات" : "Reviews"}
-          </h2>
-          {reviews.length > 0 ? (
-            <div className="grid grid-cols-2 gap-2">
-              {reviews.slice(0, 4).map((r, i) => (
-                <div key={i} className="border border-border rounded-[10px] p-2.5 bg-card">
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <div className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-[9px] font-medium text-primary-dark" style={{ backgroundColor: r.bg }}>
-                      {r.initials}
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-semibold text-foreground">{r.name}</p>
-                      {r.city && <p className="text-[10px] text-muted-foreground">{r.city}</p>}
-                    </div>
-                  </div>
-                  <StarRow count={r.rating} size={11} />
-                  {r.text && <p className="text-[10px] text-muted-foreground leading-[1.45] mt-1 line-clamp-3">{r.text}</p>}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-xs text-muted-foreground">{ar ? "لا توجد تقييمات بعد." : "No reviews yet."}</p>
+              <div className="flex gap-2 mt-4">
+                {provider && (
+                  <button type="button" onClick={() => navigate(`/provider/${provider.slug || provider.id}`)} className="flex-1 h-11 rounded-xl border border-border text-sm font-semibold text-foreground">
+                    {ar ? "عرض الملف" : "View profile"}
+                  </button>
+                )}
+                <button type="button" onClick={messageHost} className="flex-1 h-11 rounded-xl border border-primary text-primary-dark text-sm font-semibold inline-flex items-center justify-center gap-1.5">
+                  <MessageCircle className="w-4 h-4" /> {ar ? "راسل" : "Message"}
+                </button>
+              </div>
+            </Section>
           )}
-        </div>
 
-        {/* ── GETTING THERE — only transport serving this city ───── */}
-        {cityTransport && cityTransport.length > 0 && (
-          <>
-            <Divider />
-            <div>
-              <h2 className="text-sm font-semibold text-foreground mb-2">{t("experience.getting_there")}</h2>
-              <div className="bg-secondary rounded-[10px] border border-primary/40 p-3 space-y-1.5">
+          {/* e) Choose a date */}
+          <Section ref={dateRef} id="choose-date" title={ar ? "اختر موعدًا" : "Choose a date"} ar={ar}>
+            {slots.length > 0 ? (
+              <>
+                <MonthDatePicker
+                  slots={slots}
+                  selectedId={selectedSlotId}
+                  onSelect={(sid) => { setSelectedSlotId(sid); setUserPicked(true); }}
+                  ar={ar}
+                  currency={egp}
+                />
+                <div className="mt-4 border-t border-border">{stepper}</div>
+                <div className="flex justify-between text-[15px]">
+                  <span>{fmtNumber(guests, ar)} × {priceLabel}</span>
+                  <span className="font-semibold text-foreground">{fmtNumber(subtotal, ar)} {egp}</span>
+                </div>
+                <p className="mt-2 text-[13px] text-muted-foreground">{noPayNote}</p>
+              </>
+            ) : (
+              <>
+                <p>{ar ? "لم ينشر المضيف مواعيد بعد. راسله لتحديد موعد." : "The host hasn't published dates yet. Message them to agree a date."}</p>
+                <button type="button" onClick={messageHost} className="mt-3 h-11 px-5 rounded-xl border border-primary text-primary-dark text-sm font-semibold inline-flex items-center gap-1.5">
+                  <MessageCircle className="w-4 h-4" /> {ar ? "راسل المضيف" : "Message the host"}
+                </button>
+              </>
+            )}
+          </Section>
+
+          {/* f) Where we'll meet */}
+          {(exp.meeting_point_name || (exp.meeting_point_lat != null && exp.meeting_point_lng != null)) && (
+            <Section title={ar ? "أين سنلتقي" : "Where we’ll meet"} ar={ar}>
+              {exp.meeting_point_lat != null && exp.meeting_point_lng != null ? (() => {
+                const lat = Number(exp.meeting_point_lat), lng = Number(exp.meeting_point_lng);
+                const bbox = [lng - 0.006, lat - 0.004, lng + 0.006, lat + 0.004].join(",");
+                return (
+                  <>
+                    <div className="rounded-xl overflow-hidden border border-border h-[200px] bg-muted">
+                      <iframe
+                        title={ar ? "خريطة نقطة اللقاء" : "Meeting point map"}
+                        src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`}
+                        loading="lazy"
+                        className="w-full h-full pointer-events-none border-0"
+                        tabIndex={-1}
+                      />
+                    </div>
+                    {exp.meeting_point_name && <p className="mt-2 font-semibold text-foreground">{exp.meeting_point_name}</p>}
+                    <a href={mapsUrl(lat, lng)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 min-h-[44px] text-sm font-semibold text-primary-dark underline">
+                      <MapPin className="w-4 h-4" /> {ar ? "افتح في خرائط جوجل" : "Open in Google Maps"}
+                    </a>
+                  </>
+                );
+              })() : (
+                <p className="flex items-center gap-2"><MapPin className="w-4 h-4 text-primary-dark" /> {exp.meeting_point_name}</p>
+              )}
+            </Section>
+          )}
+
+          {/* g) Good to know */}
+          <Section title={ar ? "معلومات مهمة" : "Good to know"} ar={ar}>
+            <dl className="divide-y divide-border">
+              {[
+                included && [ar ? "يشمل" : "What’s included", included],
+                notIncluded && [ar ? "لا يشمل" : "Not included", notIncluded],
+                langs.length > 0 && [ar ? "اللغات" : "Languages", langs.join(ar ? "، " : ", ")],
+                [ar ? "سياسة الإلغاء" : "Cancellation", cancellation],
+                remarks && [ar ? "ملاحظات مهمة" : "Main remarks", remarks],
+              ].filter(Boolean).map((row) => {
+                const [k, v] = row as [string, string];
+                return (
+                  <div key={k} className="py-3 first:pt-0">
+                    <dt className="text-[13px] font-semibold uppercase tracking-wide text-muted-foreground">{k}</dt>
+                    <dd className="mt-1 whitespace-pre-line" data-testid={k === (ar ? "سياسة الإلغاء" : "Cancellation") ? "cancellation-policy" : undefined}>{v}</dd>
+                  </div>
+                );
+              })}
+            </dl>
+            {remarks && <MachineTranslatedNote meta={e.translation_meta} field={ar ? "remarks_ar" : "remarks_en"} className="mt-1" />}
+          </Section>
+
+          {/* h) Reviews (real only) */}
+          <Section title={ar ? "التقييمات" : "Reviews"} ar={ar}>
+            {reviews.length > 0 ? (
+              <ul className="space-y-4">
+                {reviews.slice(0, 6).map((r, i) => (
+                  <li key={i}>
+                    <div className="flex items-center gap-2">
+                      <span className="w-9 h-9 rounded-full bg-accent text-accent-foreground text-xs font-semibold flex items-center justify-center">{r.initials}</span>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{r.name}</p>
+                        <p className="text-[13px] text-muted-foreground">{"★".repeat(Math.round(r.rating))}{r.city ? ` · ${r.city}` : ""}</p>
+                      </div>
+                    </div>
+                    {r.text && <p className="mt-1.5">{r.text}</p>}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground">{ar ? "لا توجد تقييمات بعد." : "No reviews yet."}</p>
+            )}
+          </Section>
+
+          {/* i) Getting there */}
+          {cityTransport && cityTransport.length > 0 && (
+            <Section title={t("experience.getting_there")} ar={ar}>
+              <ul className="divide-y divide-border">
                 {cityTransport.map((tr) => {
                   const Icon = tr.transport_type === "train" ? Train : Bus;
-                  const name = ar ? tr.name_ar : tr.name_en;
                   const from = ar ? (tr.from_ar || tr.from_en) : tr.from_en;
                   const to = ar ? (tr.to_ar || tr.to_en) : tr.to_en;
                   return (
-                    <div key={tr.id} className="flex items-center gap-2.5">
-                      <div className="w-[26px] h-[26px] rounded-[7px] bg-primary flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-3 h-3 text-primary-foreground" />
-                      </div>
-                      <span className="text-[11px] text-primary-dark leading-[1.4]">
-                        {name}{from && to ? `: ${from} → ${to}` : ""}{tr.duration ? ` · ${tr.duration}` : ""} · {tr.price} {t("common.egp")}
-                      </span>
-                    </div>
+                    <li key={tr.id}>
+                      <button type="button" onClick={() => navigate(`/transport/${tr.id}`)} className="w-full flex items-center gap-3 py-3 text-start">
+                        <Icon className="w-5 h-5 text-primary-dark flex-shrink-0" />
+                        <span className="flex-1 min-w-0">
+                          <span className="block font-semibold text-foreground">{ar ? tr.name_ar || tr.name_en : tr.name_en}</span>
+                          <span className="block text-[13px] text-muted-foreground">
+                            {[from && to ? `${from} → ${to}` : null, tr.duration, `${fmtNumber(tr.price, ar)} ${egp}`].filter(Boolean).join(" · ")}
+                          </span>
+                        </span>
+                      </button>
+                    </li>
                   );
                 })}
-              </div>
-            </div>
-          </>
-        )}
+              </ul>
+            </Section>
+          )}
 
-        {/* ── MORE EXPERIENCES — last ────────────────────────────── */}
-        {relatedExps && relatedExps.length > 0 && (
-          <>
-            <Divider />
-            <div>
-              <h2 className="text-sm font-semibold text-foreground mb-2">
-                {regionName ? t("experience.more_experiences_in", { region: regionName }) : (ar ? "تجارب أخرى" : "More experiences")}
-              </h2>
-              <div className="flex gap-2.5 overflow-x-auto hide-scrollbar pb-1.5">
+          {/* j) Read before you go */}
+          <ReadBeforeYouGo cityId={exp.city_id} regionId={exp.region_id} ar={ar} />
+
+          {/* k) More nearby */}
+          {relatedExps && relatedExps.length > 0 && (
+            <Section title={ar ? "تجارب أخرى قريبة" : "More experiences nearby"} ar={ar}>
+              <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-1 snap-x">
                 {relatedExps.map((r) => {
-                  const rTitle = ar ? r.title_ar : r.title_en;
-                  const hrs = r.duration_minutes ? `${Math.round(r.duration_minutes / 60)}h` : "";
+                  const rTitle = ar ? r.title_ar || r.title_en : r.title_en;
                   return (
-                    <div key={r.id} className="flex-shrink-0 w-[138px] border border-border rounded-[10px] overflow-hidden bg-card">
-                      <div className="h-[72px] bg-secondary overflow-hidden">
-                        {r.image ? (
-                          <img src={r.image} alt={rTitle} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-[10px] text-primary-dark font-medium px-2 text-center">{rTitle}</div>
-                        )}
+                    <button key={r.id} type="button" onClick={() => navigate(`/experience/${r.slug || r.id}`)} className="flex-shrink-0 w-[220px] snap-start text-start">
+                      <div className="aspect-[3/2] rounded-xl overflow-hidden bg-muted">
+                        {r.image && <img src={r.image} alt="" loading="lazy" className="w-full h-full object-cover" />}
                       </div>
-                      <div className="p-2">
-                        <p className="text-[11px] font-semibold text-foreground leading-[1.3] mb-0.5 line-clamp-2">{rTitle}</p>
-                        <p className="text-[10px] text-muted-foreground mb-1.5">
-                          {[r.theme, hrs, `${r.price} ${t("common.egp")}`].filter(Boolean).join(" · ")}
-                        </p>
-                        <button
-                          onClick={() => navigate(`/experience/${r.slug || r.id}`)}
-                          className="w-full h-7 rounded-md bg-primary text-primary-foreground text-[10px] font-semibold"
-                        >
-                          {ar ? "عرض" : "View"}
-                        </button>
-                      </div>
-                    </div>
+                      <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} !text-base mt-2 line-clamp-2 text-foreground`}>{rTitle}</p>
+                      <p className="text-[13px] text-muted-foreground">
+                        {[formatDuration(r.duration_minutes, ar), `${fmtNumber(r.price, ar)} ${egp}`].filter(Boolean).join(" · ")}
+                      </p>
+                    </button>
                   );
                 })}
               </div>
-            </div>
-          </>
-        )}
-      </div>
+            </Section>
+          )}
+        </main>
 
-      {/* ── MESSAGE BAR (in-app only) ───────────────────────────── */}
-      <button
-        onClick={() => navigate(`/inbox?personId=${providerId || exp.provider_id || ""}&kind=provider`)}
-        className="fixed bottom-[136px] left-0 right-0 z-50 bg-secondary border-t border-primary/40 px-4 py-2.5 flex items-center gap-2.5 text-start"
-      >
-        <div className="w-[22px] h-[22px] rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-          <MessageCircle className="w-[11px] h-[11px] text-primary-foreground" />
-        </div>
-        <span className="text-xs text-primary-dark flex-1 min-w-0 truncate">
-          {ar ? "راسل المضيف داخل التطبيق" : "Message the host in the app"}
-        </span>
-      </button>
-
-      {/* ── STICKY BOOKING BAR ─────────────────────────────────── */}
-      <div className="fixed bottom-[68px] left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-2px_12px_rgba(0,0,0,0.06)] px-4 py-3 pb-7 flex items-center justify-between">
-        <div>
-          <span className="text-xl font-bold text-primary">{unitPrice} {t("common.egp")}</span>
-          <span className="text-[13px] text-muted-foreground"> {t("common.per_person")}</span>
-        </div>
-        <button
-          onClick={() => (slots.length > 0 ? setSheetOpen(true) : navigate(`/booking?type=experience&id=${exp.id || id}`))}
-          className="h-[46px] px-[26px] bg-primary rounded-[10px] text-primary-foreground text-sm font-bold"
-        >
-          {ar ? "اطلب الحجز" : "Request to book"}
-        </button>
-      </div>
-
-      {/* ── BOOKING SHEET ──────────────────────────────────────── */}
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent side="bottom" className="rounded-t-[20px] px-0 pb-8 pt-0 max-h-[85vh] overflow-y-auto">
-          <div className="flex justify-center pt-2.5 pb-1">
-            <div className="w-8 h-1 rounded-full bg-border" />
-          </div>
-          <SheetHeader className="px-4 pb-3">
-            <SheetTitle className="text-base font-bold text-foreground">{t("experience.select_a_time")}</SheetTitle>
-          </SheetHeader>
-
-          <div className="px-4 pb-3 flex justify-between items-center border-b border-border">
-            <p className="text-sm font-semibold text-foreground">
-              {t(sheetGuests > 1 ? "experience.n_adults_other" : "experience.n_adults_one", { count: sheetGuests })}
-            </p>
-            <div className="flex items-center gap-3">
-              <button onClick={() => setSheetGuests(Math.max(1, sheetGuests - 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center" aria-label="Decrease"><Minus className="w-3.5 h-3.5" /></button>
-              <span className="text-[15px] font-semibold w-5 text-center">{sheetGuests}</span>
-              <button onClick={() => setSheetGuests(Math.min(exp.capacity_max || 12, sheetGuests + 1))} className="w-[30px] h-[30px] rounded-full border border-border flex items-center justify-center" aria-label="Increase"><Plus className="w-3.5 h-3.5" /></button>
-            </div>
-          </div>
-
-          {sheetSlotGroups.map((group, gi) => (
-            <div key={gi} className="px-4">
-              <p className="text-sm font-bold text-foreground pt-2.5 pb-1.5">{group.label}</p>
-              {group.slots.map((s: any) => (
-                <button
-                  key={s._idx}
-                  onClick={() => setSheetSlot(s._idx)}
-                  className={`w-full rounded-[10px] border p-3 mb-2 text-left transition-colors ${sheetSlot === s._idx ? "border-primary bg-secondary" : "border-border"}`}
-                >
-                  <p className="text-sm font-semibold text-foreground">{s.time}</p>
-                  <div className="flex justify-between mt-1">
-                    <span className="text-xs text-muted-foreground">{s.price} {t("common.egp")} {t("common.per_person")}</span>
-                    <span className={`text-xs ${s.low ? "text-destructive font-medium" : "text-muted-foreground"}`}>{t("common.spots_available", { count: s.spots })}</span>
-                  </div>
+        {/* Desktop sticky booking card */}
+        <aside className="hidden lg:block w-[320px] flex-shrink-0 pt-6">
+          <div className="sticky top-6 rounded-2xl border border-border bg-card shadow-card p-5">
+            <p className="text-2xl font-bold text-foreground">{priceLabel} <span className="text-sm font-normal text-muted-foreground">{perPerson}</span></p>
+            {slots.length > 0 ? (
+              <>
+                <button type="button" onClick={() => dateRef.current?.scrollIntoView({ behavior: "smooth" })} className="mt-3 w-full rounded-xl border border-border px-3 py-2.5 text-start">
+                  <span className="block text-[13px] text-muted-foreground">{ar ? "الموعد" : "Date"}</span>
+                  <span className="block text-sm font-semibold text-foreground">{selectedSummary}</span>
                 </button>
-              ))}
-            </div>
-          ))}
-
-          <div className="px-4 pt-2">
-            <button
-              onClick={() => {
-                setSheetOpen(false);
-                const slotUuid = (slots[sheetSlot] as { id?: string } | undefined)?.id;
-                const slotParam = slotUuid ? `&slot=${slotUuid}` : "";
-                navigate(`/booking?type=experience&id=${exp.id || id}${slotParam}&guests=${sheetGuests}`);
-              }}
-              className="w-full h-[46px] bg-primary rounded-[10px] text-primary-foreground text-sm font-bold"
-            >
-              {ar ? "متابعة" : "Continue"} · {(slots[sheetSlot]?.price || unitPrice) * sheetGuests} {t("common.egp")}
+                {stepper}
+                <div className="flex justify-between text-sm pb-3">
+                  <span>{ar ? "الإجمالي" : "Subtotal"}</span>
+                  <span className="font-semibold">{fmtNumber(subtotal, ar)} {egp}</span>
+                </div>
+              </>
+            ) : (
+              <p className="mt-3 text-sm text-muted-foreground">{ar ? "لا توجد مواعيد منشورة بعد." : "No dates published yet."}</p>
+            )}
+            <button type="button" onClick={() => goBooking(selected?.id)} className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold">{bookLabel}</button>
+            <button type="button" onClick={messageHost} className="mt-2 w-full h-11 rounded-xl border border-border text-sm font-semibold inline-flex items-center justify-center gap-1.5">
+              <MessageCircle className="w-4 h-4" /> {ar ? "راسل المضيف" : "Message host"}
             </button>
+            <p className="mt-3 text-[13px] text-muted-foreground">{noPayNote}</p>
           </div>
-        </SheetContent>
-      </Sheet>
+        </aside>
+      </div>
+
+      <ActionBar
+        price={priceLabel}
+        note={selected && userPicked ? `${perPerson} · ${selectedSummary}` : perPerson}
+        buttonLabel={bookLabel}
+        onPrimary={requestToBook}
+        onMessage={messageHost}
+        ar={ar}
+      />
     </div>
   );
 };

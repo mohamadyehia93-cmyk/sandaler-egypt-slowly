@@ -216,3 +216,9 @@ html, body {
 .article-standfirst { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-weight: 500; font-size: 1.25rem; line-height: 1.5; }
 .article-standfirst.lang-ar { font-family: "Amiri", "Cairo", serif; font-style: normal; font-weight: 400; font-size: 1.375rem; line-height: 1.75; }
 .article-prose.lang-en .drop-cap::first-letter { float: left; font-size: 3.6em; line-height: 0.85; font-weight: 600; margin: 0.08em 0.1em 0 0; color: hsl(var(--primary-dark, var(--primary))); }
+
+/* ── Listing pages (shared with article typography) ── */
+.listing-title { font-family: "Source Serif 4", Georgia, serif; font-weight: 600; line-height: 1.2; }
+.listing-title.lang-ar { font-family: "Amiri", "Cairo", serif; font-weight: 700; line-height: 1.4; }
+.listing-h2 { font-family: "Source Serif 4", Georgia, serif; font-weight: 600; font-size: 1.25rem; line-height: 1.35; }
+.listing-h2.lang-ar { font-family: "Amiri", "Cairo", serif; font-weight: 700; font-size: 1.4rem; line-height: 1.5; }
