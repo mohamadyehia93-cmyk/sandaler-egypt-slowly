@@ -182,7 +182,7 @@ const EventDetail = () => {
     <div className="flex flex-wrap gap-2">
       <button type="button" onClick={addToCalendar} className={pill}><CalendarPlus className="w-4 h-4 text-primary-dark" /> {ar ? "أضف للتقويم" : "Add to calendar"}</button>
       <a href={mapsHref} target="_blank" rel="noopener noreferrer" className={pill}><Navigation className="w-4 h-4 text-primary-dark" /> {ar ? "الاتجاهات" : "Directions"}</a>
-      <ShareButton title={title} className={pill} iconClassName="w-4 h-4 text-primary-dark" />
+      <ShareButton title={title} className={pill} iconClassName="w-4 h-4 text-primary-dark" showLabel />
     </div>
   );
 

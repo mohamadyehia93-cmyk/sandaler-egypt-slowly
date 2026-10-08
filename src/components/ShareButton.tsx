@@ -6,13 +6,15 @@ interface ShareButtonProps {
   title: string;
   className?: string;
   iconClassName?: string;
+  /** Show a visible text label next to the icon. */
+  showLabel?: boolean;
 }
 
 /**
  * Single share control used by every detail page. Previously several pages
  * rendered a decorative Share2 icon with no handler.
  */
-const ShareButton = ({ title, className, iconClassName }: ShareButtonProps) => {
+const ShareButton = ({ title, className, iconClassName, showLabel }: ShareButtonProps) => {
   const { lang } = useI18n();
 
   const share = async () => {
@@ -37,6 +39,7 @@ const ShareButton = ({ title, className, iconClassName }: ShareButtonProps) => {
       className={className ?? "p-2 rounded-full bg-background/80 backdrop-blur-sm"}
     >
       <Share2 className={iconClassName ?? "w-5 h-5 text-foreground"} />
+      {showLabel && <span>{lang === "ar" ? "مشاركة" : "Share"}</span>}
     </button>
   );
 };
