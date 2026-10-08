@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { MessageCircle } from "lucide-react";
 
 interface Props {
@@ -6,11 +7,13 @@ interface Props {
   buttonLabel: string;
   onPrimary: () => void;
   onMessage?: () => void;
+  /** Optional small secondary link under the price (e.g. official site). */
+  extra?: ReactNode;
   ar: boolean;
 }
 
 /** Mobile-only fixed bar above the app bottom navigation. Desktop renders a sticky card instead. */
-const ActionBar = ({ price, note, buttonLabel, onPrimary, onMessage, ar }: Props) => (
+const ActionBar = ({ price, note, buttonLabel, onPrimary, onMessage, extra, ar }: Props) => (
   <div
     className="lg:hidden fixed inset-x-0 z-40 bg-card border-t border-border shadow-elevated"
     style={{ bottom: "calc(68px + env(safe-area-inset-bottom, 0px))" }}
@@ -19,6 +22,7 @@ const ActionBar = ({ price, note, buttonLabel, onPrimary, onMessage, ar }: Props
       <div className="flex-1 min-w-0">
         <p className="text-xl font-bold text-foreground leading-tight">{price}</p>
         {note && <p className="text-[13px] text-muted-foreground">{note}</p>}
+        {extra}
       </div>
       {onMessage && (
         <button type="button" onClick={onMessage} aria-label={ar ? "راسل المضيف" : "Message the host"}

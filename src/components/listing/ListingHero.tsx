@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import ShareButton from "@/components/ShareButton";
 import WishlistButton from "@/components/WishlistButton";
@@ -15,12 +15,16 @@ interface Props {
   wishlistId?: string | null;
   /** Mobile-only thumbnail row under the hero (when >1 photo). */
   thumbnails?: boolean;
+  /** Shown when the row has no images (calm placeholder, never a stock photo). */
+  placeholder?: ReactNode;
+  /** Extra bottom room on mobile when a card overlaps the hero. */
+  overlap?: boolean;
 }
 
 const roundBtn = "tap-target rounded-full bg-background/80 backdrop-blur-sm text-foreground";
 
 /** Full-bleed gallery of the row's REAL images only — never duplicates a file to fake a gallery. */
-const ListingHero = ({ images, title, eyebrow, ar, onBack, wishlistType, wishlistId, thumbnails }: Props) => {
+const ListingHero = ({ images, title, eyebrow, ar, onBack, wishlistType, wishlistId, thumbnails, placeholder, overlap }: Props) => {
   const photos = Array.from(new Set(images.filter(Boolean)));
   const scroller = useRef<HTMLDivElement>(null);
   const [idx, setIdx] = useState(0);
@@ -62,7 +66,7 @@ const ListingHero = ({ images, title, eyebrow, ar, onBack, wishlistType, wishlis
             />
           ))}
         </div>
-      ) : null}
+      ) : placeholder ?? null}
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/25 to-transparent" />
 
@@ -94,7 +98,7 @@ const ListingHero = ({ images, title, eyebrow, ar, onBack, wishlistType, wishlis
       )}
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0">
-        <div className="max-w-[680px] lg:max-w-[1040px] mx-auto px-4 pb-5">
+        <div className={`max-w-[680px] lg:max-w-[1040px] mx-auto px-4 ${overlap ? "pb-10 lg:pb-5" : "pb-5"}`}>
           {eyebrow && (
             <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-primary-foreground/85 mb-1.5">{eyebrow}</p>
           )}
