@@ -17,6 +17,7 @@ import Section from "@/components/listing/Section";
 import ActionBar from "@/components/listing/ActionBar";
 import ReadBeforeYouGo from "@/components/listing/ReadBeforeYouGo";
 import { fmtNumber, listingLocale, splitStandfirst } from "@/components/listing/format";
+import PosterDate from "@/components/listing/PosterDate";
 import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
 
 /**
@@ -113,14 +114,6 @@ const EventDetail = () => {
   const isFree = event.is_free || !event.price;
 
   // Poster date block
-  const dayNum = multiDay && end && end.getMonth() === start.getMonth()
-    ? `${fmtNumber(start.getDate(), ar)}–${fmtNumber(end.getDate(), ar)}`
-    : start.toLocaleDateString(loc, { day: "numeric" });
-  const monthShort = multiDay && end && end.getMonth() !== start.getMonth()
-    ? `${start.toLocaleDateString(loc, { month: "short" })} – ${end.toLocaleDateString(loc, { day: "numeric", month: "short" })}`
-    : start.toLocaleDateString(loc, { month: "short" });
-  const weekday = start.toLocaleDateString(loc, { weekday: "long" });
-  const timeLabel = event.event_time || (ar ? "الموعد سيُعلن لاحقًا" : "Time to be announced");
   const whereLine = [venue, cityName].filter(Boolean).join(" · ");
 
   const lat = ev.latitude != null ? Number(ev.latitude) : null;
@@ -215,20 +208,8 @@ const EventDetail = () => {
       <div className="max-w-[1040px] mx-auto px-4 lg:flex lg:gap-10 lg:justify-center">
         <main className="max-w-[680px] w-full min-w-0">
           {/* Poster date block */}
-          <div className="relative z-10 -mt-6 lg:mt-6 rounded-2xl border border-border bg-card shadow-card p-4 flex gap-4 items-center">
-            <div className="flex flex-col items-center justify-center text-center min-w-[76px] pe-4 border-e border-border">
-              <span className="text-[13px] font-semibold uppercase tracking-wide text-primary-dark">{monthShort}</span>
-              <span className="text-3xl font-bold leading-none text-foreground mt-0.5">{dayNum}</span>
-              <span className="text-[13px] text-muted-foreground mt-1">{weekday}</span>
-            </div>
-            <div className="min-w-0 flex-1 space-y-1">
-              <p className="flex items-center gap-1.5 text-[15px] text-foreground"><Clock className="w-4 h-4 text-primary-dark flex-shrink-0" /> {timeLabel}</p>
-              {whereLine && <p className="flex items-center gap-1.5 text-[15px] text-foreground"><MapPin className="w-4 h-4 text-primary-dark flex-shrink-0" /> <span className="truncate">{whereLine}</span></p>}
-              <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${past ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary-dark"}`}>
-                <Timer className="w-3.5 h-3.5" /> {countdown}
-              </span>
-            </div>
-          </div>
+          <PosterDate start={start} end={multiDay ? end : null} ar={ar} time={event.event_time} where={whereLine} countdown={countdown} past={past}
+            className="relative z-10 -mt-6 lg:mt-6" />
 
           <div className="pt-4 pb-2 lg:hidden">{quickActions}</div>
 
