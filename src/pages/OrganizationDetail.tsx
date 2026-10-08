@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  ArrowLeft, Share2, MapPin, Users, Globe, Heart, Sparkles, Target,
+  ArrowLeft, MapPin, Users, Globe, Heart,
   Mail, Building2, HandCoins,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
@@ -14,7 +14,14 @@ import NotFoundView from "@/components/NotFound";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import { useIsFollowing, useToggleFollow, useFollowerCount } from "@/hooks/useFollows";
-import { UserPlus, UserCheck } from "lucide-react";
+import { UserPlus, UserCheck, MessageCircle } from "lucide-react";
+import ShareButton from "@/components/ShareButton";
+import KeyFacts, { type KeyFact } from "@/components/listing/KeyFacts";
+import Section from "@/components/listing/Section";
+import ReadBeforeYouGo from "@/components/listing/ReadBeforeYouGo";
+import WideCard, { WideRow } from "@/components/listing/WideCard";
+import MiniDate from "@/components/listing/MiniDate";
+import { fmtNumber, formatSlotDay } from "@/components/listing/format";
 
 type Region = { id: string; name_en: string; name_ar: string; emoji: string | null; color: string | null };
 type Org = {
@@ -31,12 +38,18 @@ type Org = {
   website: string | null;
   focus_areas_en: string[] | null; focus_areas_ar: string[] | null;
   status: string | null;
+  volunteers_count?: number | null;
 };
 type Program = {
   id: string; slug: string | null;
   title_en: string; title_ar: string;
   description_en: string | null; description_ar: string | null;
   image: string | null; status: string;
+  start_date: string | null; end_date: string | null; volunteers_needed: number | null;
+};
+type OrgEvent = {
+  id: string; slug: string | null; title_en: string; title_ar: string | null; image: string | null;
+  start_date: string; end_date: string | null; venue_en: string | null; venue_ar: string | null; is_free: boolean; price: number | null;
 };
 type Cause = {
   id: string; slug: string | null;
@@ -50,7 +63,7 @@ const isImageUrl = (v: string | null) => !!v && /^(https?:|\/)/.test(v);
 const OrganizationDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { lang, t } = useI18n();
+  const { lang } = useI18n();
   const { user } = useAuth();
 
   const [org, setOrg] = useState<Org | null>(null);
@@ -58,6 +71,7 @@ const OrganizationDetail = () => {
   const [cityName, setCityName] = useState<string | null>(null);
   const [programs, setPrograms] = useState<Program[]>([]);
   const [causes, setCauses] = useState<Cause[]>([]);
+  const [events, setEvents] = useState<OrgEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -83,15 +97,26 @@ const OrganizationDetail = () => {
           const [pRes, cRes] = await Promise.all([
             supabase
               .from("programs")
-              .select("id, slug, title_en, title_ar, description_en, description_ar, image, status")
+              .select("id, slug, title_en, title_ar, description_en, description_ar, image, status, start_date, end_date, volunteers_needed")
               .eq("owner_id", o.owner_id)
+              .eq("status", "published")
               .order("created_at", { ascending: false }),
             supabase
               .from("causes")
               .select("id, slug, title_en, title_ar, summary_en, summary_ar, image")
               .eq("owner_id", o.owner_id)
+              .eq("status", "published")
               .order("created_at", { ascending: false }),
           ]);
+          // Events: events.organizer_id holds providers.id of the owning account.
+          const { data: provs } = await supabase.from("providers").select("id").eq("user_id", o.owner_id);
+          const provIds = (provs ?? []).map((x: { id: string }) => x.id);
+          if (provIds.length) {
+            const { data: ev } = await supabase.from("events")
+              .select("id, slug, title_en, title_ar, image, start_date, end_date, venue_en, venue_ar, is_free, price")
+              .in("organizer_id", provIds).eq("status", "published").order("start_date", { ascending: true }).limit(12);
+            if (!cancelled) setEvents((ev as OrgEvent[]) ?? []);
+          }
           if (!cancelled) {
             setPrograms((pRes.data as Program[]) ?? []);
             setCauses((cRes.data as Cause[]) ?? []);
@@ -144,233 +169,146 @@ const OrganizationDetail = () => {
   }
   if (!org) return <NotFoundView context="organization" />;
 
-  const name = lang === "ar" ? (org.name_ar || org.name_en) : org.name_en;
-  const mission = lang === "ar" ? (org.mission_ar || org.mission_en) : org.mission_en;
-  const description = lang === "ar" ? (org.description_ar || org.description_en) : org.description_en;
-  const location = lang === "ar" ? (org.location_ar || org.location_en) : org.location_en;
-  const focusAreas = (lang === "ar" ? (org.focus_areas_ar || org.focus_areas_en) : org.focus_areas_en) ?? [];
-  const regionName = region ? (lang === "ar" ? (region.name_ar || region.name_en) : region.name_en) : null;
+  const ar = lang === "ar";
+  const name = (ar ? (org.name_ar || org.name_en) : org.name_en) || "";
+  const mission = ar ? (org.mission_ar || org.mission_en) : org.mission_en;
+  const description = ar ? (org.description_ar || org.description_en) : org.description_en;
+  const location = ar ? (org.location_ar || org.location_en) : org.location_en;
+  const focusAreas = (ar ? (org.focus_areas_ar || org.focus_areas_en) : org.focus_areas_en) ?? [];
+  const regionName = region ? (ar ? (region.name_ar || region.name_en) : region.name_en) : null;
   const place = location || cityName || regionName;
+  const todayIso = new Date().toISOString().slice(0, 10);
+
+  // Status pill only from stored dates / counts — never guessed.
+  const programmeStatus = (p: Program): string | null => {
+    if (p.end_date && p.end_date < todayIso) return ar ? "انتهى" : "Ended";
+    if (p.volunteers_needed && p.volunteers_needed > 0) return ar ? "مفتوح للمتطوعين" : "Open for volunteers";
+    if (p.start_date && p.start_date <= todayIso) return ar ? "جارٍ" : "Ongoing";
+    return null;
+  };
+
+  const facts: KeyFact[] = [];
+  if (place) facts.push({ icon: MapPin, label: place });
+  if (org.volunteers_count) facts.push({ icon: Users, label: ar ? `${fmtNumber(org.volunteers_count, ar)} متطوعين` : `${org.volunteers_count} volunteers` });
+  if (followerCount > 0) facts.push({ icon: Heart, label: ar ? `${fmtNumber(followerCount, ar)} متابعين` : `${followerCount} ${followerCount === 1 ? "follower" : "followers"}` });
+  const work = programs.length + causes.length;
+  if (work) facts.push({ icon: HandCoins, label: ar ? `${fmtNumber(work, ar)} برامج وقضايا` : `${work} programmes & causes` });
+
+  const actionBtn = "h-11 px-4 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-1.5";
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Cover */}
-      <div className="relative h-44 bg-gradient-to-br from-primary/30 to-primary/10">
-        {org.image && <img src={org.image} alt="" className="w-full h-full object-cover opacity-40" />}
-        <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
-        <button
-          onClick={() => navigate(-1)}
-          className="absolute top-4 start-4 p-2 rounded-full bg-background/80 backdrop-blur-sm z-10"
-          aria-label="Back"
-        >
-          <ArrowLeft className="w-5 h-5 text-foreground rtl:rotate-180" />
-        </button>
-        <button
-          onClick={() => {
-            navigator.clipboard?.writeText(window.location.href);
-            toast({ title: lang === "ar" ? "تم نسخ الرابط" : "Link copied" });
-          }}
-          className="absolute top-4 end-4 p-2 rounded-full bg-background/80 backdrop-blur-sm z-10"
-          aria-label="Share"
-        >
-          <Share2 className="w-5 h-5 text-foreground" />
-        </button>
+    <div className="min-h-screen bg-background pb-24">
+      <div className="relative h-44 lg:h-64 overflow-hidden bg-gradient-to-br from-primary/50 via-primary/20 to-accent/40">
+        {org.image && <img src={org.image} alt="" className="w-full h-full object-cover" />}
+        <div className="absolute top-3 inset-x-3 flex justify-between pt-[env(safe-area-inset-top,0px)]">
+          <button type="button" onClick={() => navigate(-1)} aria-label={ar ? "رجوع" : "Back"} className="tap-target rounded-full bg-background/80 backdrop-blur-sm text-foreground">
+            <ArrowLeft className={`w-5 h-5 ${ar ? "rotate-180" : ""}`} />
+          </button>
+        </div>
       </div>
 
-      {/* Header card */}
-      <div className="px-4 -mt-14 relative z-10">
-        <div className="bg-card rounded-2xl shadow-elevated p-4">
-          <div className="flex items-start gap-3">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl shrink-0 overflow-hidden">
-              {isImageUrl(org.logo) ? (
-                <img src={org.logo!} alt={name} className="w-full h-full object-cover" />
-              ) : org.logo ? (
-                org.logo
-              ) : (
-                <Building2 className="w-7 h-7 text-primary" />
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <h1 className="text-base font-bold text-foreground truncate">{name}</h1>
-                {org.status !== "published" && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-semibold">
-                    {lang === "ar" ? "مسودة" : "Draft"}
-                  </span>
-                )}
-              </div>
-              {org.org_type && (
-                <p className="text-xs text-muted-foreground mt-0.5">{org.org_type}</p>
-              )}
-              <div className="flex items-center gap-3 mt-1.5 text-[11px] text-muted-foreground flex-wrap">
-                {place && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
-                    {place}
-                  </span>
-                )}
-                <span className="flex items-center gap-1">
-                  <Users className="w-3 h-3" />
-                  <span className="font-semibold text-foreground tabular-nums">{followerCount}</span>
-                  {lang === "ar" ? "متابع" : "followers"}
-                </span>
-              </div>
-            </div>
-          </div>
+      <div className="max-w-[680px] mx-auto px-4">
+        <div className="-mt-12 relative z-10 w-24 h-24 rounded-full border-4 border-background shadow-card bg-card overflow-hidden flex items-center justify-center text-4xl">
+          {isImageUrl(org.logo) ? <img src={org.logo!} alt={name} className="w-full h-full object-cover" /> : org.logo ? org.logo : <Building2 className="w-9 h-9 text-primary-dark" />}
+        </div>
+        <h1 className={`listing-title ${ar ? "lang-ar" : "lang-en"} text-foreground text-3xl mt-3`}>{name}</h1>
+        <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-primary-dark mt-1">
+          {[org.org_type || (ar ? "مؤسسة" : "Organisation"), cityName].filter(Boolean).join(" · ")}
+          {org.status !== "published" && <span className="ms-2 normal-case tracking-normal text-muted-foreground">({ar ? "مسودة" : "Draft"})</span>}
+        </p>
+        {mission && <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground mt-3`}>{mission}</p>}
 
-          {focusAreas.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-3">
-              {focusAreas.map((f, i) => (
-                <span key={i} className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium">
-                  {f}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="flex gap-2 mt-4">
-            {org.owner_id ? (
-              <button
-                onClick={() => navigate(`/inbox?personId=${org.owner_id}&kind=user`)}
-                className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-1.5"
-              >
-                <Mail className="w-4 h-4" />
-                {lang === "ar" ? "تواصل" : "Contact"}
-              </button>
-            ) : (
-              <button
-                disabled
-                className="flex-1 py-2.5 rounded-xl bg-secondary text-muted-foreground font-semibold text-xs flex items-center justify-center gap-1.5 cursor-not-allowed"
-              >
-                <Mail className="w-4 h-4 shrink-0" />
-                {lang === "ar" ? "لم تنضم بعد" : "Hasn't joined yet"}
-              </button>
-            )}
-            <button
-              onClick={handleFollow}
-              aria-pressed={following}
-              className={`flex-1 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5 border-2 ${
-                following ? "bg-primary/10 border-primary text-primary" : "border-border bg-card text-foreground"
-              }`}
-            >
-              {following ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
-              {following
-                ? lang === "ar" ? "متابَع" : "Following"
-                : lang === "ar" ? "متابعة" : "Follow"}
+        <div className="flex flex-wrap gap-2 mt-4">
+          {org.owner_id ? (
+            <button type="button" onClick={() => navigate(`/inbox?personId=${org.owner_id}&kind=user`)} className={`${actionBtn} bg-primary text-primary-foreground`}>
+              <MessageCircle className="w-4 h-4" /> {ar ? "راسل" : "Message"}
             </button>
-          </div>
+          ) : (
+            <span className={`${actionBtn} bg-muted text-muted-foreground`}><Mail className="w-4 h-4" /> {ar ? "لم تنضم بعد" : "Hasn't joined yet"}</span>
+          )}
+          <button type="button" onClick={handleFollow} aria-pressed={following}
+            className={`${actionBtn} border ${following ? "border-primary bg-primary/10 text-primary-dark" : "border-border text-foreground"}`}>
+            {following ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+            {following ? (ar ? "متابَع" : "Following") : (ar ? "متابعة" : "Follow")}
+          </button>
+          <ShareButton title={name} showLabel className={`${actionBtn} border border-border text-foreground`} iconClassName="w-4 h-4" />
         </div>
       </div>
 
-      {/* Today's Status */}
-      <div className="px-4 mt-4">
-        {user ? (
-          <DailyStatusCard sampleId={`org-${org.id}`} accentBg="bg-primary" accentText="text-primary" />
-        ) : (
-          <ProviderStatusView sampleId={`org-${org.id}`} accentText="text-primary" />
-        )}
-      </div>
+      <div className="mt-5"><KeyFacts facts={facts} /></div>
 
-      {/* Mission */}
-      {mission && (
-        <div className="px-4 mt-5">
-          <h2 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-            <Target className="w-4 h-4 text-primary" />
-            {lang === "ar" ? "رسالتنا" : "Our Mission"}
-          </h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">{mission}</p>
+      <div className="max-w-[680px] mx-auto px-4">
+        <div className="pt-4">
+          {user ? <DailyStatusCard sampleId={`org-${org.id}`} accentBg="bg-primary" accentText="text-primary" /> : <ProviderStatusView sampleId={`org-${org.id}`} accentText="text-primary" />}
         </div>
-      )}
 
-      {/* About */}
-      {description && (
-        <div className="px-4 mt-5">
-          <h2 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-primary" />
-            {lang === "ar" ? "عن المنظمة" : "About"}
-          </h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
-        </div>
-      )}
-
-      {/* Programs */}
-      {programs.length > 0 && (
-        <div className="px-4 mt-5">
-          <h2 className="text-sm font-bold text-foreground mb-3">
-            {lang === "ar" ? `البرامج (${programs.length})` : `Programs (${programs.length})`}
-          </h2>
-          <div className="space-y-2">
-            {programs.map((p) => (
-              <button key={p.id} type="button" onClick={() => navigate(`/program/${p.slug || p.id}`)} className="w-full flex items-center gap-3 bg-card rounded-xl border border-border p-3 text-start hover:border-primary transition-colors">
-                <img src={p.image || "/placeholder.svg"} alt="" className="w-14 h-14 rounded-lg object-cover shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-foreground line-clamp-1">
-                    {lang === "ar" ? (p.title_ar || p.title_en) : p.title_en}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5">
-                    {lang === "ar" ? (p.description_ar || p.description_en) : p.description_en}
-                  </p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Causes */}
-      {causes.length > 0 && (
-        <div className="px-4 mt-5">
-          <h2 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-            <Heart className="w-4 h-4 text-primary" />
-            {lang === "ar" ? `القضايا (${causes.length})` : `Causes (${causes.length})`}
-          </h2>
-          <div className="space-y-2">
-            {causes.map((c) => {
-              return (
-                <div key={c.id} className="flex items-center gap-3 bg-card rounded-xl border border-border p-3">
-                  <img src={c.image || "/placeholder.svg"} alt="" className="w-14 h-14 rounded-lg object-cover shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-foreground line-clamp-1">
-                      {lang === "ar" ? (c.title_ar || c.title_en) : c.title_en}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">
-                      {lang === "ar" ? (c.summary_ar || c.summary_en) : c.summary_en}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Contact */}
-      {(org.website || place) && (
-        <div className="px-4 mt-5">
-          <h2 className="text-sm font-bold text-foreground mb-2">
-            {lang === "ar" ? "تواصل معنا" : "Get in Touch"}
-          </h2>
-          <div className="bg-card rounded-xl border border-border divide-y divide-border">
-            {org.website && (
-              <a
-                href={org.website.startsWith("http") ? org.website : `https://${org.website}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-3 px-3 py-3"
-              >
-                <Globe className="w-4 h-4 text-primary shrink-0" />
-                <p className="text-xs text-primary underline break-all">{org.website}</p>
-              </a>
-            )}
-            {place && (
-              <div className="flex items-center gap-3 px-3 py-3">
-                <MapPin className="w-4 h-4 text-primary shrink-0" />
-                <p className="text-xs text-foreground">{place}</p>
+        {(description || focusAreas.length > 0) && (
+          <Section title={ar ? "نبذة" : "About"} ar={ar}>
+            {description && <p className="whitespace-pre-line">{description}</p>}
+            {focusAreas.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-3">
+                {focusAreas.map((f, i) => <span key={i} className="px-2.5 py-1 rounded-full bg-muted text-[13px]">{f}</span>)}
               </div>
             )}
-          </div>
-        </div>
-      )}
+          </Section>
+        )}
+
+        {work > 0 && (
+          <Section title={ar ? "البرامج والقضايا" : "Programmes & causes"} ar={ar}>
+            <WideRow>
+              {programs.map((p) => {
+                const st = programmeStatus(p);
+                return (
+                  <WideCard key={p.id} ar={ar} path={`/program/${p.slug || p.id}`} image={p.image}
+                    title={(ar ? p.title_ar || p.title_en : p.title_en) || ""}
+                    meta={[ar ? "برنامج" : "Programme", p.start_date ? formatSlotDay(p.start_date, ar, { day: "numeric", month: "short", year: "numeric" }) : null].filter(Boolean).join(" · ")}
+                    badge={st ? <span className={`rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${st === "Ended" || st === "انتهى" ? "bg-muted text-muted-foreground" : "bg-background/95 text-primary-dark"}`}>{st}</span> : undefined} />
+                );
+              })}
+              {causes.map((c) => (
+                <WideCard key={c.id} ar={ar} path={`/cause/${c.slug || c.id}`} image={c.image}
+                  title={(ar ? c.title_ar || c.title_en : c.title_en) || ""} meta={ar ? "قضية" : "Cause"} />
+              ))}
+            </WideRow>
+          </Section>
+        )}
+
+        {events.length > 0 && (
+          <Section title={ar ? "فعاليات هذه المؤسسة" : "Events by this organisation"} ar={ar}>
+            <WideRow>
+              {events.map((e) => {
+                const d = new Date(e.start_date.slice(0, 10) + "T00:00:00");
+                const past = (e.end_date || e.start_date).slice(0, 10) < todayIso;
+                return (
+                  <div key={e.id} className={past ? "opacity-60" : ""}>
+                    <WideCard ar={ar} path={`/event/${e.slug || e.id}`} image={e.image}
+                      title={(ar ? e.title_ar || e.title_en : e.title_en) || ""}
+                      meta={[ar ? e.venue_ar || e.venue_en : e.venue_en, past ? (ar ? "انتهت" : "Ended") : null].filter(Boolean).join(" · ")}
+                      badge={<MiniDate d={d} ar={ar} />} />
+                  </div>
+                );
+              })}
+            </WideRow>
+          </Section>
+        )}
+
+        {(org.website || place) && (
+          <Section title={ar ? "التواصل" : "Contact"} ar={ar}>
+            <ul className="divide-y divide-border">
+              {org.website && (
+                <li>
+                  <a href={org.website.startsWith("http") ? org.website : `https://${org.website}`} target="_blank" rel="noreferrer" className="flex items-center gap-3 py-3 min-h-[44px] text-primary-dark underline break-all">
+                    <Globe className="w-4 h-4 shrink-0" /> {org.website}
+                  </a>
+                </li>
+              )}
+              {place && <li className="flex items-center gap-3 py-3"><MapPin className="w-4 h-4 text-primary-dark shrink-0" /> {place}</li>}
+            </ul>
+          </Section>
+        )}
+
+        <ReadBeforeYouGo cityId={org.city_id} regionId={org.region_id} ar={ar} />
+      </div>
     </div>
   );
 };
