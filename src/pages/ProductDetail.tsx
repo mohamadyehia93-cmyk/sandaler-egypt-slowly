@@ -316,7 +316,7 @@ const ProductDetail = () => {
 
   type Mini = { id: string; slug: string | null; name_en: string; name_ar: string | null; image: string | null; price: number; currency?: string | null };
   const cards = (rows: Mini[]) => (
-    <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-1 snap-x">
+    <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0 pb-1 snap-x">
       {rows.map((r) => {
         const rName = ar ? r.name_ar || r.name_en : r.name_en;
         const rCur = (r.currency || "EGP").trim();

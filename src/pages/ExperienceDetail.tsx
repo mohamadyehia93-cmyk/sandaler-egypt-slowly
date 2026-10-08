@@ -503,7 +503,7 @@ const ExperienceDetail = () => {
           {/* k) More nearby */}
           {relatedExps && relatedExps.length > 0 && (
             <Section title={ar ? "تجارب أخرى قريبة" : "More experiences nearby"} ar={ar}>
-              <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-1 snap-x">
+              <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0 pb-1 snap-x">
                 {relatedExps.map((r) => {
                   const rTitle = ar ? r.title_ar || r.title_en : r.title_en;
                   return (
