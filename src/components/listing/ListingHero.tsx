@@ -13,12 +13,14 @@ interface Props {
   onBack: () => void;
   wishlistType?: WishlistItemType;
   wishlistId?: string | null;
+  /** Mobile-only thumbnail row under the hero (when >1 photo). */
+  thumbnails?: boolean;
 }
 
 const roundBtn = "tap-target rounded-full bg-background/80 backdrop-blur-sm text-foreground";
 
 /** Full-bleed gallery of the row's REAL images only — never duplicates a file to fake a gallery. */
-const ListingHero = ({ images, title, eyebrow, ar, onBack, wishlistType, wishlistId }: Props) => {
+const ListingHero = ({ images, title, eyebrow, ar, onBack, wishlistType, wishlistId, thumbnails }: Props) => {
   const photos = Array.from(new Set(images.filter(Boolean)));
   const scroller = useRef<HTMLDivElement>(null);
   const [idx, setIdx] = useState(0);
@@ -34,7 +36,14 @@ const ListingHero = ({ images, title, eyebrow, ar, onBack, wishlistType, wishlis
     el.scrollBy({ left: step * el.clientWidth * (ar ? -1 : 1), behavior: "smooth" });
   };
 
+  const jump = (i: number) => {
+    const el = scroller.current;
+    if (!el) return;
+    el.scrollTo({ left: i * el.clientWidth * (ar ? -1 : 1), behavior: "smooth" });
+  };
+
   return (
+    <>
     <div className="relative h-[56vh] max-h-[460px] lg:h-[30rem] lg:max-h-none bg-muted overflow-hidden">
       {photos.length > 0 ? (
         <div
@@ -85,7 +94,7 @@ const ListingHero = ({ images, title, eyebrow, ar, onBack, wishlistType, wishlis
       )}
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0">
-        <div className="max-w-[680px] mx-auto px-4 pb-5">
+        <div className="max-w-[680px] lg:max-w-[1040px] mx-auto px-4 pb-5">
           {eyebrow && (
             <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-primary-foreground/85 mb-1.5">{eyebrow}</p>
           )}
@@ -100,6 +109,17 @@ const ListingHero = ({ images, title, eyebrow, ar, onBack, wishlistType, wishlis
         </div>
       </div>
     </div>
+    {thumbnails && photos.length > 1 && (
+      <div className="lg:hidden flex gap-2 overflow-x-auto hide-scrollbar px-4 py-2 border-b border-border">
+        {photos.map((src, i) => (
+          <button key={src} type="button" onClick={() => jump(i)} aria-label={`${ar ? "صورة" : "Photo"} ${fmtNumber(i + 1, ar)}`}
+            aria-current={i === idx} className={`w-14 h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 ${i === idx ? "border-primary" : "border-transparent"}`}>
+            <img src={src} alt="" loading="lazy" className="w-full h-full object-cover" />
+          </button>
+        ))}
+      </div>
+    )}
+    </>
   );
 };
 

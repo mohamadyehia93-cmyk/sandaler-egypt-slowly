@@ -300,8 +300,8 @@ const ExperienceDetail = () => {
           {/* a) Standfirst + body */}
           {description && (
             <div className="py-6">
-              <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{standfirst}</p>
-              {rest && <p className="mt-4 text-[15px] leading-7 text-foreground/90 whitespace-pre-line">{rest}</p>}
+              {standfirst && <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{standfirst}</p>}
+              {rest && <p className="mt-4 first:mt-0 text-[15px] leading-7 text-foreground/90 whitespace-pre-line">{rest}</p>}
               <MachineTranslatedNote meta={e.translation_meta} field={ar ? "description_ar" : "description_en"} className="mt-2" />
             </div>
           )}
@@ -503,7 +503,7 @@ const ExperienceDetail = () => {
           {/* k) More nearby */}
           {relatedExps && relatedExps.length > 0 && (
             <Section title={ar ? "تجارب أخرى قريبة" : "More experiences nearby"} ar={ar}>
-              <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-1 snap-x">
+              <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0 pb-1 snap-x">
                 {relatedExps.map((r) => {
                   const rTitle = ar ? r.title_ar || r.title_en : r.title_en;
                   return (

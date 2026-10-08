@@ -1,12 +1,15 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, ShoppingCart, Minus, Plus, X, Truck, Ruler, Clock, Sparkles, Package, Droplets } from "lucide-react";
+import { Minus, Plus, X, Truck, Ruler, Clock, Package, MapPin, Banknote } from "lucide-react";
+import ListingHero from "@/components/listing/ListingHero";
+import KeyFacts, { type KeyFact } from "@/components/listing/KeyFacts";
+import Section from "@/components/listing/Section";
+import ActionBar from "@/components/listing/ActionBar";
+import ReadBeforeYouGo from "@/components/listing/ReadBeforeYouGo";
+import { fmtNumber, splitStandfirst } from "@/components/listing/format";
 import MachineTranslatedNote from "@/components/MachineTranslatedNote";
 import { toast } from "sonner";
-import WishlistButton from "@/components/WishlistButton";
-import ShareButton from "@/components/ShareButton";
-import LocationChips from "@/components/LocationChips";
 import Avatar from "@/components/AvatarFallback";
 import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { useI18n } from "@/lib/i18n";
@@ -38,24 +41,14 @@ type DeliveryOption = {
 
 const asArray = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
 
-const Divider = () => <div className="h-px bg-black/[0.06] my-4" />;
-
-const SectionTitle = ({ children, icon }: { children: React.ReactNode; icon?: React.ReactNode }) => (
-  <h2 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-1.5">
-    {icon}
-    {children}
-  </h2>
-);
-
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang } = useI18n();
   const { user } = useAuth();
   const ar = lang === "ar";
-  const locale = ar ? "ar-EG" : "en-US";
+  const locale = ar ? "ar-EG" : "en-GB";
 
-  const [photoIdx, setPhotoIdx] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [qty, setQty] = useState(1);
   const [note, setNote] = useState("");
@@ -130,6 +123,16 @@ const ProductDetail = () => {
     },
   });
 
+  const { data: city } = useQuery({
+    queryKey: ["city-name", product?.city_id],
+    enabled: !!product?.city_id,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("cities").select("name_en, name_ar").eq("id", product!.city_id!).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const variants = useMemo(() => {
     return asArray<VariantGroup>(product?.variants)
       .map((v) => ({
@@ -155,8 +158,8 @@ const ProductDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-4 space-y-4">
-        <Skeleton className="h-72 w-full rounded-xl" />
+      <div className="min-h-screen bg-background space-y-4">
+        <Skeleton className="h-[56vh] max-h-[460px] w-full rounded-none" />
         <Skeleton className="h-6 w-3/4" />
         <Skeleton className="h-4 w-1/2" />
         <Skeleton className="h-20 w-full" />
@@ -187,7 +190,6 @@ const ProductDetail = () => {
   // Only real images: never repeat one file to fake a gallery.
   const gallery = (product.images || []).filter(Boolean);
   const photos = gallery.length > 0 ? gallery : product.image ? [product.image] : [];
-  const hero = photos[Math.min(photoIdx, Math.max(photos.length - 1, 0))] || "/placeholder.svg";
 
   const currency = (product.currency || "EGP").trim();
   const money = (n: number) => `${n.toLocaleString(locale)} ${ar && currency === "EGP" ? "ج.م" : currency}`;
@@ -197,16 +199,18 @@ const ProductDetail = () => {
   const total = unitPrice * qty + (deliveryCost || 0);
   const isPickup = /pickup|استلام/i.test(chosenDelivery?.method || "");
 
-  const openOrder = () => {
+  const openOrder = (keepSelection = false) => {
     if (!user) {
       toast.error(ar ? "يرجى تسجيل الدخول لإتمام الطلب" : "Please sign in to place an order");
       navigate("/login");
       return;
     }
-    setQty(1);
+    if (!keepSelection) {
+      setQty(1);
+      setChosen({});
+    }
     setNote("");
     setAddress("");
-    setChosen({});
     setDeliveryIdx(deliveryOptions.length > 0 ? 0 : null);
     setContactName(((user.user_metadata as Record<string, unknown>)?.display_name as string) || "");
     setContactPhone("");
@@ -253,479 +257,246 @@ const ProductDetail = () => {
     navigate("/orders");
   };
 
-  const MiniCard = ({
-    row,
-  }: {
-    row: { id: string; slug: string | null; name_en: string; name_ar: string | null; image: string | null; price: number; currency?: string | null };
-  }) => {
-    const rName = ar ? row.name_ar || row.name_en : row.name_en;
-    const rCur = (row.currency || "EGP").trim();
-    return (
-      <button
-        onClick={() => navigate(`/product/${row.slug || row.id}`)}
-        className="flex-shrink-0 w-[138px] border border-border rounded-[10px] overflow-hidden bg-card text-start"
-      >
-        <div className="h-[80px] bg-secondary overflow-hidden">
-          {row.image ? (
-            <img src={row.image} alt={rName} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-[10px] text-primary-dark font-medium px-2 text-center">{rName}</div>
-          )}
-        </div>
-        <div className="p-2">
-          <p className="text-[11px] font-semibold text-foreground leading-[1.3] line-clamp-2">{rName}</p>
-          <p className="text-[10px] text-muted-foreground mt-0.5">
-            {Number(row.price || 0).toLocaleString(locale)} {ar && rCur === "EGP" ? "ج.م" : rCur}
-          </p>
-        </div>
-      </button>
-    );
-  };
+  const cityName = city ? (ar ? city.name_ar || city.name_en : city.name_en) : null;
+  const place = cityName || sellerVillage;
+  const eyebrow = [categoryLabel || (ar ? "صناعة يدوية" : "Handmade"), place].filter(Boolean).join(" · ");
+  const { first: standfirst, rest } = splitStandfirst(description || "");
+  const leadNote = product.made_to_order && product.lead_time_days
+    ? ar ? `يُصنع حسب الطلب · جاهز في نحو ${fmtNumber(product.lead_time_days, ar)} أيام` : `Made to order · ready in ~${product.lead_time_days} days`
+    : null;
+  const weight = product.weight_grams
+    ? product.weight_grams >= 1000
+      ? `${(product.weight_grams / 1000).toLocaleString(locale)} ${ar ? "كجم" : "kg"}`
+      : `${product.weight_grams.toLocaleString(locale)} ${ar ? "جم" : "g"}`
+    : null;
+
+  const facts: KeyFact[] = [{ icon: Banknote, label: money(unitPrice) }];
+  if (product.made_to_order && product.lead_time_days)
+    facts.push({ icon: Clock, label: ar ? `جاهز في نحو ${fmtNumber(product.lead_time_days, ar)} أيام` : `ready in ~${product.lead_time_days} days` });
+  else if (product.stock !== null && product.stock !== undefined)
+    facts.push({ icon: Package, label: ar ? `المتوفر: ${fmtNumber(product.stock, ar)}` : `In stock: ${product.stock}` });
+  if (product.dimensions) facts.push({ icon: Ruler, label: product.dimensions });
+  if (place) facts.push({ icon: MapPin, label: place });
+
+  const dlRows = [
+    materials && [ar ? "المواد" : "Materials", materials],
+    product.dimensions && [ar ? "الأبعاد" : "Dimensions", product.dimensions],
+    weight && [ar ? "الوزن" : "Weight", weight],
+    care && [ar ? "العناية" : "Care", care],
+  ].filter(Boolean) as [string, string][];
+
+  const costLabel = (c: number | null) => (c === null ? (ar ? "حسب الاتفاق" : "On request") : c === 0 ? (ar ? "مجانًا" : "Free") : money(c));
+  const orderLabel = ar ? "اطلب" : "Order";
+  const msgSeller = sellerId ? () => navigate(`/inbox?personId=${sellerId}&kind=provider`) : undefined;
+  const inputCls = "w-full h-12 rounded-xl border border-border bg-background px-4 text-[15px] text-foreground placeholder:text-muted-foreground";
+  const areaCls = "w-full rounded-xl border border-border bg-background px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground";
+
+  const chip = (label: string, o: string) => (
+    <button key={o} type="button" onClick={() => setChosen((p) => ({ ...p, [label]: o }))} aria-pressed={chosen[label] === o}
+      className={`min-h-[40px] px-4 rounded-full text-sm font-medium border transition-colors ${chosen[label] === o ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"}`}>
+      {o}
+    </button>
+  );
+  const variantPickers = variants.map((v) => (
+    <div key={v.label} className="mb-3 last:mb-0">
+      <p className="text-[13px] font-semibold text-muted-foreground mb-1.5">{v.label}</p>
+      <div className="flex flex-wrap gap-2">{v.options.map((o) => chip(v.label, o))}</div>
+    </div>
+  ));
+  const qtyStepper = (
+    <div className="flex items-center justify-between py-3">
+      <span className="text-[15px] font-semibold text-foreground">{ar ? "الكمية" : "Quantity"}</span>
+      <div className="flex items-center gap-2">
+        <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label={ar ? "إنقاص" : "Decrease"} className="tap-target rounded-full border border-border"><Minus className="w-4 h-4" /></button>
+        <span className="text-base font-semibold w-6 text-center" aria-live="polite">{fmtNumber(qty, ar)}</span>
+        <button type="button" onClick={() => setQty((q) => q + 1)} aria-label={ar ? "زيادة" : "Increase"} className="tap-target rounded-full border border-border"><Plus className="w-4 h-4" /></button>
+      </div>
+    </div>
+  );
+
+  type Mini = { id: string; slug: string | null; name_en: string; name_ar: string | null; image: string | null; price: number; currency?: string | null };
+  const cards = (rows: Mini[]) => (
+    <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0 pb-1 snap-x">
+      {rows.map((r) => {
+        const rName = ar ? r.name_ar || r.name_en : r.name_en;
+        const rCur = (r.currency || "EGP").trim();
+        return (
+          <button key={r.id} type="button" onClick={() => navigate(`/product/${r.slug || r.id}`)} className="flex-shrink-0 w-[220px] snap-start text-start">
+            <div className="aspect-[3/2] rounded-xl overflow-hidden bg-muted">
+              {r.image && <img src={r.image} alt="" loading="lazy" className="w-full h-full object-cover" />}
+            </div>
+            <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} !text-base mt-2 line-clamp-2 text-foreground`}>{rName}</p>
+            <p className="text-[13px] text-muted-foreground">{fmtNumber(Number(r.price || 0), ar)} {ar && rCur === "EGP" ? "ج.م" : rCur}</p>
+          </button>
+        );
+      })}
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* ── TOP NAV — actions live here, so nothing overlaps the title ── */}
-      <div className="h-11 flex items-center justify-between px-4 bg-card sticky top-0 z-40">
-        <button
-          onClick={() => navigate(-1)}
-          className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center"
-         aria-label={lang === "ar" ? "رجوع" : "Back"}>
-          <ArrowLeft className="w-4 h-4 text-foreground" />
-        </button>
-        <span className="text-xs text-muted-foreground truncate max-w-[55%]">
-          {categoryLabel || (ar ? "منتج يدوي" : "Handmade product")}
-        </span>
-        <div className="flex gap-2">
-          <ShareButton
-            title={name}
-            className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center"
-            iconClassName="w-3.5 h-3.5 text-foreground"
-          />
-          <WishlistButton
-            itemType="product"
-            itemId={product.id}
-            className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center transition-transform [&>svg]:w-3.5 [&>svg]:h-3.5"
-          />
-        </div>
-      </div>
+    <div className="min-h-screen bg-background pb-[150px] lg:pb-16">
+      <ListingHero images={photos} title={name} eyebrow={eyebrow} ar={ar} onBack={() => navigate(-1)} wishlistType="product" wishlistId={product.id} thumbnails />
+      <KeyFacts facts={facts} />
 
-      {/* ── GALLERY — only the images the row actually has ── */}
-      {photos.length > 0 && (
-        <div>
-          <div className="h-[260px] bg-secondary">
-            <img src={hero} alt={name} className="w-full h-full object-cover" />
-          </div>
-          {photos.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto hide-scrollbar px-4 py-2">
-              {photos.map((p, i) => (
-                <button
-                  key={`${p}-${i}`}
-                  onClick={() => setPhotoIdx(i)}
-                  className={`w-14 h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 ${
-                    i === photoIdx ? "border-primary" : "border-transparent"
-                  }`}
-                 aria-label={lang === "ar" ? "صورة" : "Show photo"}>
-                  <img src={p} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
+      <div className="max-w-[1040px] mx-auto px-4 lg:flex lg:gap-10 lg:justify-center">
+        <main className="max-w-[680px] w-full min-w-0">
+          <MachineTranslatedNote meta={product.translation_meta} field={ar ? "name_ar" : "name_en"} className="pt-3" />
+
+          {description && (
+            <>
+              {standfirst && (
+                <div className="pt-6 pb-2">
+                  <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{standfirst}</p>
+                </div>
+              )}
+              {rest ? (
+                <Section title={ar ? "عن هذه القطعة" : "About this piece"} ar={ar} className={standfirst ? "" : ""}>
+                  <p className="whitespace-pre-line">{rest}</p>
+                  <MachineTranslatedNote meta={product.translation_meta} field={ar ? "description_ar" : "description_en"} className="mt-2" />
+                </Section>
+              ) : (
+                <MachineTranslatedNote meta={product.translation_meta} field={ar ? "description_ar" : "description_en"} className="pb-4" />
+              )}
+            </>
           )}
-        </div>
-      )}
 
-      <div className="px-4 pt-4">
-        {/* ── TITLE · PRICE · CATEGORY · LOCATION ── */}
-        <h1 className="text-xl font-bold text-foreground leading-snug">{name}</h1>
-        <p className="text-lg font-bold text-primary-dark mt-1">{money(unitPrice)}</p>
-        <div className="flex items-center gap-2 flex-wrap mt-2">
-          {categoryLabel && (
-            <span className="text-[11px] font-medium bg-primary/10 text-primary px-2.5 py-1 rounded-full">{categoryLabel}</span>
-          )}
-        </div>
-        <LocationChips
-          cityId={product.city_id}
-          regionId={product.region_id}
-          fallbackText={product.city_id ? null : sellerVillage}
-          className="mt-2"
-        />
-
-        {/* ── DESCRIPTION ── */}
-        {description && (
-          <>
-            <Divider />
-            <SectionTitle>{ar ? "عن المنتج" : "About this product"}</SectionTitle>
-            <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{description}</p>
-            <MachineTranslatedNote
-              meta={product.translation_meta}
-              field={ar ? "description_ar" : "description_en"}
-              className="mt-1"
-            />
-          </>
-        )}
-
-        {/* ── THE MAKER — lead, not footnote ── */}
-        {(sellerName || story || sellerId) && (
-          <>
-            <Divider />
-            <SectionTitle>{ar ? "الحرفي" : "The maker"}</SectionTitle>
-            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
-              <div className="flex items-center gap-3">
-                <Avatar
-                  src={seller?.avatar || product.seller_image}
-                  name={sellerName}
-                  className="w-14 h-14 rounded-full border-2 border-primary/20"
-                />
+          {(sellerName || sellerId) && (
+            <Section title={ar ? "الحرفي" : "The maker"} ar={ar}>
+              <div className="flex items-center gap-4">
+                <Avatar src={seller?.avatar || product.seller_image} name={sellerName} className="w-16 h-16 rounded-full flex-shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-base font-bold text-foreground leading-tight">
-                    {sellerName || (ar ? "حرفي محلي" : "Local maker")}
-                  </p>
-                  {sellerVillage && <p className="text-xs text-muted-foreground mt-0.5">{sellerVillage}</p>}
-                  {providerTagline && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{providerTagline}</p>}
+                  <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{sellerName || (ar ? "حرفي محلي" : "Local maker")}</p>
+                  {sellerVillage && <p className="text-[13px] text-muted-foreground">{sellerVillage}</p>}
+                  {providerTagline && <p className="text-[13px] text-muted-foreground line-clamp-2">{providerTagline}</p>}
                 </div>
               </div>
-
-              {story && (
-                <>
-                  <p className="text-sm text-foreground leading-relaxed mt-3 whitespace-pre-line">{story}</p>
-                  <MachineTranslatedNote
-                    meta={product.translation_meta}
-                    field={ar ? "origin_story_ar" : "origin_story_en"}
-                    className="mt-1"
-                  />
-                </>
-              )}
-
               {sellerId ? (
-                <div className="flex items-center gap-2 mt-3">
-                  <button
-                    onClick={() => navigate(`/provider/${seller?.slug || sellerId}`)}
-                    className="flex-1 h-9 rounded-xl bg-card border border-border text-xs font-semibold text-foreground"
-                  >
-                    {ar ? "عرض ملف الحرفي" : "View maker profile"}
+                <div className="flex gap-2 mt-4">
+                  <button type="button" onClick={() => navigate(`/provider/${seller?.slug || sellerId}`)} className="flex-1 h-11 rounded-xl border border-border text-sm font-semibold text-foreground">
+                    {ar ? "عرض الملف" : "View profile"}
                   </button>
-                  <MessageOwnerButton
-                    ownerId={sellerId}
-                    kind="provider"
-                    variant="chip"
-                    label={ar ? "مراسلة" : "Message"}
-                  />
+                  <MessageOwnerButton ownerId={sellerId} kind="provider" variant="chip" label={ar ? "راسل" : "Message"}
+                    className="flex-1 h-11 rounded-xl border border-primary text-primary-dark text-sm font-semibold inline-flex items-center justify-center gap-1.5" />
                 </div>
               ) : (
-                <p className="text-[11px] text-muted-foreground mt-3">
-                  {ar
-                    ? "لم ينضم هذا الحرفي إلى التطبيق بعد، لذا لا يمكن مراسلته هنا."
-                    : "This maker hasn't joined the app yet, so they can't be messaged here."}
+                <p className="mt-3 text-[13px] text-muted-foreground">
+                  {ar ? "لم ينضم هذا الحرفي إلى التطبيق بعد، لذا لا يمكن مراسلته هنا." : "This maker hasn't joined the app yet, so they can't be messaged here."}
                 </p>
               )}
-            </div>
-          </>
-        )}
+            </Section>
+          )}
 
-        {/* ── MADE TO ORDER — a feature of craft ── */}
-        {product.made_to_order && (
-          <>
-            <Divider />
-            <div className="flex items-start gap-3 rounded-2xl border border-accent/30 bg-accent/10 p-3.5">
-              <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-semibold text-foreground">
-                  {ar ? "يُصنع خصيصًا لك" : "Made to order for you"}
-                  {product.lead_time_days
-                    ? ar
-                      ? ` · جاهز في نحو ${product.lead_time_days} يوم`
-                      : ` · ready in ~${product.lead_time_days} days`
-                    : ""}
-                </p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {ar
-                    ? "يبدأ الحرفي العمل بعد تأكيد الطلب."
-                    : "The maker starts the work once your order is confirmed."}
-                </p>
-              </div>
-            </div>
-          </>
-        )}
+          {story && (
+            <Section title={ar ? "كيف تُصنع" : "How it’s made"} ar={ar}>
+              <p className="whitespace-pre-line">{story}</p>
+              <MachineTranslatedNote meta={product.translation_meta} field={ar ? "origin_story_ar" : "origin_story_en"} className="mt-2" />
+            </Section>
+          )}
 
-        {/* ── VARIANTS ── */}
-        {variants.length > 0 && (
-          <>
-            <Divider />
-            <SectionTitle icon={<Package className="w-4 h-4 text-primary" />}>
-              {ar ? "الخيارات" : "Options"}
-            </SectionTitle>
-            <div className="space-y-3">
-              {variants.map((v) => (
-                <div key={v.label}>
-                  <p className="text-xs font-semibold text-muted-foreground mb-1.5">{v.label}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {v.options.map((o) => (
-                      <button
-                        key={o}
-                        onClick={() => setChosen((p) => ({ ...p, [v.label]: o }))}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                          chosen[v.label] === o
-                            ? "bg-primary text-primary-foreground border-primary"
-                            : "bg-card text-foreground border-border"
-                        }`}
-                      >
-                        {o}
-                      </button>
-                    ))}
+          {dlRows.length > 0 && (
+            <Section title={ar ? "التفاصيل" : "Details"} ar={ar}>
+              <dl className="divide-y divide-border">
+                {dlRows.map(([k, v]) => (
+                  <div key={k} className="py-3 first:pt-0">
+                    <dt className="text-[13px] font-semibold uppercase tracking-wide text-muted-foreground">{k}</dt>
+                    <dd className="mt-1 whitespace-pre-line">{v}</dd>
                   </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+                ))}
+              </dl>
+            </Section>
+          )}
 
-        {/* ── DETAILS — supporting evidence ── */}
-        {(materials || product.dimensions || product.weight_grams || care) && (
-          <>
-            <Divider />
-            <SectionTitle icon={<Ruler className="w-4 h-4 text-primary" />}>
-              {ar ? "التفاصيل" : "Details"}
-            </SectionTitle>
-            <dl className="rounded-xl border border-border bg-surface divide-y divide-border">
-              {materials && (
-                <div className="flex gap-3 px-3 py-2.5">
-                  <dt className="text-xs text-muted-foreground w-24 shrink-0">{ar ? "المواد" : "Materials"}</dt>
-                  <dd className="text-xs font-medium text-foreground">{materials}</dd>
-                </div>
-              )}
-              {product.dimensions && (
-                <div className="flex gap-3 px-3 py-2.5">
-                  <dt className="text-xs text-muted-foreground w-24 shrink-0">{ar ? "الأبعاد" : "Dimensions"}</dt>
-                  <dd className="text-xs font-medium text-foreground">{product.dimensions}</dd>
-                </div>
-              )}
-              {!!product.weight_grams && (
-                <div className="flex gap-3 px-3 py-2.5">
-                  <dt className="text-xs text-muted-foreground w-24 shrink-0">{ar ? "الوزن" : "Weight"}</dt>
-                  <dd className="text-xs font-medium text-foreground">
-                    {product.weight_grams >= 1000
-                      ? `${(product.weight_grams / 1000).toLocaleString(locale)} ${ar ? "كجم" : "kg"}`
-                      : `${product.weight_grams.toLocaleString(locale)} ${ar ? "جم" : "g"}`}
-                  </dd>
-                </div>
-              )}
-              {care && (
-                <div className="flex gap-3 px-3 py-2.5">
-                  <dt className="text-xs text-muted-foreground w-24 shrink-0 flex items-center gap-1">
-                    <Droplets className="w-3.5 h-3.5 text-primary" />
-                    {ar ? "العناية" : "Care"}
-                  </dt>
-                  <dd className="text-xs font-medium text-foreground">{care}</dd>
-                </div>
-              )}
-            </dl>
-          </>
-        )}
+          {variants.length > 0 && <Section title={ar ? "الخيارات" : "Options"} ar={ar}>{variantPickers}</Section>}
 
-        {/* ── DELIVERY ── */}
-        <Divider />
-        <SectionTitle icon={<Truck className="w-4 h-4 text-primary" />}>
-          {ar ? "الاستلام والتوصيل" : "Pickup & delivery"}
-        </SectionTitle>
-        {deliveryOptions.length > 0 ? (
-          <ul className="rounded-xl border border-border bg-surface divide-y divide-border">
-            {deliveryOptions.map((d, i) => (
-              <li key={`${d.method}-${i}`} className="px-3 py-2.5">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs font-medium text-foreground">{d.method}</span>
-                  <span className="text-xs font-semibold text-primary-dark shrink-0">
-                    {d.cost === null ? (ar ? "حسب الاتفاق" : "On request") : d.cost === 0 ? (ar ? "مجانًا" : "Free") : money(d.cost)}
-                  </span>
-                </div>
-                {d.notes && <p className="text-[11px] text-muted-foreground mt-0.5">{d.notes}</p>}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-xs text-muted-foreground">
-            {ar
-              ? "يتم الاتفاق على الاستلام أو التوصيل مع الحرفي بعد الطلب."
-              : "Pickup or delivery is arranged directly with the maker after you order."}
-          </p>
-        )}
+          <Section title={ar ? "الاستلام والتوصيل" : "Pickup & delivery"} ar={ar}>
+            {deliveryOptions.length > 0 ? (
+              <ul className="divide-y divide-border">
+                {deliveryOptions.map((d, i) => (
+                  <li key={`${d.method}-${i}`} className="py-3 first:pt-0 flex items-start gap-3">
+                    <Truck className="w-5 h-5 text-primary-dark flex-shrink-0 mt-1" aria-hidden />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-foreground">{d.method} · {costLabel(d.cost)}</p>
+                      {d.notes && <p className="text-[13px] text-muted-foreground">{d.notes}</p>}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground">
+                {ar ? "يتم الاتفاق على الاستلام أو التوصيل مع الحرفي بعد الطلب." : "Pickup or delivery is arranged directly with the maker after you order."}
+              </p>
+            )}
+          </Section>
 
-        {/* ── MORE FROM THIS SELLER ── */}
-        {sellerId && fromSeller.length > 0 && (
-          <>
-            <Divider />
-            <SectionTitle>{ar ? "المزيد من هذا الحرفي" : "More from this maker"}</SectionTitle>
-            <div className="flex gap-2.5 overflow-x-auto hide-scrollbar pb-1.5">
-              {fromSeller.map((r) => (
-                <MiniCard key={r.id} row={r} />
-              ))}
-            </div>
-          </>
-        )}
+          {sellerId && fromSeller.length > 0 && <Section title={ar ? "المزيد من هذا الحرفي" : "More from this maker"} ar={ar}>{cards(fromSeller as Mini[])}</Section>}
+          {related.length > 0 && (
+            <Section title={categoryLabel ? (ar ? `المزيد في ${categoryLabel}` : `More in ${categoryLabel}`) : ar ? "منتجات أخرى" : "Other products"} ar={ar}>
+              {cards(related as Mini[])}
+            </Section>
+          )}
 
-        {/* ── RELATED ── */}
-        {related.length > 0 && (
-          <>
-            <Divider />
-            <SectionTitle>
-              {categoryLabel ? (ar ? `المزيد في ${categoryLabel}` : `More in ${categoryLabel}`) : ar ? "منتجات أخرى" : "Other products"}
-            </SectionTitle>
-            <div className="flex gap-2.5 overflow-x-auto hide-scrollbar pb-1.5">
-              {related.map((r) => (
-                <MiniCard key={r.id} row={r} />
-              ))}
-            </div>
-          </>
-        )}
+          <ReadBeforeYouGo cityId={product.city_id} regionId={product.region_id} ar={ar} />
+        </main>
+
+        <aside className="hidden lg:block w-[320px] flex-shrink-0 pt-6">
+          <div className="sticky top-6 rounded-2xl border border-border bg-card shadow-card p-5">
+            <p className="text-2xl font-bold text-foreground">{money(unitPrice)}</p>
+            {leadNote && <p className="text-[13px] text-muted-foreground mt-1">{leadNote}</p>}
+            {variants.length > 0 && <div className="mt-4">{variantPickers}</div>}
+            {qtyStepper}
+            <button type="button" onClick={() => openOrder(true)} className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold">{orderLabel}</button>
+            {msgSeller && (
+              <button type="button" onClick={msgSeller} className="mt-2 w-full h-11 rounded-xl border border-border text-sm font-semibold">{ar ? "راسل الحرفي" : "Message the maker"}</button>
+            )}
+          </div>
+        </aside>
       </div>
 
-      {/* ── STICKY BAR ── */}
-      <div className="fixed bottom-[68px] left-0 right-0 bg-background border-t border-border px-4 py-3 flex items-center justify-between z-50">
-        <div className="min-w-0">
-          <span className="text-lg font-bold text-primary-dark">{money(unitPrice)}</span>
-          {product.made_to_order && product.lead_time_days ? (
-            <p className="text-[10px] text-muted-foreground flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {ar ? `يُصنع في نحو ${product.lead_time_days} يوم` : `made in ~${product.lead_time_days} days`}
-            </p>
-          ) : null}
-        </div>
-        <button
-          onClick={openOrder}
-          className="flex items-center gap-2 px-8 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-sm shadow-elevated"
-        >
-          <ShoppingCart className="w-4 h-4" />
-          {ar ? "اطلب الآن" : "Order Now"}
-        </button>
-      </div>
+      <ActionBar price={money(unitPrice)} note={leadNote || undefined} buttonLabel={orderLabel} onPrimary={() => openOrder(true)} onMessage={msgSeller} ar={ar} />
 
-      {/* ── ORDER SHEET ── */}
       {sheetOpen && (
-        <div className="fixed inset-0 z-[60] flex items-end bg-foreground/40" onClick={() => setSheetOpen(false)}>
-          <div
-            className="w-full max-h-[88vh] overflow-y-auto bg-background rounded-t-2xl p-4 space-y-4"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="fixed inset-0 z-[60] flex items-end lg:items-center lg:justify-center bg-foreground/40" onClick={() => setSheetOpen(false)}>
+          <div role="dialog" aria-modal="true" aria-label={ar ? "إتمام الطلب" : "Place your order"}
+            className="w-full lg:max-w-[520px] max-h-[88vh] overflow-y-auto bg-background rounded-t-2xl lg:rounded-2xl p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom,0px))] space-y-4"
+            onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-foreground">{ar ? "إتمام الطلب" : "Place Order"}</h3>
-              <button onClick={() => setSheetOpen(false)} className="tap-target text-muted-foreground" aria-label={lang === "ar" ? "إغلاق" : "Close"}>
+              <h3 className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{ar ? "إتمام الطلب" : "Place your order"}</h3>
+              <button type="button" onClick={() => setSheetOpen(false)} className="tap-target text-muted-foreground" aria-label={ar ? "إغلاق" : "Close"}>
                 <X className="w-5 h-5" />
               </button>
             </div>
-
-            <p className="text-sm font-semibold text-foreground line-clamp-1">{name}</p>
-
-            {/* variant choices — captured on the order row */}
-            {variants.map((v) => (
-              <div key={v.label}>
-                <p className="text-xs font-semibold text-muted-foreground mb-1.5">{v.label}</p>
-                <div className="flex flex-wrap gap-2">
-                  {v.options.map((o) => (
-                    <button
-                      key={o}
-                      onClick={() => setChosen((p) => ({ ...p, [v.label]: o }))}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium border ${
-                        chosen[v.label] === o
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-card text-foreground border-border"
-                      }`}
-                    >
-                      {o}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">{ar ? "الكمية" : "Quantity"}</span>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center text-foreground"
-                 aria-label={lang === "ar" ? "إنقاص" : "Decrease"}>
-                  <Minus className="w-4 h-4" />
-                </button>
-                <span className="text-base font-bold text-foreground w-6 text-center">{qty}</span>
-                <button
-                  onClick={() => setQty((q) => q + 1)}
-                  className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary"
-                 aria-label={lang === "ar" ? "زيادة" : "Increase"}>
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* delivery choice */}
+            <p className="text-[15px] font-semibold text-foreground line-clamp-2">{name}</p>
+            {variantPickers}
+            {qtyStepper}
             {deliveryOptions.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-muted-foreground mb-1.5">
-                  {ar ? "الاستلام / التوصيل" : "Pickup / delivery"}
-                </p>
+                <p className="text-[13px] font-semibold text-muted-foreground mb-1.5">{ar ? "الاستلام / التوصيل" : "Pickup / delivery"}</p>
                 <div className="space-y-2">
                   {deliveryOptions.map((d, i) => (
-                    <button
-                      key={`${d.method}-${i}`}
-                      onClick={() => setDeliveryIdx(i)}
-                      className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl border text-start ${
-                        deliveryIdx === i ? "border-primary bg-primary/5" : "border-border bg-surface"
-                      }`}
-                    >
-                      <span className="text-xs font-medium text-foreground">{d.method}</span>
-                      <span className="text-xs font-semibold text-primary-dark shrink-0">
-                        {d.cost === null ? (ar ? "حسب الاتفاق" : "On request") : d.cost === 0 ? (ar ? "مجانًا" : "Free") : money(d.cost)}
-                      </span>
+                    <button key={`${d.method}-${i}`} type="button" onClick={() => setDeliveryIdx(i)} aria-pressed={deliveryIdx === i}
+                      className={`w-full min-h-[48px] flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl border text-start ${deliveryIdx === i ? "border-primary bg-primary/5" : "border-border bg-background"}`}>
+                      <span className="text-[15px] font-medium text-foreground">{d.method}</span>
+                      <span className="text-sm font-semibold text-primary-dark shrink-0">{costLabel(d.cost)}</span>
                     </button>
                   ))}
                 </div>
               </div>
             )}
-
             {chosenDelivery && !isPickup && (
-              <textarea
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                rows={2}
-                placeholder={ar ? "عنوان التوصيل" : "Delivery address"}
-                className="w-full rounded-xl border border-border bg-surface p-3 text-sm text-foreground placeholder:text-muted-foreground"
-              />
+              <textarea value={address} onChange={(e) => setAddress(e.target.value)} rows={2} aria-label={ar ? "عنوان التوصيل" : "Delivery address"} placeholder={ar ? "عنوان التوصيل" : "Delivery address"} className={areaCls} />
             )}
-
-            <input
-              value={contactName}
-              onChange={(e) => setContactName(e.target.value)}
-              placeholder={ar ? "الاسم" : "Your name"}
-              className="w-full rounded-xl border border-border bg-surface p-3 text-sm text-foreground placeholder:text-muted-foreground"
-            />
-            <input
-              value={contactPhone}
-              onChange={(e) => setContactPhone(e.target.value)}
-              placeholder={ar ? "رقم الهاتف (اختياري)" : "Phone (optional)"}
-              className="w-full rounded-xl border border-border bg-surface p-3 text-sm text-foreground placeholder:text-muted-foreground"
-            />
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={2}
-              placeholder={ar ? "ملاحظة للبائع (اختياري)" : "Note for the seller (optional)"}
-              className="w-full rounded-xl border border-border bg-surface p-3 text-sm text-foreground placeholder:text-muted-foreground"
-            />
-
+            <input value={contactName} onChange={(e) => setContactName(e.target.value)} aria-label={ar ? "الاسم" : "Your name"} placeholder={ar ? "الاسم" : "Your name"} className={inputCls} />
+            <input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} type="tel" aria-label={ar ? "رقم الهاتف" : "Phone"} placeholder={ar ? "رقم الهاتف (اختياري)" : "Phone (optional)"} className={inputCls} />
+            <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} aria-label={ar ? "ملاحظة للبائع" : "Note for the seller"} placeholder={ar ? "ملاحظة للبائع (اختياري)" : "Note for the seller (optional)"} className={areaCls} />
             <div className="flex items-center justify-between border-t border-border pt-3">
-              <span className="text-sm text-muted-foreground">{ar ? "الإجمالي" : "Total"}</span>
-              <span className="text-lg font-bold text-primary-dark">{money(total)}</span>
+              <span className="text-[15px] text-muted-foreground">{ar ? "الإجمالي" : "Total"}</span>
+              <span className="text-xl font-bold text-foreground">{money(total)}</span>
             </div>
-
-            <p className="text-[11px] text-muted-foreground">
-              {ar
-                ? "سيتم إرسال الطلب كغير مدفوع بانتظار تأكيد البائع، ويتم الدفع لاحقاً."
-                : "The order is sent as unpaid and pending seller confirmation. Payment is handled later."}
+            <p className="text-[13px] text-muted-foreground">
+              {ar ? "سيتم إرسال الطلب كغير مدفوع بانتظار تأكيد البائع، ويتم الدفع لاحقاً." : "The order is sent as unpaid and pending seller confirmation. Payment is handled later."}
             </p>
-
-            <button
-              disabled={submitting}
-              onClick={submitOrder}
-              className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm disabled:opacity-50"
-            >
-              {submitting ? (ar ? "جاري الإرسال..." : "Sending...") : ar ? "تأكيد الطلب" : "Confirm Order"}
+            <button type="button" disabled={submitting} onClick={submitOrder} className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold text-[15px] disabled:opacity-50">
+              {submitting ? (ar ? "جاري الإرسال..." : "Sending...") : ar ? "تأكيد الطلب" : "Confirm order"}
             </button>
           </div>
         </div>

@@ -23,10 +23,14 @@ export const formatClock = (t: string, ar: boolean) => {
 export const formatSlotDay = (iso: string, ar: boolean, opts: Intl.DateTimeFormatOptions = { weekday: "short", day: "numeric", month: "short" }) =>
   new Date(iso + "T00:00:00").toLocaleDateString(listingLocale(ar), opts);
 
-/** Split off the first sentence (. ! ? ؟ ۔) for a standfirst. */
+/** Split off the first sentence (… ... . ! ? ؟ ۔) for a standfirst.
+ *  If that sentence is longer than 220 characters, no standfirst is used. */
+export const STANDFIRST_MAX = 220;
 export const splitStandfirst = (text: string): { first: string; rest: string } => {
   const t = (text || "").trim();
-  const m = t.match(/^([\s\S]+?[.!?؟۔])(\s+|$)/);
-  if (!m || m[1].length < 12) return { first: t, rest: "" };
-  return { first: m[1].trim(), rest: t.slice(m[0].length).trim() };
+  if (!t) return { first: "", rest: "" };
+  const m = t.match(/^([\s\S]+?(?:\.\.\.|…|[.!?؟۔]))(\s+|$)/);
+  const first = m && m[1].trim().length >= 12 ? m[1].trim() : t;
+  if (first.length > STANDFIRST_MAX) return { first: "", rest: t };
+  return { first, rest: m && first !== t ? t.slice(m[0].length).trim() : "" };
 };
