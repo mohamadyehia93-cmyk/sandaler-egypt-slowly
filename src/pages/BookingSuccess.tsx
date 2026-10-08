@@ -64,17 +64,17 @@ export default function BookingSuccess() {
 
   // Still polling for confirmation.
   if (checking && (!booking || booking.status !== 'confirmed')) {
-    return <div className="p-8 text-center font-cairo">{t('booking.confirming_your_booking')}</div>;
+    return <div className="min-h-screen bg-background p-8 text-center text-[15px] text-muted-foreground" role="status">{t('booking.confirming_your_booking')}</div>;
   }
 
   // Payment not confirmed within the polling window — reassure instead of spinning forever.
   if (!booking || booking.status !== 'confirmed') {
     return (
-      <div className="max-w-md mx-auto p-6 text-center font-cairo">
-        <div className="w-20 h-20 mx-auto rounded-full bg-warning/10 border-2 border-warning flex items-center justify-center mb-6">
-          <span className="text-4xl text-warning">⏳</span>
+      <div className="min-h-screen bg-background"><div className="max-w-[560px] mx-auto px-4 pt-12 text-center">
+        <div className="w-20 h-20 mx-auto rounded-full bg-warning/10 flex items-center justify-center mb-5">
+          <span className="text-4xl text-warning" aria-hidden>⏳</span>
         </div>
-        <h1 className="text-xl font-bold mb-2">
+        <h1 className={`listing-title ${lang === 'ar' ? 'lang-ar' : 'lang-en'} text-3xl text-foreground mb-2`}>
           {lang === 'ar' ? 'جاري تأكيد الدفع' : 'Payment is being confirmed'}
         </h1>
         <p className="text-muted-foreground mb-1">
@@ -83,7 +83,7 @@ export default function BookingSuccess() {
             : 'This can take a moment. Your booking will appear under "My Bookings" once complete.'}
         </p>
         {booking && <p className="text-xs text-muted-foreground mt-2">{t('booking.ref_short')}: SND-{booking.id.slice(0, 8).toUpperCase()}</p>}
-      </div>
+      </div></div>
     );
   }
 
@@ -92,14 +92,14 @@ export default function BookingSuccess() {
     : '';
 
   return (
-    <div className="max-w-md mx-auto p-6 text-center font-cairo">
-      <div className="w-20 h-20 mx-auto rounded-full bg-success/10 border-2 border-success flex items-center justify-center mb-6">
-        <span className="text-4xl text-success">✓</span>
+    <div className="min-h-screen bg-background"><div className="max-w-[560px] mx-auto px-4 pt-12 text-center">
+      <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 text-primary-dark flex items-center justify-center mb-5">
+        <span className="text-4xl" aria-hidden>✓</span>
       </div>
-      <h1 className="text-2xl font-bold mb-2">{t('booking.booking_confirmed')}</h1>
+      <h1 className={`listing-title ${lang === 'ar' ? 'lang-ar' : 'lang-en'} text-3xl text-foreground mb-2`}>{t('booking.booking_confirmed')}</h1>
       <p className="text-muted-foreground mb-1">{experienceTitle}</p>
       <p className="text-xs text-muted-foreground mb-6">{t('booking.ref_short')}: SND-{booking.id.slice(0, 8).toUpperCase()}</p>
-      <div className="bg-card border rounded-xl p-4 text-left">
+      <div className="rounded-2xl border border-border bg-card shadow-card p-4 text-start text-[15px]">
         <div className="flex justify-between mb-2">
           <span>{t('booking.guests')}</span><strong>{booking.guests}</strong>
         </div>
@@ -110,6 +110,7 @@ export default function BookingSuccess() {
           <span>{t('booking.booking_to_host')}</span><span>{booking.provider_amount_egp} {t('common.egp')}</span>
         </div>
       </div>
-    </div>
+      <a href="/bookings" className="mt-6 inline-flex h-12 px-6 items-center rounded-xl bg-primary text-primary-foreground font-bold">{lang === 'ar' ? 'عرض حجوزاتي' : 'See my bookings'}</a>
+    </div></div>
   );
 }

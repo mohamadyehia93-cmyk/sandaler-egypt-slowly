@@ -12,6 +12,7 @@ import DetailSkeleton from "@/components/DetailSkeleton";
 import NotFoundView from "@/components/NotFound";
 import SmartImage from "@/components/ui/SmartImage";
 import { useRequestRescue } from "@/hooks/useRequestRescue";
+import PosterDate from "@/components/listing/PosterDate";
 
 const SERVICE_FEE_RATE = 0.05;
 
@@ -139,22 +140,22 @@ const EventCheckout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-32">
-      <header className="flex items-center gap-2 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
+    <div className="min-h-screen bg-background pb-32">
+      <header className="flex items-center gap-2 px-4 py-3 max-w-[560px] mx-auto">
         <button onClick={() => navigate(-1)} aria-label={ar ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
-          <ArrowLeft className="w-5 h-5 text-foreground" />
+          <ArrowLeft className={`w-5 h-5 text-foreground ${ar ? "rotate-180" : ""}`} />
         </button>
-        <h1 className="text-base font-bold text-foreground">{ar ? "شراء التذاكر" : "Get tickets"}</h1>
+        <h1 className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{ar ? "شراء التذاكر" : "Get tickets"}</h1>
       </header>
 
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 max-w-[560px] mx-auto">
         {/* Event summary */}
-        <div className="bg-card rounded-xl shadow-card p-3 flex gap-3">
+        <div className="rounded-2xl border border-border bg-card shadow-card p-3 flex gap-3">
           <div className="w-20 h-20 rounded-lg overflow-hidden bg-secondary shrink-0">
             {event.image ? <SmartImage src={event.image} alt={title} className="w-full h-full object-cover" /> : null}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-bold text-foreground line-clamp-2">{title}</p>
+            <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} !text-base text-foreground line-clamp-2`}>{title}</p>
             <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-1">
               <Calendar className="w-3 h-3" /> {dateLabel}
               {event.event_time ? ` · ${event.event_time}` : ""}
@@ -167,6 +168,8 @@ const EventCheckout = () => {
           </div>
         </div>
 
+        <PosterDate start={new Date(event.start_date.slice(0, 10) + "T00:00:00")} end={event.end_date && event.end_date !== event.start_date ? new Date(event.end_date.slice(0, 10) + "T00:00:00") : null} ar={ar} time={event.event_time} where={venue} />
+
         {past ? (
           <p className="text-sm text-muted-foreground text-center py-8">
             {ar ? "انتهى هذا الحدث" : "This event has ended"}
@@ -174,11 +177,11 @@ const EventCheckout = () => {
         ) : (
           <>
             {/* Quantity */}
-            <div className="bg-card rounded-xl shadow-card p-4">
+            <div className="rounded-2xl border border-border bg-card p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold text-foreground">{ar ? "عدد التذاكر" : "Tickets"}</p>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-[13px] text-muted-foreground">
                     {event.is_free
                       ? ar
                         ? "دخول مجاني"
@@ -190,7 +193,7 @@ const EventCheckout = () => {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="w-9 h-9 rounded-full border border-border flex items-center justify-center disabled:opacity-40"
+                    className="tap-target rounded-full border border-border flex items-center justify-center disabled:opacity-40"
                     disabled={quantity <= 1}
                    aria-label={lang === "ar" ? "إنقاص" : "Decrease"}>
                     <Minus className="w-4 h-4" />
@@ -198,8 +201,9 @@ const EventCheckout = () => {
                   <span className="text-lg font-bold w-6 text-center">{quantity}</span>
                   <button
                     onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}
-                    className="w-9 h-9 rounded-full border border-border flex items-center justify-center disabled:opacity-40"
+                    className="tap-target rounded-full border border-border flex items-center justify-center disabled:opacity-40"
                     disabled={quantity >= maxQty}
+                    aria-label={ar ? "زيادة" : "Increase"}
                   >
                     <Plus className="w-4 h-4" />
                   </button>
@@ -208,26 +212,26 @@ const EventCheckout = () => {
             </div>
 
             {/* Attendee */}
-            <div className="bg-card rounded-xl shadow-card p-4 space-y-3">
+            <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
               <p className="text-sm font-semibold text-foreground">{ar ? "بيانات الحضور" : "Attendee details"}</p>
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={ar ? "الاسم الكامل" : "Full name"}
-                className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm"
+                className="w-full h-12 rounded-xl border border-border bg-background px-4 text-[15px]"
               />
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
                 placeholder={ar ? "البريد الإلكتروني" : "Email"}
-                className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm"
+                className="w-full h-12 rounded-xl border border-border bg-background px-4 text-[15px]"
               />
             </div>
 
             {/* Payment method */}
             {totals.total > 0 && (
-              <div className="bg-card rounded-xl shadow-card p-4 space-y-2">
+              <div className="rounded-2xl border border-border bg-card p-4 space-y-2">
                 <p className="text-sm font-semibold text-foreground">{ar ? "طريقة الدفع" : "Payment method"}</p>
                 {methods.map((m) => (
                   <button
@@ -244,7 +248,7 @@ const EventCheckout = () => {
             )}
 
             {/* Price breakdown */}
-            <div className="bg-card rounded-xl shadow-card p-4 space-y-2 text-sm">
+            <div className="rounded-2xl border border-border bg-card p-4 space-y-2 text-sm">
               <div className="flex justify-between text-muted-foreground">
                 <span>
                   {totals.unit} {ar ? "ج.م" : "EGP"} × {quantity}
@@ -279,7 +283,7 @@ const EventCheckout = () => {
           <button
             onClick={confirm}
             disabled={submitting || (remaining != null && remaining < 1)}
-            className="w-full bg-primary text-primary-foreground rounded-xl py-3.5 font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-60"
+            className="max-w-[560px] mx-auto w-full h-12 bg-primary text-primary-foreground rounded-xl font-bold text-[15px] flex items-center justify-center gap-2 disabled:opacity-60"
           >
             <Ticket className="w-4 h-4" />
             {remaining != null && remaining < 1

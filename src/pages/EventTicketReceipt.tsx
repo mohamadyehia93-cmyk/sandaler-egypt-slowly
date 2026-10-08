@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import DetailSkeleton from "@/components/DetailSkeleton";
 import NotFoundView from "@/components/NotFound";
+import PosterDate from "@/components/listing/PosterDate";
 
 type TicketRow = {
   id: string;
@@ -107,20 +108,20 @@ const EventTicketReceipt = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface">
-      <header className="flex items-center gap-2 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
+    <div className="min-h-screen bg-background">
+      <header className="flex items-center gap-2 px-4 py-3 max-w-[560px] mx-auto">
         <button onClick={() => navigate("/tickets")} className="tap-target rounded-full hover:bg-secondary" aria-label={lang === "ar" ? "رجوع" : "Back"}>
-          <ArrowLeft className="w-5 h-5 text-foreground" />
+          <ArrowLeft className={`w-5 h-5 text-foreground ${ar ? "rotate-180" : ""}`} />
         </button>
-        <h1 className="text-base font-bold text-foreground">{ar ? "تذكرتك" : "Your ticket"}</h1>
+        <h1 className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{ar ? "تذكرتك" : "Your ticket"}</h1>
       </header>
 
-      <div className="px-4 py-6 space-y-4">
+      <div className="px-4 py-6 space-y-4 max-w-[560px] mx-auto">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-3">
-            <CheckCircle2 className="w-8 h-8 text-success" />
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+            <CheckCircle2 className="w-10 h-10 text-primary-dark" />
           </div>
-          <h2 className="text-lg font-bold text-foreground">
+          <h2 className={`listing-title ${ar ? "lang-ar" : "lang-en"} text-3xl text-foreground`}>
             {ticket.total_egp > 0
               ? ar
                 ? "تم تأكيد الدفع"
@@ -134,25 +135,17 @@ const EventTicketReceipt = () => {
           </p>
         </div>
 
-        <div className="bg-card rounded-xl shadow-card p-4 space-y-2">
-          <p className="text-sm font-bold text-foreground">{title}</p>
-          <p className="text-[11px] text-muted-foreground">
-            {dateLabel}
-            {ev?.event_time ? ` · ${ev.event_time}` : ""}
-          </p>
-          {venue && (
-            <p className="text-[11px] text-muted-foreground flex items-center gap-1">
-              <MapPin className="w-3 h-3" /> {venue}
-            </p>
-          )}
+        <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} text-foreground text-center`}>{title}</p>
+        {ev && <PosterDate start={new Date(ev.start_date.slice(0, 10) + "T00:00:00")} ar={ar} time={ev.event_time} where={venue} />}
+        <div className="space-y-2">
           <div className="flex gap-2 pt-2">
-            <button onClick={addToCalendar} className="flex-1 border border-border rounded-xl py-2 text-xs font-semibold flex items-center justify-center gap-1.5">
+            <button onClick={addToCalendar} className="flex-1 h-11 border border-border rounded-full text-sm font-semibold flex items-center justify-center gap-1.5">
               <CalendarPlus className="w-3.5 h-3.5" /> {ar ? "أضف للتقويم" : "Add to calendar"}
             </button>
             {ev && (
               <button
                 onClick={() => navigate(`/event/${ev.slug || ev.id}`)}
-                className="flex-1 border border-border rounded-xl py-2 text-xs font-semibold"
+                className="flex-1 h-11 border border-border rounded-full text-sm font-semibold"
               >
                 {ar ? "تفاصيل الحدث" : "Event details"}
               </button>
@@ -161,7 +154,7 @@ const EventTicketReceipt = () => {
         </div>
 
         {/* Receipt */}
-        <div className="bg-card rounded-xl shadow-card p-4 space-y-2 text-sm">
+        <div className="rounded-2xl border border-border bg-card p-4 space-y-2 text-[15px]">
           <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
             {ar ? "إيصال الشراء" : "Receipt"}
           </h3>
@@ -199,14 +192,14 @@ const EventTicketReceipt = () => {
               {ticket.total_egp} {ar ? "ج.م" : "EGP"}
             </span>
           </div>
-          <p className="text-[10px] text-muted-foreground pt-1">
+          <p className="text-[13px] text-muted-foreground pt-1">
             {new Date(ticket.created_at).toLocaleString(locale)}
           </p>
         </div>
 
         <button
           onClick={() => navigate("/tickets")}
-          className="w-full bg-primary text-primary-foreground rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2"
+          className="w-full h-12 bg-primary text-primary-foreground rounded-xl font-bold text-[15px] flex items-center justify-center gap-2"
         >
           <Ticket className="w-4 h-4" /> {ar ? "كل تذاكري" : "All my tickets"}
         </button>
