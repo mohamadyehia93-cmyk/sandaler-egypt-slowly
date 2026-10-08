@@ -73,19 +73,6 @@ const TripDetail = () => {
     enabled: !!trip?.city_id,
   });
 
-  // Real reviews only: rows written by a signed-in account.
-  const { data: reviews = [] } = useQuery({
-    queryKey: ["trip-reviews", trip?.id],
-    queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from("reviews").select("id, rating, comment, created_at, user_id")
-        .eq("item_type", "trip").eq("item_id", trip!.id).not("user_id", "is", null).limit(10);
-      if (error) return [];
-      return data as any[];
-    },
-    enabled: !!trip?.id,
-  });
-
   const range = useMemo(() => parseLooseDateRange(t?.date), [t?.date]);
 
   if (isLoading) {
@@ -301,19 +288,7 @@ const TripDetail = () => {
             </Section>
           )}
 
-          <Section title={ar ? "التقييمات" : "Reviews"} ar={ar}>
-            {reviews.length > 0 ? (
-              <ul className="space-y-4">
-                {reviews.map((r) => (
-                  <li key={r.id}>
-                    <p className="text-[13px] text-muted-foreground">{"★".repeat(Math.round(r.rating || 0))}</p>
-                    {r.comment && <p className="mt-1">{r.comment}</p>}
-                  </li>
-                ))}
-              </ul>
-            ) : <p className="text-muted-foreground">{ar ? "لا توجد تقييمات بعد." : "No reviews yet."}</p>}
-          </Section>
-
+          {/* Reviews: trips have no reviews table yet, so no section is shown. */}
           <ReadBeforeYouGo cityId={trip.city_id} regionId={trip.region_id} ar={ar} />
 
           {similar.length > 0 && (
