@@ -1,345 +1,269 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import ShareButton from "@/components/ShareButton";
-import { useI18n } from "@/lib/i18n";
-import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
-import { Skeleton } from "@/components/ui/skeleton";
-import ProviderStatusView from "@/components/ProviderStatusView";
+import { ArrowLeft, MapPin, Clock, Languages, LayoutGrid, MessageCircle, CheckCircle } from "lucide-react";
+import ShareButton from "@/components/ShareButton";
 import FollowButton from "@/components/FollowButton";
 import Avatar from "@/components/AvatarFallback";
-
-import {
-  ArrowLeft, Share2, MapPin, Star, CheckCircle, MessageSquare,
-  Heart, Globe, Clock, ChevronRight, Users
-} from "lucide-react";
 import NotFoundView from "@/components/NotFound";
-import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
+import ProviderStatusView from "@/components/ProviderStatusView";
 import ProviderContactCard from "@/components/ProviderContactCard";
 import ExpertCollections from "@/components/ExpertCollections";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
+import KeyFacts, { type KeyFact } from "@/components/listing/KeyFacts";
+import Section from "@/components/listing/Section";
+import ReadBeforeYouGo from "@/components/listing/ReadBeforeYouGo";
+import { fmtNumber, formatDuration, listingLocale } from "@/components/listing/format";
 
-type ProviderRole =
-  | "culture-actor" | "service-provider" | "accommodation-host"
-  | "transport-provider" | "trip-organizer" | "product-seller"
-  | "organization";
-
-const roleColorClass: Record<string, string> = {
-  "culture-actor": "bg-role-culture-actor",
-  "service-provider": "bg-role-service-provider",
-  "accommodation-host": "bg-role-host",
-  "transport-provider": "bg-role-transport",
-  "trip-organizer": "bg-role-trip-organizer",
-  "product-seller": "bg-role-product-seller",
-  "organization": "bg-role-organization",
-};
-
-const roleTextClass: Record<string, string> = {
-  "culture-actor": "text-role-culture-actor",
-  "service-provider": "text-role-service-provider",
-  "accommodation-host": "text-role-host",
-  "transport-provider": "text-role-transport",
-  "trip-organizer": "text-role-trip-organizer",
-  "product-seller": "text-role-product-seller",
-  "organization": "text-role-organization",
-};
+/**
+ * INTEGRITY RULE for this page: everything shown comes from this provider's row
+ * or from published rows they own. No sample listings, ratings or follower counts;
+ * empty sections hide themselves.
+ */
 
 const roleLabels: Record<string, { en: string; ar: string }> = {
-  "culture-actor": { en: "Culture Actor", ar: "فاعل ثقافي" },
-  "service-provider": { en: "Service Provider", ar: "مقدم خدمة" },
-  "accommodation-host": { en: "Accommodation Host", ar: "مضيف إقامة" },
-  "transport-provider": { en: "Transport Provider", ar: "مقدم مواصلات" },
-  "trip-organizer": { en: "Trip Organizer", ar: "منظم رحلات" },
-  "product-seller": { en: "Product Seller", ar: "بائع منتجات" },
-  "organization": { en: "Organization", ar: "مؤسسة" },
+  "culture-actor": { en: "Culture actor", ar: "فاعل ثقافي" },
+  "service-provider": { en: "Experience host", ar: "مضيف تجارب" },
+  "accommodation-host": { en: "Stay host", ar: "مضيف إقامة" },
+  "transport-provider": { en: "Transport provider", ar: "مقدم مواصلات" },
+  "trip-organizer": { en: "Trip organiser", ar: "منظم رحلات" },
+  "product-seller": { en: "Maker", ar: "حرفي" },
+  organization: { en: "Organisation", ar: "مؤسسة" },
 };
 
-const listingRoutes: Record<string, string> = {
-  "culture-actor": "/post",
-  "service-provider": "/experience",
-  "accommodation-host": "/stay",
-  "transport-provider": "/transport",
-  "trip-organizer": "/trip",
-  "product-seller": "/product",
-  "organization": "/cause",
-};
+type OfferType = "experience" | "trip" | "stay" | "product" | "event";
+type Offer = { type: OfferType; id: string; path: string; title: string; image: string | null; meta: string };
 
-const listingSectionLabels: Record<string, { en: string; ar: string }> = {
-  "culture-actor": { en: "Articles & Stories", ar: "مقالات وقصص" },
-  "service-provider": { en: "Experiences", ar: "تجارب" },
-  "accommodation-host": { en: "Properties", ar: "عقارات" },
-  "transport-provider": { en: "Routes & Services", ar: "مسارات وخدمات" },
-  "trip-organizer": { en: "Trips", ar: "رحلات" },
-  "product-seller": { en: "Products", ar: "منتجات" },
-  "organization": { en: "Programs & Causes", ar: "برامج وقضايا" },
-};
+// Owner columns all hold providers.id (see src/lib/providerRecord.ts).
+const SOURCES: { type: OfferType; table: string; col: string; route: string; cols: string }[] = [
+  { type: "experience", table: "experiences", col: "provider_id", route: "/experience", cols: "id, slug, title_en, title_ar, image, price, duration_minutes" },
+  { type: "trip", table: "trips", col: "organizer_id", route: "/trip", cols: "id, slug, title_en, title_ar, image, price, duration_days, date" },
+  { type: "stay", table: "accommodations", col: "host_id", route: "/stay", cols: "id, slug, name_en, name_ar, image, price_per_night" },
+  { type: "product", table: "products", col: "seller_id", route: "/product", cols: "id, slug, name_en, name_ar, image, price" },
+  { type: "event", table: "events", col: "organizer_id", route: "/event", cols: "id, slug, title_en, title_ar, image, price, is_free, start_date" },
+];
 
-// Map role to the table + column that links listings back.
-// All of these owner columns hold providers.id (see src/lib/providerRecord.ts).
-const listingSource: Record<string, { table: string; column: string; titleEn: string; titleAr: string; imageCol: string; ratingCol?: string; priceCol?: string }> = {
-
-  "service-provider": { table: "experiences", column: "provider_id", titleEn: "title_en", titleAr: "title_ar", imageCol: "image", ratingCol: "rating", priceCol: "price" },
-  "accommodation-host": { table: "accommodations", column: "host_id", titleEn: "name_en", titleAr: "name_ar", imageCol: "image", ratingCol: "rating", priceCol: "price_per_night" },
-  "transport-provider": { table: "transport", column: "provider_id", titleEn: "name_en", titleAr: "name_ar", imageCol: "image", ratingCol: "rating", priceCol: "price" },
-  "trip-organizer": { table: "trips", column: "organizer_id", titleEn: "title_en", titleAr: "title_ar", imageCol: "image", ratingCol: "rating", priceCol: "price" },
-  "product-seller": { table: "products", column: "seller_id", titleEn: "name_en", titleAr: "name_ar", imageCol: "image", ratingCol: "rating", priceCol: "price" },
+const TYPE_LABEL: Record<OfferType, { en: string; ar: string }> = {
+  experience: { en: "Experiences", ar: "تجارب" },
+  trip: { en: "Trips", ar: "رحلات" },
+  stay: { en: "Stays", ar: "إقامات" },
+  product: { en: "Products", ar: "منتجات" },
+  event: { en: "Events", ar: "فعاليات" },
 };
 
 const ProviderProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang } = useI18n();
+  const ar = lang === "ar";
   const { user: authUser } = useAuth();
-  const [following, setFollowing] = useState(false);
+  const [bioOpen, setBioOpen] = useState(false);
+  const [tab, setTab] = useState<OfferType | null>(null);
 
   const { data: provider, isLoading } = useQuery({
     queryKey: ["provider", id],
     queryFn: async () => {
-      // Try UUID first, then slug
       const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       const col = UUID_RE.test(id!) ? "id" : "slug";
-      const { data, error } = await (supabase as any)
-        .from("providers")
-        .select(PROVIDER_PUBLIC_COLUMNS)
-        .eq(col, id)
-        .maybeSingle();
+      const { data, error } = await (supabase as any).from("providers").select(PROVIDER_PUBLIC_COLUMNS).eq(col, id).maybeSingle();
       if (error) throw error;
       return data;
     },
     enabled: !!id,
   });
 
-  // Fetch listings for this provider
-  const source = provider ? listingSource[provider.role] : null;
-  const { data: listings } = useQuery({
-    queryKey: ["provider-listings", provider?.id, provider?.role],
+  const { data: rawOffers = [] } = useQuery({
+    queryKey: ["provider-offers", provider?.id],
     queryFn: async () => {
-      if (!source || !provider) return [];
-      const { data, error } = await (supabase as any)
-        .from(source.table)
-        .select("*")
-        .eq(source.column, provider.id)
-        .eq("status", "published")
-        .limit(5);
-      if (error) throw error;
-      return data || [];
+      const results = await Promise.all(
+        SOURCES.map(async (s) => {
+          const { data, error } = await (supabase as any).from(s.table).select(s.cols).eq(s.col, provider!.id).eq("status", "published").limit(24);
+          return error ? [] : (data || []).map((r: any) => ({ ...r, __type: s.type, __route: s.route }));
+        }),
+      );
+      return results.flat();
     },
-    enabled: !!provider && !!source,
+    enabled: !!provider?.id,
   });
+
+  const expIds = rawOffers.filter((r: any) => r.__type === "experience").map((r: any) => r.id);
+  const { data: reviews = [] } = useQuery({
+    queryKey: ["provider-reviews", expIds.join(",")],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("experience_reviews").select("id, rating, review_text, reviewer_name, reviewer_city, created_at")
+        .in("experience_id", expIds).not("user_id", "is", null).order("created_at", { ascending: false }).limit(6);
+      return error ? [] : (data as any[]);
+    },
+    enabled: expIds.length > 0,
+  });
+
+  const { data: cityRow } = useQuery({
+    queryKey: ["provider-city", provider?.city_en],
+    queryFn: async () => {
+      const { data } = await supabase.from("cities").select("id, region_id").ilike("name_en", provider!.city_en).maybeSingle();
+      return data;
+    },
+    enabled: !!provider?.city_en,
+  });
+
+  const egp = ar ? "ج.م" : "EGP";
+  const offers: Offer[] = useMemo(() => rawOffers.map((r: any) => {
+    const title = (ar ? r.title_ar || r.name_ar || r.title_en || r.name_en : r.title_en || r.name_en) || "";
+    const money = (n: number) => `${fmtNumber(Number(n || 0), ar)} ${egp}`;
+    let meta: (string | null)[] = [];
+    if (r.__type === "experience") meta = [formatDuration(r.duration_minutes, ar), money(r.price)];
+    if (r.__type === "trip") meta = [r.date || (r.duration_days ? (ar ? `${fmtNumber(r.duration_days, ar)} أيام` : `${r.duration_days} days`) : null), money(r.price)];
+    if (r.__type === "stay") meta = [`${money(r.price_per_night)} ${ar ? "/ليلة" : "/ night"}`];
+    if (r.__type === "product") meta = [money(r.price)];
+    if (r.__type === "event") meta = [
+      r.start_date ? new Date(r.start_date.slice(0, 10) + "T00:00:00").toLocaleDateString(listingLocale(ar), { day: "numeric", month: "short" }) : null,
+      r.is_free || !r.price ? (ar ? "مجاني" : "Free") : money(r.price),
+    ];
+    return { type: r.__type, id: r.id, path: `${r.__route}/${r.slug || r.id}`, title, image: r.image || null, meta: meta.filter(Boolean).join(" · ") };
+  }), [rawOffers, ar, egp]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-surface p-4 space-y-4">
-        <Skeleton className="h-48 w-full rounded-xl" />
-        <Skeleton className="h-6 w-1/2" />
-        <Skeleton className="h-4 w-1/3" />
-        <Skeleton className="h-32 w-full" />
+      <div className="min-h-screen bg-background">
+        <Skeleton className="h-44 w-full rounded-none" />
+        <div className="max-w-[680px] mx-auto px-4 space-y-3">
+          <Skeleton className="w-24 h-24 rounded-full -mt-12" />
+          <Skeleton className="h-7 w-1/2" />
+          <Skeleton className="h-4 w-1/3" />
+        </div>
       </div>
     );
   }
-
   if (!provider) return <NotFoundView context="person" />;
 
-  const name = (lang === "ar" ? (provider.name_ar || provider.name_en) : provider.name_en) || provider.name_en;
-  const bio = (lang === "ar" ? (provider.bio_ar || provider.bio_en) : provider.bio_en) || provider.bio_en;
-  const city = (lang === "ar" ? (provider.city_ar || provider.city_en) : provider.city_en) || provider.city_en;
-  const region = (lang === "ar" ? (provider.region_ar || provider.region_en) : provider.region_en) || provider.region_en;
-  const tagline = lang === "ar" ? (provider.tagline_ar || provider.tagline_en) : provider.tagline_en;
-  const specialties: { en: string; ar: string }[] = provider.specialties || [];
-  const color = roleColorClass[provider.role] || "bg-primary";
-  const textColor = roleTextClass[provider.role] || "text-primary";
-  const roleLabel = roleLabels[provider.role] || { en: "Provider", ar: "مقدم خدمة" };
+  const name = (ar ? provider.name_ar || provider.name_en : provider.name_en) || "";
+  const bio = ar ? provider.bio_ar || provider.bio_en : provider.bio_en || provider.bio_ar;
+  const city = ar ? provider.city_ar || provider.city_en : provider.city_en;
+  const tagline = ar ? provider.tagline_ar || provider.tagline_en : provider.tagline_en;
+  const role = roleLabels[provider.role]?.[ar ? "ar" : "en"] || (ar ? "مقدم خدمة" : "Provider");
+  const specialties: any[] = Array.isArray(provider.specialties) ? provider.specialties : [];
+  const isSelf = !!authUser && provider.user_id === authUser.id;
+
+  const facts: KeyFact[] = [];
+  if (city) facts.push({ icon: MapPin, label: city });
+  if (provider.years_active > 0) facts.push({ icon: Clock, label: ar ? `${fmtNumber(provider.years_active, ar)} سنوات نشاط` : `${provider.years_active} years active` });
+  if (provider.languages) facts.push({ icon: Languages, label: String(provider.languages) });
+  if (offers.length) facts.push({ icon: LayoutGrid, label: ar ? `${fmtNumber(offers.length, ar)} عروض منشورة` : `${offers.length} published ${offers.length === 1 ? "offer" : "offers"}` });
+
+  const types = Array.from(new Set(offers.map((o) => o.type)));
+  const activeTab = tab && types.includes(tab) ? tab : types[0];
+  const shown = types.length > 1 ? offers.filter((o) => o.type === activeTab) : offers;
+
+  const actionBtn = "h-11 px-4 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-1.5";
 
   return (
-    <div className="min-h-screen bg-surface pb-8">
-      {/* Cover Image */}
-      <div className="relative h-48">
-        <img src={provider.cover_image || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-4 z-10">
-          <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur flex items-center justify-center" aria-label={lang === "ar" ? "رجوع" : "Back"}>
-            <ArrowLeft className="w-4 h-4 text-white" />
+    <div className="min-h-screen bg-background pb-24">
+      {/* Cover */}
+      <div className="relative h-44 lg:h-64 overflow-hidden bg-gradient-to-br from-primary/50 via-primary/20 to-accent/40">
+        {provider.cover_image && <img src={provider.cover_image} alt="" className="w-full h-full object-cover" />}
+        <div className="absolute top-3 inset-x-3 flex justify-between pt-[env(safe-area-inset-top,0px)]">
+          <button type="button" onClick={() => navigate(-1)} aria-label={ar ? "رجوع" : "Back"} className="tap-target rounded-full bg-background/80 backdrop-blur-sm text-foreground">
+            <ArrowLeft className={`w-5 h-5 ${ar ? "rotate-180" : ""}`} />
           </button>
-          <ShareButton title={lang === "ar" ? (provider as any).name_ar : (provider as any).name_en} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur flex items-center justify-center" iconClassName="w-4 h-4 text-white" />
         </div>
       </div>
 
-      {/* Avatar + Name */}
-      <div className="px-4 -mt-12 relative z-10">
-        <div className="flex items-end gap-3">
-          <Avatar
-            src={provider.avatar}
-            name={name}
-            className="w-20 h-20 rounded-2xl border-4 border-background shadow-card"
-          />
+      <div className="max-w-[680px] mx-auto px-4">
+        {/* Identity */}
+        <div className="-mt-12 relative z-10">
+          <Avatar src={provider.avatar} name={name} className="w-24 h-24 rounded-full border-4 border-background shadow-card" />
+        </div>
+        <h1 className={`listing-title ${ar ? "lang-ar" : "lang-en"} text-foreground text-3xl mt-3 flex items-center gap-2`}>
+          {name}
+          {provider.verified && <CheckCircle className="w-5 h-5 text-primary-dark" aria-label={ar ? "موثّق" : "Verified"} />}
+        </h1>
+        <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-primary-dark mt-1">{[role, city].filter(Boolean).join(" · ")}</p>
+        {tagline && <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground mt-3`}>{tagline}</p>}
 
-          <div className="pb-1 flex-1">
-            <div className="flex items-center gap-1.5">
-              <h1 className="text-lg font-bold text-foreground">{name}</h1>
-              {provider.verified && <CheckCircle className={`w-4 h-4 ${textColor}`} />}
-            </div>
-            <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${color} text-white text-[10px] font-semibold`}>
-              {roleLabel[lang]}
-            </div>
-          </div>
+        {/* Actions */}
+        <div className="flex flex-wrap gap-2 mt-4">
+          {!isSelf && (
+            <button type="button" onClick={() => navigate(`/inbox?personId=${provider.id}&kind=provider`)} className={`${actionBtn} bg-primary text-primary-foreground`}>
+              <MessageCircle className="w-4 h-4" /> {ar ? "راسل" : "Message"}
+            </button>
+          )}
+          <FollowButton targetType="provider" targetId={provider.id} variant="outline" />
+          <ShareButton title={name} showLabel className={`${actionBtn} border border-border text-foreground`} iconClassName="w-4 h-4" />
         </div>
       </div>
 
-      {/* Tagline */}
-      {tagline && <p className="px-4 mt-2 text-sm text-muted-foreground italic">"{tagline}"</p>}
+      <div className="mt-5"><KeyFacts facts={facts} /></div>
 
-      {/* Action Buttons */}
-      <div className="px-4 mt-4 flex gap-2">
-        <FollowButton
-          targetType="provider"
-          targetId={provider.id}
-          variant="primary"
-          className="flex-1"
-        />
-        {provider.user_id !== authUser?.id && (
-        <button
-          onClick={() => navigate(`/inbox?personId=${provider.id}&kind=provider`)}
-          className="flex-1 py-2.5 rounded-xl border-2 border-border text-foreground font-semibold text-sm flex items-center justify-center gap-1.5 bg-card"
-        >
-          <MessageSquare className="w-4 h-4" />
-          {lang === "ar" ? "رسالة" : "Message"}
-        </button>
-        )}
-      </div>
+      <div className="max-w-[680px] mx-auto px-4">
+        {provider.user_id && <div className="pt-4"><ProviderStatusView userId={provider.user_id} accentText="text-primary-dark" /></div>}
 
-      <ProviderContactCard providerId={provider.id} />
-
-      {/* Stats Row */}
-      <div className="flex mx-4 mt-4 bg-card rounded-xl shadow-card overflow-hidden">
-        <div className="flex-1 py-3 text-center border-r border-border">
-          <span className="text-lg font-bold text-foreground block">{provider.followers || 0}</span>
-          <span className="text-[10px] text-muted-foreground">{lang === "ar" ? "متابع" : "Followers"}</span>
-        </div>
-        <div className="flex-1 py-3 text-center border-r border-border">
-          <span className="text-lg font-bold text-foreground block">{provider.rating || 0}</span>
-          <span className="text-[10px] text-muted-foreground">{lang === "ar" ? "تقييم" : "Rating"}</span>
-        </div>
-        <div className="flex-1 py-3 text-center">
-          <span className="text-lg font-bold text-foreground block">{provider.years_active || 0}</span>
-          <span className="text-[10px] text-muted-foreground">{lang === "ar" ? "سنوات" : "Years"}</span>
-        </div>
-      </div>
-
-      {/* Info Cards */}
-      <div className="px-4 mt-4 space-y-3">
-        {/* Today's Status */}
-        {provider.user_id && (
-          <ProviderStatusView userId={provider.user_id} accentText={textColor} />
-        )}
-
-        {/* About */}
         {bio && (
-          <div className="bg-card rounded-xl shadow-card p-4">
-            <h3 className="text-sm font-bold text-foreground mb-2">{lang === "ar" ? "نبذة" : "About"}</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">{bio}</p>
-          </div>
-        )}
-
-        {/* Details Grid */}
-        <div className="bg-card rounded-xl shadow-card p-4 space-y-3">
-          {city && (
-            <div className="flex items-center gap-3">
-              <MapPin className={`w-4 h-4 ${textColor} shrink-0`} />
-              <div>
-                <p className="text-xs font-semibold text-foreground">{city}</p>
-                {region && <p className="text-[10px] text-muted-foreground">{region}</p>}
+          <Section title={ar ? "نبذة" : "About"} ar={ar}>
+            <p className={`whitespace-pre-line ${bioOpen ? "" : "line-clamp-6"}`}>{bio}</p>
+            {bio.length > 320 && (
+              <button type="button" onClick={() => setBioOpen(!bioOpen)} className="mt-1 text-sm font-semibold text-primary-dark underline min-h-[44px]">
+                {bioOpen ? (ar ? "أقل" : "Less") : (ar ? "المزيد" : "More")}
+              </button>
+            )}
+            {specialties.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-3">
+                {specialties.map((s, i) => {
+                  const label = typeof s === "string" ? s : ar ? s.ar || s.en : s.en || s.ar;
+                  return label ? <span key={i} className="px-2.5 py-1 rounded-full bg-muted text-[13px] text-foreground">{label}</span> : null;
+                })}
               </div>
-            </div>
-          )}
-          {provider.languages && (
-            <div className="flex items-center gap-3">
-              <Globe className={`w-4 h-4 ${textColor} shrink-0`} />
-              <p className="text-xs text-foreground">{provider.languages}</p>
-            </div>
-          )}
-          {provider.years_active > 0 && (
-            <div className="flex items-center gap-3">
-              <Clock className={`w-4 h-4 ${textColor} shrink-0`} />
-              <p className="text-xs text-foreground">
-                {provider.years_active} {lang === "ar" ? "سنوات خبرة" : "years experience"}
-              </p>
-            </div>
-          )}
-          {(provider.followers || 0) > 0 && (
-            <div className="flex items-center gap-3">
-              <Users className={`w-4 h-4 ${textColor} shrink-0`} />
-              <p className="text-xs text-foreground">
-                {provider.followers?.toLocaleString()} {lang === "ar" ? "متابع" : "followers"}
-              </p>
-            </div>
-          )}
-          {(provider.rating || 0) > 0 && (
-            <div className="flex items-center gap-3">
-              <Star className="w-4 h-4 text-warning shrink-0" />
-              <p className="text-xs text-foreground">
-                {provider.rating} ({provider.review_count || 0} {lang === "ar" ? "تقييم" : "reviews"})
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Knowledge collections (culture-actor output; expert_id = providers.user_id) */}
-        <ExpertCollections userId={provider.user_id} />
-
-        {/* Specialties */}
-        {specialties.length > 0 && (
-          <div className="bg-card rounded-xl shadow-card p-4">
-            <h3 className="text-sm font-bold text-foreground mb-2">{lang === "ar" ? "التخصصات" : "Specialties"}</h3>
-            <div className="flex flex-wrap gap-2">
-              {specialties.map((s, i) => (
-                <span key={i} className={`px-3 py-1 rounded-full text-[10px] font-semibold ${color} text-white`}>
-                  {s[lang]}
-                </span>
-              ))}
-            </div>
-          </div>
+            )}
+          </Section>
         )}
 
-        {/* Listings from DB */}
-        {listings && listings.length > 0 && source && (
-          <div className="bg-card rounded-xl shadow-card p-4">
-            <h3 className="text-sm font-bold text-foreground mb-3">
-              {(listingSectionLabels[provider.role] || { en: "Listings", ar: "العروض" })[lang]}
-            </h3>
-            <div className="space-y-3">
-              {listings.map((listing: any) => (
-                <button
-                  key={listing.id}
-                  onClick={() => navigate(`${listingRoutes[provider.role] || "/experience"}/${listing.slug || listing.id}`)}
-                  className="w-full flex items-center gap-3 text-start"
-                >
-                  <img
-                    src={listing[source.imageCol] || "/placeholder.svg"}
-                    alt=""
-                    className="w-16 h-16 rounded-xl object-cover shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-foreground truncate">
-                      {lang === "ar" ? listing[source.titleAr] : listing[source.titleEn]}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      {source.ratingCol && listing[source.ratingCol] > 0 && (
-                        <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
-                          <Star className="w-3 h-3 text-warning fill-warning" /> {listing[source.ratingCol]}
-                        </span>
-                      )}
-                      {source.priceCol && listing[source.priceCol] > 0 && (
-                        <span className="text-[10px] font-medium text-foreground">{listing[source.priceCol]} EGP</span>
-                      )}
-                    </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+        {offers.length > 0 && (
+          <Section title={ar ? "العروض" : "Offers"} ar={ar}>
+            {types.length > 1 && (
+              <div role="tablist" className="flex gap-2 overflow-x-auto hide-scrollbar mb-4">
+                {types.map((ty) => (
+                  <button key={ty} role="tab" aria-selected={ty === activeTab} type="button" onClick={() => setTab(ty)}
+                    className={`min-h-[40px] px-4 rounded-full text-sm font-semibold border flex-shrink-0 ${ty === activeTab ? "bg-foreground text-background border-foreground" : "bg-background text-foreground border-border"}`}>
+                    {TYPE_LABEL[ty][ar ? "ar" : "en"]} · {fmtNumber(offers.filter((o) => o.type === ty).length, ar)}
+                  </button>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0 pb-1 snap-x">
+              {shown.map((o) => (
+                <button key={`${o.type}-${o.id}`} type="button" onClick={() => navigate(o.path)} className="flex-shrink-0 w-[220px] snap-start text-start">
+                  <div className="aspect-[3/2] rounded-xl overflow-hidden bg-muted">{o.image && <img src={o.image} alt="" loading="lazy" className="w-full h-full object-cover" />}</div>
+                  <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} !text-base mt-2 line-clamp-2 text-foreground`}>{o.title}</p>
+                  {o.meta && <p className="text-[13px] text-muted-foreground">{o.meta}</p>}
                 </button>
               ))}
             </div>
-          </div>
+          </Section>
         )}
+
+        <ExpertCollections userId={provider.user_id} />
+
+        {reviews.length > 0 && (
+          <Section title={ar ? "التقييمات" : "Reviews"} ar={ar}>
+            <ul className="space-y-4">
+              {reviews.map((r) => (
+                <li key={r.id}>
+                  <p className="text-sm font-semibold text-foreground">{r.reviewer_name}</p>
+                  <p className="text-[13px] text-muted-foreground">{"★".repeat(Math.round(r.rating || 0))}{r.reviewer_city ? ` · ${r.reviewer_city}` : ""}</p>
+                  {r.review_text && <p className="mt-1">{r.review_text}</p>}
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
+
+        <div className="border-t border-border pt-2"><ProviderContactCard providerId={provider.id} /></div>
+
+        <ReadBeforeYouGo cityId={cityRow?.id} regionId={cityRow?.region_id} ar={ar} />
       </div>
     </div>
   );
