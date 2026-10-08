@@ -1,42 +1,41 @@
-import MessageOwnerButton from "@/components/MessageOwnerButton";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import {
-  ArrowLeft,
-  Calendar,
-  CalendarPlus,
-  Clock,
-  MapPin,
-  Ticket,
-  Tag,
-  Share2,
-  Users,
-  Navigation,
-  Timer,
-  Wallet,
-} from "lucide-react";
+import { Calendar, CalendarPlus, Clock, MapPin, Navigation, Users, Tag, Timer, Wallet, MessageCircle, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n";
 import { fetchByIdOrSlug } from "@/lib/fetchByIdOrSlug";
 import { useCities, useRegions } from "@/hooks/useListings";
 import { supabase } from "@/integrations/supabase/client";
 import { EventRow, isPastEvent, eventCategoryText, sortEventsUpcomingFirst } from "@/lib/eventSort";
-import SmartImage from "@/components/ui/SmartImage";
 import NotFoundView from "@/components/NotFound";
-import DetailSkeleton from "@/components/DetailSkeleton";
-import WishlistButton from "@/components/WishlistButton";
-import ProviderBioCard from "@/components/ProviderBioCard";
-import SectionHeader from "@/components/SectionHeader";
-import EventCard from "@/components/EventCard";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SEO } from "@/components/SEO";
+import ShareButton from "@/components/ShareButton";
+import MachineTranslatedNote from "@/components/MachineTranslatedNote";
+import ListingHero from "@/components/listing/ListingHero";
+import KeyFacts, { type KeyFact } from "@/components/listing/KeyFacts";
+import Section from "@/components/listing/Section";
+import ActionBar from "@/components/listing/ActionBar";
+import ReadBeforeYouGo from "@/components/listing/ReadBeforeYouGo";
+import { fmtNumber, listingLocale, splitStandfirst } from "@/components/listing/format";
+import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
+
+/**
+ * INTEGRITY RULE for this page: every block is backed by a real column on THIS
+ * event row (or a query scoped to it). No invented times, venues, organisers
+ * or prices. Each section hides itself when its column is empty.
+ */
 
 const pad = (n: number) => String(n).padStart(2, "0");
 const icsDate = (d: Date) => `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}`;
+const localDate = (iso: string) => new Date(iso.slice(0, 10) + "T00:00:00");
 
 const EventDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useI18n();
+  const ar = lang === "ar";
+  const loc = listingLocale(ar);
   const { data: cities = [] } = useCities();
   const { data: regions = [] } = useRegions();
 
@@ -53,86 +52,98 @@ const EventDetail = () => {
       q = event?.city_id ? q.eq("city_id", event.city_id) : q.eq("region_id", event?.region_id);
       const { data, error } = await q;
       if (error) throw error;
-      return sortEventsUpcomingFirst(((data || []) as EventRow[]).filter((e) => e.id !== event?.id)).slice(0, 3);
+      return sortEventsUpcomingFirst(((data || []) as EventRow[]).filter((e) => e.id !== event?.id)).slice(0, 6);
     },
     enabled: !!event && !!(event.city_id || event.region_id),
   });
 
-  if (isLoading) return <DetailSkeleton variant="city" />;
+  const organizerId: string | null = (event as any)?.organizer_id || null;
+  const { data: organizer } = useQuery({
+    queryKey: ["provider", organizerId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("providers").select(PROVIDER_PUBLIC_COLUMNS).eq("id", organizerId!).maybeSingle();
+      if (error) throw error;
+      return data as any;
+    },
+    enabled: !!organizerId,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Skeleton className="h-[56vh] max-h-[460px] w-full rounded-none" />
+        <div className="max-w-[680px] mx-auto p-4 space-y-3">
+          <Skeleton className="h-24 w-full -mt-10 rounded-2xl" />
+          <Skeleton className="h-5 w-2/3" />
+          <Skeleton className="h-4 w-full" />
+        </div>
+      </div>
+    );
+  }
   if (!event) return <NotFoundView context="event" />;
 
-  const title = lang === "ar" ? (event.title_ar || event.title_en) : event.title_en;
-  const description = lang === "ar" ? (event.description_ar || event.description_en) : event.description_en;
-  const venue = lang === "ar" ? event.venue_ar || event.location_ar : event.venue_en || event.location_en;
-  const locale = lang === "ar" ? "ar-EG" : "en-US";
+  const ev = event as any;
+  const title = ar ? event.title_ar || event.title_en : event.title_en;
+  const description = (ar ? event.description_ar || event.description_en : event.description_en) || "";
+  const venue = ar ? event.venue_ar || event.location_ar : event.venue_en || event.location_en;
 
-  const start = new Date(event.start_date);
-  const end = event.end_date ? new Date(event.end_date) : null;
-  const fmtLong = (d: Date) =>
-    d.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  const fmtShort = (d: Date) => d.toLocaleDateString(locale, { day: "numeric", month: "short" });
-  const multiDay = !!end && event.end_date !== event.start_date;
-  const dateLabel = multiDay ? `${fmtLong(start)} — ${fmtLong(end!)}` : fmtLong(start);
-  const shortDateLabel = multiDay ? `${fmtShort(start)} — ${fmtShort(end!)}` : fmtShort(start);
+  const start = localDate(event.start_date);
+  const end = event.end_date ? localDate(event.end_date) : null;
+  const multiDay = !!end && event.end_date!.slice(0, 10) !== event.start_date.slice(0, 10);
   const past = isPastEvent(event);
 
   const dayMs = 86400000;
   const today = new Date(new Date().toDateString()).getTime();
-  const daysAway = Math.round((new Date(event.start_date).getTime() - today) / dayMs);
+  const daysAway = Math.round((start.getTime() - today) / dayMs);
   const countdown = past
-    ? t("event.ended")
-    : daysAway <= 0
-    ? t("event.today")
-    : daysAway === 1
-    ? t("event.tomorrow")
-    : t("event.inDays").replace("{days}", String(daysAway));
-  const durationDays = multiDay
-    ? Math.round((end!.getTime() - start.getTime()) / dayMs) + 1
-    : 1;
+    ? ar ? "انتهت" : "Ended"
+    : daysAway <= 0 ? (ar ? "اليوم" : "Today")
+    : daysAway === 1 ? (ar ? "غدًا" : "Tomorrow")
+    : ar ? `بعد ${fmtNumber(daysAway, ar)} أيام` : `In ${daysAway} days`;
+  const durationDays = multiDay ? Math.round((end!.getTime() - start.getTime()) / dayMs) + 1 : 1;
 
   const city = (cities as any[]).find((c) => c.id === event.city_id);
   const region = (regions as any[]).find((r) => r.id === event.region_id);
-  const cityName = city ? (lang === "ar" ? (city.name_ar || city.name_en) : city.name_en) : null;
-  const regionName = region ? (lang === "ar" ? (region.name_ar || region.name_en) : region.name_en) : null;
+  const cityName = city ? (ar ? city.name_ar || city.name_en : city.name_en) : null;
+  const regionName = region ? (ar ? region.name_ar || region.name_en : region.name_en) : null;
 
-  const priceLabel = event.is_free
-    ? t("common.free")
-    : event.price != null
-    ? `${event.price} ${t("common.egp")}`
-    : t("common.free");
+  const egp = ar ? "ج.م" : "EGP";
+  const priceLabel = event.is_free || event.price == null || Number(event.price) === 0
+    ? (ar ? "مجاني" : "Free")
+    : `${fmtNumber(Number(event.price), ar)} ${egp}`;
+  const isFree = event.is_free || !event.price;
 
+  // Poster date block
+  const dayNum = multiDay && end && end.getMonth() === start.getMonth()
+    ? `${fmtNumber(start.getDate(), ar)}–${fmtNumber(end.getDate(), ar)}`
+    : start.toLocaleDateString(loc, { day: "numeric" });
+  const monthShort = multiDay && end && end.getMonth() !== start.getMonth()
+    ? `${start.toLocaleDateString(loc, { month: "short" })} – ${end.toLocaleDateString(loc, { day: "numeric", month: "short" })}`
+    : start.toLocaleDateString(loc, { month: "short" });
+  const weekday = start.toLocaleDateString(loc, { weekday: "long" });
+  const timeLabel = event.event_time || (ar ? "الموعد سيُعلن لاحقًا" : "Time to be announced");
+  const whereLine = [venue, cityName].filter(Boolean).join(" · ");
+
+  const lat = ev.latitude != null ? Number(ev.latitude) : null;
+  const lng = ev.longitude != null ? Number(ev.longitude) : null;
+  const hasGeo = lat != null && lng != null && !Number.isNaN(lat) && !Number.isNaN(lng);
   const mapsQuery = encodeURIComponent([venue, cityName, regionName, "Egypt"].filter(Boolean).join(", "));
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
-
-  const share = async () => {
-    const url = window.location.href;
-    try {
-      if (navigator.share) await navigator.share({ title, url });
-      else {
-        await navigator.clipboard.writeText(url);
-        toast(t("event.linkCopied"));
-      }
-    } catch {
-      /* dismissed */
-    }
-  };
+  const mapsHref = hasGeo
+    ? `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
+    : `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
 
   const addToCalendar = () => {
     const endDate = new Date((end || start).getTime() + dayMs);
     const ics = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//Sandal//Events//EN",
-      "BEGIN:VEVENT",
+      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Sandal//Events//EN", "BEGIN:VEVENT",
       `UID:${event.id}@sandal`,
       `DTSTAMP:${icsDate(new Date())}T000000Z`,
-      `DTSTART;VALUE=DATE:${icsDate(start)}`,
-      `DTEND;VALUE=DATE:${icsDate(endDate)}`,
+      `DTSTART;VALUE=DATE:${icsDate(new Date(Date.UTC(start.getFullYear(), start.getMonth(), start.getDate())))}`,
+      `DTEND;VALUE=DATE:${icsDate(new Date(Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())))}`,
       `SUMMARY:${title}`,
       `LOCATION:${[venue, cityName].filter(Boolean).join(", ")}`,
-      `DESCRIPTION:${(description || "").replace(/\n/g, " ")}`,
-      "END:VEVENT",
-      "END:VCALENDAR",
+      `DESCRIPTION:${description.replace(/\n/g, " ")}`,
+      "END:VEVENT", "END:VCALENDAR",
     ].join("\r\n");
     const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
     const a = document.createElement("a");
@@ -143,21 +154,45 @@ const EventDetail = () => {
     toast(t("event.calendarSaved"));
   };
 
-  const facts = [
-    { icon: Calendar, label: t("event.date"), value: shortDateLabel },
-    { icon: Clock, label: t("event.time"), value: event.event_time || t("event.timeTBA") },
-    { icon: Wallet, label: t("event.admission"), value: priceLabel },
-  ];
+  const { first: standfirst, rest } = splitStandfirst(description);
+  const categoryText = eventCategoryText(event.category, t);
+  const eyebrow = [categoryText, cityName].filter(Boolean).join(" · ");
+
+  const facts: KeyFact[] = [{ icon: Wallet, label: priceLabel }];
+  if (event.capacity) facts.push({ icon: Users, label: ar ? `${fmtNumber(event.capacity, ar)} شخص` : `${event.capacity} people` });
+  if (categoryText) facts.push({ icon: Tag, label: categoryText });
 
   const details = [
-    { icon: Tag, label: t("event.category"), value: eventCategoryText(event.category, t) },
-    { icon: Timer, label: t("event.duration"), value: multiDay ? `${durationDays} ${t("event.days")}` : t("event.oneDay") },
-    ...(event.capacity ? [{ icon: Users, label: t("event.capacity"), value: `${event.capacity} ${t("event.people")}` }] : []),
-    { icon: Wallet, label: t("event.admission"), value: priceLabel },
-  ];
+    categoryText && [ar ? "الفئة" : "Category", categoryText],
+    [ar ? "المدة" : "Duration", multiDay ? (ar ? `${fmtNumber(durationDays, ar)} أيام` : `${durationDays} days`) : (ar ? "يوم واحد" : "One day")],
+    event.capacity && [ar ? "السعة" : "Capacity", ar ? `${fmtNumber(event.capacity, ar)} شخص` : `${event.capacity} people`],
+    [ar ? "الدخول" : "Admission", priceLabel],
+  ].filter(Boolean) as [string, string][];
+
+  const ticketsPath = `/event/${event.slug || event.id}/tickets`;
+  const primaryLabel = isFree ? (ar ? "احجز" : "Reserve") : (ar ? "احصل على التذاكر" : "Get tickets");
+  const officialSite = event.ticket_url ? (
+    <a href={event.ticket_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 min-h-[44px] text-sm font-semibold text-primary-dark underline">
+      {ar ? "الموقع الرسمي" : "Official site"} <ExternalLink className="w-3.5 h-3.5" />
+    </a>
+  ) : null;
+
+  const pill = "inline-flex items-center gap-1.5 h-10 px-4 rounded-full border border-border bg-background text-sm font-semibold text-foreground";
+  const quickActions = (
+    <div className="flex flex-wrap gap-2">
+      <button type="button" onClick={addToCalendar} className={pill}><CalendarPlus className="w-4 h-4 text-primary-dark" /> {ar ? "أضف للتقويم" : "Add to calendar"}</button>
+      <a href={mapsHref} target="_blank" rel="noopener noreferrer" className={pill}><Navigation className="w-4 h-4 text-primary-dark" /> {ar ? "الاتجاهات" : "Directions"}</a>
+      <ShareButton title={title} className={pill} iconClassName="w-4 h-4 text-primary-dark" />
+    </div>
+  );
+
+  const orgName = organizer ? (ar ? organizer.name_ar || organizer.name_en : organizer.name_en) : null;
+  const orgBio = organizer ? (ar ? organizer.bio_ar || organizer.bio_en : organizer.bio_en || organizer.bio_ar) : null;
+  const orgCity = organizer ? (ar ? organizer.city_ar || organizer.city_en : organizer.city_en) : null;
+  const messageOrganizer = organizerId ? () => navigate(`/inbox?personId=${organizerId}&kind=provider`) : undefined;
 
   return (
-    <div className="min-h-screen bg-surface pb-40">
+    <div className="min-h-screen bg-background pb-[150px] lg:pb-16">
       <SEO
         title={title}
         description={(description || `${title} — ${venue || cityName || ""}`).slice(0, 155)}
@@ -166,231 +201,175 @@ const EventDetail = () => {
         type="article"
       />
 
-      <header className="flex items-center gap-2 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
-        <button onClick={() => navigate(-1)} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
-          <ArrowLeft className="w-5 h-5 text-foreground" />
-        </button>
-        <h1 className="flex-1 text-lg font-bold text-foreground line-clamp-1">{title}</h1>
-        <WishlistButton itemType="event" itemId={event?.id} className="tap-target rounded-full hover:bg-secondary" />
-        <button onClick={share} className="tap-target rounded-full hover:bg-secondary" aria-label={t("event.share")}>
-          <Share2 className="w-5 h-5 text-foreground" />
-        </button>
-      </header>
-
-      {/* Hero */}
-      <div className="relative h-56 mx-4 mt-2 rounded-xl overflow-hidden">
-        {event.image ? (
-          <SmartImage src={event.image} alt={title} loading="eager" />
-        ) : (
-          <div className="w-full h-full bg-secondary flex items-center justify-center">
-            <Calendar className="w-12 h-12 text-muted-foreground" />
+      <ListingHero
+        images={event.image ? [event.image] : []}
+        title={title}
+        eyebrow={eyebrow}
+        ar={ar}
+        onBack={() => navigate(-1)}
+        wishlistType="event"
+        wishlistId={event.id}
+        placeholder={
+          <div className="w-full h-full bg-gradient-to-br from-primary/40 via-secondary to-accent/40 flex items-center justify-center">
+            <Calendar className="w-14 h-14 text-primary-dark/60" aria-hidden />
           </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
-        <div className="absolute top-3 start-3 flex flex-wrap gap-2">
-          <span className="bg-primary/90 text-primary-foreground text-[11px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
-            <Tag className="w-3 h-3" /> {eventCategoryText(event.category, t)}
-          </span>
-          <span
-            className={`text-[11px] font-medium px-2.5 py-1 rounded-full ${
-              past ? "bg-muted text-muted-foreground" : "bg-success text-success-foreground"
-            }`}
-          >
-            {past ? t("events.past") : t("events.upcoming")}
-          </span>
-        </div>
-        <div className="absolute bottom-3 start-4 end-4">
-          <span className="inline-flex items-center gap-1 bg-background/90 backdrop-blur-sm text-foreground text-[11px] font-semibold px-2.5 py-1 rounded-full mb-2">
-            <Timer className="w-3 h-3" /> {countdown}
-          </span>
-          <h2 className="text-xl font-bold text-primary-foreground drop-shadow">{title}</h2>
-          {(venue || cityName) && (
-            <p className="flex items-center gap-1 text-xs text-primary-foreground/90 mt-0.5">
-              <MapPin className="w-3 h-3 shrink-0" /> {[venue, cityName].filter(Boolean).join(" · ")}
-            </p>
-          )}
-        </div>
-      </div>
+        }
+      />
 
-      {/* Quick facts */}
-      <div className="grid grid-cols-3 gap-2 px-4 mt-4">
-        {facts.map((f) => (
-          <div key={f.label} className="bg-card rounded-xl shadow-card p-3 text-center">
-            <f.icon className="w-4 h-4 text-primary mx-auto mb-1" />
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{f.label}</p>
-            <p className="text-xs font-semibold text-foreground line-clamp-2">{f.value}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Quick actions */}
-      <div className="grid grid-cols-3 gap-2 px-4 mt-3">
-        <button
-          onClick={addToCalendar}
-          className="bg-card rounded-xl shadow-card p-3 flex flex-col items-center gap-1 active:scale-[0.97] transition-transform"
-        >
-          <CalendarPlus className="w-4 h-4 text-primary" />
-          <span className="text-[11px] font-medium text-foreground">{t("event.addToCalendar")}</span>
-        </button>
-        <a
-          href={mapsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-card rounded-xl shadow-card p-3 flex flex-col items-center gap-1 active:scale-[0.97] transition-transform"
-        >
-          <Navigation className="w-4 h-4 text-primary" />
-          <span className="text-[11px] font-medium text-foreground">{t("event.directions")}</span>
-        </a>
-        <button
-          onClick={share}
-          className="bg-card rounded-xl shadow-card p-3 flex flex-col items-center gap-1 active:scale-[0.97] transition-transform"
-        >
-          <Share2 className="w-4 h-4 text-primary" />
-          <span className="text-[11px] font-medium text-foreground">{t("event.share")}</span>
-        </button>
-      </div>
-
-      <div className="px-4 py-5 space-y-4">
-        {/* When */}
-        <div className="bg-card rounded-xl shadow-card p-4">
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t("event.when")}</h3>
-          <p className="flex items-center gap-2 text-sm text-foreground">
-            <Calendar className="w-4 h-4 text-primary shrink-0" /> {dateLabel}
-          </p>
-          <p className="flex items-center gap-2 text-sm text-foreground mt-1.5">
-            <Clock className="w-4 h-4 text-primary shrink-0" /> {event.event_time || t("event.timeTBA")}
-          </p>
-          <button
-            onClick={addToCalendar}
-            className="mt-3 w-full border border-primary/30 text-primary rounded-xl py-2 text-xs font-semibold flex items-center justify-center gap-2"
-          >
-            <CalendarPlus className="w-4 h-4" /> {t("event.addToCalendar")}
-          </button>
-        </div>
-
-        {/* Where */}
-        {(venue || cityName || regionName) && (
-          <div className="bg-card rounded-xl shadow-card p-4">
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t("event.where")}</h3>
-            {venue && (
-              <p className="flex items-center gap-2 text-sm text-foreground mb-2">
-                <MapPin className="w-4 h-4 text-primary shrink-0" /> {venue}
-              </p>
-            )}
-            <div className="flex flex-wrap gap-2">
-              {cityName && (
-                <button
-                  onClick={() => navigate(`/city/${event.city_id}`)}
-                  className="text-xs font-medium text-primary bg-primary/10 px-2.5 py-1 rounded-full"
-                >
-                  {cityName}
-                </button>
-              )}
-              {regionName && (
-                <button
-                  onClick={() => navigate(`/region/${event.region_id}`)}
-                  className="text-xs font-medium text-primary bg-primary/10 px-2.5 py-1 rounded-full"
-                >
-                  {regionName}
-                </button>
-              )}
+      <div className="max-w-[1040px] mx-auto px-4 lg:flex lg:gap-10 lg:justify-center">
+        <main className="max-w-[680px] w-full min-w-0">
+          {/* Poster date block */}
+          <div className="relative z-10 -mt-6 lg:mt-6 rounded-2xl border border-border bg-card shadow-card p-4 flex gap-4 items-center">
+            <div className="flex flex-col items-center justify-center text-center min-w-[76px] pe-4 border-e border-border">
+              <span className="text-[13px] font-semibold uppercase tracking-wide text-primary-dark">{monthShort}</span>
+              <span className="text-3xl font-bold leading-none text-foreground mt-0.5">{dayNum}</span>
+              <span className="text-[13px] text-muted-foreground mt-1">{weekday}</span>
             </div>
-            <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 w-full border border-primary/30 text-primary rounded-xl py-2 text-xs font-semibold flex items-center justify-center gap-2"
-            >
-              <Navigation className="w-4 h-4" /> {t("event.openMaps")}
-            </a>
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="flex items-center gap-1.5 text-[15px] text-foreground"><Clock className="w-4 h-4 text-primary-dark flex-shrink-0" /> {timeLabel}</p>
+              {whereLine && <p className="flex items-center gap-1.5 text-[15px] text-foreground"><MapPin className="w-4 h-4 text-primary-dark flex-shrink-0" /> <span className="truncate">{whereLine}</span></p>}
+              <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${past ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary-dark"}`}>
+                <Timer className="w-3.5 h-3.5" /> {countdown}
+              </span>
+            </div>
           </div>
-        )}
 
-        {/* About */}
-        {description && (
-          <div className="bg-card rounded-xl shadow-card p-4">
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{t("event.about")}</h3>
-            <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{description}</p>
-          </div>
-        )}
+          <div className="pt-4 pb-2 lg:hidden">{quickActions}</div>
+          <div className="mt-4 -mx-4"><KeyFacts facts={facts} /></div>
 
-        {/* Details */}
-        <div className="bg-card rounded-xl shadow-card p-4">
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">{t("event.details")}</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {details.map((d, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <d.icon className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+          {description && (
+            <>
+              {standfirst && (
+                <div className="pt-6 pb-2">
+                  <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{standfirst}</p>
+                </div>
+              )}
+              {rest ? (
+                <Section title={ar ? "عن الفعالية" : "About"} ar={ar}>
+                  <p className="whitespace-pre-line">{rest}</p>
+                  <MachineTranslatedNote meta={ev.translation_meta} field={ar ? "description_ar" : "description_en"} className="mt-2" />
+                </Section>
+              ) : (
+                <MachineTranslatedNote meta={ev.translation_meta} field={ar ? "description_ar" : "description_en"} className="pb-4" />
+              )}
+            </>
+          )}
+
+          {(venue || cityName || regionName) && (
+            <Section title={ar ? "المكان" : "Where"} ar={ar}>
+              {venue && <p className="flex items-center gap-2 font-semibold text-foreground"><MapPin className="w-4 h-4 text-primary-dark" /> {venue}</p>}
+              <div className="flex flex-wrap gap-2 mt-2">
+                {cityName && <Link to={`/city/${event.city_id}`} className="inline-flex items-center min-h-[36px] px-3 rounded-full bg-primary/10 text-sm font-medium text-primary-dark">{cityName}</Link>}
+                {regionName && <Link to={`/region/${event.region_id}`} className="inline-flex items-center min-h-[36px] px-3 rounded-full bg-primary/10 text-sm font-medium text-primary-dark">{regionName}</Link>}
+              </div>
+              {hasGeo && (() => {
+                const bbox = [lng! - 0.006, lat! - 0.004, lng! + 0.006, lat! + 0.004].join(",");
+                return (
+                  <div className="mt-3 rounded-xl overflow-hidden border border-border h-[200px] bg-muted">
+                    <iframe title={ar ? "خريطة المكان" : "Venue map"} src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`}
+                      loading="lazy" className="w-full h-full pointer-events-none border-0" tabIndex={-1} />
+                  </div>
+                );
+              })()}
+            </Section>
+          )}
+
+          <Section title={ar ? "التفاصيل" : "Details"} ar={ar}>
+            <dl className="divide-y divide-border">
+              {details.map(([k, v]) => (
+                <div key={k} className="py-3 first:pt-0">
+                  <dt className="text-[13px] font-semibold uppercase tracking-wide text-muted-foreground">{k}</dt>
+                  <dd className="mt-1">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </Section>
+
+          {organizer && (
+            <Section title={ar ? "المنظِّم" : "Organiser"} ar={ar}>
+              <div className="flex items-center gap-4">
+                {organizer.avatar ? (
+                  <img src={organizer.avatar} alt={orgName || ""} className="w-16 h-16 rounded-full object-cover flex-shrink-0" />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-semibold flex-shrink-0">{(orgName || "·").slice(0, 1)}</div>
+                )}
                 <div className="min-w-0">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{d.label}</p>
-                  <p className="text-xs font-semibold text-foreground">{d.value}</p>
+                  <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} text-foreground`}>{orgName}</p>
+                  {orgCity && <p className="text-[13px] text-muted-foreground">{orgCity}</p>}
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
+              {orgBio && <p className="mt-3 line-clamp-4 whitespace-pre-line">{orgBio}</p>}
+              <div className="flex gap-2 mt-4">
+                <button type="button" onClick={() => navigate(`/provider/${organizer.slug || organizer.id}`)} className="flex-1 h-11 rounded-xl border border-border text-sm font-semibold text-foreground">
+                  {ar ? "عرض الملف" : "View profile"}
+                </button>
+                <button type="button" onClick={messageOrganizer} className="flex-1 h-11 rounded-xl border border-primary text-primary-dark text-sm font-semibold inline-flex items-center justify-center gap-1.5">
+                  <MessageCircle className="w-4 h-4" /> {ar ? "راسل المنظِّم" : "Message organiser"}
+                </button>
+              </div>
+            </Section>
+          )}
 
-      </div>
+          {nearby.length > 0 && (
+            <Section title={cityName ? (ar ? `فعاليات أخرى في ${cityName}` : `More events in ${cityName}`) : (ar ? "فعاليات قريبة" : "More events nearby")} ar={ar}>
+              <div className="flex gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0 pb-1 snap-x">
+                {nearby.map((n) => {
+                  const nTitle = ar ? n.title_ar || n.title_en : n.title_en;
+                  const nDate = localDate(n.start_date).toLocaleDateString(loc, { day: "numeric", month: "short" });
+                  return (
+                    <button key={n.id} type="button" onClick={() => navigate(`/event/${n.slug || n.id}`)} className="flex-shrink-0 w-[220px] snap-start text-start">
+                      <div className="aspect-[3/2] rounded-xl overflow-hidden bg-muted flex items-center justify-center">
+                        {n.image ? <img src={n.image} alt="" loading="lazy" className="w-full h-full object-cover" /> : <Calendar className="w-8 h-8 text-muted-foreground" />}
+                      </div>
+                      <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} !text-base mt-2 line-clamp-2 text-foreground`}>{nTitle}</p>
+                      <p className="text-[13px] text-muted-foreground">{[nDate, isPastEvent(n) ? (ar ? "انتهت" : "Ended") : null].filter(Boolean).join(" · ")}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </Section>
+          )}
 
-      {/* Organizer */}
-      <ProviderBioCard
-        providerId={(event as any).organizer_id || undefined}
-        roleLabel={{ en: "Organizer", ar: "المنظم" }}
-      />
-      {(event as any).organizer_id && (
-        <div className="mx-4 mt-3 flex">
-          <MessageOwnerButton
-            ownerId={(event as any).organizer_id}
-            kind="auto"
-            label={lang === "ar" ? "مراسلة المنظم" : "Message organizer"}
-          />
-        </div>
-      )}
+          <ReadBeforeYouGo cityId={event.city_id} regionId={event.region_id} ar={ar} />
+        </main>
 
-      {/* Nearby events */}
-      {nearby.length > 0 && (
-        <div className="mt-6">
-          <SectionHeader titleKey="event.moreInCity" onSeeAll={() => navigate("/calendar")}>
-            <div className="grid grid-cols-3 gap-3 px-4">
-              {nearby.map((e) => (
-                <EventCard key={e.id} event={e} onClick={() => navigate(`/event/${e.slug || e.id}`)} />
-              ))}
+        <aside className="hidden lg:block w-[320px] flex-shrink-0 pt-6">
+          <div className="sticky top-6 rounded-2xl border border-border bg-card shadow-card p-5 space-y-3">
+            <div>
+              <p className="text-2xl font-bold text-foreground">{priceLabel}</p>
+              <p className="text-[13px] text-muted-foreground">{countdown}</p>
             </div>
-          </SectionHeader>
-        </div>
-      )}
-
-      {/* Sticky CTA */}
-      <div className="fixed bottom-[68px] inset-x-0 z-30 bg-background/95 backdrop-blur border-t border-border px-4 py-3 flex items-center gap-3">
-        <div className="min-w-0">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{t("event.admission")}</p>
-          <p className="text-lg font-bold text-primary-dark leading-tight">{priceLabel}</p>
-        </div>
-        {!past ? (
-          <div className="flex-1 flex items-center gap-2">
-            <button
-              onClick={() => navigate(`/event/${event.slug || event.id}/tickets`)}
-              className="flex-1 bg-primary text-primary-foreground rounded-xl py-3 font-bold text-sm flex items-center justify-center gap-2"
-            >
-              <Ticket className="w-4 h-4" /> {event.is_free ? t("event.reserve") : t("event.tickets")}
-            </button>
-            {event.ticket_url && (
-              <a
-                href={event.ticket_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-3 rounded-xl border border-border text-[11px] font-semibold text-muted-foreground"
-              >
-                {t("event.externalTickets")}
-              </a>
+            {past ? (
+              <>
+                <p className="text-[15px] text-foreground">{ar ? "انتهت هذه الفعالية" : "This event has ended"}</p>
+                <button type="button" onClick={() => navigate("/calendar")} className="w-full h-12 rounded-xl border border-primary text-primary-dark font-bold">{ar ? "الفعاليات القادمة" : "See upcoming events"}</button>
+              </>
+            ) : (
+              <button type="button" onClick={() => navigate(ticketsPath)} className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-bold">{primaryLabel}</button>
             )}
+            {officialSite}
+            <div className="pt-2 border-t border-border">{quickActions}</div>
           </div>
-        ) : (
-          <p className="flex-1 text-[11px] text-muted-foreground text-center leading-snug">
-            {t("event.ended")}
-          </p>
-        )}
+        </aside>
       </div>
+
+      {past ? (
+        <ActionBar
+          price={ar ? "انتهت هذه الفعالية" : "This event has ended"}
+          buttonLabel={ar ? "الفعاليات القادمة" : "See upcoming events"}
+          onPrimary={() => navigate("/calendar")}
+          ar={ar}
+        />
+      ) : (
+        <ActionBar
+          price={priceLabel}
+          note={countdown}
+          buttonLabel={primaryLabel}
+          onPrimary={() => navigate(ticketsPath)}
+          extra={officialSite}
+          ar={ar}
+        />
+      )}
     </div>
   );
 };
