@@ -94,7 +94,7 @@ const CauseSupportDonate = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-28">
+    <div className="min-h-screen bg-background pb-28">
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
         {step !== "success" && (
           <button onClick={handleBack} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">

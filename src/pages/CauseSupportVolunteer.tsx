@@ -187,7 +187,7 @@ const CauseSupportVolunteer = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-28">
+    <div className="min-h-screen bg-background pb-28">
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
         {step !== "success" && (
           <button onClick={handleBack} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
@@ -296,7 +296,7 @@ const CauseSupportVolunteer = () => {
                     errors.fullName ? "border-destructive" : "border-border focus:border-primary"
                   }`}
                 />
-                {errors.fullName && <p className="text-[10px] text-destructive mt-1">{errors.fullName}</p>}
+                {errors.fullName && <p className="text-[13px] text-destructive mt-1">{errors.fullName}</p>}
               </div>
 
               {/* Email */}
@@ -314,7 +314,7 @@ const CauseSupportVolunteer = () => {
                     errors.email ? "border-destructive" : "border-border focus:border-primary"
                   }`}
                 />
-                {errors.email && <p className="text-[10px] text-destructive mt-1">{errors.email}</p>}
+                {errors.email && <p className="text-[13px] text-destructive mt-1">{errors.email}</p>}
               </div>
 
               {/* Phone */}
@@ -332,7 +332,7 @@ const CauseSupportVolunteer = () => {
                     errors.phone ? "border-destructive" : "border-border focus:border-primary"
                   }`}
                 />
-                {errors.phone && <p className="text-[10px] text-destructive mt-1">{errors.phone}</p>}
+                {errors.phone && <p className="text-[13px] text-destructive mt-1">{errors.phone}</p>}
               </div>
 
               {/* Preferred Start Date */}
@@ -348,7 +348,7 @@ const CauseSupportVolunteer = () => {
                     errors.startDate ? "border-destructive" : "border-border focus:border-primary"
                   }`}
                 />
-                {errors.startDate && <p className="text-[10px] text-destructive mt-1">{errors.startDate}</p>}
+                {errors.startDate && <p className="text-[13px] text-destructive mt-1">{errors.startDate}</p>}
               </div>
 
               {/* Skills */}
@@ -393,7 +393,7 @@ const CauseSupportVolunteer = () => {
                   }`}
                 />
                 <div className="flex justify-between">
-                  {errors.motivation && <p className="text-[10px] text-destructive mt-1">{errors.motivation}</p>}
+                  {errors.motivation && <p className="text-[13px] text-destructive mt-1">{errors.motivation}</p>}
                   <p className="text-[10px] text-muted-foreground mt-1 ms-auto">{motivation.length}/500</p>
                 </div>
               </div>

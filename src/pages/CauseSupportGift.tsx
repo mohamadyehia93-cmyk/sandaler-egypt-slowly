@@ -176,7 +176,7 @@ const CauseSupportGift = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface pb-28">
+    <div className="min-h-screen bg-background pb-28">
       <header className="flex items-center gap-3 px-4 py-3 bg-background sticky top-0 z-40 border-b border-border">
         {step !== "success" && (
           <button onClick={handleBack} aria-label={lang === "ar" ? "رجوع" : "Back"} className="tap-target rounded-full hover:bg-secondary">
@@ -382,7 +382,7 @@ const CauseSupportGift = () => {
                   );
                 })}
               </div>
-              {errors.categories && <p className="text-[10px] text-destructive mt-1">{errors.categories}</p>}
+              {errors.categories && <p className="text-[13px] text-destructive mt-1">{errors.categories}</p>}
             </div>
 
             {/* Description */}
@@ -397,7 +397,7 @@ const CauseSupportGift = () => {
                 }`}
               />
               <div className="flex justify-between">
-                {errors.itemDescription && <p className="text-[10px] text-destructive mt-1">{errors.itemDescription}</p>}
+                {errors.itemDescription && <p className="text-[13px] text-destructive mt-1">{errors.itemDescription}</p>}
                 <p className="text-[10px] text-muted-foreground mt-1 ms-auto">{itemDescription.length}/500</p>
               </div>
             </div>
@@ -420,7 +420,7 @@ const CauseSupportGift = () => {
                   >{c.emoji} {c.label[lang]}</button>
                 ))}
               </div>
-              {errors.itemCondition && <p className="text-[10px] text-destructive mt-1">{errors.itemCondition}</p>}
+              {errors.itemCondition && <p className="text-[13px] text-destructive mt-1">{errors.itemCondition}</p>}
             </div>
 
             {/* Delivery Method */}
@@ -456,7 +456,7 @@ const CauseSupportGift = () => {
                   );
                 })}
               </div>
-              {errors.deliveryMethod && <p className="text-[10px] text-destructive mt-1">{errors.deliveryMethod}</p>}
+              {errors.deliveryMethod && <p className="text-[13px] text-destructive mt-1">{errors.deliveryMethod}</p>}
             </div>
 
             <div className="h-px bg-border my-5" />
@@ -471,7 +471,7 @@ const CauseSupportGift = () => {
                   placeholder={lang === "ar" ? "أدخل اسمك" : "Enter your name"}
                   className={`w-full p-3 rounded-xl border-2 bg-card text-sm text-foreground outline-none placeholder:text-muted-foreground transition-colors ${errors.fullName ? "border-destructive" : "border-border focus:border-primary"}`}
                 />
-                {errors.fullName && <p className="text-[10px] text-destructive mt-1">{errors.fullName}</p>}
+                {errors.fullName && <p className="text-[13px] text-destructive mt-1">{errors.fullName}</p>}
               </div>
 
               <div>
@@ -480,7 +480,7 @@ const CauseSupportGift = () => {
                   placeholder="+20 1xx xxx xxxx"
                   className={`w-full p-3 rounded-xl border-2 bg-card text-sm text-foreground outline-none placeholder:text-muted-foreground transition-colors ${errors.phone ? "border-destructive" : "border-border focus:border-primary"}`}
                 />
-                {errors.phone && <p className="text-[10px] text-destructive mt-1">{errors.phone}</p>}
+                {errors.phone && <p className="text-[13px] text-destructive mt-1">{errors.phone}</p>}
               </div>
 
               <div>
@@ -493,7 +493,7 @@ const CauseSupportGift = () => {
                   placeholder={lang === "ar" ? "المنطقة، الشارع، المبنى..." : "Area, street, building..."}
                   className={`w-full p-3 rounded-xl border-2 bg-card text-sm text-foreground outline-none placeholder:text-muted-foreground resize-none transition-colors ${errors.address ? "border-destructive" : "border-border focus:border-primary"}`}
                 />
-                {errors.address && <p className="text-[10px] text-destructive mt-1">{errors.address}</p>}
+                {errors.address && <p className="text-[13px] text-destructive mt-1">{errors.address}</p>}
               </div>
 
               <div>
@@ -505,7 +505,7 @@ const CauseSupportGift = () => {
                 <input type="date" value={preferredDate} onChange={(e) => setPreferredDate(e.target.value)}
                   className={`w-full p-3 rounded-xl border-2 bg-card text-sm text-foreground outline-none transition-colors ${errors.preferredDate ? "border-destructive" : "border-border focus:border-primary"}`}
                 />
-                {errors.preferredDate && <p className="text-[10px] text-destructive mt-1">{errors.preferredDate}</p>}
+                {errors.preferredDate && <p className="text-[13px] text-destructive mt-1">{errors.preferredDate}</p>}
               </div>
 
               <div>
