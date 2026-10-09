@@ -1,7 +1,7 @@
 import { isGuideEntry } from "@/lib/guideEntry";
 import WishlistButton from "@/components/WishlistButton";
 import { useState, useRef, useMemo, useEffect } from "react";
-import { MessageCircle, Bus, Train, Plus, Minus, Clock, Users, Languages, Tag, MapPin } from "lucide-react";
+import { BookOpen, MessageCircle, Bus, Train, Plus, Minus, Clock, Users, Languages, Tag, MapPin } from "lucide-react";
 import ListingHero from "@/components/listing/ListingHero";
 import KeyFacts, { type KeyFact } from "@/components/listing/KeyFacts";
 import Section from "@/components/listing/Section";
@@ -550,7 +550,7 @@ const ExperienceDetail = () => {
           <div className="sticky top-6 rounded-2xl border border-border bg-card p-5">
             <p className="text-[15px] text-foreground">{ar ? "تعرف مضيفًا محليًا هنا؟" : "Know a local host here?"}</p>
             <button type="button" onClick={tellUs} className="mt-3 w-full h-11 rounded-xl border border-border text-sm font-semibold">{ar ? "أخبرنا" : "Tell us"}</button>
-            <WishlistButton itemType="experience" itemId={exp.id} variant="heart" withLabel className="mt-2 w-full h-11 rounded-xl border border-border text-sm font-semibold inline-flex items-center justify-center gap-1.5" />
+            <WishlistButton itemType="experience" itemId={exp.id} variant="heart" className="mt-2 tap-target rounded-full border border-border" />
           </div>
         </aside>
         ) : (
