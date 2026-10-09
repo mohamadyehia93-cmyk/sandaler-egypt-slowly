@@ -419,7 +419,7 @@ const ExperienceDetail = () => {
 
           {/* f) Where we'll meet */}
           {(exp.meeting_point_name || (exp.meeting_point_lat != null && exp.meeting_point_lng != null)) && (
-            <Section title={ar ? "أين سنلتقي" : "Where we’ll meet"} ar={ar}>
+            <Section title={isGuide ? (ar ? "الموقع" : "Where it is") : (ar ? "أين سنلتقي" : "Where we’ll meet")} ar={ar}>
               {exp.meeting_point_lat != null && exp.meeting_point_lng != null ? (() => {
                 const lat = Number(exp.meeting_point_lat), lng = Number(exp.meeting_point_lng);
                 const bbox = [lng - 0.006, lat - 0.004, lng + 0.006, lat + 0.004].join(",");
