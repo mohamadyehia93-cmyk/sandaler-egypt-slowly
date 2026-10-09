@@ -222,7 +222,7 @@ export default function RegionPage() {
                             {lang === "ar" ? (exp.title_ar || exp.title_en) : exp.title_en}
                           </h3>
                           <p className="text-[11px] text-primary font-semibold">
-                            {exp.price === 0 ? t("region.free") : `${exp.price} ${t("common.egp")}`}
+                            {!exp.provider_id ? (lang === "ar" ? "دليل" : "Guide") : exp.price === 0 ? t("region.free") : `${exp.price} ${t("common.egp")}`}
                           </p>
                         </div>
                       </Card>
@@ -282,7 +282,7 @@ export default function RegionPage() {
                           {lang === "ar" ? (exp.title_ar || exp.title_en) : exp.title_en}
                         </h3>
                         <p className="text-xs text-primary font-semibold">
-                          {exp.price === 0 ? t("region.free") : `${exp.price} ${t("common.egp")}`}
+                          {!exp.provider_id ? (lang === "ar" ? "دليل" : "Guide") : exp.price === 0 ? t("region.free") : `${exp.price} ${t("common.egp")}`}
                         </p>
                       </div>
                     </Card>

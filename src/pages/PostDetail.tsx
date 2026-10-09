@@ -184,7 +184,7 @@ const PostDetail = () => {
     ? [
         ...dbExperiences.filter((e) => e.city_id === post.cityId).map((e) => ({
           key: `x-${e.id}`, type: "experience" as const, title: pick(e.title_en, e.title_ar), image: e.image,
-          href: `/experience/${e.slug || e.id}`, price: e.price, note: undefined as string | undefined,
+          href: `/experience/${e.slug || e.id}`, price: e.price, guide: !e.provider_id, note: undefined as string | undefined,
           wishlist: { itemType: "experience" as const, itemId: e.id },
         })),
         ...dbAudioTours.filter((a) => a.city_id === post.cityId).map((a) => ({

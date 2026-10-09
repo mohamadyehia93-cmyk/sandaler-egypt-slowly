@@ -129,7 +129,7 @@ const CityDetail = () => {
 
   const [lead, ...more] = posts;
   const thingsToDo = [
-    ...experiences.map((e) => ({ k: `e${e.id}`, path: `/experience/${e.slug || e.id}`, image: e.image, title: title(e), meta: [formatDuration(e.duration_minutes, ar), money(e.price)].filter(Boolean).join(" · ") })),
+    ...experiences.map((e) => ({ k: `e${e.id}`, path: `/experience/${e.slug || e.id}`, image: e.image, title: title(e), meta: e.provider_id ? [formatDuration(e.duration_minutes, ar), money(e.price)].filter(Boolean).join(" · ") : (ar ? "دليل" : "Guide") })),
     ...trips.map((t) => ({ k: `t${t.id}`, path: `/trip/${t.slug || t.id}`, image: t.image, title: title(t), meta: [t.date || null, money(t.price)].filter(Boolean).join(" · ") })),
   ];
 

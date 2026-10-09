@@ -325,7 +325,7 @@ const PersonDetail = () => {
                     {lang === "ar" ? (e.title_ar || e.title_en) : e.title_en}
                   </h4>
                   <span className="text-xs font-bold text-primary mt-1">
-                    {e.price === 0 ? (lang === "ar" ? "مجاني" : "Free") : `${e.price} ${lang === "ar" ? "ج.م" : "EGP"}`}
+                    {!e.provider_id ? (lang === "ar" ? "دليل" : "Guide") : e.price === 0 ? (lang === "ar" ? "مجاني" : "Free") : `${e.price} ${lang === "ar" ? "ج.م" : "EGP"}`}
                   </span>
                 </div>
               </div>

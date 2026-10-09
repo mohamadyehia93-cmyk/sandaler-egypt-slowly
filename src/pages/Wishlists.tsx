@@ -32,7 +32,7 @@ type TypeConfig = {
 /** One entry per wishlists.item_type value. */
 const TYPE_CONFIG: Record<WishlistItemType, TypeConfig> = {
   experience: {
-    table: "experiences", columns: "id, slug, image, title_en, title_ar, city_id, price",
+    table: "experiences", columns: "id, slug, image, title_en, title_ar, city_id, price, provider_id",
     icon: Compass, label: { en: "Experiences", ar: "التجارب" }, route: "/experience",
     titleEn: "title_en", titleAr: "title_ar",
   },
@@ -144,7 +144,9 @@ const Wishlists = () => {
                 "";
               const price = row.price ?? row.price_per_night;
               const subtitle =
-                typeof price === "number" && price > 0
+                cfg.table === "experiences" && !row.provider_id
+                  ? (isAr ? "دليل" : "Guide")
+                  : typeof price === "number" && price > 0
                   ? isAr
                     ? `${price} ج.م`
                     : `EGP ${price}`

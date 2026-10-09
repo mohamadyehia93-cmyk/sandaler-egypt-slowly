@@ -56,6 +56,7 @@ const ExperienceCards = () => {
               image={e.image}
               href={`/experience/${e.slug || e.id}`}
               price={e.price}
+              guide={!e.provider_id}
               wishlist={{ itemType: "experience", itemId: e.id }}
             />
           ))}

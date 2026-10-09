@@ -534,7 +534,7 @@ const ExperienceDetail = () => {
                       </div>
                       <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} !text-base mt-2 line-clamp-2 text-foreground`}>{rTitle}</p>
                       <p className="text-[13px] text-muted-foreground">
-                        {[formatDuration(r.duration_minutes, ar), `${fmtNumber(r.price, ar)} ${egp}`].filter(Boolean).join(" · ")}
+                        {r.provider_id ? [formatDuration(r.duration_minutes, ar), `${fmtNumber(r.price, ar)} ${egp}`].filter(Boolean).join(" · ") : (ar ? "دليل" : "Guide")}
                       </p>
                     </button>
                   );
