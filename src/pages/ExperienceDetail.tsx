@@ -1,4 +1,3 @@
-import OsmCredit from "@/components/listing/OsmCredit";
 import { useState, useRef, useMemo, useEffect } from "react";
 import { MessageCircle, Bus, Train, Plus, Minus, Clock, Users, Languages, Tag, MapPin } from "lucide-react";
 import ListingHero from "@/components/listing/ListingHero";
@@ -418,7 +417,6 @@ const ExperienceDetail = () => {
                         className="w-full h-full pointer-events-none border-0"
                         tabIndex={-1}
                       />
-<OsmCredit />
                     </div>
                     {exp.meeting_point_name && <p className="mt-2 font-semibold text-foreground">{exp.meeting_point_name}</p>}
                     <a href={mapsUrl(lat, lng)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 min-h-[44px] text-sm font-semibold text-primary-dark underline">

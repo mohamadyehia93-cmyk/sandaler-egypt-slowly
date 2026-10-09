@@ -1,4 +1,3 @@
-import OsmCredit from "@/components/listing/OsmCredit";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Calendar, CalendarPlus, Clock, MapPin, Navigation, Timer, Wallet, MessageCircle, ExternalLink } from "lucide-react";
@@ -245,7 +244,6 @@ const EventDetail = () => {
                   <div className="mt-3 relative rounded-xl overflow-hidden border border-border h-[200px] bg-muted">
                     <iframe title={ar ? "خريطة المكان" : "Venue map"} src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`}
                       loading="lazy" className="w-full h-full pointer-events-none border-0" tabIndex={-1} />
-<OsmCredit />
                   </div>
                 );
               })()}
