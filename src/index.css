@@ -229,3 +229,5 @@ html, body {
 .leaflet-container .leaflet-popup-content { direction: inherit; }
 [dir="rtl"] .leaflet-container .leaflet-popup-content { direction: rtl; text-align: right; }
 .leaflet-control-attribution { font-size: 10px; max-width: 100%; white-space: normal; }
+.city-cluster { background: transparent; }
+.city-cluster-bubble { width: 36px; height: 36px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); font-weight: 700; font-size: 13px; border: 3px solid hsl(var(--background)); box-shadow: 0 2px 6px hsl(var(--foreground) / 0.3); }
