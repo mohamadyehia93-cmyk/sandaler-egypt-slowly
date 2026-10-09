@@ -14,6 +14,8 @@ import NotFoundView from "@/components/NotFound";
 import { useAuth } from "@/hooks/useAuth";
 import { useBooking } from "@/hooks/useBooking";
 import { supabase } from "@/integrations/supabase/client";
+import { isGuideEntry } from "@/lib/guideEntry";
+import { toast } from "@/hooks/use-toast";
 
 
 type BookingType = "experience" | "trip" | "stay" | "transport" | "product";
@@ -44,6 +46,17 @@ const Booking = () => {
     queryFn: () => fetchByIdOrSlug(tableMap[type], id),
     enabled: !!id,
   });
+
+  // Sandal guide entries (no provider) can never be booked: send the visitor back.
+  const guideBlocked = type === "experience" && !!item && isGuideEntry(item as any);
+  useEffect(() => {
+    if (!guideBlocked) return;
+    toast({
+      title: lang === "ar" ? "هذا دليل وليس عرضًا للحجز" : "This is a guide, not a bookable offer",
+      description: lang === "ar" ? "لا يوجد مضيف محلي على صندل لهذا المكان بعد." : "There is no local host for this place on Sandal yet.",
+    });
+    navigate(`/experience/${(item as any).slug || (item as any).id}`, { replace: true });
+  }, [guideBlocked]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Real published slots for this experience — the Date field is driven by these,
   // never by a free-text picker that lets a request through with no usable date.
