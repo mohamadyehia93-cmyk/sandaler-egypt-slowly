@@ -34,7 +34,7 @@ export default function RegionPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("experiences")
-        .select("id, slug, title_en, title_ar, price, image, rating")
+        .select("id, slug, title_en, title_ar, price, image, rating, provider_id")
         .eq("region_id", slug!)
         .eq("status", "published")
         .limit(6);

@@ -105,7 +105,7 @@ const ExperienceDetail = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("experiences")
-        .select("id, slug, title_en, title_ar, price, rating, duration_minutes, theme, image, city_id")
+        .select("id, slug, title_en, title_ar, price, rating, duration_minutes, theme, image, city_id, provider_id")
         .eq("region_id", exp!.region_id)
         .eq("status", "published")
         .neq("id", expId!)

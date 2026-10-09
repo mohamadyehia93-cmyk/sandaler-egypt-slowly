@@ -228,7 +228,7 @@ const RegionDetail = () => {
         id: e.slug || e.id, slug: e.slug,
         title: { en: e.title_en, ar: e.title_ar || e.title_en },
         image: e.image, price: e.price ?? 0, rating: e.rating ?? 0,
-        cityId: e.city_id, regionId: e.region_id,
+        cityId: e.city_id, regionId: e.region_id, provider_id: e.provider_id,
       })),
     ])
   );
