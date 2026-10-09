@@ -2594,6 +2594,30 @@ export type Database = {
         }
         Relationships: []
       }
+      seed_cleanup_backup: {
+        Row: {
+          created_at: string | null
+          extra: Json | null
+          id: string | null
+          prev_status: string | null
+          tbl: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          extra?: Json | null
+          id?: string | null
+          prev_status?: string | null
+          tbl?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          extra?: Json | null
+          id?: string | null
+          prev_status?: string | null
+          tbl?: string | null
+        }
+        Relationships: []
+      }
       session_requests: {
         Row: {
           contact_email: string | null
