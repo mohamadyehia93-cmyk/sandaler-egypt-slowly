@@ -155,6 +155,18 @@ const ExperienceDetail = () => {
     enabled: !!exp?.region_id,
   });
 
+  // Photo credits — only real image_credits rows for this listing's own photos.
+  const photoUrls: string[] = exp ? (exp.images?.length ? exp.images : exp.image ? [exp.image] : []) : [];
+  const { data: photoCredits } = useQuery({
+    queryKey: ["image-credits", photoUrls],
+    enabled: photoUrls.length > 0,
+    queryFn: async () => {
+      const { data } = await supabase.from("image_credits").select("image_url, artist, license, source_url").in("image_url", photoUrls);
+      const seen = new Set<string>();
+      return (data ?? []).filter((c) => (c.artist || c.license) && !seen.has(`${c.artist}|${c.license}`) && seen.add(`${c.artist}|${c.license}`));
+    },
+  });
+
   // ── Derived values ──
   const e = exp as any;
   const pick = (k: string): string | null => (e ? (ar ? e[`${k}_ar`] || e[`${k}_en`] : e[`${k}_en`] || e[`${k}_ar`]) || null : null);
