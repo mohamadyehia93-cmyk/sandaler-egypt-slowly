@@ -140,7 +140,7 @@ const CityDetail = () => {
     ...experiences.map((e) => ({ id: e.slug || e.id, slug: e.slug, category: "experience" as const, title: T(e), ...coord(e, "meeting_point_lat", "meeting_point_lng") })),
     ...stays.map((a) => ({ id: a.slug || a.id, slug: a.slug, category: "accommodation" as const, title: T(a), ...coord(a, "latitude", "longitude") })),
     ...products.map((p) => ({ id: p.slug || p.id, slug: p.slug, category: "product" as const, title: T(p), ...coord(p, "latitude", "longitude") })),
-    ...tours.map((a) => ({ id: a.slug || a.id, slug: a.slug, category: "audio" as const, title: T(a), ...coord(a, "latitude", "longitude") })),
+    ...tours.map((a) => { const c = coord(a, "latitude", "longitude"); const st = Array.isArray(a.stops) ? a.stops.find((x: any) => Number.isFinite(Number(x?.lat)) && Number.isFinite(Number(x?.lng)) && x?.lat != null) : null; return { id: a.slug || a.id, slug: a.slug, category: "audio" as const, title: T(a), ...(c.lat == null && st ? { lat: Number(st.lat), lng: Number(st.lng) } : c) }; }),
     ...trips.map((t) => ({ id: t.slug || t.id, slug: t.slug, category: "trip" as const, title: T(t), ...coord(t, "latitude", "longitude") })),
     ...people.map((p) => ({ id: p.slug || p.id, slug: p.slug, category: "person" as const, title: { en: p.name_en, ar: p.name_ar || p.name_en }, ...coord(p, "latitude", "longitude") })),
     ...causes.map((c) => ({ id: c.slug || c.id, slug: c.slug, category: "cause" as const, title: T(c), ...coord(c, "latitude", "longitude") })),
