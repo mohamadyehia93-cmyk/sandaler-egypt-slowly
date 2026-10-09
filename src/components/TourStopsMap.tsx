@@ -1,5 +1,6 @@
-import { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from "react-leaflet";
+import { MapContainer, Marker, Polyline, Popup } from "react-leaflet";
+import { AppTileLayer, FitToPoints } from "@/lib/mapTiles";
+
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useI18n } from "@/lib/i18n";
@@ -55,17 +56,6 @@ type Props = {
 const isPlottable = (s: Stop | null | undefined): s is Stop =>
   !!s && Number.isFinite(Number(s.lat)) && Number.isFinite(Number(s.lng));
 
-const FitBounds = ({ stops, userLocation }: { stops: Stop[]; userLocation?: { lat: number; lng: number } | null }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (stops.length === 0) return;
-    const points: [number, number][] = stops.map((s) => [Number(s.lat), Number(s.lng)]);
-    if (userLocation) points.push([userLocation.lat, userLocation.lng]);
-    const bounds = L.latLngBounds(points);
-    map.fitBounds(bounds, { padding: [40, 40] });
-  }, [stops, userLocation, map]);
-  return null;
-};
 
 const TourStopsMap = ({ stops, userLocation, activeStopIndex }: Props) => {
   const { lang } = useI18n();
@@ -85,10 +75,9 @@ const TourStopsMap = ({ stops, userLocation, activeStopIndex }: Props) => {
           zoom={14}
           scrollWheelZoom={false}
           style={{ height: "100%", width: "100%" }}
-          attributionControl={false}
         >
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <FitBounds stops={plottable} userLocation={userLocation} />
+          <AppTileLayer />
+          <FitToPoints points={userLocation ? [...polyline, [userLocation.lat, userLocation.lng]] : polyline} />
           <Polyline
             positions={polyline}
             pathOptions={{ color: "hsl(174, 60%, 45%)", weight: 3, dashArray: "8, 8", opacity: 0.7 }}

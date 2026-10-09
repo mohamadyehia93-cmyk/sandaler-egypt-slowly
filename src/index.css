@@ -222,3 +222,10 @@ html, body {
 .listing-title.lang-ar { font-family: "Amiri", "Cairo", serif; font-weight: 700; line-height: 1.4; }
 .listing-h2 { font-family: "Source Serif 4", Georgia, serif; font-weight: 600; font-size: 1.25rem; line-height: 1.35; }
 .listing-h2.lang-ar { font-family: "Amiri", "Cairo", serif; font-weight: 700; font-size: 1.4rem; line-height: 1.5; }
+
+/* Shared map look: calm tiles only (markers untouched); controls never mirrored in RTL. */
+.leaflet-tile-pane { filter: saturate(0.6) brightness(1.03); }
+.leaflet-container { direction: ltr; }
+.leaflet-container .leaflet-popup-content { direction: inherit; }
+[dir="rtl"] .leaflet-container .leaflet-popup-content { direction: rtl; text-align: right; }
+.leaflet-control-attribution { font-size: 10px; max-width: 100%; white-space: normal; }

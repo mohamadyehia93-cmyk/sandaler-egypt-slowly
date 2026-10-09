@@ -64,7 +64,7 @@ export const useOfflineTour = (tourId: string | undefined) => {
         const cache = await caches.open(CACHE_NAME);
         const tiles = tilesAroundStops(stops);
         const tileUrls = tiles.map(
-          (t) => `https://a.tile.openstreetmap.org/${t}.png`,
+          (t) => `https://tile.openstreetmap.org/${t}.png`,
         );
         const total = tileUrls.length + 1; // +1 for audio
         let done = 0;
