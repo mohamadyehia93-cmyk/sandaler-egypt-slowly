@@ -184,7 +184,7 @@ const PostDetail = () => {
     ? [
         ...dbExperiences.filter((e) => e.city_id === post.cityId).map((e) => ({
           key: `x-${e.id}`, type: "experience" as const, title: pick(e.title_en, e.title_ar), image: e.image,
-          href: `/experience/${e.slug || e.id}`, price: e.price, note: undefined as string | undefined,
+          href: `/experience/${e.slug || e.id}`, price: e.price, guide: !e.provider_id, note: undefined as string | undefined,
           wishlist: { itemType: "experience" as const, itemId: e.id },
         })),
         ...dbAudioTours.filter((a) => a.city_id === post.cityId).map((a) => ({
@@ -424,7 +424,7 @@ const PostDetail = () => {
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             {goThere.map((g) => (
-              <ContentCard key={g.key} type={g.type} title={g.title} image={g.image} href={g.href} price={g.price} note={g.note} wishlist={g.wishlist} />
+              <ContentCard key={g.key} type={g.type} title={g.title} image={g.image} href={g.href} price={g.price} guide={(g as any).guide} note={g.note} wishlist={g.wishlist} />
             ))}
           </div>
         </section>

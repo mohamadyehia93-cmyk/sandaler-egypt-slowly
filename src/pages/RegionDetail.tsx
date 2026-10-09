@@ -228,7 +228,7 @@ const RegionDetail = () => {
         id: e.slug || e.id, slug: e.slug,
         title: { en: e.title_en, ar: e.title_ar || e.title_en },
         image: e.image, price: e.price ?? 0, rating: e.rating ?? 0,
-        cityId: e.city_id, regionId: e.region_id,
+        cityId: e.city_id, regionId: e.region_id, provider_id: e.provider_id,
       })),
     ])
   );
@@ -478,7 +478,7 @@ const RegionDetail = () => {
                     <h3 className="text-sm font-semibold text-foreground line-clamp-1 mb-1">{e.title[lang]}</h3>
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-bold text-primary-dark">
-                        {e.price === 0 ? t("common.free") : `${e.price} ${t("common.egp")}`}
+                        {!e.provider_id ? (lang === "ar" ? "دليل" : "Guide") : e.price === 0 ? t("common.free") : `${e.price} ${t("common.egp")}`}
                       </span>
                       <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
                         <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {e.rating}

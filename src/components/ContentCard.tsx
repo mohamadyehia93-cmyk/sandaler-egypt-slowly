@@ -27,6 +27,8 @@ export type ContentCardProps = {
   className?: string;
   /** Optional corner badge on the image (e.g. a mini poster date). */
   badge?: React.ReactNode;
+  /** Sandal guide entry: "Guide" instead of a price. */
+  guide?: boolean;
 };
 
 /**
@@ -46,6 +48,7 @@ const ContentCard = ({
   subtitle,
   className = "",
   badge,
+  guide = false,
 }: ContentCardProps) => {
   const navigate = useNavigate();
   const { lang } = useI18n();
@@ -71,7 +74,7 @@ const ContentCard = ({
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-primary/40 to-accent/40" />
         )}
-        {showPrice && <PriceBadge price={price} variant="overlay" className="absolute top-3 start-3" />}
+        {showPrice && <PriceBadge price={price} guide={guide} variant="overlay" className="absolute top-3 start-3" />}
         {wishlist && (
           <WishlistButton
             itemType={wishlist.itemType}

@@ -25,7 +25,7 @@ const Places = () => {
     const offers = new Map<string, number>();
     const articles = new Map<string, number>();
     const today = new Date().toISOString().slice(0, 10);
-    sources.forEach((rows) => (rows as any[] | undefined)?.forEach((r) => r.city_id && !(r.start_date && String(r.end_date || r.start_date).slice(0, 10) < today) && offers.set(r.city_id, (offers.get(r.city_id) ?? 0) + 1)));
+    sources.forEach((rows) => (rows as any[] | undefined)?.forEach((r) => r.city_id && !("provider_id" in r && "meeting_point_lat" in r && !r.provider_id) && !(r.start_date && String(r.end_date || r.start_date).slice(0, 10) < today) && offers.set(r.city_id, (offers.get(r.city_id) ?? 0) + 1)));
     (posts as any[] | undefined)?.forEach((r) => r.city_id && articles.set(r.city_id, (articles.get(r.city_id) ?? 0) + 1));
     return { offers, articles };
     // eslint-disable-next-line react-hooks/exhaustive-deps

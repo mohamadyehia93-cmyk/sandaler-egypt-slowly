@@ -1,5 +1,7 @@
+import { isGuideEntry } from "@/lib/guideEntry";
+import WishlistButton from "@/components/WishlistButton";
 import { useState, useRef, useMemo, useEffect } from "react";
-import { MessageCircle, Bus, Train, Plus, Minus, Clock, Users, Languages, Tag, MapPin } from "lucide-react";
+import { BookOpen, MessageCircle, Bus, Train, Plus, Minus, Clock, Users, Languages, Tag, MapPin } from "lucide-react";
 import ListingHero from "@/components/listing/ListingHero";
 import KeyFacts, { type KeyFact } from "@/components/listing/KeyFacts";
 import Section from "@/components/listing/Section";
@@ -103,7 +105,7 @@ const ExperienceDetail = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("experiences")
-        .select("id, slug, title_en, title_ar, price, rating, duration_minutes, theme, image, city_id")
+        .select("id, slug, title_en, title_ar, price, rating, duration_minutes, theme, image, city_id, provider_id")
         .eq("region_id", exp!.region_id)
         .eq("status", "published")
         .neq("id", expId!)
@@ -189,6 +191,7 @@ const ExperienceDetail = () => {
   const messageHost = () => navigate(`/inbox?personId=${providerId || exp?.provider_id || ""}&kind=provider`);
   const goBooking = (slotId?: string | null) =>
     navigate(`/booking?type=experience&id=${exp?.id || id}${slotId ? `&slot=${slotId}` : ""}&guests=${guests}`);
+  const tellUs = () => navigate("/about#contact");
   const requestToBook = () => {
     if (slots.length > 0 && !userPicked) {
       dateRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -213,6 +216,9 @@ const ExperienceDetail = () => {
   }
 
   if (!exp) return <NotFoundView context="experience" />;
+
+  // A row with no provider is a Sandal guide entry about a real place — never a bookable offer.
+  const isGuide = isGuideEntry(exp);
 
   const photos: string[] = exp.images?.length ? exp.images : exp.image ? [exp.image] : [];
   const remarks = pick("remarks");
@@ -293,6 +299,14 @@ const ExperienceDetail = () => {
 
       <div className="max-w-[1040px] mx-auto px-4 lg:flex lg:gap-10 lg:justify-center">
         <main className="max-w-[680px] w-full min-w-0">
+          {isGuide && (
+            <p className="pt-4">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-[13px] font-semibold text-foreground">
+                <BookOpen className="w-4 h-4 text-primary-dark" />
+                {ar ? "دليل صندل · لا يوجد مضيف محلي على صندل بعد" : "Sandal guide · No local host on Sandal yet"}
+              </span>
+            </p>
+          )}
           <MachineTranslatedNote meta={e.translation_meta} field={ar ? "title_ar" : "title_en"} className="pt-3" />
           {hasRating && (
             <p className="pt-3 text-sm text-foreground">
@@ -330,7 +344,7 @@ const ExperienceDetail = () => {
           )}
 
           {/* d) Your host */}
-          {(hostName || provider) && (
+          {!isGuide && (hostName || provider) && (
             <Section title={ar ? "مضيفك" : "Your host"} ar={ar}>
               <div className="flex items-center gap-4">
                 {provider?.avatar ? (
@@ -374,6 +388,7 @@ const ExperienceDetail = () => {
           )}
 
           {/* e) Choose a date */}
+          {!isGuide && (
           <Section ref={dateRef} id="choose-date" title={ar ? "اختر موعدًا" : "Choose a date"} ar={ar}>
             {slots.length > 0 ? (
               <>
@@ -400,10 +415,11 @@ const ExperienceDetail = () => {
               </>
             )}
           </Section>
+          )}
 
           {/* f) Where we'll meet */}
           {(exp.meeting_point_name || (exp.meeting_point_lat != null && exp.meeting_point_lng != null)) && (
-            <Section title={ar ? "أين سنلتقي" : "Where we’ll meet"} ar={ar}>
+            <Section title={isGuide ? (ar ? "الموقع" : "Where it is") : (ar ? "أين سنلتقي" : "Where we’ll meet")} ar={ar}>
               {exp.meeting_point_lat != null && exp.meeting_point_lng != null ? (() => {
                 const lat = Number(exp.meeting_point_lat), lng = Number(exp.meeting_point_lng);
                 const bbox = [lng - 0.006, lat - 0.004, lng + 0.006, lat + 0.004].join(",");
@@ -430,6 +446,7 @@ const ExperienceDetail = () => {
             </Section>
           )}
 
+          {!isGuide && (<>
           {/* g) Good to know */}
           <Section title={ar ? "معلومات مهمة" : "Good to know"} ar={ar}>
             <dl className="divide-y divide-border">
@@ -473,6 +490,7 @@ const ExperienceDetail = () => {
               <p className="text-muted-foreground">{ar ? "لا توجد تقييمات بعد." : "No reviews yet."}</p>
             )}
           </Section>
+          </>)}
 
           {/* i) Getting there */}
           {cityTransport && cityTransport.length > 0 && (
@@ -516,7 +534,7 @@ const ExperienceDetail = () => {
                       </div>
                       <p className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} !text-base mt-2 line-clamp-2 text-foreground`}>{rTitle}</p>
                       <p className="text-[13px] text-muted-foreground">
-                        {[formatDuration(r.duration_minutes, ar), `${fmtNumber(r.price, ar)} ${egp}`].filter(Boolean).join(" · ")}
+                        {r.provider_id ? [formatDuration(r.duration_minutes, ar), `${fmtNumber(r.price, ar)} ${egp}`].filter(Boolean).join(" · ") : (ar ? "دليل" : "Guide")}
                       </p>
                     </button>
                   );
@@ -527,6 +545,15 @@ const ExperienceDetail = () => {
         </main>
 
         {/* Desktop sticky booking card */}
+        {isGuide ? (
+        <aside className="hidden lg:block w-[320px] flex-shrink-0 pt-6">
+          <div className="sticky top-6 rounded-2xl border border-border bg-card p-5">
+            <p className="text-[15px] text-foreground">{ar ? "تعرف مضيفًا محليًا هنا؟" : "Know a local host here?"}</p>
+            <button type="button" onClick={tellUs} className="mt-3 w-full h-11 rounded-xl border border-border text-sm font-semibold">{ar ? "أخبرنا" : "Tell us"}</button>
+            <WishlistButton itemType="experience" itemId={exp.id} variant="heart" className="mt-2 tap-target rounded-full border border-border" />
+          </div>
+        </aside>
+        ) : (
         <aside className="hidden lg:block w-[320px] flex-shrink-0 pt-6">
           <div className="sticky top-6 rounded-2xl border border-border bg-card shadow-card p-5">
             <p className="text-2xl font-bold text-foreground">{priceLabel} <span className="text-sm font-normal text-muted-foreground">{perPerson}</span></p>
@@ -552,8 +579,20 @@ const ExperienceDetail = () => {
             <p className="mt-3 text-[13px] text-muted-foreground">{noPayNote}</p>
           </div>
         </aside>
+        )}
       </div>
 
+      {isGuide ? (
+        <div className="lg:hidden fixed inset-x-0 z-40 bg-card border-t border-border" style={{ bottom: "calc(68px + env(safe-area-inset-bottom, 0px))" }}>
+          <div className="max-w-[680px] mx-auto px-4 py-2 flex items-center gap-3">
+            <button type="button" onClick={tellUs} className="flex-1 min-h-[44px] text-start text-[15px] text-foreground">
+              {ar ? "تعرف مضيفًا محليًا هنا؟ " : "Know a local host here? "}
+              <span className="font-semibold text-primary-dark underline">{ar ? "أخبرنا" : "Tell us"}</span>
+            </button>
+            <WishlistButton itemType="experience" itemId={exp.id} variant="heart" className="tap-target rounded-full border border-border" />
+          </div>
+        </div>
+      ) : (
       <ActionBar
         price={priceLabel}
         note={selected && userPicked ? `${perPerson} · ${selectedSummary}` : perPerson}
@@ -562,6 +601,7 @@ const ExperienceDetail = () => {
         onMessage={messageHost}
         ar={ar}
       />
+      )}
     </div>
   );
 };

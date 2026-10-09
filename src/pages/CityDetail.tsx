@@ -102,11 +102,13 @@ const CityDetail = () => {
   const programs = (dbPrograms as any[]).filter(inCity);
   const causes = (dbCauses as any[]).filter(inCity);
 
-  const offerCount = experiences.length + trips.length + tours.length + stays.length + products.length + events.length;
+  const guideCount = experiences.filter((x: any) => !x.provider_id).length;
+  const offerCount = experiences.length - guideCount + trips.length + tours.length + stays.length + products.length + events.length;
   const facts: KeyFact[] = [];
   if (governorate) facts.push({ icon: MapPin, label: governorate });
   if (bestTime) facts.push({ icon: Calendar, label: ar ? `أفضل وقت: ${bestTime}` : `Best time: ${bestTime}` });
   if (offerCount) facts.push({ icon: LayoutGrid, label: ar ? `${fmtNumber(offerCount, ar)} عروض` : `${offerCount} ${offerCount === 1 ? "offer" : "offers"}` });
+  if (guideCount) facts.push({ icon: BookOpen, label: ar ? `${fmtNumber(guideCount, ar)} أدلة` : `${guideCount} ${guideCount === 1 ? "guide" : "guides"}` });
   if (posts.length) facts.push({ icon: BookOpen, label: ar ? `${fmtNumber(posts.length, ar)} مقالات` : `${posts.length} ${posts.length === 1 ? "article" : "articles"}` });
 
   const Chevron = ar ? ChevronLeft : ChevronRight;
@@ -129,7 +131,7 @@ const CityDetail = () => {
 
   const [lead, ...more] = posts;
   const thingsToDo = [
-    ...experiences.map((e) => ({ k: `e${e.id}`, path: `/experience/${e.slug || e.id}`, image: e.image, title: title(e), meta: [formatDuration(e.duration_minutes, ar), money(e.price)].filter(Boolean).join(" · ") })),
+    ...experiences.map((e) => ({ k: `e${e.id}`, path: `/experience/${e.slug || e.id}`, image: e.image, title: title(e), meta: e.provider_id ? [formatDuration(e.duration_minutes, ar), money(e.price)].filter(Boolean).join(" · ") : (ar ? "دليل" : "Guide") })),
     ...trips.map((t) => ({ k: `t${t.id}`, path: `/trip/${t.slug || t.id}`, image: t.image, title: title(t), meta: [t.date || null, money(t.price)].filter(Boolean).join(" · ") })),
   ];
 
