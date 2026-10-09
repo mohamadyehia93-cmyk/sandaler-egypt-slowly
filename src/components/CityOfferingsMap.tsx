@@ -1,5 +1,6 @@
 import { MapContainer, Marker, Popup, useMap } from "react-leaflet";
 import { AppTileLayer, FitToPoints } from "@/lib/mapTiles";
+import MarkerClusterGroup from "react-leaflet-cluster";
 
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -41,16 +42,21 @@ const CITY_CENTERS: Record<string, [number, number]> = {
   quseir: [26.0993, 34.2810],
 };
 
-// Deterministic pseudo-random scatter from a string id
-const hashOffset = (key: string, radiusKm = 3): [number, number] => {
-  let h = 0;
-  for (let i = 0; i < key.length; i++) h = (h << 5) - h + key.charCodeAt(i);
-  const a = (Math.abs(h) % 1000) / 1000;
-  const b = (Math.abs(h >> 3) % 1000) / 1000;
-  const angle = a * 2 * Math.PI;
-  const dist = (0.4 + b * 0.6) * (radiusKm / 111); // ~km to deg
-  return [Math.cos(angle) * dist, Math.sin(angle) * dist];
+/** Rough great-circle distance in km. */
+const kmBetween = (a: [number, number], b: [number, number]) => {
+  const R = 6371, toR = Math.PI / 180;
+  const dLat = (b[0] - a[0]) * toR, dLng = (b[1] - a[1]) * toR;
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * toR) * Math.cos(b[0] * toR) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(x));
 };
+const FRAME_RADIUS_KM = 40;
+
+const clusterIcon = (cluster: any) =>
+  L.divIcon({
+    className: "city-cluster",
+    html: `<div class="city-cluster-bubble">${cluster.getChildCount()}</div>`,
+    iconSize: [36, 36],
+  });
 
 type Category =
   | "experience"
@@ -112,22 +118,13 @@ export type OfferingPin = {
   category: Category;
   title: { en: string; ar: string };
   subtitle?: { en: string; ar: string };
-  /** Real GPS coordinates if known. When null/undefined, a deterministic scatter near the city center is used. */
+  /** Real stored coordinates only. Rows without them are not plotted. */
   lat?: number | null;
   lng?: number | null;
 };
 
-const resolvePos = (
-  o: OfferingPin,
-  center: [number, number]
-): { pos: [number, number]; precise: boolean } => {
-  if (typeof o.lat === "number" && typeof o.lng === "number" && !Number.isNaN(o.lat) && !Number.isNaN(o.lng)) {
-    return { pos: [o.lat, o.lng], precise: true };
-  }
-  const [dLat, dLng] = hashOffset(`${o.category}-${o.id}`);
-  return { pos: [center[0] + dLat, center[1] + dLng], precise: false };
-};
-
+const realPos = (o: OfferingPin): [number, number] | null =>
+  typeof o.lat === "number" && typeof o.lng === "number" && Number.isFinite(o.lat) && Number.isFinite(o.lng) ? [o.lat, o.lng] : null;
 
 const FlyTo = ({ target }: { target: [number, number] | null }) => {
   const map = useMap();
@@ -169,6 +166,7 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
     return offerings.filter((o) => {
+      if (!realPos(o)) return false;
       if (!active.has(o.category)) return false;
       if (!q) return true;
       const hay = [
@@ -187,16 +185,21 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
   }, [offerings, active, query]);
 
   const points = useMemo<[number, number][]>(() => {
-    const pts = visible.map((o) => resolvePos(o, center).pos);
-    pts.push(center);
-    return pts;
+    const pts = visible.map((o) => realPos(o)!);
+    // Frame only pins near the city; far outliers stay on the map but don't zoom it out.
+    const near = CITY_CENTERS[cityId] ? pts.filter((p) => kmBetween(p, center) <= FRAME_RADIUS_KM) : pts;
+    return near.length ? near : pts;
   }, [visible, center]);
 
+  const pinned = useMemo(() => offerings.filter((o) => realPos(o)), [offerings]);
+  const unpinned = offerings.length - pinned.length;
   const presentCategories = useMemo(() => {
     const set = new Set<Category>();
-    offerings.forEach((o) => set.add(o.category));
+    pinned.forEach((o) => set.add(o.category));
     return Array.from(set);
-  }, [offerings]);
+  }, [pinned]);
+
+  if (pinned.length === 0) return null;
 
   return (
     <div className="space-y-3">
@@ -222,11 +225,11 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
             </button>
           )}
         </div>
-        {(query || visible.length !== offerings.length) && (
+        {(query || visible.length !== pinned.length) && (
           <p className="text-[11px] text-muted-foreground mt-1.5 px-1">
             {lang === "ar"
-              ? `${visible.length} نتيجة من ${offerings.length}`
-              : `${visible.length} of ${offerings.length} results`}
+              ? `${visible.length} نتيجة من ${pinned.length}`
+              : `${visible.length} of ${pinned.length} results`}
           </p>
         )}
       </div>
@@ -235,7 +238,7 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
       <div className="flex gap-2 px-4 overflow-x-auto hide-scrollbar">
         {presentCategories.map((c) => {
           const isActive = active.has(c);
-          const count = offerings.filter((o) => o.category === c).length;
+          const count = pinned.filter((o) => o.category === c).length;
           return (
             <button
               key={c}
@@ -274,26 +277,15 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
               selectedKey
                 ? (() => {
                     const o = visible.find((x) => `${x.category}-${x.id}` === selectedKey);
-                    return o ? resolvePos(o, center).pos : null;
+                    return o ? realPos(o) : null;
                   })()
                 : null
             }
           />
 
-          {/* City center marker */}
-          <Marker position={center} icon={makeIcon("#1A7A74")}>
-            <Popup>
-              <div className="text-center">
-                <strong className="text-sm">{cityName?.[lang]}</strong>
-                <div className="text-[11px] text-muted-foreground mt-0.5">
-                  {lang === "ar" ? "مركز المدينة" : "City center"}
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-
+          <MarkerClusterGroup chunkedLoading iconCreateFunction={clusterIcon} showCoverageOnHover={false} spiderfyOnMaxZoom maxClusterRadius={40}>
           {visible.map((o) => {
-            const { pos, precise } = resolvePos(o, center);
+            const pos = realPos(o)!;
             const route = CAT_ROUTE[o.category](o.slug || o.id);
             const key = `${o.category}-${o.id}`;
             return (
@@ -325,11 +317,6 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
                         {o.subtitle?.[lang]}
                       </div>
                     )}
-                    {!precise && (
-                      <div className="text-[10px] text-muted-foreground mt-1 italic">
-                        {lang === "ar" ? "موقع تقريبي" : "Approximate location"}
-                      </div>
-                    )}
                     <button
                       onClick={() => navigate(route)}
                       className="mt-2 text-xs font-medium text-primary"
@@ -341,6 +328,7 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
               </Marker>
             );
           })}
+          </MarkerClusterGroup>
         </MapContainer>
       </div>
 
@@ -350,7 +338,6 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
           {visible.map((o) => {
             const key = `${o.category}-${o.id}`;
             const isSelected = selectedKey === key;
-            const { precise } = resolvePos(o, center);
             return (
               <button
                 key={key}
@@ -386,22 +373,19 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
                     {o.subtitle?.[lang]}
                   </p>
                 )}
-                {!precise && (
-                  <p className="text-[9px] text-muted-foreground italic mt-0.5">
-                    {lang === "ar" ? "موقع تقريبي" : "Approx."}
-                  </p>
-                )}
               </button>
             );
           })}
         </div>
       )}
 
-      <p className="px-4 text-[11px] text-muted-foreground">
-        {lang === "ar"
-          ? "اضغط الدبوس لعرض التفاصيل. الدبابيس بدون موقع دقيق تظهر بالقرب من مركز المدينة."
-          : "Tap a pin to view details. Pins without a precise location are shown near the city center."}
-      </p>
+      {unpinned > 0 && (
+        <p className="px-4 text-[13px] text-muted-foreground">
+          {lang === "ar"
+            ? `${unpinned.toLocaleString("ar-EG")} أماكن أخرى في ${cityName?.ar} ليس لها دبوس على الخريطة بعد`
+            : `${unpinned} more ${unpinned === 1 ? "place" : "places"} in ${cityName?.en} ${unpinned === 1 ? "has" : "have"} no map pin yet`}
+        </p>
+      )}
     </div>
   );
 };
