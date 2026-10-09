@@ -37,7 +37,7 @@ type Person = {
 type Experience = {
   id: string; slug: string | null;
   title_en: string; title_ar: string;
-  image: string | null; price: number;
+  image: string | null; price: number; provider_id?: string | null;
 };
 
 const PersonDetail = () => {
@@ -71,7 +71,7 @@ const PersonDetail = () => {
         if (p?.city_id || p?.region_id) {
           let q = supabase
             .from("experiences")
-            .select("id, slug, title_en, title_ar, image, price")
+            .select("id, slug, title_en, title_ar, image, price, provider_id")
             .eq("status", "published")
             .limit(3);
           q = p.city_id ? q.eq("city_id", p.city_id) : q.eq("region_id", p.region_id!);
