@@ -170,6 +170,7 @@ const Booking = () => {
   );
 
   if (!item) return <NotFoundView context="generic" />;
+  if (guideBlocked) return null;
 
   const itemTitle = (lang === "ar"
     ? (item.title_ar || item.name_ar || "")
