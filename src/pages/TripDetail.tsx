@@ -273,7 +273,7 @@ const TripDetail = () => {
               {hasGeo && (() => {
                 const bbox = [lng! - 0.006, lat! - 0.004, lng! + 0.006, lat! + 0.004].join(",");
                 return (
-                  <div className="rounded-xl overflow-hidden border border-border h-[200px] bg-muted mb-2">
+                  <div className="relative rounded-xl overflow-hidden border border-border h-[200px] bg-muted mb-2">
                     <iframe title={ar ? "خريطة نقطة الانطلاق" : "Departure point map"} src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`}
                       loading="lazy" className="w-full h-full pointer-events-none border-0" tabIndex={-1} />
                   </div>

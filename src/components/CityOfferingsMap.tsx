@@ -1,4 +1,6 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, Marker, Popup, useMap } from "react-leaflet";
+import { AppTileLayer, FitToPoints } from "@/lib/mapTiles";
+
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -126,19 +128,6 @@ const resolvePos = (
   return { pos: [center[0] + dLat, center[1] + dLng], precise: false };
 };
 
-const FitBounds = ({ points }: { points: [number, number][] }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (points.length === 0) return;
-    if (points.length === 1) {
-      map.setView(points[0], 14);
-      return;
-    }
-    const bounds = L.latLngBounds(points);
-    map.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
-  }, [points, map]);
-  return null;
-};
 
 const FlyTo = ({ target }: { target: [number, number] | null }) => {
   const map = useMap();
@@ -277,10 +266,9 @@ const CityOfferingsMap = ({ cityId, cityName, offerings }: CityOfferingsMapProps
           zoom={13}
           style={{ height: "100%", width: "100%" }}
           zoomControl={true}
-          attributionControl={false}
         >
-          <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
-          <FitBounds points={points} />
+          <AppTileLayer />
+          <FitToPoints points={points} />
           <FlyTo
             target={
               selectedKey

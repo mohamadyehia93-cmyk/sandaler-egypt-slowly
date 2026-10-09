@@ -1,7 +1,8 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, Marker, Popup } from "react-leaflet";
+import { AppTileLayer, FitToPoints } from "@/lib/mapTiles";
+
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 
@@ -95,16 +96,6 @@ const regionMaps: Record<string, RegionMapConfig> = {
   },
 };
 
-const FitBounds = ({ cities }: { cities: CityPoint[] }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (cities.length > 0) {
-      const bounds = L.latLngBounds(cities.map((c) => [c.lat, c.lng]));
-      map.fitBounds(bounds, { padding: [40, 40] });
-    }
-  }, [cities, map]);
-  return null;
-};
 
 interface RegionMapProps {
   regionId: string;
@@ -115,7 +106,7 @@ const RegionMap = ({ regionId, color }: RegionMapProps) => {
   const navigate = useNavigate();
   const { lang } = useI18n();
   const config = regionMaps[regionId];
-  if (!config) return null;
+  if (!config || config.cities.length === 0) return null;
 
   return (
     <div className="rounded-xl overflow-hidden border border-border shadow-card" style={{ height: 260 }}>
@@ -124,10 +115,9 @@ const RegionMap = ({ regionId, color }: RegionMapProps) => {
         zoom={config.zoom}
         style={{ height: "100%", width: "100%" }}
         zoomControl={true}
-        attributionControl={false}
       >
-        <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
-        <FitBounds cities={config.cities} />
+        <AppTileLayer />
+        <FitToPoints points={config.cities.map((c) => [c.lat, c.lng] as [number, number])} />
         {config.cities.map((city) => (
           <Marker
             key={city.id}

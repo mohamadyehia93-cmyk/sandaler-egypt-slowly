@@ -409,7 +409,7 @@ const ExperienceDetail = () => {
                 const bbox = [lng - 0.006, lat - 0.004, lng + 0.006, lat + 0.004].join(",");
                 return (
                   <>
-                    <div className="rounded-xl overflow-hidden border border-border h-[200px] bg-muted">
+                    <div className="relative rounded-xl overflow-hidden border border-border h-[200px] bg-muted">
                       <iframe
                         title={ar ? "خريطة نقطة اللقاء" : "Meeting point map"}
                         src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`}

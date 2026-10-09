@@ -6,7 +6,7 @@ const StaticMap = ({ lat, lng, ar, label, title }: { lat: number; lng: number; a
   const bbox = [lng - 0.006, lat - 0.004, lng + 0.006, lat + 0.004].join(",");
   return (
     <>
-      <div className="rounded-xl overflow-hidden border border-border h-[200px] bg-muted">
+      <div className="relative rounded-xl overflow-hidden border border-border h-[200px] bg-muted">
         <iframe title={title} src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`}
           loading="lazy" className="w-full h-full pointer-events-none border-0" tabIndex={-1} />
       </div>
