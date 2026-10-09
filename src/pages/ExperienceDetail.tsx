@@ -307,6 +307,18 @@ const ExperienceDetail = () => {
   return (
     <div className="min-h-screen bg-background pb-[150px] lg:pb-16">
       <ListingHero images={photos} title={title} eyebrow={eyebrow} ar={ar} onBack={() => navigate(-1)} wishlistType="experience" wishlistId={exp.id} />
+      {photoCredits && photoCredits.length > 0 && (
+        <p className="mx-auto max-w-[1040px] px-4 pt-2 text-[11px] text-muted-foreground" data-testid="photo-credit">
+          {ar ? "الصور: " : photoCredits.length > 1 ? "Photos: " : "Photo: "}
+          {photoCredits.map((c, i) => (
+            <span key={i}>
+              {i > 0 && "; "}
+              {c.source_url ? <a href={c.source_url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-foreground">{c.artist || "Wikimedia Commons"}</a> : c.artist}
+              {c.license && <> · {c.license}</>}
+            </span>
+          ))}
+        </p>
+      )}
       <KeyFacts facts={facts} />
 
       <div className="max-w-[1040px] mx-auto px-4 lg:flex lg:gap-10 lg:justify-center">
