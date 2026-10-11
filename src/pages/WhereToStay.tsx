@@ -84,7 +84,12 @@ const WhereToStay = () => {
           <h1 className={`listing-title ${ar ? "lang-ar" : "lang-en"} text-foreground text-3xl mt-1`}>
             {ar ? `أين تقيم في ${cityName}` : `Where to stay in ${cityName}`}
           </h1>
-          {preamble && <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground mt-3`}>{preamble}</p>}
+          {preamble && (page as any)?.preamble_is_advisory ? (
+            <div role="note" className="mt-3 rounded-xl border border-ochre/40 border-s-4 border-s-ochre bg-ochre-soft p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-ochre mb-1">{ar ? "تنبيه للسفر" : "Travel advisory"}</p>
+              <p className={`${ar ? "lang-ar" : "lang-en"} text-foreground leading-relaxed`}>{preamble.replace(/^(Travel advisory:|تنبيه للسفر:)\s*/, "")}</p>
+            </div>
+          ) : preamble && <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground mt-3`}>{preamble}</p>}
           {pageChecked && <p className="text-[12px] text-muted-foreground mt-2">{ar ? `آخر تحقق ${pageChecked}` : `Last verified ${pageChecked}`}</p>}
         </header>
 
