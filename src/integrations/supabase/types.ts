@@ -582,6 +582,7 @@ export type Database = {
           notes_en: string[]
           preamble_ar: string | null
           preamble_en: string | null
+          preamble_is_advisory: boolean
           status: string
           updated_at: string
           verified_at: string | null
@@ -594,6 +595,7 @@ export type Database = {
           notes_en?: string[]
           preamble_ar?: string | null
           preamble_en?: string | null
+          preamble_is_advisory?: boolean
           status?: string
           updated_at?: string
           verified_at?: string | null
@@ -606,6 +608,7 @@ export type Database = {
           notes_en?: string[]
           preamble_ar?: string | null
           preamble_en?: string | null
+          preamble_is_advisory?: boolean
           status?: string
           updated_at?: string
           verified_at?: string | null

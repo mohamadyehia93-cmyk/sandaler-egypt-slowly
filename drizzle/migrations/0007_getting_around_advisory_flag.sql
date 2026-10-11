@@ -1,0 +1,1 @@
+ALTER TABLE public.city_getting_around ADD COLUMN IF NOT EXISTS preamble_is_advisory boolean NOT NULL DEFAULT false;
