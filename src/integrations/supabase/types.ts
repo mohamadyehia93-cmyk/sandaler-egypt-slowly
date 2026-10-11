@@ -506,6 +506,8 @@ export type Database = {
           image: string | null
           known_for_ar: string[] | null
           known_for_en: string[] | null
+          latitude: number | null
+          longitude: number | null
           name_ar: string
           name_en: string
           overview_ar: string | null
@@ -531,6 +533,8 @@ export type Database = {
           image?: string | null
           known_for_ar?: string[] | null
           known_for_en?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           name_ar: string
           name_en: string
           overview_ar?: string | null
@@ -556,6 +560,8 @@ export type Database = {
           image?: string | null
           known_for_ar?: string[] | null
           known_for_en?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           name_ar?: string
           name_en?: string
           overview_ar?: string | null
