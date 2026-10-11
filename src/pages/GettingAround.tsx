@@ -63,9 +63,9 @@ const GettingAround = () => {
     [ar ? "السعر" : "Price", s.price_range],
     [ar ? "المدة" : "Duration", s.duration_text],
     [ar ? "التكرار" : "Frequency", s.frequency],
-    [ar ? "من" : "From", s.from_station],
-    [ar ? "إلى" : "To", s.to_station],
-    [ar ? "الحجز" : "Booking", s.booking_channel],
+    [ar ? "من" : "From", (ar && s.from_station_ar) || s.from_station],
+    [ar ? "إلى" : "To", (ar && s.to_station_ar) || s.to_station],
+    [ar ? "الحجز" : "Booking", (ar && s.booking_channel_ar) || s.booking_channel],
   ].filter(([, v]) => v) as [string, string][];
 
   return (
@@ -106,7 +106,7 @@ const GettingAround = () => {
                 const b = s.badge ? BADGES[s.badge as Badge] : null;
                 const border = s.recommended ? "border-s-primary" : s.caution ? "border-s-ochre" : "border-s-border";
                 const actions = [1, 2, 3]
-                  .map((i) => ({ label: s[`action_${i}_label`], url: s[`action_${i}_url`] }))
+                  .map((i) => ({ label: (ar && s[`action_${i}_label_ar`]) || s[`action_${i}_label`], url: s[`action_${i}_url`] }))
                   .filter((a) => a.label && a.url);
                 const checked = checkedLabel(s.verified_at, ar);
                 return (

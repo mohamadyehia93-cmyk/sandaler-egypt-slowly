@@ -17,3 +17,6 @@
 - [x] City/region pages: shared EmptySection instead of hidden sections
 - [x] Draft saving for NewArticle, NewProgram, NewSession, NewCollection
 - [x] Accessibility: aria-labels on icon-only buttons, focus-visible rings, 44px tap targets, delete dead TopTabs
+
+## Getting Around
+- [ ] Delta part 2 (fuwwah, damietta, manzala, rosetta): load, then publish all 9 Delta pages + hide their seeded transport rows (part 1 staged as draft)
