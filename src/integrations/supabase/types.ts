@@ -573,6 +573,53 @@ export type Database = {
           },
         ]
       }
+      city_getting_around: {
+        Row: {
+          city_id: string
+          created_at: string
+          editorial_article_slug: string | null
+          notes_ar: string[]
+          notes_en: string[]
+          preamble_ar: string | null
+          preamble_en: string | null
+          status: string
+          updated_at: string
+          verified_at: string | null
+        }
+        Insert: {
+          city_id: string
+          created_at?: string
+          editorial_article_slug?: string | null
+          notes_ar?: string[]
+          notes_en?: string[]
+          preamble_ar?: string | null
+          preamble_en?: string | null
+          status?: string
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Update: {
+          city_id?: string
+          created_at?: string
+          editorial_article_slug?: string | null
+          notes_ar?: string[]
+          notes_en?: string[]
+          preamble_ar?: string | null
+          preamble_en?: string | null
+          status?: string
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "city_getting_around_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: true
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       collections: {
         Row: {
           abstract_ar: string | null
@@ -1313,6 +1360,126 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      getting_around_services: {
+        Row: {
+          action_1_label: string | null
+          action_1_url: string | null
+          action_2_label: string | null
+          action_2_url: string | null
+          action_3_label: string | null
+          action_3_url: string | null
+          badge: Database["public"]["Enums"]["getting_around_badge"] | null
+          booking_channel: string | null
+          caution: boolean
+          city_id: string
+          created_at: string
+          duration_text: string | null
+          editorial_note_ar: string | null
+          editorial_note_en: string | null
+          frequency: string | null
+          from_station: string | null
+          id: string
+          mode_label_ar: string | null
+          mode_label_en: string | null
+          operator: string | null
+          order_rank: number
+          origin_city_id: string
+          price_range: string | null
+          recommended: boolean
+          route_title_ar: string | null
+          route_title_en: string
+          slug: string
+          status: string
+          to_station: string | null
+          transport_row_link: string | null
+          updated_at: string
+          verified_at: string | null
+        }
+        Insert: {
+          action_1_label?: string | null
+          action_1_url?: string | null
+          action_2_label?: string | null
+          action_2_url?: string | null
+          action_3_label?: string | null
+          action_3_url?: string | null
+          badge?: Database["public"]["Enums"]["getting_around_badge"] | null
+          booking_channel?: string | null
+          caution?: boolean
+          city_id: string
+          created_at?: string
+          duration_text?: string | null
+          editorial_note_ar?: string | null
+          editorial_note_en?: string | null
+          frequency?: string | null
+          from_station?: string | null
+          id?: string
+          mode_label_ar?: string | null
+          mode_label_en?: string | null
+          operator?: string | null
+          order_rank?: number
+          origin_city_id?: string
+          price_range?: string | null
+          recommended?: boolean
+          route_title_ar?: string | null
+          route_title_en: string
+          slug: string
+          status?: string
+          to_station?: string | null
+          transport_row_link?: string | null
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Update: {
+          action_1_label?: string | null
+          action_1_url?: string | null
+          action_2_label?: string | null
+          action_2_url?: string | null
+          action_3_label?: string | null
+          action_3_url?: string | null
+          badge?: Database["public"]["Enums"]["getting_around_badge"] | null
+          booking_channel?: string | null
+          caution?: boolean
+          city_id?: string
+          created_at?: string
+          duration_text?: string | null
+          editorial_note_ar?: string | null
+          editorial_note_en?: string | null
+          frequency?: string | null
+          from_station?: string | null
+          id?: string
+          mode_label_ar?: string | null
+          mode_label_en?: string | null
+          operator?: string | null
+          order_rank?: number
+          origin_city_id?: string
+          price_range?: string | null
+          recommended?: boolean
+          route_title_ar?: string | null
+          route_title_en?: string
+          slug?: string
+          status?: string
+          to_station?: string | null
+          transport_row_link?: string | null
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "getting_around_services_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "getting_around_services_transport_row_link_fkey"
+            columns: ["transport_row_link"]
+            isOneToOne: false
+            referencedRelation: "transport"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       hero_slides: {
         Row: {
@@ -3316,6 +3483,18 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "ambassador"
+      getting_around_badge:
+        | "pick-frequency"
+        | "pick-comfort"
+        | "pick-price"
+        | "pick-speed"
+        | "pick-groups"
+        | "pick-ease"
+        | "pick-view"
+        | "not-recommended"
+        | "intermittent"
+        | "summer-only"
+        | "no-regular-service"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3444,6 +3623,19 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user", "ambassador"],
+      getting_around_badge: [
+        "pick-frequency",
+        "pick-comfort",
+        "pick-price",
+        "pick-speed",
+        "pick-groups",
+        "pick-ease",
+        "pick-view",
+        "not-recommended",
+        "intermittent",
+        "summer-only",
+        "no-regular-service",
+      ],
     },
   },
 } as const
