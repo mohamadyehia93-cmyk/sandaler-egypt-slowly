@@ -148,7 +148,7 @@ const WhereToStay = () => {
             <h2 className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} text-foreground mb-3`}>{ar ? "مضيفون محليون" : "Local hosts"}</h2>
             <div className="space-y-3">
               {hosted.map((t) => (
-                <Link key={t.id} to={`/accommodation/${t.slug || t.id}`} className="flex gap-3 items-center rounded-xl bg-success/5 border border-success/25 p-3">
+                <Link key={t.id} to={`/stay/${t.slug || t.id}`} className="flex gap-3 items-center rounded-xl bg-success/5 border border-success/25 p-3">
                   {t.image ? <img src={t.image} alt="" className="w-20 h-16 rounded-lg object-cover flex-shrink-0" /> : <div className="w-20 h-16 rounded-lg bg-success/10 flex-shrink-0" />}
                   <div className="min-w-0">
                     <p className="font-semibold text-foreground line-clamp-1">{L(t, "name")}</p>
