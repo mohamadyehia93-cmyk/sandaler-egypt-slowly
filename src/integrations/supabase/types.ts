@@ -629,6 +629,53 @@ export type Database = {
           },
         ]
       }
+      city_stays: {
+        Row: {
+          city_id: string
+          created_at: string
+          editorial_article_slug: string | null
+          notes_ar: string[] | null
+          notes_en: string[] | null
+          preamble_ar: string | null
+          preamble_en: string | null
+          status: string
+          updated_at: string
+          verified_at: string | null
+        }
+        Insert: {
+          city_id: string
+          created_at?: string
+          editorial_article_slug?: string | null
+          notes_ar?: string[] | null
+          notes_en?: string[] | null
+          preamble_ar?: string | null
+          preamble_en?: string | null
+          status?: string
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Update: {
+          city_id?: string
+          created_at?: string
+          editorial_article_slug?: string | null
+          notes_ar?: string[] | null
+          notes_en?: string[] | null
+          preamble_ar?: string | null
+          preamble_en?: string | null
+          status?: string
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "city_stays_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: true
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       collections: {
         Row: {
           abstract_ar: string | null
@@ -2862,6 +2909,116 @@ export type Database = {
           },
         ]
       }
+      stays_services: {
+        Row: {
+          action_1_label_ar: string | null
+          action_1_label_en: string | null
+          action_1_url: string | null
+          action_2_label_ar: string | null
+          action_2_label_en: string | null
+          action_2_url: string | null
+          action_3_label_ar: string | null
+          action_3_label_en: string | null
+          action_3_url: string | null
+          amenities_ar: string | null
+          amenities_en: string | null
+          area_ar: string | null
+          area_en: string | null
+          badge: Database["public"]["Enums"]["stay_badge"] | null
+          caution: boolean
+          city_id: string | null
+          created_at: string
+          editorial_note_ar: string | null
+          editorial_note_en: string | null
+          id: string
+          name: string
+          order_rank: number
+          price_range: string | null
+          recommended: boolean
+          rooms_text: string | null
+          slug: string
+          status: string
+          stay_type_ar: string | null
+          stay_type_en: string | null
+          updated_at: string
+          verified_at: string | null
+        }
+        Insert: {
+          action_1_label_ar?: string | null
+          action_1_label_en?: string | null
+          action_1_url?: string | null
+          action_2_label_ar?: string | null
+          action_2_label_en?: string | null
+          action_2_url?: string | null
+          action_3_label_ar?: string | null
+          action_3_label_en?: string | null
+          action_3_url?: string | null
+          amenities_ar?: string | null
+          amenities_en?: string | null
+          area_ar?: string | null
+          area_en?: string | null
+          badge?: Database["public"]["Enums"]["stay_badge"] | null
+          caution?: boolean
+          city_id?: string | null
+          created_at?: string
+          editorial_note_ar?: string | null
+          editorial_note_en?: string | null
+          id?: string
+          name: string
+          order_rank?: number
+          price_range?: string | null
+          recommended?: boolean
+          rooms_text?: string | null
+          slug: string
+          status?: string
+          stay_type_ar?: string | null
+          stay_type_en?: string | null
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Update: {
+          action_1_label_ar?: string | null
+          action_1_label_en?: string | null
+          action_1_url?: string | null
+          action_2_label_ar?: string | null
+          action_2_label_en?: string | null
+          action_2_url?: string | null
+          action_3_label_ar?: string | null
+          action_3_label_en?: string | null
+          action_3_url?: string | null
+          amenities_ar?: string | null
+          amenities_en?: string | null
+          area_ar?: string | null
+          area_en?: string | null
+          badge?: Database["public"]["Enums"]["stay_badge"] | null
+          caution?: boolean
+          city_id?: string | null
+          created_at?: string
+          editorial_note_ar?: string | null
+          editorial_note_en?: string | null
+          id?: string
+          name?: string
+          order_rank?: number
+          price_range?: string | null
+          recommended?: boolean
+          rooms_text?: string | null
+          slug?: string
+          status?: string
+          stay_type_ar?: string | null
+          stay_type_en?: string | null
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stays_services_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_pledges: {
         Row: {
           amount: number | null
@@ -3522,6 +3679,17 @@ export type Database = {
         | "intermittent"
         | "summer-only"
         | "no-regular-service"
+      stay_badge:
+        | "pick-view"
+        | "pick-beach"
+        | "pick-resort"
+        | "pick-service"
+        | "pick-price"
+        | "pick-location"
+        | "pick-local"
+        | "not-recommended"
+        | "seasonal"
+        | "booking-only"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3662,6 +3830,18 @@ export const Constants = {
         "intermittent",
         "summer-only",
         "no-regular-service",
+      ],
+      stay_badge: [
+        "pick-view",
+        "pick-beach",
+        "pick-resort",
+        "pick-service",
+        "pick-price",
+        "pick-location",
+        "pick-local",
+        "not-recommended",
+        "seasonal",
+        "booking-only",
       ],
     },
   },

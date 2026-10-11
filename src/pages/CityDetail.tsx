@@ -13,6 +13,8 @@ import DetailSkeleton from "@/components/DetailSkeleton";
 import SectionEmptyState, { type EmptyKind } from "@/components/SectionEmptyState";
 import ServiceChip from "@/components/gettingAround/ServiceChip";
 import { useCityGettingAround } from "@/lib/gettingAround";
+import { useCityStays } from "@/lib/whereToStay";
+import StayChip from "@/components/whereToStay/StayChip";
 import ProgramsCausesSection from "@/components/ProgramsCausesSection";
 import Avatar from "@/components/AvatarFallback";
 import ListingHero from "@/components/listing/ListingHero";
@@ -79,6 +81,7 @@ const CityDetail = () => {
   });
 
   const { data: ga } = useCityGettingAround(cityId);
+  const { data: wts } = useCityStays(cityId);
 
   if (isLoading || lCity) return <DetailSkeleton variant="city" />;
   if (!cityRow) return <NotFoundView context="city" />;
@@ -243,7 +246,12 @@ const CityDetail = () => {
           </Block>
 
         {/* d) Where to stay */}
-        <Block title={ar ? "أين تقيم" : "Where to stay"}>
+        <Block title={ar ? "أين تقيم" : "Where to stay"} seeAll={wts?.stays.length ? `/where-to-stay/${cityId}` : undefined}>
+            {wts?.stays.length ? (
+              <div className="flex gap-2.5 overflow-x-auto hide-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0 pb-1">
+                {wts.stays.slice(0, 3).map((s) => <StayChip key={s.slug} s={s} ar={ar} href={`/where-to-stay/${cityId}#${s.slug}`} onClick={() => navigate(`/where-to-stay/${cityId}#${s.slug}`)} />)}
+              </div>
+            ) : null}
             {stays.length > 0 ? (<>
             <WideRow>
               {stays.map((s) => (
@@ -251,7 +259,7 @@ const CityDetail = () => {
                   meta={s.price_per_night ? `${fmtNumber(s.price_per_night, ar)} ${egp} ${ar ? "لليلة" : "per night"}` : null} />
               ))}
             </WideRow>
-          </>) : <Empty kind="stays" />}
+          </>) : !wts?.stays.length ? <Empty kind="stays" /> : null}
           </Block>
 
         {/* e) What's on */}

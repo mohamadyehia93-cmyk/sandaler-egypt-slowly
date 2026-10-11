@@ -64,6 +64,13 @@
       "when": 1791759002416,
       "tag": "0008_cities_lat_lng",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791759428358,
+      "tag": "0009_where_to_stay",
+      "breakpoints": true
     }
   ]
 }
