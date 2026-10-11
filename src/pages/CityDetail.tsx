@@ -13,6 +13,8 @@ import DetailSkeleton from "@/components/DetailSkeleton";
 import SectionEmptyState, { type EmptyKind } from "@/components/SectionEmptyState";
 import ServiceChip from "@/components/gettingAround/ServiceChip";
 import { useCityGettingAround } from "@/lib/gettingAround";
+import { useCityStays } from "@/lib/whereToStay";
+import StayChip from "@/components/whereToStay/StayChip";
 import ProgramsCausesSection from "@/components/ProgramsCausesSection";
 import Avatar from "@/components/AvatarFallback";
 import ListingHero from "@/components/listing/ListingHero";
@@ -79,6 +81,7 @@ const CityDetail = () => {
   });
 
   const { data: ga } = useCityGettingAround(cityId);
+  const { data: wts } = useCityStays(cityId);
 
   if (isLoading || lCity) return <DetailSkeleton variant="city" />;
   if (!cityRow) return <NotFoundView context="city" />;
