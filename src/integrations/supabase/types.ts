@@ -1364,13 +1364,17 @@ export type Database = {
       getting_around_services: {
         Row: {
           action_1_label: string | null
+          action_1_label_ar: string | null
           action_1_url: string | null
           action_2_label: string | null
+          action_2_label_ar: string | null
           action_2_url: string | null
           action_3_label: string | null
+          action_3_label_ar: string | null
           action_3_url: string | null
           badge: Database["public"]["Enums"]["getting_around_badge"] | null
           booking_channel: string | null
+          booking_channel_ar: string | null
           caution: boolean
           city_id: string
           created_at: string
@@ -1379,6 +1383,7 @@ export type Database = {
           editorial_note_en: string | null
           frequency: string | null
           from_station: string | null
+          from_station_ar: string | null
           id: string
           mode_label_ar: string | null
           mode_label_en: string | null
@@ -1392,19 +1397,24 @@ export type Database = {
           slug: string
           status: string
           to_station: string | null
+          to_station_ar: string | null
           transport_row_link: string | null
           updated_at: string
           verified_at: string | null
         }
         Insert: {
           action_1_label?: string | null
+          action_1_label_ar?: string | null
           action_1_url?: string | null
           action_2_label?: string | null
+          action_2_label_ar?: string | null
           action_2_url?: string | null
           action_3_label?: string | null
+          action_3_label_ar?: string | null
           action_3_url?: string | null
           badge?: Database["public"]["Enums"]["getting_around_badge"] | null
           booking_channel?: string | null
+          booking_channel_ar?: string | null
           caution?: boolean
           city_id: string
           created_at?: string
@@ -1413,6 +1423,7 @@ export type Database = {
           editorial_note_en?: string | null
           frequency?: string | null
           from_station?: string | null
+          from_station_ar?: string | null
           id?: string
           mode_label_ar?: string | null
           mode_label_en?: string | null
@@ -1426,19 +1437,24 @@ export type Database = {
           slug: string
           status?: string
           to_station?: string | null
+          to_station_ar?: string | null
           transport_row_link?: string | null
           updated_at?: string
           verified_at?: string | null
         }
         Update: {
           action_1_label?: string | null
+          action_1_label_ar?: string | null
           action_1_url?: string | null
           action_2_label?: string | null
+          action_2_label_ar?: string | null
           action_2_url?: string | null
           action_3_label?: string | null
+          action_3_label_ar?: string | null
           action_3_url?: string | null
           badge?: Database["public"]["Enums"]["getting_around_badge"] | null
           booking_channel?: string | null
+          booking_channel_ar?: string | null
           caution?: boolean
           city_id?: string
           created_at?: string
@@ -1447,6 +1463,7 @@ export type Database = {
           editorial_note_en?: string | null
           frequency?: string | null
           from_station?: string | null
+          from_station_ar?: string | null
           id?: string
           mode_label_ar?: string | null
           mode_label_en?: string | null
@@ -1460,6 +1477,7 @@ export type Database = {
           slug?: string
           status?: string
           to_station?: string | null
+          to_station_ar?: string | null
           transport_row_link?: string | null
           updated_at?: string
           verified_at?: string | null
