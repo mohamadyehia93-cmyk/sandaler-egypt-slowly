@@ -10,7 +10,7 @@ import ServiceChip from "@/components/gettingAround/ServiceChip";
 import SectionEmptyState from "@/components/SectionEmptyState";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
-import SEO from "@/components/SEO";
+import { SEO } from "@/components/SEO";
 import { fmtNumber } from "@/components/listing/format";
 
 /**

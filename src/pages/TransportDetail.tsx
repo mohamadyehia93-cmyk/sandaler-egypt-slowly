@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft, Clock, MapPin, Route, ArrowRight, Users, Navigation, CalendarClock, Info, BookOpen,
@@ -79,10 +79,10 @@ const TransportDetail = () => {
   }
 
   if (!item) {
-    if (gaMatch) { navigate(`/getting-around/${gaMatch.city_id}#${gaMatch.slug}`, { replace: true }); return null; }
+    if (gaMatch) return <Navigate to={`/getting-around/${gaMatch.city_id}#${gaMatch.slug}`} replace />;
     return <NotFoundView context="transport" />;
   }
-  if (gaMatch && item.listing_kind !== "hosted") { navigate(`/getting-around/${gaMatch.city_id}#${gaMatch.slug}`, { replace: true }); return null; }
+  if (gaMatch && item.listing_kind !== "hosted") return <Navigate to={`/getting-around/${gaMatch.city_id}#${gaMatch.slug}`} replace />;
 
   const name = isAr ? item.name_ar || item.name_en : item.name_en;
   const description = isAr ? item.description_ar || item.description_en : item.description_en;
