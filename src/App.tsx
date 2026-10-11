@@ -48,6 +48,7 @@ const PostDetail = lazy(() => import("./pages/PostDetail.tsx"));
 const CultureActorDetail = lazy(() => import("./pages/CultureActorDetail.tsx"));
 const AccommodationDetail = lazy(() => import("./pages/AccommodationDetail.tsx"));
 const TransportDetail = lazy(() => import("./pages/TransportDetail.tsx"));
+const GettingAround = lazy(() => import("./pages/GettingAround.tsx"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail.tsx"));
 const PartnerDetail = lazy(() => import("./pages/PartnerDetail.tsx"));
 const ImpactDashboard = lazy(() => import("./pages/ImpactDashboard.tsx"));
@@ -197,6 +198,7 @@ const App = () => {
             <Route path="/culture-actor/:id" element={<CultureActorDetail />} />
             <Route path="/stay/:id" element={<AccommodationDetail />} />
             <Route path="/transport/:id" element={<TransportDetail />} />
+            <Route path="/getting-around/:citySlug" element={<GettingAround />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/partner/:id" element={<PartnerDetail />} />
             <Route path="/provider/:id" element={<ProviderProfile />} />

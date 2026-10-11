@@ -78,6 +78,10 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        ochre: {
+          DEFAULT: "hsl(var(--ochre))",
+          soft: "hsl(var(--ochre-soft))",
+        },
         success: {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",

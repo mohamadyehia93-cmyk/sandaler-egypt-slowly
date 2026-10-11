@@ -1,7 +1,7 @@
 import { postCategoryLabel } from "@/lib/postCategories";
 import MessageOwnerButton from "@/components/MessageOwnerButton";
 import { useState, useRef, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Clock, Share2, User, MapPin, Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Maximize, Camera, ChevronLeft, ChevronRight } from "lucide-react";
 import ShareButton from "@/components/ShareButton";
@@ -59,6 +59,13 @@ const PhotoGallery = ({ photos }: { photos: string[] }) => {
 };
 
 /* ─── Main Page ─── */
+/** Articles that now have a live Getting Around page (slug -> city id). */
+const GA_BANNER: Record<string, string> = {
+  "getting-from-cairo-to-ismailia-every-way": "ismailia",
+  "getting-from-cairo-to-port-said-every-way": "port-said",
+  "getting-from-cairo-to-suez-every-way": "suez",
+};
+
 const PostDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -255,6 +262,15 @@ const PostDetail = () => {
           <h1 className="text-xl lg:text-3xl font-bold text-white leading-tight">{post.title[lang]}</h1>
         </div>
       </div>
+
+      {GA_BANNER[(row as any)?.slug] && (
+        <div className="mx-auto max-w-[680px] px-4 pt-4">
+          <Link to={`/getting-around/${GA_BANNER[(row as any).slug]}`} className="block rounded-xl bg-primary/10 border border-primary/20 px-4 py-3 text-[14px] text-foreground" data-testid="getting-around-banner">
+            {lang === "ar" ? "لهذا المقال الآن مخطِّط حيّ ← " : "This article now has a live planner → "}
+            <span className="font-semibold text-primary-dark underline underline-offset-4">{lang === "ar" ? "قارن واحجز في صفحة التنقل" : "Compare and book on the Getting Around page"}</span>
+          </Link>
+        </div>
+      )}
 
       {/* Photo credit — only when a real image_credits row exists */}
       {credit && (credit.artist || credit.license) && (

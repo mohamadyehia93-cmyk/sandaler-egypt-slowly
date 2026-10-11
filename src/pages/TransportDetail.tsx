@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft, Clock, MapPin, Route, ArrowRight, Users, Navigation, CalendarClock, Info, BookOpen,
@@ -57,7 +57,18 @@ const TransportDetail = () => {
     },
   });
 
-  if (isLoading) {
+  // Deep link: an editorial Getting Around card with this slug, or linked to this row.
+  const { data: gaMatch, isLoading: gaLoading } = useQuery({
+    queryKey: ["ga-match", id, item?.id],
+    enabled: !!id && !isLoading,
+    queryFn: async () => {
+      const ors = [`slug.eq.${id}`]; if (item?.id) ors.push(`transport_row_link.eq.${item.id}`);
+      const { data } = await (supabase as any).from("getting_around_services").select("slug,city_id").eq("status", "published").or(ors.join(",")).limit(1);
+      return (data?.[0] ?? null) as { slug: string; city_id: string } | null;
+    },
+  });
+
+  if (isLoading || gaLoading) {
     return (
       <div className="min-h-screen bg-background p-4 space-y-4">
         <Skeleton className="h-16 w-full" />
@@ -67,7 +78,11 @@ const TransportDetail = () => {
     );
   }
 
-  if (!item) return <NotFoundView context="transport" />;
+  if (!item) {
+    if (gaMatch) return <Navigate to={`/getting-around/${gaMatch.city_id}#${gaMatch.slug}`} replace />;
+    return <NotFoundView context="transport" />;
+  }
+  if (gaMatch && item.listing_kind !== "hosted") return <Navigate to={`/getting-around/${gaMatch.city_id}#${gaMatch.slug}`} replace />;
 
   const name = isAr ? item.name_ar || item.name_en : item.name_en;
   const description = isAr ? item.description_ar || item.description_en : item.description_en;
