@@ -11,6 +11,8 @@ import CityOfferingsMap, { type OfferingPin } from "@/components/CityOfferingsMa
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
 import SectionEmptyState, { type EmptyKind } from "@/components/SectionEmptyState";
+import ServiceChip from "@/components/gettingAround/ServiceChip";
+import { useCityGettingAround } from "@/lib/gettingAround";
 import ProgramsCausesSection from "@/components/ProgramsCausesSection";
 import Avatar from "@/components/AvatarFallback";
 import ListingHero from "@/components/listing/ListingHero";
@@ -75,6 +77,8 @@ const CityDetail = () => {
       return (data || []) as any[];
     },
   });
+
+  const { data: ga } = useCityGettingAround(cityId);
 
   if (isLoading || lCity) return <DetailSkeleton variant="city" />;
   if (!cityRow) return <NotFoundView context="city" />;
@@ -284,8 +288,12 @@ const CityDetail = () => {
           </Block>
 
         {/* Getting around (real rides only) */}
-        <Block title={ar ? "التنقل" : "Getting around"}>
-            {transport.length > 0 ? (<>
+        <Block title={ar ? "التنقل" : "Getting around"} seeAll={ga?.services.length ? `/getting-around/${cityId}` : undefined}>
+            {ga?.services.length ? (
+              <div className="flex gap-2.5 overflow-x-auto hide-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0 pb-1">
+                {ga.services.slice(0, 3).map((s) => <ServiceChip key={s.slug} s={s} ar={ar} href={`/getting-around/${cityId}#${s.slug}`} onClick={() => navigate(`/getting-around/${cityId}#${s.slug}`)} />)}
+              </div>
+            ) : transport.length > 0 ? (<>
             <ul className="divide-y divide-border">
               {transport.map((tr) => (
                 <li key={tr.id}>
