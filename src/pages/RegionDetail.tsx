@@ -207,14 +207,6 @@ const RegionDetail = () => {
     about: lang === "ar" ? regionRow.about_ar || "" : regionRow.about_en || "",
   };
 
-  /**
-   * Empty sections used to disappear, which made a quiet region look broken.
-   * One honest line naming the region is clearer than a silent gap.
-   */
-  const nothingYet = (en: string, ar: string) => ({
-    messageEn: `No ${en} listed in ${regionRow.name_en || ""} yet.`,
-    messageAr: `لا ${ar} في ${regionRow.name_ar || regionRow.name_en || ""} بعد.`,
-  });
 
 
   const dedupe = <T extends { id: string }>(arr: T[]) => {
@@ -454,10 +446,10 @@ const RegionDetail = () => {
         )}
 
         {/* Events */}
-        <EventsSection events={regionEvents} />
+        <EventsSection events={regionEvents} empty={<SectionEmptyState kind="events" placeEn={regionRow.name_en || ""} placeAr={regionRow.name_ar} />} />
 
         {/* Programs & Causes — one merged feed with per-item labels */}
-        <ProgramsCausesSection programs={regionPrograms} causes={regionCauses} />
+        <ProgramsCausesSection programs={regionPrograms} causes={regionCauses} empty={<SectionEmptyState kind="organisations" placeEn={regionRow.name_en || ""} placeAr={regionRow.name_ar} />} />
 
         {/* Experiences */}
         {regionExperiences.length > 0 ? (
