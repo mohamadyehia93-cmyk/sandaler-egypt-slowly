@@ -48,6 +48,8 @@ html, body {
     --success-foreground: 0 0% 100%;
     --warning: 28 80% 52%;
     --warning-foreground: 0 0% 100%;
+    --ochre: 36 78% 41%;
+    --ochre-soft: 36 78% 94%;
     --destructive: 358 60% 41%;
     --destructive-foreground: 0 0% 100%;
 
