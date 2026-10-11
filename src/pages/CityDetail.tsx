@@ -131,7 +131,62 @@ const CityDetail = () => {
   const catLabel = (c?: string | null) => (c ? postCategoryLabel(c)[ar ? "ar" : "en"] : null);
   const title = (r: any) => (ar ? r.title_ar || r.name_ar || r.title_en || r.name_en : r.title_en || r.name_en) || "";
 
-  const <Block title={ar ? "ابدأ من هنا" : "Start here"} seeAll={lead ? "/posts" : undefined}>
+  const [lead, ...more] = posts;
+  const thingsToDo = [
+    ...experiences.map((e) => ({ k: `e${e.id}`, path: `/experience/${e.slug || e.id}`, image: e.image, title: title(e), meta: e.provider_id ? [formatDuration(e.duration_minutes, ar), money(e.price)].filter(Boolean).join(" · ") : (ar ? "دليل" : "Guide") })),
+    ...trips.map((t) => ({ k: `t${t.id}`, path: `/trip/${t.slug || t.id}`, image: t.image, title: title(t), meta: [t.date || null, money(t.price)].filter(Boolean).join(" · ") })),
+  ];
+
+  // Map pins (existing CityOfferingsMap) — real rows only.
+  const coord = (r: any, la: string, ln: string) => (typeof r[la] === "number" && typeof r[ln] === "number" ? { lat: r[la], lng: r[ln] } : { lat: null, lng: null });
+  const T = (r: any) => ({ en: r.title_en || r.name_en || "", ar: r.title_ar || r.name_ar || r.title_en || r.name_en || "" });
+  const pins: OfferingPin[] = [
+    ...experiences.map((e) => ({ id: e.slug || e.id, slug: e.slug, category: "experience" as const, title: T(e), ...coord(e, "meeting_point_lat", "meeting_point_lng") })),
+    ...stays.map((a) => ({ id: a.slug || a.id, slug: a.slug, category: "accommodation" as const, title: T(a), ...coord(a, "latitude", "longitude") })),
+    ...products.map((p) => ({ id: p.slug || p.id, slug: p.slug, category: "product" as const, title: T(p), ...coord(p, "latitude", "longitude") })),
+    ...tours.map((a) => { const c = coord(a, "latitude", "longitude"); const st = Array.isArray(a.stops) ? a.stops.find((x: any) => Number.isFinite(Number(x?.lat)) && Number.isFinite(Number(x?.lng)) && x?.lat != null) : null; return { id: a.slug || a.id, slug: a.slug, category: "audio" as const, title: T(a), ...(c.lat == null && st ? { lat: Number(st.lat), lng: Number(st.lng) } : c) }; }),
+    ...trips.map((t) => ({ id: t.slug || t.id, slug: t.slug, category: "trip" as const, title: T(t), ...coord(t, "latitude", "longitude") })),
+    ...people.map((p) => ({ id: p.slug || p.id, slug: p.slug, category: "person" as const, title: { en: p.name_en, ar: p.name_ar || p.name_en }, ...coord(p, "latitude", "longitude") })),
+    ...causes.map((c) => ({ id: c.slug || c.id, slug: c.slug, category: "cause" as const, title: T(c), ...coord(c, "latitude", "longitude") })),
+  ] as OfferingPin[];
+
+  const peopleChips = [
+    ...cityProviders.map((p) => ({ k: `p${p.id}`, path: `/provider/${p.slug || p.id}`, name: L(p.name_en, p.name_ar), img: p.avatar, sub: null as string | null })),
+    ...orgs.map((o) => ({ k: `o${o.id}`, path: `/organization/${o.slug || o.id}`, name: L(o.name_en, o.name_ar), img: o.logo || o.image, sub: ar ? "مؤسسة" : "Organisation" })),
+    ...people.map((w) => ({ k: `w${w.id}`, path: `/person/${w.slug || w.id}`, name: L(w.name_en, w.name_ar), img: w.image, sub: L(w.role_en, w.role_ar) })),
+  ];
+
+  const highlightsEn: string[] = cityRow.highlights_en || [];
+  const highlightsLoc: string[] = (ar ? cityRow.highlights_ar : cityRow.highlights_en) || [];
+  const about = [
+    { h: ar ? "التاريخ" : "History", t: L(cityRow.history_en, cityRow.history_ar) },
+    { h: ar ? "الثقافة" : "Culture", t: L(cityRow.culture_en, cityRow.culture_ar) },
+    { h: ar ? "الجغرافيا" : "Geography", t: L(cityRow.geography_en, cityRow.geography_ar) },
+  ].filter((x) => x.t);
+  const knownFor: string[] = (ar ? cityRow.known_for_ar : cityRow.known_for_en) || [];
+
+  return (
+    <div className="min-h-screen bg-background pb-24">
+      <ListingHero images={[cityRow.image].filter(Boolean) as string[]} title={cityName} eyebrow={governorate || undefined} ar={ar} onBack={() => navigate(-1)} />
+      {credit && (credit.artist || credit.license) && (
+        <p className="mx-auto max-w-[680px] px-4 pt-2 text-[11px] text-muted-foreground" data-testid="photo-credit">
+          {ar ? "الصورة: " : "Photo: "}
+          {credit.source_url ? (
+            <a href={credit.source_url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{credit.artist || (ar ? "ويكيميديا كومنز" : "Wikimedia Commons")}</a>
+          ) : credit.artist}
+          {credit.license && <> · {credit.license}</>}
+        </p>
+      )}
+      <KeyFacts facts={facts} />
+
+      <div className="max-w-[680px] lg:max-w-[1040px] mx-auto px-4">
+        <div className="max-w-[680px]">
+          {standfirst && <p className={`article-standfirst ${ar ? "lang-ar" : "lang-en"} text-foreground pt-6 pb-2`}>{standfirst}</p>}
+          {overviewRest && <p className="text-[15px] leading-7 text-foreground/90 pb-4">{overviewRest}</p>}
+        </div>
+
+        {/* a) Start here */}
+        <Block title={ar ? "ابدأ من هنا" : "Start here"} seeAll={lead ? "/posts" : undefined}>
             {lead ? (<>
             <div className="lg:grid lg:grid-cols-[1.4fr_1fr] lg:gap-8">
               <Link to={`/post/${lead.slug || lead.id}`} className="block">
