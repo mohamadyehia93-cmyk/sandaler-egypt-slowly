@@ -10,6 +10,7 @@ import { PROVIDER_PUBLIC_COLUMNS } from "@/lib/providerColumns";
 import CityOfferingsMap, { type OfferingPin } from "@/components/CityOfferingsMap";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
+import SectionEmptyState, { type EmptyKind } from "@/components/SectionEmptyState";
 import ProgramsCausesSection from "@/components/ProgramsCausesSection";
 import Avatar from "@/components/AvatarFallback";
 import ListingHero from "@/components/listing/ListingHero";
@@ -20,8 +21,8 @@ import { fmtNumber, formatDuration, listingLocale, splitStandfirst } from "@/com
 
 /**
  * INTEGRITY RULE: the city hub shows only the city's own row and real published
- * rows linked to it. No sample listings, no invented counts; every section hides
- * itself when empty.
+ * rows linked to it. No sample listings, no invented counts; an empty offer
+ * section keeps its heading and shows one shared "nothing listed yet" line.
  */
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -125,6 +126,7 @@ const CityDetail = () => {
   const Block = ({ title, seeAll, children }: { title: string; seeAll?: string; children: ReactNode }) => (
     <Section ar={ar}><Head title={title} seeAll={seeAll} />{children}</Section>
   );
+  const Empty = ({ kind }: { kind: EmptyKind }) => <SectionEmptyState kind={kind} placeEn={cityRow.name_en || ""} placeAr={cityRow.name_ar} className="!px-0" />;
   const readTime = (m?: number | null) => (m ? (ar ? `${fmtNumber(m, ar)} دقائق قراءة` : `${m} min read`) : null);
   const catLabel = (c?: string | null) => (c ? postCategoryLabel(c)[ar ? "ar" : "en"] : null);
   const title = (r: any) => (ar ? r.title_ar || r.name_ar || r.title_en || r.name_en : r.title_en || r.name_en) || "";
@@ -184,8 +186,8 @@ const CityDetail = () => {
         </div>
 
         {/* a) Start here */}
-        {lead && (
-          <Block title={ar ? "ابدأ من هنا" : "Start here"} seeAll="/posts">
+        <Block title={ar ? "ابدأ من هنا" : "Start here"} seeAll={lead ? "/posts" : undefined}>
+            {lead ? (<>
             <div className="lg:grid lg:grid-cols-[1.4fr_1fr] lg:gap-8">
               <Link to={`/post/${lead.slug || lead.id}`} className="block">
                 <div className="aspect-video rounded-xl overflow-hidden bg-muted">{lead.image && <img src={lead.image} alt="" className="w-full h-full object-cover" />}</div>
@@ -211,19 +213,19 @@ const CityDetail = () => {
                 </ul>
               )}
             </div>
+          </>) : <Empty kind="stories" />}
           </Block>
-        )}
 
         {/* b) Things to do */}
-        {thingsToDo.length > 0 && (
-          <Block title={ar ? "أشياء تفعلها" : "Things to do"} seeAll={experiences.length ? "/?tab=experiences" : "/trips"}>
+        <Block title={ar ? "أشياء تفعلها" : "Things to do"} seeAll={thingsToDo.length ? (experiences.length ? "/?tab=experiences" : "/trips") : undefined}>
+            {thingsToDo.length > 0 ? (<>
             <WideRow>{thingsToDo.map((c) => <WideCard key={c.k} ar={ar} {...c} />)}</WideRow>
+          </>) : <Empty kind="experiences" />}
           </Block>
-        )}
 
         {/* c) Listen */}
-        {tours.length > 0 && (
-          <Block title={ar ? "استمع" : "Listen"} seeAll="/audio-tours">
+        <Block title={ar ? "استمع" : "Listen"} seeAll={tours.length ? "/audio-tours" : undefined}>
+            {tours.length > 0 ? (<>
             <WideRow>
               {tours.map((a) => (
                 <WideCard key={a.id} ar={ar} path={`/audio-tour/${a.slug || a.id}`} image={a.image} title={title(a)}
@@ -233,24 +235,24 @@ const CityDetail = () => {
                   </span>} />
               ))}
             </WideRow>
+          </>) : <Empty kind="audio" />}
           </Block>
-        )}
 
         {/* d) Where to stay */}
-        {stays.length > 0 && (
-          <Block title={ar ? "أين تقيم" : "Where to stay"}>
+        <Block title={ar ? "أين تقيم" : "Where to stay"}>
+            {stays.length > 0 ? (<>
             <WideRow>
               {stays.map((s) => (
                 <WideCard key={s.id} ar={ar} path={`/stay/${s.slug || s.id}`} image={s.image} title={title(s)}
                   meta={s.price_per_night ? `${fmtNumber(s.price_per_night, ar)} ${egp} ${ar ? "لليلة" : "per night"}` : null} />
               ))}
             </WideRow>
+          </>) : <Empty kind="stays" />}
           </Block>
-        )}
 
         {/* e) What's on */}
-        {events.length > 0 && (
-          <Block title={ar ? "ماذا يحدث" : "What’s on"} seeAll="/calendar">
+        <Block title={ar ? "ماذا يحدث" : "What’s on"} seeAll={events.length ? "/calendar" : undefined}>
+            {events.length > 0 ? (<>
             <WideRow>
               {events.map((e) => {
                 const d = new Date(String(e.start_date).slice(0, 10) + "T00:00:00");
@@ -266,24 +268,24 @@ const CityDetail = () => {
                 );
               })}
             </WideRow>
+          </>) : <Empty kind="events" />}
           </Block>
-        )}
 
         {/* f) Made here */}
-        {products.length > 0 && (
-          <Block title={ar ? "صُنع هنا" : "Made here"}>
+        <Block title={ar ? "صُنع هنا" : "Made here"}>
+            {products.length > 0 ? (<>
             <WideRow>
               {products.map((p) => (
                 <WideCard key={p.id} ar={ar} path={`/product/${p.slug || p.id}`} image={p.image} title={title(p)}
                   meta={[L(p.seller_name_en, p.seller_name_ar), money(p.price)].filter(Boolean).join(" · ")} />
               ))}
             </WideRow>
+          </>) : <Empty kind="products" />}
           </Block>
-        )}
 
         {/* Getting around (real rides only) */}
-        {transport.length > 0 && (
-          <Block title={ar ? "التنقل" : "Getting around"}>
+        <Block title={ar ? "التنقل" : "Getting around"}>
+            {transport.length > 0 ? (<>
             <ul className="divide-y divide-border">
               {transport.map((tr) => (
                 <li key={tr.id}>
@@ -294,12 +296,12 @@ const CityDetail = () => {
                 </li>
               ))}
             </ul>
+          </>) : <Empty kind="transport" />}
           </Block>
-        )}
 
         {/* g) People and organisations */}
-        {peopleChips.length > 0 && (
-          <Block title={ar ? "أشخاص ومؤسسات" : "People and organisations"} seeAll={people.length ? "/people" : undefined}>
+        <Block title={ar ? "أشخاص ومؤسسات" : "People and organisations"} seeAll={people.length ? "/people" : undefined}>
+            {peopleChips.length > 0 ? (<>
             <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0 pb-1">
               {peopleChips.map((p) => (
                 <button key={p.k} type="button" onClick={() => navigate(p.path)} className="flex-shrink-0 w-[96px] text-center">
@@ -309,11 +311,11 @@ const CityDetail = () => {
                 </button>
               ))}
             </div>
+          </>) : <Empty kind="organisations" />}
           </Block>
-        )}
 
         <div className="[&>section]:border-t [&>section]:border-border [&>section]:py-6 [&>section]:-mx-4">
-          <ProgramsCausesSection programs={programs} causes={causes} />
+          <ProgramsCausesSection programs={programs} causes={causes} empty={<SectionEmptyState kind="organisations" placeEn={cityRow.name_en || ""} placeAr={cityRow.name_ar} />} />
         </div>
 
         {/* h) Highlights */}

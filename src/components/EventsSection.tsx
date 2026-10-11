@@ -1,3 +1,4 @@
+import type React from "react";
 import { useNavigate } from "react-router-dom";
 import SectionHeader from "@/components/SectionHeader";
 import CardCarousel from "@/components/CardCarousel";
@@ -6,10 +7,13 @@ import { useI18n } from "@/lib/i18n";
 import MiniDate from "@/components/listing/MiniDate";
 import { EventRow, sortEventsUpcomingFirst } from "@/lib/eventSort";
 
-const EventsSection = ({ events }: { events: EventRow[] }) => {
+const EventsSection = ({ events, empty }: { events: EventRow[]; empty?: React.ReactNode }) => {
   const navigate = useNavigate();
   const { lang } = useI18n();
-  if (!events || events.length === 0) return null;
+  if (!events || events.length === 0) {
+    if (!empty) return null;
+    return <SectionHeader id="events" titleKey="section.events">{empty}</SectionHeader>;
+  }
   const sorted = sortEventsUpcomingFirst(events).slice(0, 6);
 
   return (

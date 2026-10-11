@@ -11,7 +11,7 @@ import { bylineNames } from "@/lib/postByline";
 // with real ones. Only real rows are rendered now.
 import { useAudioTours, useExperiences, useWhosWho, usePosts, useEvents, useTrips, useProducts, useAccommodations, useTransport, usePrograms, useCauses } from "@/hooks/useListings";
 import SectionHeader from "@/components/SectionHeader";
-import EmptySection from "@/components/EmptySection";
+import SectionEmptyState from "@/components/SectionEmptyState";
 import EventsSection from "@/components/EventsSection";
 import RegionMap from "@/components/RegionMap";
 import SmartImage from "@/components/ui/SmartImage";
@@ -207,14 +207,6 @@ const RegionDetail = () => {
     about: lang === "ar" ? regionRow.about_ar || "" : regionRow.about_en || "",
   };
 
-  /**
-   * Empty sections used to disappear, which made a quiet region look broken.
-   * One honest line naming the region is clearer than a silent gap.
-   */
-  const nothingYet = (en: string, ar: string) => ({
-    messageEn: `No ${en} listed in ${regionRow.name_en || ""} yet.`,
-    messageAr: `لا ${ar} في ${regionRow.name_ar || regionRow.name_en || ""} بعد.`,
-  });
 
 
   const dedupe = <T extends { id: string }>(arr: T[]) => {
@@ -424,12 +416,7 @@ const RegionDetail = () => {
           <RegionPostsSection posts={regionPosts} lang={lang} navigate={navigate} regionId={regionId} />
         ) : (
           <SectionHeader titleKey="section.latestPosts">
-            <EmptySection
-              {...nothingYet("stories", "توجد حكايات")}
-              actionEn="Read stories from everywhere"
-              actionAr="اقرأ حكايات من كل مكان"
-              actionHref="/posts"
-            />
+            <SectionEmptyState kind="stories" placeEn={regionRow.name_en || ""} placeAr={regionRow.name_ar} />
           </SectionHeader>
         )}
 
@@ -459,10 +446,10 @@ const RegionDetail = () => {
         )}
 
         {/* Events */}
-        <EventsSection events={regionEvents} />
+        <EventsSection events={regionEvents} empty={<SectionEmptyState kind="events" placeEn={regionRow.name_en || ""} placeAr={regionRow.name_ar} />} />
 
         {/* Programs & Causes — one merged feed with per-item labels */}
-        <ProgramsCausesSection programs={regionPrograms} causes={regionCauses} />
+        <ProgramsCausesSection programs={regionPrograms} causes={regionCauses} empty={<SectionEmptyState kind="organisations" placeEn={regionRow.name_en || ""} placeAr={regionRow.name_ar} />} />
 
         {/* Experiences */}
         {regionExperiences.length > 0 ? (
@@ -491,12 +478,7 @@ const RegionDetail = () => {
           </SectionHeader>
         ) : (
           <SectionHeader titleKey="section.experiences">
-            <EmptySection
-              {...nothingYet("experiences", "توجد تجارب")}
-              actionEn="Browse all experiences"
-              actionAr="تصفّح كل التجارب"
-              actionHref="/?tab=experiences"
-            />
+            <SectionEmptyState kind="experiences" placeEn={regionRow.name_en || ""} placeAr={regionRow.name_ar} />
           </SectionHeader>
         )}
 
@@ -528,12 +510,7 @@ const RegionDetail = () => {
           </SectionHeader>
         ) : (
           <SectionHeader titleKey="section.trips">
-            <EmptySection
-              {...nothingYet("trips", "توجد رحلات")}
-              actionEn="Browse all trips"
-              actionAr="تصفّح كل الرحلات"
-              actionHref="/trips"
-            />
+            <SectionEmptyState kind="trips" placeEn={regionRow.name_en || ""} placeAr={regionRow.name_ar} />
           </SectionHeader>
         )}
 
@@ -562,12 +539,7 @@ const RegionDetail = () => {
           </SectionHeader>
         ) : (
           <SectionHeader titleKey="section.products">
-            <EmptySection
-              {...nothingYet("products", "توجد منتجات")}
-              actionEn="Do you make things here? Join Sandal"
-              actionAr="تصنع منتجات هنا؟ انضم إلى صندل"
-              actionHref="/welcome"
-            />
+            <SectionEmptyState kind="products" placeEn={regionRow.name_en || ""} placeAr={regionRow.name_ar} />
           </SectionHeader>
         )}
 
@@ -594,12 +566,7 @@ const RegionDetail = () => {
           </SectionHeader>
         ) : (
           <SectionHeader titleKey="section.placesToStay">
-            <EmptySection
-              {...nothingYet("stays", "توجد إقامات")}
-              actionEn="Do you host here? Join Sandal"
-              actionAr="تستضيف هنا؟ انضم إلى صندل"
-              actionHref="/welcome"
-            />
+            <SectionEmptyState kind="stays" placeEn={regionRow.name_en || ""} placeAr={regionRow.name_ar} />
           </SectionHeader>
         )}
 
@@ -626,12 +593,7 @@ const RegionDetail = () => {
           </SectionHeader>
         ) : (
           <SectionHeader titleKey="section.gettingAround">
-            <EmptySection
-              {...nothingYet("rides", "توجد وسائل تنقّل")}
-              actionEn="Do you drive here? Join Sandal"
-              actionAr="تعمل بالنقل هنا؟ انضم إلى صندل"
-              actionHref="/welcome"
-            />
+            <SectionEmptyState kind="transport" placeEn={regionRow.name_en || ""} placeAr={regionRow.name_ar} />
           </SectionHeader>
         )}
 
@@ -664,12 +626,7 @@ const RegionDetail = () => {
           </SectionHeader>
         ) : (
           <SectionHeader titleKey="section.audioTours">
-            <EmptySection
-              {...nothingYet("audio tours", "توجد جولات صوتية")}
-              actionEn="Browse all audio tours"
-              actionAr="تصفّح كل الجولات الصوتية"
-              actionHref="/audio-tours"
-            />
+            <SectionEmptyState kind="audio" placeEn={regionRow.name_en || ""} placeAr={regionRow.name_ar} />
           </SectionHeader>
         )}
 
