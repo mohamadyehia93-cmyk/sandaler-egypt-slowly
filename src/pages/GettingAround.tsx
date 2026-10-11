@@ -7,6 +7,7 @@ import { useI18n } from "@/lib/i18n";
 import { useTransport } from "@/hooks/useListings";
 import { BADGES, checkedLabel, useCityGettingAround, type Badge } from "@/lib/gettingAround";
 import ServiceChip from "@/components/gettingAround/ServiceChip";
+import CityCentreMap from "@/components/gettingAround/CityCentreMap";
 import SectionEmptyState from "@/components/SectionEmptyState";
 import NotFoundView from "@/components/NotFound";
 import DetailSkeleton from "@/components/DetailSkeleton";
@@ -28,7 +29,7 @@ const GettingAround = () => {
   const { data: city, isLoading: lc } = useQuery({
     queryKey: ["city", citySlug],
     enabled: !!citySlug,
-    queryFn: async () => (await supabase.from("cities").select("id,name_en,name_ar").eq("id", citySlug!).maybeSingle()).data,
+    queryFn: async () => (await supabase.from("cities").select("id,name_en,name_ar,latitude,longitude").eq("id", citySlug!).maybeSingle()).data,
   });
   const { data, isLoading } = useCityGettingAround(citySlug);
   const { data: transport = [] } = useTransport();
@@ -193,6 +194,13 @@ const GettingAround = () => {
             <ul className="list-disc ps-5 space-y-2 text-[15px] leading-7 text-foreground/90">
               {notes.map((n, i) => <li key={i}>{n}</li>)}
             </ul>
+          </section>
+        )}
+
+        {city && (city as any).latitude != null && (city as any).longitude != null && (
+          <section className="mt-8 pt-6 border-t border-border">
+            <h2 className={`listing-h2 ${ar ? "lang-ar" : "lang-en"} text-foreground mb-3`}>{ar ? `خريطة ${city.name_ar || city.name_en}` : `Map of ${city.name_en}`}</h2>
+            <CityCentreMap cityId={city.id} lat={Number((city as any).latitude)} lng={Number((city as any).longitude)} nameEn={city.name_en} title={ar ? `خريطة ${city.name_ar || city.name_en}` : `Map of ${city.name_en}`} />
           </section>
         )}
       </div>

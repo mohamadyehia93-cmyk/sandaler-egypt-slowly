@@ -1,0 +1,5 @@
+ALTER TABLE public.cities ADD COLUMN IF NOT EXISTS latitude numeric;
+ALTER TABLE public.cities ADD COLUMN IF NOT EXISTS longitude numeric;
+UPDATE public.cities c SET latitude = v.lat, longitude = v.lng FROM (VALUES
+('suez',29.9668,32.5498),('ismailia',30.5833,32.2667),('port-said',31.2653,32.3019),('bilbeis',30.4197,31.5600),('tanta',30.7865,31.0004),('el-mahalla',30.9676,31.1667),('mansoura',31.0409,31.3785),('desouk',31.1340,30.6468),('fuwwah',31.2057,30.5519),('damietta',31.4165,31.8133),('manzala',31.1600,31.9333),('rosetta',31.4047,30.4160),('fayoum',29.3084,30.8428),('minya',28.1099,30.7503),('assiut',27.1800,31.1837),('sohag',26.5569,31.6957),('qena',26.1551,32.7160),('luxor',25.6872,32.6396),('esna',25.2933,32.5536),('edfu',24.9780,32.8730),('aswan',24.0889,32.8998),('marsa-matrouh',31.3543,27.2373),('siwa',29.2037,25.5195),('dahab',28.5091,34.5136),('el-arish',31.1326,33.8018),('hurghada',27.2579,33.8116),('quseir',26.1047,34.2779),('marsa-alam',25.0657,34.8900)
+) AS v(id,lat,lng) WHERE c.id = v.id;
