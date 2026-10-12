@@ -85,6 +85,13 @@
       "when": 1791783520056,
       "tag": "0011_stay_badge_stay_nearby",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791800152072,
+      "tag": "0012_posts_editor_choice",
+      "breakpoints": true
     }
   ]
 }

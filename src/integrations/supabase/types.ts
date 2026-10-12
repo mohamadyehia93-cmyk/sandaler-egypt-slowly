@@ -2125,6 +2125,7 @@ export type Database = {
           id: string
           image: string | null
           images: string[] | null
+          is_editor_choice: boolean | null
           read_time_minutes: number | null
           region_id: string | null
           slug: string | null
@@ -2152,6 +2153,7 @@ export type Database = {
           id?: string
           image?: string | null
           images?: string[] | null
+          is_editor_choice?: boolean | null
           read_time_minutes?: number | null
           region_id?: string | null
           slug?: string | null
@@ -2179,6 +2181,7 @@ export type Database = {
           id?: string
           image?: string | null
           images?: string[] | null
+          is_editor_choice?: boolean | null
           read_time_minutes?: number | null
           region_id?: string | null
           slug?: string | null
