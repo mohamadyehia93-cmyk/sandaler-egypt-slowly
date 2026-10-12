@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export type StayBadge =
   | "pick-view" | "pick-beach" | "pick-resort" | "pick-service" | "pick-price" | "pick-location" | "pick-local"
-  | "not-recommended" | "seasonal" | "booking-only";
+  | "not-recommended" | "seasonal" | "booking-only" | "stay-nearby";
 
 export const STAY_BADGES: Record<StayBadge, { en: string; ar: string; caution: boolean }> = {
   "pick-view": { en: "Pick for the view", ar: "الأجمل إطلالة", caution: false },
@@ -20,6 +20,7 @@ export const STAY_BADGES: Record<StayBadge, { en: string; ar: string; caution: b
   "not-recommended": { en: "Not recommended", ar: "غير مُستحسن", caution: true },
   seasonal: { en: "Seasonal", ar: "موسمي", caution: true },
   "booking-only": { en: "Booking sites only", ar: "عبر مواقع الحجز فقط", caution: true },
+  "stay-nearby": { en: "Stay nearby", ar: "أقم في مدينة قريبة", caution: true },
 };
 
 export const useCityStays = (cityId?: string) =>

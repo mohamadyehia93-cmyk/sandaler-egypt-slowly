@@ -1,0 +1,1 @@
+ALTER TYPE public.stay_badge ADD VALUE IF NOT EXISTS 'stay-nearby';

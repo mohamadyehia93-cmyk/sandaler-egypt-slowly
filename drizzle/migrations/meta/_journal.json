@@ -78,6 +78,13 @@
       "when": 1791761150052,
       "tag": "0010_city_stays_advisory",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791783520056,
+      "tag": "0011_stay_badge_stay_nearby",
+      "breakpoints": true
     }
   ]
 }
